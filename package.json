@@ -1,10 +1,28 @@
 {
   "name": "farrow",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "description": "Functional style web framework for node.js",
   "main": "index.js",
+  "engines": {
+    "node": ">=10.14.0"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
+    "prebuild": "rimraf dist",
+    "build:ts": "tsc --module commonjs",
+    "build": "npm run build:ts && npm run copy",
+    "copy": "copyfiles README.md package.json dist",
+    "start": "tsc -w --module commonjs",
+    "test": "jest",
+    "test:coverage": "jest --coverage",
+    "test:watch": "jest --coverage --watch",
+    "test:prod": "npm run lint && npm run test -- --no-cache",
+    "report-coverage": "cat ./coverage/lcov.info | coveralls",
+    "commit": "git-cz",
+    "semantic-release": "semantic-release",
+    "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
+    "precommit": "lint-staged",
+    "travis-deploy-once": "travis-deploy-once"
   },
   "repository": {
     "type": "git",
@@ -12,7 +30,100 @@
   },
   "keywords": [],
   "author": "Jade Gu<guyingjie129@163.com>",
-  "license": "ISC",
+  "lint-staged": {
+    "{src,test}/**/*.ts": []
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-conventional-changelog"
+    }
+  },
+  "jest": {
+    "transform": {
+      ".(ts|tsx|js|jsx)": "ts-jest"
+    },
+    "testEnvironment": "jsdom",
+    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
+    "moduleFileExtensions": [
+      "ts",
+      "tsx",
+      "js",
+      "jsx"
+    ],
+    "coveragePathIgnorePatterns": [
+      "/node_modules/",
+      "/test/"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 90,
+        "functions": 95,
+        "lines": 95,
+        "statements": 95
+      }
+    },
+    "collectCoverageFrom": [
+      "src/*.{js,ts}"
+    ]
+  },
+  "prettier": {
+    "semi": false,
+    "singleQuote": true
+  },
+  "commitlint": {
+    "extends": [
+      "@commitlint/config-conventional"
+    ]
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^8.3.5",
+    "@commitlint/config-conventional": "^7.1.2",
+    "@types/body-parser": "^1.19.0",
+    "@types/co-body": "^5.1.0",
+    "@types/debug": "^4.1.5",
+    "@types/express": "^4.17.7",
+    "@types/jest": "^25.2.1",
+    "@types/morgan": "^1.9.1",
+    "@types/node": "^10.17.21",
+    "@types/node-fetch": "^2.5.7",
+    "@types/qs": "^6.9.2",
+    "colors": "^1.3.2",
+    "commitizen": "^4.1.2",
+    "copyfiles": "^2.2.0",
+    "coveralls": "^3.1.0",
+    "cross-env": "^5.2.0",
+    "cz-conventional-changelog": "^2.1.0",
+    "husky": "^1.0.1",
+    "jest": "^25.2.1",
+    "jest-config": "^25.2.1",
+    "lint-staged": "^8.0.0",
+    "lodash.camelcase": "^4.3.0",
+    "node-fetch": "^2.6.0",
+    "prettier": "^1.14.3",
+    "prompt": "^1.0.0",
+    "react": "^16.9.0",
+    "react-dom": "^16.9.0",
+    "replace-in-file": "^3.4.2",
+    "rimraf": "^2.6.2",
+    "semantic-release": "^15.9.16",
+    "shelljs": "^0.8.4",
+    "travis-deploy-once": "^5.0.9",
+    "ts-jest": "^25.5.0",
+    "ts-node": "^8.10.1",
+    "tslint": "^5.11.0",
+    "tslint-config-prettier": "^1.15.0",
+    "tslint-config-standard": "^8.0.1",
+    "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "body-parser": "^1.19.0",
+    "debug": "^4.1.1",
+    "express": "^4.17.1",
+    "morgan": "^1.10.0",
+    "path-to-regexp": "^6.1.0",
+    "qs": "^6.9.4"
+  },
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/Lucifier129/farrow/issues"
   },

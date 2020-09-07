@@ -1,161 +1,239 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.createPipeline = exports.runHandler = exports.createContextManager = void 0;
+const ContextCellSymbol = Symbol('ContextCell');
+const createContextCell = (value) => {
+    let id = Symbol('ContextID');
+    let create = (value) => {
+        return {
+            id,
+            [ContextCellSymbol]: value,
+            create
+        };
+    };
+    return create(value);
+};
+const toRawContextStorage = (ContextStorage) => {
+    let result = {};
+    for (let key in ContextStorage) {
+        result[key] = ContextStorage[key][ContextCellSymbol];
+    }
     return result;
 };
-var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
-    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
-    return new (P || (P = Promise))(function (resolve, reject) {
-        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
-        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
-        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
-        step((generator = generator.apply(thisArg, _arguments || [])).next());
+const ContextManagerRequest = Symbol('context.manager.request');
+const createCellMap = (storage) => {
+    let cellMap = new Map();
+    Object.values(storage).forEach(cell => {
+        cellMap.set(cell.id, cell);
     });
+    return cellMap;
 };
-var __generator = (this && this.__generator) || function (thisArg, body) {
-    var _ = { label: 0, sent: function() { if (t[0] & 1) throw t[1]; return t[1]; }, trys: [], ops: [] }, f, y, t, g;
-    return g = { next: verb(0), "throw": verb(1), "return": verb(2) }, typeof Symbol === "function" && (g[Symbol.iterator] = function() { return this; }), g;
-    function verb(n) { return function (v) { return step([n, v]); }; }
-    function step(op) {
-        if (f) throw new TypeError("Generator is already executing.");
-        while (_) try {
-            if (f = 1, y && (t = op[0] & 2 ? y["return"] : op[0] ? y["throw"] || ((t = y["return"]) && t.call(y), 0) : y.next) && !(t = t.call(y, op[1])).done) return t;
-            if (y = 0, t) op = [op[0] & 2, t.value];
-            switch (op[0]) {
-                case 0: case 1: t = op; break;
-                case 4: _.label++; return { value: op[1], done: false };
-                case 5: _.label++; y = op[1]; op = [0]; continue;
-                case 7: op = _.ops.pop(); _.trys.pop(); continue;
-                default:
-                    if (!(t = _.trys, t = t.length > 0 && t[t.length - 1]) && (op[0] === 6 || op[0] === 2)) { _ = 0; continue; }
-                    if (op[0] === 3 && (!t || (op[1] > t[0] && op[1] < t[3]))) { _.label = op[1]; break; }
-                    if (op[0] === 6 && _.label < t[1]) { _.label = t[1]; t = op; break; }
-                    if (t && _.label < t[2]) { _.label = t[2]; _.ops.push(op); break; }
-                    if (t[2]) _.ops.pop();
-                    _.trys.pop(); continue;
+exports.createContextManager = (ContextStorage = {}) => {
+    let cellMap = createCellMap(ContextStorage);
+    let read = (inputCell) => {
+        let target = cellMap.get(inputCell.id);
+        if (target) {
+            return target[ContextCellSymbol];
+        }
+        return inputCell[ContextCellSymbol];
+    };
+    let write = (inputCell, value) => {
+        cellMap.set(inputCell.id, inputCell.create(value));
+    };
+    let run = (gen) => {
+        let next = (result) => {
+            if (result.done) {
+                return Promise.resolve(result.value);
             }
-            op = body.call(thisArg, _);
-        } catch (e) { op = [6, e]; y = 0; } finally { f = t = 0; }
-        if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
-    }
+            if (result.value !== ContextManagerRequest) {
+                throw new Error(`Please use yield* instead of yield`);
+            }
+            return gen.next(manager).then(next);
+        };
+        return gen.next(manager).then(next);
+    };
+    let manager = Object.freeze({
+        read,
+        write,
+        run
+    });
+    return manager;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
+exports.runHandler = (handler) => {
+    let latestIndex = -1;
+    let dispatch = (index) => {
+        if (index <= latestIndex) {
+            throw new Error(`Called next() multiple times`);
+        }
+        latestIndex = index;
+        try {
+            return handler(dispatch.bind(null, index + 1), index);
+        }
+        catch (error) {
+            return Promise.reject(error);
+        }
+    };
+    return dispatch(0);
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-var express_1 = __importDefault(require("express"));
-var bodyParser = __importStar(require("body-parser"));
-var core_1 = require("./core");
-var morgan_1 = __importDefault(require("morgan"));
-var userDb = [
-    {
-        id: 0,
-        name: 'user0'
-    },
-    {
-        id: 1,
-        name: 'user1'
-    }
-];
-var delay = function (time) {
-    if (time === void 0) { time = 0; }
-    return new Promise(function (resolve) { return setTimeout(resolve, time); });
+const createHook = (f) => {
+    return f;
 };
-var useUser = function () {
-    var res = core_1.useRes();
-    var url = core_1.useUrl();
-    core_1.useMiddleware(function (next) { return __awaiter(void 0, void 0, void 0, function () {
-        var start;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    start = Date.now();
-                    return [4 /*yield*/, next()];
-                case 1:
-                    _a.sent();
-                    console.log('time', Date.now() - start);
-                    return [2 /*return*/];
+const createMiddleware = (f) => {
+    return f;
+};
+exports.createPipeline = () => {
+    let middlewares = [];
+    let isRan = false;
+    let use = (middleware) => {
+        if (isRan) {
+            throw new Error(`Can't add middleware after running`);
+        }
+        middlewares.push(middleware);
+    };
+    let run = (manager = exports.createContextManager()) => {
+        isRan = true;
+        return exports.runHandler((next, index) => {
+            if (index >= middlewares.length) {
+                return Promise.resolve();
+            }
+            else {
+                let middleware = middlewares[index];
+                let result = middleware(next, manager);
+                if (result instanceof Promise) {
+                    return result;
+                }
+                else {
+                    return manager.run(result);
+                }
             }
         });
-    }); });
-    var userId = core_1.useMatchPath('/user/:id', function (params) {
-        var num = Number(params.id);
-        if (Number.isNaN(num)) {
-            return core_1.Err("Expected user id to be a number, but received " + params.id);
+    };
+    return Object.freeze({
+        use,
+        run
+    });
+};
+const usePipeline = createHook(async function* (pipeline) {
+    let manager = yield* useManager();
+    await pipeline.run(manager);
+});
+const useManager = createHook(async function* () {
+    let manager = yield ContextManagerRequest;
+    return manager;
+});
+const useCell = createHook(async function* (ContextCell) {
+    let manager = yield* useManager();
+    let getValue = () => {
+        return manager.read(ContextCell);
+    };
+    let setValue = (value) => {
+        manager.write(ContextCell, value);
+    };
+    return [getValue, setValue];
+});
+const useCellValue = createHook(async function* (ContextCell) {
+    let [getValue] = yield* useCell(ContextCell);
+    return getValue();
+});
+const CountCell = createContextCell(20);
+const useCounter = createHook(async function* () {
+    let [getCount, setCount] = yield* useCell(CountCell);
+    let increBy = (step) => {
+        let count = getCount();
+        setCount(count + step);
+        return count;
+    };
+    return {
+        getCount,
+        setCount,
+        increBy
+    };
+});
+const delay = (duration) => {
+    return new Promise(resolve => {
+        setTimeout(resolve, duration);
+    });
+};
+const log = (name) => {
+    return createMiddleware(async function (next) {
+        let start = Date.now();
+        await next();
+        let time = Date.now() - start;
+        console.log(name, `time: ${time.toFixed(2)}ms`);
+    });
+};
+const logCell = (name, Cell) => {
+    return createMiddleware(async function (next, ctx) {
+        let [getValue] = await ctx.run(useCell(Cell));
+        let start = Date.now();
+        let before = getValue();
+        await next();
+        let time = Date.now() - start;
+        let after = getValue();
+        console.log(name, {
+            time,
+            before,
+            after
+        });
+    });
+};
+const TextCell = createContextCell('');
+const createTextPipeline = () => {
+    let pipeline = exports.createPipeline();
+    pipeline.use(logCell('text', TextCell));
+    pipeline.use(async function* () {
+        let [_, setText] = yield* useCell(TextCell);
+        setText(`some text`);
+    });
+    return pipeline;
+};
+const EnvCell = createContextCell('fat');
+const test = async () => {
+    let pipeline = exports.createPipeline();
+    pipeline.use(log('test'));
+    pipeline.use(async function (next, ctx) {
+        let counter = await ctx.run(useCounter());
+        console.log('before', counter.getCount());
+        await next();
+        console.log('after', counter.getCount());
+    });
+    pipeline.use(async function* (next) {
+        let env = yield* useCellValue(EnvCell);
+        if (env === 'fat') {
+            let textPipeline = createTextPipeline();
+            yield* usePipeline(textPipeline);
         }
         else {
-            return core_1.Ok(num);
+            await next();
         }
     });
-    var fieldName = core_1.useMatchQuery(function (query) {
-        var _a;
-        return core_1.Ok((_a = query.field) !== null && _a !== void 0 ? _a : 'name');
-    });
-    var userRequestGuard = core_1.combine([userId, fieldName], function (userId, name) {
-        return {
-            userId: userId,
-            name: name
-        };
-    });
-    core_1.useRoute(userRequestGuard, function (params) { return __awaiter(void 0, void 0, void 0, function () {
-        var user;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0:
-                    user = userDb.find(function (user) { return user.id === params.userId; });
-                    return [4 /*yield*/, delay(1000)];
-                case 1:
-                    _a.sent();
-                    if (user) {
-                        res.json({
-                            status: {
-                                success: true,
-                                message: '',
-                                requestUrl: url.href
-                            },
-                            data: user
-                        });
-                    }
-                    else {
-                        res.json({
-                            status: {
-                                success: false,
-                                message: "user not found: " + params.userId,
-                                requestUrl: url.href
-                            },
-                            data: null
-                        });
-                    }
-                    return [2 /*return*/];
-            }
+    Array.from({ length: 1000 }).forEach(() => {
+        pipeline.use(async function* (next) {
+            yield* useCounter();
+            yield* useCellValue(EnvCell);
+            await next();
         });
-    }); });
+    });
+    pipeline.use(async function* () {
+        let counter = yield* useCounter();
+        let env = yield* useCellValue(EnvCell);
+        await delay(500);
+        console.log('env', { env });
+        counter.increBy(10);
+    });
+    let manager = exports.createContextManager({
+        count: CountCell.create(11),
+        env: EnvCell.create('prod'),
+        text: TextCell.create('initial text')
+    });
+    await pipeline.run(manager);
+    let count = manager.read(CountCell);
+    let env = manager.read(EnvCell);
+    let text = manager.read(TextCell);
+    console.log('values', {
+        count,
+        env,
+        text
+    });
 };
-var app = express_1.default();
-var port = 3000;
-app.use(morgan_1.default('dev'));
-// parse application/x-www-form-urlencoded
-// tslint:disable-next-line: deprecation
-app.use(bodyParser.urlencoded({ extended: false }));
-// parse application/json
-// tslint:disable-next-line: deprecation
-app.use(bodyParser.json());
-app.use(core_1.createExpressMiddleware(function () {
-    useUser();
-}));
-app.listen(port, function () { return console.log("Example app listening at http://localhost:" + port); });
+// test()

@@ -1,22 +1,19 @@
-/// <reference types="node" />
-import { Request, Response, RequestHandler } from 'express';
+import { RequestHandler } from 'express';
 import { Path } from 'path-to-regexp';
-import { URL } from 'url';
-import { ContextItem, ContextValue, Context } from './context';
-import { Ref, RefValue } from './ref';
-import { Middlewares, Next } from './middleware';
-export declare const useRequest: () => Request, useResponse: () => Response, useContext: <T extends Context<any>>(context: T) => ContextValue<T>, useRef: <T extends Ref<any>>(ref: T) => RefValue<T>, useMiddleware: (...middlewares: Middlewares) => void;
+import { ContextItem } from './context';
+import { Next } from './middleware';
+export declare const useRequest: any, useResponse: any, useContext: any, useRef: any, useMiddleware: any;
 declare type CreateRequestListenerOptions = {
     context?: ContextItem;
 };
 export declare const createExpressMiddleware: (initializer: () => void, options?: CreateRequestListenerOptions) => RequestHandler;
-export declare const useReq: () => Request;
-export declare const useRes: () => Response;
-export declare const useHeaders: () => import("http").IncomingHttpHeaders;
-export declare const useUrl: () => URL;
+export declare const useReq: any;
+export declare const useRes: any;
+export declare const useHeaders: () => any;
+export declare const useUrl: () => any;
 export declare type MiddlewareWithParams<P extends object = object> = (params: P, next: Next) => Promise<void>;
 export declare type MiddlewaresWithParams<P extends object = object> = MiddlewareWithParams<P>[];
-export declare const useRoute: <T>(pattern: Result<T, string>, handler: (t: T, next: Next) => Promise<void>) => void;
+export declare const useRoute: <T>(pattern: Result<T, string>, handler: (t: T, next: any) => Promise<void>) => void;
 declare type Err<T> = {
     kind: 'Err';
     value: T;

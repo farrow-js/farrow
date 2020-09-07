@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
     "moduleResolution": "node",
-    "target": "es5",
+    "target": "ES2018",
     "module": "es2015",
     "lib": ["ES2015", "ES2016", "ES2017", "ES2018"],
     "jsx": "react",

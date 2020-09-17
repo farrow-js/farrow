@@ -1,33 +1,30 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createPipeline = exports.isPipeline = exports.createMiddleware = void 0;
+exports.createPipeline = exports.isPipeline = void 0;
 const counter_1 = require("./counter");
-const createMiddleware = (f) => {
-    return f;
-};
-exports.createMiddleware = createMiddleware;
 const isPipeline = (input) => {
     return !!(input && input[PipelineSymbol]);
 };
 exports.isPipeline = isPipeline;
 const PipelineSymbol = Symbol('pipeline');
+const identity = (a) => a;
 const createPipeline = (defaultValue = PipelineSymbol) => {
     let middlewares = [];
-    let counter = counter_1.createCounter((index, input, next) => {
-        if (index >= middlewares.length) {
-            if (defaultValue !== PipelineSymbol) {
-                return defaultValue;
-            }
-            throw new Error(`Expect returning a value, but all middlewares just calling next()`);
-        }
-        let middleware = middlewares[index];
-        let result = middleware(input, next);
-        return result;
-    });
     let add = (middleware) => {
         middlewares.push(middleware);
     };
-    let run = (input) => {
+    let run = (input, enhancer = identity) => {
+        let counter = counter_1.createCounter((index, input, next) => {
+            if (index >= middlewares.length) {
+                if (defaultValue !== PipelineSymbol) {
+                    return defaultValue;
+                }
+                throw new Error(`Expect returning a value, but all middlewares just calling next()`);
+            }
+            let middleware = enhancer(middlewares[index]);
+            let result = middleware(input, next);
+            return result;
+        });
         return counter.start(input);
     };
     return {

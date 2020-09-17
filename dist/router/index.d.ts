@@ -1,6 +1,5 @@
 /// <reference types="node" />
 import type { Stream } from 'stream';
-import { Middleware, ContextManagerGenerator } from '../core';
 import * as Schema from '../schema';
 export declare type RouterOptions<T extends Schema.MaybeNullable = Schema.MaybeNullable> = {
     pathname: string;
@@ -28,8 +27,6 @@ export declare type ResponseInfo = {
     body?: Buffer | Stream | string | number | boolean | object | null;
 };
 export declare const createRouterPipeline: <T extends RouterOptions<Schema.MaybeNullable>>(options: T) => {
-    middleware: Middleware<RequestInfo, ContextManagerGenerator<ResponseInfo>>;
-    add: (input: Middleware<Schema.RawType<RouterSchema<T> & {
-        pathname: Schema.String;
-    }>, ContextManagerGenerator<ResponseInfo>>) => void;
+    middleware: any;
+    add: any;
 };

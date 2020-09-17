@@ -1,22 +1,20 @@
-import { Pipeline, createPipeline, isPipeline, Next, Middleware, Middlewares } from './pipeline';
-import { createContextCell, createContextManager, ContextStorage, isContextManager, ContextCell, ContextManager, ContextManagerGenerator, assertContextManager, assertContextCell, isContextCell } from './context';
-export { createPipeline, Pipeline, Next, Middleware, Middlewares, isPipeline };
-export { createContextCell, createContextManager, isContextManager, isContextCell, ContextStorage, ContextCell, ContextManager, ContextManagerGenerator, assertContextManager, assertContextCell, };
-export declare type ContextualPipelineOptions<O = unknown> = {
+import { createContextCell, createContextManager, ContextStorage, ContextCell, ContextManager, useCell, useCellValue, useManager } from './context';
+import { Next } from './counter';
+export { Next };
+export { createContextCell, createContextManager, ContextStorage, ContextCell, ContextManager, useCellValue, useCell, useManager, };
+export declare type Middleware<I = unknown, O = unknown> = (input: I, next: Next<I, O>) => O;
+export declare type Middlewares<I = unknown, O = unknown> = Middleware<I, O>[];
+export declare const isPipeline: (input: any) => input is Pipeline<unknown, unknown>;
+declare const PipelineSymbol: unique symbol;
+declare type PipelineSymbol = typeof PipelineSymbol;
+export declare type PipelineOptions<O = unknown> = {
     defaultOutput?: O;
     contexts?: ContextStorage;
 };
-export declare type ContextualPipeline<I = unknown, O = unknown> = {
-    add: (input: Middleware<I, ContextManagerGenerator<O>>) => void;
-    run: (input: I, currentManager?: ContextManager) => Promise<O>;
+export declare type MaybePromise<T> = T | Promise<T>;
+export declare type Pipeline<I = unknown, O = unknown> = {
+    [PipelineSymbol]: true;
+    add: (input: Middleware<I, MaybePromise<O>>) => void;
+    run: (input: I, manager?: ContextManager) => Promise<O>;
 };
-export declare const createContextualPipeline: <I, O>(options?: ContextualPipelineOptions<O>) => ContextualPipeline<I, O>;
-export declare const createMiddleware: <I, O>(middleware: Middleware<I, ContextManagerGenerator<O>>) => Middleware<I, ContextManagerGenerator<O>>;
-declare type HookFunction<Args extends unknown[] = unknown[], T = unknown> = (...args: Args) => ContextManagerGenerator<T>;
-export declare const createHook: <Args extends unknown[], T>(f: HookFunction<Args, T>) => (...args: Args) => ContextManagerGenerator<T>;
-export declare const useManager: () => ContextManagerGenerator<ContextManager>;
-export declare const useCell: <T>(ContextCell: ContextCell<T>) => ContextManagerGenerator<{
-    value: T;
-}>;
-export declare const usePipeline: <I, O>(pipeline: ContextualPipeline<I, O>, input: I) => ContextManagerGenerator<O>;
-export declare const useCellValue: <T>(ContextCell: ContextCell<T>) => ContextManagerGenerator<T>;
+export declare const createPipeline: <I, O>(options?: PipelineOptions<O> | undefined) => Pipeline<I, O>;

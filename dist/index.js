@@ -1,151 +1,15 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createPipeline = exports.runHandler = exports.createContextManager = void 0;
-const ContextCellSymbol = Symbol('ContextCell');
-const createContextCell = (value) => {
-    let id = Symbol('ContextID');
-    let create = (value) => {
-        return {
-            id,
-            [ContextCellSymbol]: value,
-            create
-        };
-    };
-    return create(value);
-};
-const toRawContextStorage = (ContextStorage) => {
-    let result = {};
-    for (let key in ContextStorage) {
-        result[key] = ContextStorage[key][ContextCellSymbol];
-    }
-    return result;
-};
-const ContextManagerRequest = Symbol('context.manager.request');
-const createCellMap = (storage) => {
-    let cellMap = new Map();
-    Object.values(storage).forEach(cell => {
-        cellMap.set(cell.id, cell);
-    });
-    return cellMap;
-};
-exports.createContextManager = (ContextStorage = {}) => {
-    let cellMap = createCellMap(ContextStorage);
-    let read = (inputCell) => {
-        let target = cellMap.get(inputCell.id);
-        if (target) {
-            return target[ContextCellSymbol];
-        }
-        return inputCell[ContextCellSymbol];
-    };
-    let write = (inputCell, value) => {
-        cellMap.set(inputCell.id, inputCell.create(value));
-    };
-    let run = (gen) => {
-        let next = (result) => {
-            if (result.done) {
-                return Promise.resolve(result.value);
-            }
-            if (result.value !== ContextManagerRequest) {
-                throw new Error(`Please use yield* instead of yield`);
-            }
-            return gen.next(manager).then(next);
-        };
-        return gen.next(manager).then(next);
-    };
-    let manager = Object.freeze({
-        read,
-        write,
-        run
-    });
-    return manager;
-};
-exports.runHandler = (handler) => {
-    let latestIndex = -1;
-    let dispatch = (index) => {
-        if (index <= latestIndex) {
-            throw new Error(`Called next() multiple times`);
-        }
-        latestIndex = index;
-        try {
-            return handler(dispatch.bind(null, index + 1), index);
-        }
-        catch (error) {
-            return Promise.reject(error);
-        }
-    };
-    return dispatch(0);
-};
-const createHook = (f) => {
-    return f;
-};
-const createMiddleware = (f) => {
-    return f;
-};
-exports.createPipeline = () => {
-    let middlewares = [];
-    let isRan = false;
-    let use = (middleware) => {
-        if (isRan) {
-            throw new Error(`Can't add middleware after running`);
-        }
-        middlewares.push(middleware);
-    };
-    let run = (manager = exports.createContextManager()) => {
-        isRan = true;
-        return exports.runHandler((next, index) => {
-            if (index >= middlewares.length) {
-                return Promise.resolve();
-            }
-            else {
-                let middleware = middlewares[index];
-                let result = middleware(next, manager);
-                if (result instanceof Promise) {
-                    return result;
-                }
-                else {
-                    return manager.run(result);
-                }
-            }
-        });
-    };
-    return Object.freeze({
-        use,
-        run
-    });
-};
-const usePipeline = createHook(async function* (pipeline) {
-    let manager = yield* useManager();
-    await pipeline.run(manager);
-});
-const useManager = createHook(async function* () {
-    let manager = yield ContextManagerRequest;
-    return manager;
-});
-const useCell = createHook(async function* (ContextCell) {
-    let manager = yield* useManager();
-    let getValue = () => {
-        return manager.read(ContextCell);
-    };
-    let setValue = (value) => {
-        manager.write(ContextCell, value);
-    };
-    return [getValue, setValue];
-});
-const useCellValue = createHook(async function* (ContextCell) {
-    let [getValue] = yield* useCell(ContextCell);
-    return getValue();
-});
-const CountCell = createContextCell(20);
-const useCounter = createHook(async function* () {
-    let [getCount, setCount] = yield* useCell(CountCell);
+const pipeline_1 = require("./core/pipeline");
+const CountCell = pipeline_1.createContextCell(20);
+const useCounter = pipeline_1.createHook(async function* () {
+    let count = yield* pipeline_1.useCell(CountCell);
     let increBy = (step) => {
-        let count = getCount();
-        setCount(count + step);
+        count.value += step;
         return count;
     };
     return {
-        getCount,
-        setCount,
+        count,
         increBy
     };
 });
@@ -155,7 +19,7 @@ const delay = (duration) => {
     });
 };
 const log = (name) => {
-    return createMiddleware(async function (next) {
+    return pipeline_1.createMiddleware(async function* (next) {
         let start = Date.now();
         await next();
         let time = Date.now() - start;
@@ -163,13 +27,13 @@ const log = (name) => {
     });
 };
 const logCell = (name, Cell) => {
-    return createMiddleware(async function (next, ctx) {
-        let [getValue] = await ctx.run(useCell(Cell));
+    return pipeline_1.createMiddleware(async function* (next) {
+        let cell = yield* pipeline_1.useCell(Cell);
         let start = Date.now();
-        let before = getValue();
+        let before = cell.value;
         await next();
         let time = Date.now() - start;
-        let after = getValue();
+        let after = cell.value;
         console.log(name, {
             time,
             before,
@@ -177,51 +41,53 @@ const logCell = (name, Cell) => {
         });
     });
 };
-const TextCell = createContextCell('');
+const TextCell = pipeline_1.createContextCell('');
 const createTextPipeline = () => {
-    let pipeline = exports.createPipeline();
+    let pipeline = pipeline_1.createPipeline();
     pipeline.use(logCell('text', TextCell));
     pipeline.use(async function* () {
-        let [_, setText] = yield* useCell(TextCell);
-        setText(`some text`);
+        let text = yield* pipeline_1.useCell(TextCell);
+        text.value = `some text`;
     });
     return pipeline;
 };
-const EnvCell = createContextCell('fat');
+const EnvCell = pipeline_1.createContextCell('fat');
 const test = async () => {
-    let pipeline = exports.createPipeline();
+    let pipeline = pipeline_1.createPipeline();
     pipeline.use(log('test'));
-    pipeline.use(async function (next, ctx) {
-        let counter = await ctx.run(useCounter());
-        console.log('before', counter.getCount());
+    pipeline.use(async function* (next) {
+        let { count } = yield* useCounter();
+        console.log('before', count.value);
         await next();
-        console.log('after', counter.getCount());
+        console.log('after', count.value);
     });
     pipeline.use(async function* (next) {
-        let env = yield* useCellValue(EnvCell);
-        if (env === 'fat') {
+        let env = yield* pipeline_1.useCell(EnvCell);
+        if (env.value === 'fat') {
             let textPipeline = createTextPipeline();
-            yield* usePipeline(textPipeline);
+            yield* pipeline_1.usePipeline(textPipeline, next);
         }
         else {
             await next();
         }
+        let text = yield* pipeline_1.useCell(TextCell);
+        console.log('text', text.value);
     });
     Array.from({ length: 1000 }).forEach(() => {
         pipeline.use(async function* (next) {
             yield* useCounter();
-            yield* useCellValue(EnvCell);
+            yield* pipeline_1.useCell(EnvCell);
             await next();
         });
     });
     pipeline.use(async function* () {
         let counter = yield* useCounter();
-        let env = yield* useCellValue(EnvCell);
+        let env = yield* pipeline_1.useCell(EnvCell);
         await delay(500);
-        console.log('env', { env });
+        console.log('env', { env: env.value });
         counter.increBy(10);
     });
-    let manager = exports.createContextManager({
+    let manager = pipeline_1.createContextManager({
         count: CountCell.create(11),
         env: EnvCell.create('prod'),
         text: TextCell.create('initial text')
@@ -236,4 +102,4 @@ const test = async () => {
         text
     });
 };
-// test()
+test();

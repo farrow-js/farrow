@@ -20,42 +20,21 @@ var __importStar = (this && this.__importStar) || function (mod) {
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.createRouterPipeline = void 0;
-const path_to_regexp_1 = require("path-to-regexp");
 const core_1 = require("../core");
-const Schema = __importStar(require("../schema"));
-const createSchema = (options) => {
-    let { pathname, ...rest } = options;
-    let schema = {};
-    for (let key in rest) {
-        let value = rest[key];
-        schema[key] = value;
-    }
-    return schema;
-};
+const Schema = __importStar(require("../schema/type"));
 const createRouterPipeline = (options) => {
-    let schema = {
-        ...createSchema(options),
-        pathname: Schema.String,
-    };
-    let match = path_to_regexp_1.match(options.pathname);
-    let pipeline = core_1.createContextualPipeline();
-    let middleware = core_1.createMiddleware(async function* (requestInfo, next) {
-        let { pathname, ...input } = requestInfo;
-        let matches = match(pathname);
-        if (!matches) {
-            return yield* next();
-        }
-        let params = matches.params;
-        let result = Schema.verify(schema, { ...input, pathname, params });
-        if (result.kind === 'Err') {
-            if (options.onValidationError) {
-                options.onValidationError(result);
-            }
-            throw new Error(result.message);
-        }
-        let response = yield* core_1.usePipeline(pipeline, result.value);
-        return response;
+    let pipeline = core_1.createPipeline({
+        defaultOutput: options.defaultOutput,
+        contexts: options.contexts,
     });
+    let middleware = function (input, next) {
+        let runPipeline = core_1.usePipeline(pipeline);
+        let result = options.input.validate(input);
+        if (result.isErr) {
+            return next();
+        }
+        return runPipeline(result.value);
+    };
     let add = pipeline.add;
     return {
         middleware,
@@ -63,18 +42,22 @@ const createRouterPipeline = (options) => {
     };
 };
 exports.createRouterPipeline = createRouterPipeline;
-const Json = (data) => {
-    let body = JSON.stringify(data);
-    return {
-        status: 200,
-        statusText: 'OK',
-        headers: {
-            'Content-Type': 'application/json',
-            'Content-Length': Buffer.byteLength(body),
-        },
-        body,
-    };
-};
+const Json = Schema.thunk('Json', () => {
+    return Schema.union(Schema.number, Schema.string, Schema.boolean, Schema.literal(null), Schema.list(Json), Schema.record(Json));
+});
+let json = Json(1);
+let Int = Schema.number.pipe({
+    shape: 'Int',
+    validate: (n) => {
+        if (!Number.isInteger(n)) {
+            return Schema.Err(`${n} is not integer`);
+        }
+        else {
+            return Schema.Ok(n);
+        }
+    },
+});
+let int = Int(0.2);
 const Text = (content) => {
     return {
         status: 200,
@@ -113,7 +96,7 @@ router.add(async function* (data) {
     await sleep(200);
     return Json(data);
 });
-const app = core_1.createContextualPipeline();
+const app = createContextualPipeline();
 app.add(router.middleware);
 // tslint:disable-next-line: no-floating-promises
 app

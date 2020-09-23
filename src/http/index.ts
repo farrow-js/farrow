@@ -16,13 +16,18 @@ import {
   useManager,
   ContextManagerGenerator,
   usePipeline,
-} from '../core'
+} from '../core/pipeline'
 
-import * as Schema from '../schema'
+import * as Schema from '../core/schema'
 
-export type RouterOptions<T extends Schema.MaybeNullable = Schema.MaybeNullable> = {
+export type RouterOptions = {
   pathname: string
-  data?: T
+  method?: string
+  params?: Schema.Object
+  body?: Schema.Object
+  query?: Schema.Object
+  cookies?: Schema.Object
+  headers?: Schema.Object
   onValidationError?: (error: Schema.ValidationError) => boolean | void
 }
 

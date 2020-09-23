@@ -11,10 +11,12 @@ export declare type PipelineOptions<O = unknown> = {
     defaultOutput?: O;
     contexts?: ContextStorage;
 };
-export declare type MaybePromise<T> = T | Promise<T>;
 export declare type Pipeline<I = unknown, O = unknown> = {
     [PipelineSymbol]: true;
-    add: (input: Middleware<I, MaybePromise<O>>) => void;
-    run: (input: I, manager?: ContextManager) => Promise<O>;
+    add: (input: Middleware<I, O>) => void;
+    run: (input: I, manager?: ContextManager) => O;
 };
 export declare const createPipeline: <I, O>(options?: PipelineOptions<O> | undefined) => Pipeline<I, O>;
+export declare type PipelineInput<T extends Pipeline> = T extends Pipeline<infer I> ? I : never;
+export declare type PipelineOutput<T extends Pipeline> = T extends Pipeline<any, infer O> ? O : never;
+export declare const usePipeline: <I, O>(pipeline: Pipeline<I, O>) => (input: I) => O;

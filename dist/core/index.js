@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.createPipeline = exports.isPipeline = exports.useManager = exports.useCell = exports.useCellValue = exports.createContextManager = exports.createContextCell = void 0;
+exports.usePipeline = exports.createPipeline = exports.isPipeline = exports.useManager = exports.useCell = exports.useCellValue = exports.createContextManager = exports.createContextCell = void 0;
 const context_1 = require("./context");
 Object.defineProperty(exports, "createContextCell", { enumerable: true, get: function () { return context_1.createContextCell; } });
 Object.defineProperty(exports, "createContextManager", { enumerable: true, get: function () { return context_1.createContextManager; } });
@@ -17,16 +17,12 @@ const createPipeline = (options) => {
     let settings = {
         ...options,
     };
-    let currentManager = context_1.createContextManager(settings.contexts);
-    let currentHooks = context_1.fromManager(currentManager);
     let middlewares = [];
     let add = (middleware) => {
         middlewares.push(middleware);
     };
-    let run = (input, manager = currentManager) => {
-        context_1.assertContextManager(manager);
-        let hooks = manager === currentManager ? currentHooks : context_1.fromManager(manager);
-        let counter = counter_1.createCounter((index, input, next) => {
+    let createCurrentCounter = (hooks) => {
+        return counter_1.createCounter((index, input, next) => {
             if (index >= middlewares.length) {
                 if (settings.defaultOutput !== undefined) {
                     return settings.defaultOutput;
@@ -37,8 +33,16 @@ const createPipeline = (options) => {
             let result = context_1.runContextHooks(() => middleware(input, next), hooks);
             return result;
         });
+    };
+    let currentManager = context_1.createContextManager(settings.contexts);
+    let currentHooks = context_1.fromManager(currentManager);
+    let currentCounter = createCurrentCounter(currentHooks);
+    let run = (input, manager = currentManager) => {
+        context_1.assertContextManager(manager);
+        let hooks = manager === currentManager ? currentHooks : context_1.fromManager(manager);
+        let counter = manager === currentManager ? currentCounter : createCurrentCounter(hooks);
         let result = counter.start(input);
-        return Promise.resolve(result);
+        return result;
     };
     return {
         [PipelineSymbol]: true,
@@ -47,6 +51,14 @@ const createPipeline = (options) => {
     };
 };
 exports.createPipeline = createPipeline;
+const usePipeline = (pipeline) => {
+    let manager = context_1.useManager();
+    let runPipeline = (input) => {
+        return pipeline.run(input, manager);
+    };
+    return runPipeline;
+};
+exports.usePipeline = usePipeline;
 const Json = (data) => {
     let body = JSON.stringify(data);
     return {
@@ -76,7 +88,7 @@ const sleep = (duration) => {
     });
 };
 const pipeline = exports.createPipeline();
-pipeline.add((request, next) => {
+pipeline.add(async (request, next) => {
     var _a;
     if ((_a = request.query) === null || _a === void 0 ? void 0 : _a.name) {
         let query = {
@@ -92,7 +104,7 @@ pipeline.add((request, next) => {
         return next();
     }
 });
-pipeline.add((request, next) => {
+pipeline.add(async (request, next) => {
     var _a, _b, _c;
     if ((_a = request.query) === null || _a === void 0 ? void 0 : _a.name) {
         return Text(`Hello ${(_c = (_b = request.query) === null || _b === void 0 ? void 0 : _b.name) !== null && _c !== void 0 ? _c : 'World'}`);
@@ -135,7 +147,7 @@ const useLogger = (name) => {
 pipeline.add(async (request, next) => {
     let logger = useLogger('time');
     let start = Date.now();
-    await sleep(200);
+    await sleep(100);
     let response = await next();
     logger.add(`path: ${request.pathname}, take time ${(Date.now() - start).toFixed(2)}ms`);
     return response;

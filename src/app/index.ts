@@ -1,11 +1,11 @@
-import { RequestInfo, ResponseInfo, createRouterPipeline } from '../router'
+import { RequestInfo, ResponseInfo, createRouterPipeline } from '../core/router'
 import {
   ContextStorage,
   createContextualPipeline,
   createHook,
   createMiddleware,
   ContextualPipelineOptions,
-} from '../core'
+} from '../core/pipeline'
 
 export type CreateAppOptions = {
   contexts?: ContextStorage

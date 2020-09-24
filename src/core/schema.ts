@@ -1,22 +1,31 @@
 import { match as createMatch } from 'path-to-regexp'
+import { assign, entries, toNumber } from './util'
 
-type JsonType =
+type Json =
   | number
   | string
   | boolean
   | null
-  | JsonType[]
+  | Json[]
   | {
-      [key: string]: JsonType
+      [key: string]: Json
     }
+
+const TypeSymbol = Symbol('Type')
 
 export type Type<T = any> = {
   (value: T): Term<T>
-  toJSON: () => JsonType
+  [TypeSymbol]: true
+  toJSON: () => Json
   is: (term: Term) => term is Term<T>
   assert: (term: Term) => asserts term is Term<T>
   validate: (input: unknown) => Result<T>
-  pipe: <R>(options: CreateTypeOptions<R, T>) => Type<R>
+  create: <R>(options: CreateTypeOptions<R, T>) => Type<R>
+  pipe: <R>(Type: Type<R>) => Type<R>
+}
+
+export const isType = <T = any>(input: any): input is Type<T> => {
+  return !!(input && input[TypeSymbol])
 }
 
 export type Term<T = any> = {
@@ -42,7 +51,7 @@ export type Ok<T = any> = {
 
 export type Result<T = any, E = string> = Err<E> | Ok<T>
 
-export const Err = <T, E = string>(value: E): Result<T, E> => {
+export const Err = <E = string>(value: E): Err<E> => {
   let err: Err = {
     kind: 'Err',
     value,
@@ -63,7 +72,7 @@ export const Ok = <T, E = string>(value: T): Result<T, E> => {
 }
 
 export type CreateTypeOptions<T, I = unknown> = {
-  toJSON: () => JsonType
+  toJSON: () => Json
   validate: (input: I) => Result<T>
 }
 
@@ -84,9 +93,32 @@ export const createType = <T>(options: CreateTypeOptions<T>): Type<T> => {
     }
   }
 
-  let pipe: Schema['pipe'] = (options) => {
+  let pipe: Schema['pipe'] = (NextType) => {
+    return create({
+      toJSON: () => {
+        return {
+          type: 'Pipe',
+          prev: schema.toJSON(),
+          next: NextType.toJSON(),
+        }
+      },
+      validate: (input) => {
+        let result = schema.validate(input)
+        if (result.isErr) return result
+        return NextType.validate(result.value)
+      },
+    })
+  }
+
+  let create: Schema['create'] = (options) => {
     return createType({
-      toJSON: options.toJSON,
+      toJSON: () => {
+        return {
+          type: 'Create',
+          prev: schema.toJSON(),
+          next: options.toJSON(),
+        }
+      },
       validate: (input) => {
         let result = validate(input)
         if (result.isErr) return result
@@ -95,9 +127,10 @@ export const createType = <T>(options: CreateTypeOptions<T>): Type<T> => {
     })
   }
 
-  let json: JsonType | undefined
+  let json: Json | undefined
 
   let props = {
+    [TypeSymbol]: true as const,
     toJSON: () => {
       if (json === undefined) {
         json = options.toJSON()
@@ -107,10 +140,12 @@ export const createType = <T>(options: CreateTypeOptions<T>): Type<T> => {
     validate,
     is,
     assert,
+    create,
     pipe,
+    test,
   }
 
-  let schema: Schema = Object.assign((value: T) => {
+  let schema: Schema = assign((value: T) => {
     let result = validate(value)
     if (result.isErr) {
       throw new Error(result.value)
@@ -128,7 +163,7 @@ export const is = <T>(input: Term, Type: Type<T>): input is Term<T> => {
   return Type.is(input)
 }
 
-export const thunk = <T>(f: () => Type<T>): Type<T> => {
+export const Thunk = <T>(f: () => Type<T>): Type<T> => {
   let Type: Type<T> | undefined
 
   let getType = () => {
@@ -149,13 +184,13 @@ export const thunk = <T>(f: () => Type<T>): Type<T> => {
 }
 
 // tslint:disable-next-line: variable-name
-export const number = createType<number>({
+export const Number = createType<number>({
   toJSON: () => {
     return 'number'
   },
   validate: (input) => {
     if (input === 'string') {
-      let n = Number(input)
+      let n = toNumber(input)
       if (!isNaN(n)) {
         input = n
       }
@@ -169,7 +204,7 @@ export const number = createType<number>({
 })
 
 // tslint:disable-next-line: variable-name
-export const string = createType<string>({
+export const String = createType<string>({
   toJSON: () => {
     return 'string'
   },
@@ -183,7 +218,7 @@ export const string = createType<string>({
 })
 
 // tslint:disable-next-line: variable-name
-export const boolean = createType<boolean>({
+export const Boolean = createType<boolean>({
   toJSON: () => {
     return 'boolean'
   },
@@ -201,9 +236,9 @@ export const boolean = createType<boolean>({
   },
 })
 
-export const list = <T extends Type>(ItemType: T): Type<Array<RawType<T>>> => {
-  type List = Array<RawType<T>>
-  return createType<List>({
+export const List = <T extends Type>(ItemType: T): Type<Array<RawType<T>>> => {
+  type list = Array<RawType<T>>
+  return createType<list>({
     toJSON: () => {
       return {
         type: 'List',
@@ -215,7 +250,7 @@ export const list = <T extends Type>(ItemType: T): Type<Array<RawType<T>>> => {
         return Err(`${input} is not a array`)
       }
 
-      let list: List = []
+      let list: list = []
 
       for (let i = 0; i < input.length; i++) {
         let item = input[i]
@@ -237,7 +272,7 @@ type RawFields<T extends Fields> = {
   [key in keyof T]: RawType<T[key]>
 }
 
-export const object = <T extends Fields>(
+export const Object = <T extends Fields>(
   fields: T
 ): Type<
   {
@@ -248,7 +283,7 @@ export const object = <T extends Fields>(
 
   let Type: Type<ObjectType> = createType({
     toJSON: () => {
-      let list = Object.entries(fields).map(([key, Type]) => {
+      let list = entries(fields).map(([key, Type]) => {
         return {
           key,
           type: Type.toJSON(),
@@ -293,7 +328,7 @@ export const object = <T extends Fields>(
   return Type
 }
 
-export const nullable = <T extends Type>(Type: T): Type<RawType<T> | null | undefined> => {
+export const Nullable = <T extends Type>(Type: T): Type<RawType<T> | null | undefined> => {
   return createType<RawType<T> | null | undefined>({
     toJSON: () => {
       return {
@@ -317,7 +352,7 @@ export const nullable = <T extends Type>(Type: T): Type<RawType<T> | null | unde
 
 type RawUnionItemType<T extends Type> = T extends Type ? RawType<T> : never
 
-export const union = <T extends Type[]>(...Types: T): Type<RawUnionItemType<T[number]>> => {
+export const Union = <T extends Type[]>(...Types: T): Type<RawUnionItemType<T[number]>> => {
   let Type: Type<RawUnionItemType<T[number]>> = createType({
     toJSON: () => {
       return {
@@ -342,7 +377,7 @@ export const union = <T extends Type[]>(...Types: T): Type<RawUnionItemType<T[nu
 
 export type LiteralType = string | number | boolean | null | undefined
 
-export const literal = <T extends LiteralType>(literal: T): Type<T> => {
+export const Literal = <T extends LiteralType>(literal: T): Type<T> => {
   return createType<T>({
     toJSON: () => {
       return {
@@ -360,7 +395,7 @@ export const literal = <T extends LiteralType>(literal: T): Type<T> => {
   })
 }
 
-export const record = <T extends Type>(Type: T): Type<Record<string, RawType<T>>> => {
+export const Record = <T extends Type>(Type: T): Type<Record<string, RawType<T>>> => {
   let ResultType: Type<Record<string, RawType<T>>> = createType({
     toJSON: () => {
       return {
@@ -399,37 +434,38 @@ export const record = <T extends Type>(Type: T): Type<Record<string, RawType<T>>
   return ResultType
 }
 
-export type Object = Type<Record<string, any>>
+export type ObjectType = Type<Record<string, any>>
 
-export type List = Type<any[]>
+export type ListType = Type<any[]>
 
-export const Pattern = <T>(pattern: string, ParamsType: Type<T>): Type<T> => {
-  let match = createMatch(pattern)
-  return string.pipe({
+export const Path = (path: string) => {
+  let match = createMatch(path)
+  return String.create({
     toJSON: () => {
       return {
-        type: 'Pattern',
-        pattern: pattern,
-        paramsType: ParamsType.toJSON(),
+        type: 'Path',
+        path: path,
       }
     },
     validate: (path) => {
       let matches = match(path)
       if (!matches) {
-        return Err(`${path} is not matched the pattern: ${pattern}`)
+        return Err(`${path} is not matched the path: ${path}`)
       }
       let params = matches.params
-      return ParamsType.validate(params)
+      return Ok(params)
     },
   })
 }
 
-export const Json: Type<JsonType> = thunk(() => {
-  return union(number, string, boolean, literal(null), list(Json), record(Json))
+export type JsonType = Type<Json>
+
+export const Json: JsonType = Thunk(() => {
+  return Union(Number, String, Boolean, Literal(null), List(Json), Record(Json))
 })
 
 // tslint:disable-next-line: variable-name
-export const any = createType<any>({
+export const Any = createType<any>({
   toJSON: () => {
     return {
       type: 'Any',
@@ -439,62 +475,3 @@ export const any = createType<any>({
     return Ok(input as any)
   },
 })
-
-const Home = Pattern(
-  '/home',
-  object({
-    id: number,
-  })
-)
-
-const home = Home.validate('/home')
-
-const TestUnion = union(literal('1 as const'), literal(null))
-
-const testUnion = TestUnion('1 as const')
-
-const TestNullable = nullable(TestUnion)
-
-const testNullable = TestNullable(null)
-
-const Todo = object({
-  id: number,
-  content: string,
-  completed: boolean,
-})
-
-let n = number(1)
-
-const Todos = list(Todo)
-
-const Header = object({
-  text: string,
-})
-
-const Footer = object({
-  filterType: string,
-})
-
-const AppState = object({
-  header: Header,
-  todos: Todos,
-  footer: Footer,
-})
-
-const todos = Todos([
-  {
-    id: 0,
-    content: '0',
-    completed: false,
-  },
-  {
-    id: 1,
-    content: '1',
-    completed: false,
-  },
-  {
-    id: 2,
-    content: '2',
-    completed: false,
-  },
-])

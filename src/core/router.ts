@@ -1,4 +1,4 @@
-import { createPipeline, Next, usePipeline, PipelineOptions } from './pipeline'
+import { createPipeline, Next, usePipeline, PipelineOptions } from './pipeline/pipeline'
 import * as Schema from './schema'
 
 export interface RouterOptions<I, O> extends PipelineOptions<O> {

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Pattern = exports.record = exports.literal = exports.union = exports.nullable = exports.object = exports.list = exports.boolean = exports.string = exports.number = exports.thunk = exports.is = exports.createType = exports.Ok = exports.Err = void 0;
-const path_to_regexp_1 = require("path-to-regexp");
+exports.term = exports.any = exports.json = exports.record = exports.literal = exports.union = exports.nullable = exports.object = exports.list = exports.boolean = exports.string = exports.number = exports.thunk = exports.createType = exports.isTerm = exports.isType = exports.Ok = exports.Err = void 0;
+const util_1 = require("./util");
 const Err = (value) => {
     let err = {
         kind: 'Err',
@@ -22,58 +22,64 @@ const Ok = (value) => {
     return ok;
 };
 exports.Ok = Ok;
+const TypeSymbol = Symbol('Type');
+const isType = (input) => {
+    return !!(input && input[TypeSymbol]);
+};
+exports.isType = isType;
+const TermSymbol = Symbol('Term');
+const isTerm = (input) => {
+    return !!(input && input[TermSymbol]);
+};
+exports.isTerm = isTerm;
 const createType = (options) => {
-    let symbol = Symbol('KIND');
+    var _a;
+    let symbol = Symbol('TypeKind');
     let validate = options.validate;
     let is = (input) => {
-        return input.kind === symbol;
+        return input[TermSymbol] === symbol;
     };
     let assert = (input) => {
         if (!is(input)) {
             throw new Error(`Unexpected value: ${input}`);
         }
     };
-    let pipe = (options) => {
-        return exports.createType({
-            toJSON: options.toJSON,
-            validate: (input) => {
-                let result = validate(input);
-                if (result.isErr)
-                    return result;
-                return options.validate(result.value);
-            },
-        });
-    };
+    let toJSON = (_a = options.toJSON) !== null && _a !== void 0 ? _a : (() => ({
+        type: 'Type'
+    }));
     let json;
+    let runing = false;
     let props = {
+        [TypeSymbol]: true,
         toJSON: () => {
-            if (json === undefined) {
-                json = options.toJSON();
+            if (runing) {
+                return {
+                    type: 'Recursive',
+                };
             }
+            runing = true;
+            if (json === undefined) {
+                json = toJSON();
+            }
+            runing = false;
             return json;
         },
         validate,
         is,
         assert,
-        pipe,
     };
-    let schema = Object.assign((value) => {
+    let schema = util_1.assign((value) => {
         let result = validate(value);
-        if (result.isErr) {
-            throw new Error(result.value);
-        }
+        if (result.isErr)
+            throw new Error(result.value.message);
         return {
-            kind: symbol,
+            [TermSymbol]: symbol,
             value: result.value,
         };
     }, props);
     return schema;
 };
 exports.createType = createType;
-const is = (input, Type) => {
-    return Type.is(input);
-};
-exports.is = is;
 const thunk = (f) => {
     let Type;
     let getType = () => {
@@ -95,11 +101,13 @@ exports.thunk = thunk;
 // tslint:disable-next-line: variable-name
 exports.number = exports.createType({
     toJSON: () => {
-        return 'number';
+        return {
+            type: 'Number',
+        };
     },
     validate: (input) => {
-        if (input === 'string') {
-            let n = Number(input);
+        if (typeof input === 'string') {
+            let n = util_1.toNumber(input);
             if (!isNaN(n)) {
                 input = n;
             }
@@ -108,28 +116,36 @@ exports.number = exports.createType({
             return exports.Ok(input);
         }
         else {
-            return exports.Err(`${input} is not a number`);
+            return exports.Err({
+                message: `${input} is not a number`,
+            });
         }
     },
 });
 // tslint:disable-next-line: variable-name
 exports.string = exports.createType({
     toJSON: () => {
-        return 'string';
+        return {
+            type: 'String',
+        };
     },
     validate: (input) => {
         if (typeof input === 'string') {
             return exports.Ok(input);
         }
         else {
-            return exports.Err(`${input} is not a string`);
+            return exports.Err({
+                message: `${input} is not a string`,
+            });
         }
     },
 });
 // tslint:disable-next-line: variable-name
 exports.boolean = exports.createType({
     toJSON: () => {
-        return 'boolean';
+        return {
+            type: 'Boolean',
+        };
     },
     validate: (input) => {
         if (input === 'true') {
@@ -142,7 +158,9 @@ exports.boolean = exports.createType({
             return exports.Ok(input);
         }
         else {
-            return exports.Err(`${input} is not a boolean`);
+            return exports.Err({
+                message: `${input} is not a boolean`,
+            });
         }
     },
 });
@@ -155,15 +173,22 @@ const list = (ItemType) => {
             };
         },
         validate: (input) => {
+            var _a;
             if (!Array.isArray(input)) {
-                return exports.Err(`${input} is not a array`);
+                return exports.Err({
+                    message: `${input} is not a array`,
+                });
             }
             let list = [];
             for (let i = 0; i < input.length; i++) {
                 let item = input[i];
                 let result = ItemType.validate(item);
-                if (result.isErr)
-                    return result;
+                if (result.isErr) {
+                    return exports.Err({
+                        path: [i, ...((_a = result.value.path) !== null && _a !== void 0 ? _a : [])],
+                        message: result.value.message,
+                    });
+                }
                 list.push(result.value);
             }
             return exports.Ok(list);
@@ -174,7 +199,7 @@ exports.list = list;
 const object = (fields) => {
     let Type = exports.createType({
         toJSON: () => {
-            let list = Object.entries(fields).map(([key, Type]) => {
+            let list = util_1.entries(fields).map(([key, Type]) => {
                 return {
                     key,
                     type: Type.toJSON(),
@@ -186,14 +211,21 @@ const object = (fields) => {
             };
         },
         validate: (input) => {
+            var _a;
             if (typeof input !== 'object') {
-                return exports.Err(`${input} is not an object`);
+                return exports.Err({
+                    message: `${input} is not an object`,
+                });
             }
             if (input === null) {
-                return exports.Err(`null is not an object`);
+                return exports.Err({
+                    message: `null is not an object`,
+                });
             }
             if (Array.isArray(input)) {
-                return exports.Err(`${input} is not an object`);
+                return exports.Err({
+                    message: `${input} is not an object`,
+                });
             }
             let object = {};
             let source = input;
@@ -201,8 +233,12 @@ const object = (fields) => {
                 let FieldType = fields[key];
                 let field = source[key];
                 let result = FieldType.validate(field);
-                if (result.isErr)
-                    return result;
+                if (result.isErr) {
+                    return exports.Err({
+                        path: [key, ...((_a = result.value.path) !== null && _a !== void 0 ? _a : [])],
+                        message: result.value.message,
+                    });
+                }
                 object[key] = result.value;
             }
             return exports.Ok(object);
@@ -246,7 +282,9 @@ const union = (...Types) => {
                 if (result.isOk)
                     return result;
             }
-            return exports.Err(`${input} is not the union type`);
+            return exports.Err({
+                message: `${input} is not matched the union types: \n${JSON.stringify(Type.toJSON(), null, 2)}`,
+            });
         },
     });
     return Type;
@@ -254,13 +292,20 @@ const union = (...Types) => {
 exports.union = union;
 const literal = (literal) => {
     return exports.createType({
-        shape: () => `Literal<${literal}>`,
+        toJSON: () => {
+            return {
+                type: 'Literal',
+                literal: literal,
+            };
+        },
         validate: (input) => {
             if (input === literal) {
                 return exports.Ok(literal);
             }
             else {
-                return exports.Err(`${input} is not equal to ${literal}`);
+                return exports.Err({
+                    message: `${input} is not equal to ${literal}`,
+                });
             }
         },
     });
@@ -268,16 +313,28 @@ const literal = (literal) => {
 exports.literal = literal;
 const record = (Type) => {
     let ResultType = exports.createType({
-        shape: () => `Record<string, ${Type.shape}>`,
+        toJSON: () => {
+            return {
+                type: 'Record',
+                valueType: Type.toJSON(),
+            };
+        },
         validate: (input) => {
+            var _a;
             if (typeof input !== 'object') {
-                return exports.Err(`${input} is not matched the shape: ${ResultType.shape}`);
+                return exports.Err({
+                    message: `${input} is not an object`,
+                });
             }
             if (input === null) {
-                return exports.Err(`null is not matched the shape: ${ResultType.shape}`);
+                return exports.Err({
+                    message: `null is not an object`,
+                });
             }
             if (Array.isArray(input)) {
-                return exports.Err(`${input} is not matched the shape: ${ResultType.shape}`);
+                return exports.Err({
+                    message: `${input} is not an object`,
+                });
             }
             let record = {};
             let source = input;
@@ -285,7 +342,10 @@ const record = (Type) => {
                 let value = source[key];
                 let result = Type.validate(value);
                 if (result.isErr) {
-                    return exports.Err(`object[${key}] is not matched the shape: ${Type.shape}`);
+                    return exports.Err({
+                        path: [key, ...((_a = result.value.path) !== null && _a !== void 0 ? _a : [])],
+                        message: result.value.message,
+                    });
                 }
                 record[key] = result.value;
             }
@@ -295,64 +355,65 @@ const record = (Type) => {
     return ResultType;
 };
 exports.record = record;
-const Pattern = (pattern, ParamsType) => {
-    let match = path_to_regexp_1.match(pattern);
-    return exports.string.pipe({
-        shape: pattern,
-        validate: (path) => {
-            let matches = match(path);
-            if (!matches) {
-                return exports.Err(`${path} is not matched the pattern: ${pattern}`);
-            }
-            let params = matches.params;
-            return ParamsType.validate(params);
+exports.json = exports.thunk(() => {
+    return exports.union(exports.number, exports.string, exports.boolean, exports.any, exports.literal(null), exports.list(exports.json), exports.record(exports.json));
+});
+// tslint:disable-next-line: variable-name
+exports.any = exports.createType({
+    toJSON: () => {
+        return {
+            type: 'Any',
+        };
+    },
+    validate: (input) => {
+        return exports.Ok(input);
+    },
+});
+exports.term = exports.createType({
+    toJSON: () => {
+        return {
+            type: 'Term',
+        };
+    },
+    validate: (input) => {
+        if (exports.isTerm(input)) {
+            return exports.Ok(input);
+        }
+        else {
+            return exports.Err({
+                message: `${input} is not a term of any Type`,
+            });
+        }
+    },
+});
+const Data = exports.object({
+    a: exports.number,
+    b: exports.string,
+    c: exports.boolean,
+    d: exports.list(exports.number),
+    e: exports.record(exports.string),
+    f: exports.literal(1),
+    g: exports.nullable(exports.number),
+    h: exports.json,
+    i: exports.any,
+});
+const result = Data.validate({
+    a: 1,
+    b: '1',
+    c: false,
+    d: [1, 23, 4],
+    e: {
+        a: '1',
+        b: '2',
+    },
+    f: 1,
+    g: null,
+    h: {
+        a: {
+            b: 1,
+            c: [1, 2],
         },
-    });
-};
-exports.Pattern = Pattern;
-const Json = exports.thunk('Json', () => {
-    return exports.union(exports.number, exports.string, exports.boolean, exports.literal(null), exports.list(Json), exports.record(Json));
-});
-const Home = exports.Pattern('/home', exports.object({
-    id: exports.number,
-}));
-const home = Home.validate('/home');
-const TestUnion = exports.union(exports.literal('1 as const'), exports.literal(null));
-const testUnion = TestUnion('1 as const');
-const TestNullable = exports.nullable(TestUnion);
-const testNullable = TestNullable(null);
-const Todo = exports.object({
-    id: exports.number,
-    content: exports.string,
-    completed: exports.boolean,
-});
-let n = exports.number(1);
-const Todos = exports.list(Todo);
-const Header = exports.object({
-    text: exports.string,
-});
-const Footer = exports.object({
-    filterType: exports.string,
-});
-const AppState = exports.object({
-    header: Header,
-    todos: Todos,
-    footer: Footer,
-});
-const todos = Todos([
-    {
-        id: 0,
-        content: '0',
-        completed: false,
     },
-    {
-        id: 1,
-        content: '1',
-        completed: false,
-    },
-    {
-        id: 2,
-        content: '2',
-        completed: false,
-    },
-]);
+    i: '123',
+});
+// console.log(result.value)

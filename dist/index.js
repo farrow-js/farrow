@@ -1,105 +1,104 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+const http_1 = require("./http");
+const responser_1 = require("./http/responser");
+const router_1 = require("./http/router");
+const schema_1 = require("./core/schema");
 const pipeline_1 = require("./core/pipeline");
-const CountCell = pipeline_1.createContextCell(20);
-const useCounter = pipeline_1.createHook(async function* () {
-    let count = yield* pipeline_1.useCell(CountCell);
-    let increBy = (step) => {
-        count.value += step;
-        return count;
-    };
-    return {
-        count,
-        increBy
-    };
+const logger = async (request, next) => {
+    let start = Date.now();
+    let response = await next(request);
+    let end = Date.now();
+    let time = (end - start).toFixed(2);
+    console.log(`path: ${request.pathname}, time: ${time}ms`);
+    return response;
+};
+const NotFound = () => {
+    return responser_1.status({
+        code: 404,
+    });
+};
+const home = router_1.createRouterPipeline({
+    pathname: '/',
 });
-const delay = (duration) => {
-    return new Promise(resolve => {
-        setTimeout(resolve, duration);
+home.add(async (request, next) => {
+    let response = await next(request);
+    if (!responser_1.html.is(response)) {
+        return response;
+    }
+    return responser_1.html(`
+    <html lang="en">
+    <head>
+      <meta charset="UTF-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1.0">
+      <title>Document</title>
+    </head>
+    <body>
+      ${response.value}
+    </body>
+    </html>
+  `);
+});
+home.add(async (request) => {
+    return responser_1.html(`
+    <h1>Home:${request.pathname}</h1>
+    <ul>
+      <li>
+        <a href="/detail/1">detail 1</a>
+      </li>
+      <li>
+        <a href="/detail/2">detail 2</a>
+      </li>
+      <li>
+        <a href="/detail/3">detail 3</a>
+      </li>
+    </ul>
+  `);
+});
+const detail = router_1.createRouterPipeline({
+    pathname: '/detail/:detailId',
+    params: schema_1.object({
+        detailId: schema_1.number,
+    }),
+    query: schema_1.object({
+        tab: schema_1.nullable(schema_1.string),
+    }),
+});
+detail.add(async (request) => {
+    return responser_1.json({
+        pathname: request.pathname,
+        detailId: request.params.detailId,
+        tab: request.query.tab,
     });
+});
+const HistoryCell = pipeline_1.createCell([]);
+const useHistory = () => {
+    let cell = pipeline_1.useCell(HistoryCell);
+    return {
+        push: (pathname) => {
+            cell.value.push(pathname);
+            console.log('history', cell.value);
+        },
+    };
 };
-const log = (name) => {
-    return pipeline_1.createMiddleware(async function* (next) {
-        let start = Date.now();
-        await next();
-        let time = Date.now() - start;
-        console.log(name, `time: ${time.toFixed(2)}ms`);
-    });
+const history = async (request, next) => {
+    let history = useHistory();
+    let response = await next();
+    history.push(request.pathname);
+    return response;
 };
-const logCell = (name, Cell) => {
-    return pipeline_1.createMiddleware(async function* (next) {
-        let cell = yield* pipeline_1.useCell(Cell);
-        let start = Date.now();
-        let before = cell.value;
-        await next();
-        let time = Date.now() - start;
-        let after = cell.value;
-        console.log(name, {
-            time,
-            before,
-            after
-        });
-    });
-};
-const TextCell = pipeline_1.createContextCell('');
-const createTextPipeline = () => {
-    let pipeline = pipeline_1.createPipeline();
-    pipeline.use(logCell('text', TextCell));
-    pipeline.use(async function* () {
-        let text = yield* pipeline_1.useCell(TextCell);
-        text.value = `some text`;
-    });
-    return pipeline;
-};
-const EnvCell = pipeline_1.createContextCell('fat');
-const test = async () => {
-    let pipeline = pipeline_1.createPipeline();
-    pipeline.use(log('test'));
-    pipeline.use(async function* (next) {
-        let { count } = yield* useCounter();
-        console.log('before', count.value);
-        await next();
-        console.log('after', count.value);
-    });
-    pipeline.use(async function* (next) {
-        let env = yield* pipeline_1.useCell(EnvCell);
-        if (env.value === 'fat') {
-            let textPipeline = createTextPipeline();
-            yield* pipeline_1.usePipeline(textPipeline, next);
-        }
-        else {
-            await next();
-        }
-        let text = yield* pipeline_1.useCell(TextCell);
-        console.log('text', text.value);
-    });
-    Array.from({ length: 1000 }).forEach(() => {
-        pipeline.use(async function* (next) {
-            yield* useCounter();
-            yield* pipeline_1.useCell(EnvCell);
-            await next();
-        });
-    });
-    pipeline.use(async function* () {
-        let counter = yield* useCounter();
-        let env = yield* pipeline_1.useCell(EnvCell);
-        await delay(500);
-        console.log('env', { env: env.value });
-        counter.increBy(10);
-    });
-    let manager = pipeline_1.createContextManager({
-        count: CountCell.create(11),
-        env: EnvCell.create('prod'),
-        text: TextCell.create('initial text')
-    });
-    await pipeline.run(manager);
-    let count = manager.read(CountCell);
-    let env = manager.read(EnvCell);
-    let text = manager.read(TextCell);
-    console.log('values', {
-        count,
-        env,
-        text
-    });
-};
-test();
+const app = http_1.createHttpPipeline({
+    responsers: [responser_1.JsonResponser, responser_1.TextResponser, responser_1.StatusResponser, responser_1.HTMLResponser],
+    contexts: {
+        history: HistoryCell.create([]),
+    },
+});
+app.add(logger);
+app.add(history);
+app.add(home.middleware);
+app.add(detail.middleware);
+app.add(NotFound);
+const server = app.listen(3002, () => {
+    console.log('server start at port: 3002');
+});
+server;

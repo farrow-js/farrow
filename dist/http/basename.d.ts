@@ -7,3 +7,11 @@ export declare const useBasename: () => {
 export declare const basename: <T extends {
     pathname: string;
 }>(...basenames: string[]) => Middleware<T, import("./response").MaybeAsyncResponse>;
+export declare const handleBasenames: <T extends {
+    pathname: string;
+}>(basenames: string[], request: T) => {
+    basename: string;
+    request: T & {
+        pathname: string;
+    };
+};

@@ -1,7 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const http_1 = require("./http");
-const response_1 = require("./http/response");
 const router_1 = require("./http/router");
 const schema_1 = require("./core/schema");
 const pipeline_1 = require("./core/pipeline");
@@ -19,7 +18,7 @@ const home = router_1.createRouterPipeline({
     pathname: '/',
 });
 home.match('html', (body) => {
-    return response_1.Response.html(`
+    return http_1.Response.html(`
     <html lang="en">
     <head>
       <meta charset="UTF-8">
@@ -33,23 +32,33 @@ home.match('html', (body) => {
 `);
 });
 home.add(async (request) => {
-    return response_1.Response.html(`
+    let basename = basename_1.useBasename().value;
+    return http_1.Response.html(`
     <h1>Home:${request.pathname}</h1>
     <ul>
       <li>
-        <a href="/detail/1">detail 1</a>
+        <a href="${basename}/detail/1">detail 1</a>
       </li>
       <li>
-        <a href="/detail/2">detail 2</a>
+        <a href="${basename}/detail/2">detail 2</a>
       </li>
       <li>
-        <a href="/detail/3">detail 3</a>
+        <a href="${basename}/detail/3">detail 3</a>
       </li>
+      <li>
+        <a href="${basename}/detail/4">detail 4</a>
+      </li>
+      <li>
+        <a href="${basename}/detail/5">detail 5</a>
+      </li>
+      <li>
+      <a href="${basename}/detail/6">detail 6</a>
+    </li>
     </ul>
   `);
 });
 const detail = router_1.createRouterPipeline({
-    pathname: '/detail/:detailId',
+    pathname: '/:detailId',
     params: schema_1.object({
         detailId: schema_1.number,
     }),
@@ -58,7 +67,14 @@ const detail = router_1.createRouterPipeline({
     }),
 });
 detail.add(async (request) => {
-    return response_1.Response.json({
+    let basename = basename_1.useBasename().value;
+    let routename = http_1.useRoutename().value;
+    if (request.params.detailId > 4) {
+        return http_1.Response.redirect(`/3?tab=from=${request.params.detailId}`);
+    }
+    return http_1.Response.json({
+        basename: basename,
+        routename: routename,
         pathname: request.pathname,
         detailId: request.params.detailId,
         tab: request.query.tab,
@@ -72,13 +88,13 @@ const files = router_1.createRouterPipeline({
 });
 files.add(async (request) => {
     let filename = request.params.pathname.join('/');
-    return response_1.Response.file(filename);
+    return http_1.Response.file(filename);
 });
 const attachment = router_1.createRouterPipeline({
     pathname: '/src/index.js',
 });
 attachment.add(async () => {
-    return response_1.Response.file('index.js').attachment('bundle.js');
+    return http_1.Response.file('index.js').attachment('bundle.js');
 });
 const HistoryCell = pipeline_1.createCell([]);
 const useHistory = () => {
@@ -106,7 +122,7 @@ app.add(basename_1.basename('/base'));
 app.add(logger);
 app.add(history);
 app.add(home.middleware);
-app.add(detail.middleware);
+app.route('/detail', detail.middleware);
 app.add(attachment.middleware);
 app.add(files.middleware);
 const server = app.listen(3002, () => {

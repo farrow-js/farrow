@@ -6,7 +6,10 @@ import { IParseOptions as QueryOptions } from 'qs';
 import { Middleware, PipelineOptions, Context } from '../core/pipeline';
 import { MaybeAsyncResponse, Response } from './response';
 import { ResponseInfo } from './responseInfo';
+import { useBasename } from './basename';
+import { useRoutename } from './routename';
 export { Response, ResponseInfo };
+export { useRoutename, useBasename };
 export declare const useRequest: () => IncomingMessage;
 export declare const useResponse: () => ServerResponse;
 export declare const useReq: () => IncomingMessage;
@@ -28,9 +31,10 @@ export interface HttpPipelineOptions extends PipelineOptions {
 export declare type HttpMiddleware = Middleware<RequestInfo, ResponseOutput>;
 export declare const createHttpPipeline: (options: HttpPipelineOptions) => {
     add: (input: Middleware<RequestInfo, MaybeAsyncResponse>) => void;
+    route: (name: string, middleware: HttpMiddleware) => void;
     run: (input: RequestInfo, options?: import("../core/pipeline").RunPipelineOptions<RequestInfo, MaybeAsyncResponse> | undefined) => MaybeAsyncResponse;
     handle: (req: IncomingMessage, res: ServerResponse) => Promise<any>;
-    listen: (port: number, callback: () => void) => import("http").Server;
+    listen: (port: number, callback?: Function | undefined) => import("http").Server;
 };
 export declare type ResponseParams = {
     requestInfo: RequestInfo;

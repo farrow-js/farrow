@@ -20,6 +20,7 @@ export declare type RouterPipeline<I, O> = {
     add: (input: Middleware<I, O>) => void;
     run: (input: I, options?: RunPipelineOptions<I, O>) => O;
     match: <T extends keyof BodyMap>(type: T, f: (body: BodyMap[T]) => MaybeAsyncResponse) => void;
+    route: (name: string, middleware: Middleware<I, O>) => void;
 };
 export declare type RouterInput = {
     pathname: string;

@@ -22,7 +22,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleResponse = exports.createHttpPipeline = exports.useRes = exports.useReq = exports.useResponse = exports.useRequest = exports.Response = void 0;
+exports.handleResponse = exports.createHttpPipeline = exports.useRes = exports.useReq = exports.useResponse = exports.useRequest = exports.useBasename = exports.useRoutename = exports.Response = void 0;
 const http_1 = require("http");
 const fs_1 = __importDefault(require("fs"));
 const path = __importStar(require("path"));
@@ -43,6 +43,9 @@ const pipeline_1 = require("../core/pipeline");
 const response_1 = require("./response");
 Object.defineProperty(exports, "Response", { enumerable: true, get: function () { return response_1.Response; } });
 const basename_1 = require("./basename");
+Object.defineProperty(exports, "useBasename", { enumerable: true, get: function () { return basename_1.useBasename; } });
+const routename_1 = require("./routename");
+Object.defineProperty(exports, "useRoutename", { enumerable: true, get: function () { return routename_1.useRoutename; } });
 const dirname_1 = require("./dirname");
 const RequestCell = pipeline_1.createCell(null);
 const useRequest = () => {
@@ -91,6 +94,7 @@ const createHttpPipeline = (options) => {
             request: RequestCell.create(req),
             response: ResponseCell.create(res),
             basename: basename_1.BasenameCell.create(''),
+            routename: routename_1.RoutenameCell.create(''),
         });
         let responser = await pipeline.run(requestInfo, {
             context,
@@ -128,8 +132,12 @@ const createHttpPipeline = (options) => {
         server.listen(port, callback);
         return server;
     };
+    let route = (name, middleware) => {
+        add(routename_1.route(name, middleware));
+    };
     return {
         add,
+        route,
         run,
         handle,
         listen,
@@ -151,6 +159,7 @@ const handleResponse = async (params) => {
     let { req, res, requestInfo, responseInfo, context } = params;
     let basename = context.read(basename_1.BasenameCell);
     let dirname = context.read(dirname_1.DirnameCell);
+    let routename = context.read(routename_1.RoutenameCell);
     let accept = accepts_1.default(req);
     // handle response status
     let handleStatus = (status = { code: 200 }) => {
@@ -213,15 +222,22 @@ const handleResponse = async (params) => {
         res.setHeader('Content-Length', length);
         res.end(html);
     };
-    let handleRedirect = (url, useBasename) => {
+    let handleRedirect = (body) => {
         var _a, _b;
+        let url = body.value;
+        let { useBasename, useRoutename } = body;
         if (url === 'back') {
             let referrer = req.headers['referer'] + '' || '/';
             url = referrer;
         }
-        // attach basename
-        if (useBasename && !url.startsWith('//') && url.startsWith('/')) {
-            url = basename + url;
+        // handle routename and basename
+        if (!url.startsWith('//') && url.startsWith('/')) {
+            if (useRoutename) {
+                url = routename + url;
+            }
+            if (useBasename) {
+                url = basename + url;
+            }
         }
         let code = (_b = (_a = responseInfo.status) === null || _a === void 0 ? void 0 : _a.code) !== null && _b !== void 0 ? _b : 302;
         handleStatus({
@@ -275,7 +291,7 @@ const handleResponse = async (params) => {
         return handleHtml(body.value);
     }
     if (body.type === 'redirect') {
-        return handleRedirect(body.value, body.useBasename);
+        return handleRedirect(body);
     }
     if (body.type === 'stream') {
         return handleStream(res, body.value);

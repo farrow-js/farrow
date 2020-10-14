@@ -58,6 +58,7 @@ export type EmptyBody = {
 export type RedirectBody = {
   type: 'redirect'
   useBasename: boolean
+  useRoutename: boolean
   value: string
 }
 
@@ -163,12 +164,18 @@ export const raw = (value: string): ResponseInfo => {
   }
 }
 
-export const redirect = (url: string, useBasename: boolean = true): ResponseInfo => {
+export type RedirectOptions = {
+  useBasename: boolean,
+  useRoutename: boolean
+}
+
+export const redirect = (url: string, options?: RedirectOptions): ResponseInfo => {
   return {
     body: {
       type: 'redirect',
       value: url,
-      useBasename,
+      useBasename: options?.useBasename ?? true,
+      useRoutename: options?.useRoutename ?? true
     },
   }
 }

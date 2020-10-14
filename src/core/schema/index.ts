@@ -8,7 +8,7 @@ export {
   Result
 }
 
-export type SchemaError = {
+export type SchemaValidationError = {
   path?: (string | number)[]
   message: string
 }
@@ -21,7 +21,7 @@ export type Type<T = any> = {
   toJSON: () => Json
   is: (term: Term) => term is Term<T>
   assert: (term: Term) => asserts term is Term<T>
-  validate: (input: unknown) => Result<T, SchemaError>
+  validate: (input: unknown) => Result<T, SchemaValidationError>
 }
 
 export const isType = (input: any): input is Type => {
@@ -43,7 +43,7 @@ export type RawType<T extends Type> = T extends Type<infer R> ? R : T
 
 export type CreateTypeOptions<T, I = unknown> = {
   toJSON?: () => Json
-  validate: (input: I) => Result<T, SchemaError>
+  validate: (input: I) => Result<T, SchemaValidationError>
 }
 
 export const createType = <T>(options: CreateTypeOptions<T>): Type<T> => {
@@ -468,37 +468,3 @@ export const term: TermSchema = createType({
     }
   },
 })
-
-const Data = object({
-  a: number,
-  b: string,
-  c: boolean,
-  d: list(number),
-  e: record(string),
-  f: literal(1),
-  g: nullable(number),
-  h: json,
-  i: any,
-})
-
-const result = Data.validate({
-  a: 1,
-  b: '1',
-  c: false,
-  d: [1, 23, 4],
-  e: {
-    a: '1',
-    b: '2',
-  },
-  f: 1,
-  g: null,
-  h: {
-    a: {
-      b: 1,
-      c: [1, 2],
-    },
-  },
-  i: '123',
-})
-
-// console.log(result.value)

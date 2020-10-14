@@ -29,14 +29,19 @@ import {
 
 import { MaybeAsyncResponse, Response } from './response'
 
-import { ResponseInfo, Status, Headers, Cookies } from './responseInfo'
+import { ResponseInfo, Status, Headers, Cookies, RedirectBody } from './responseInfo'
 
-import { BasenameCell } from './basename'
+import { BasenameCell, useBasename } from './basename'
+
+import { route as createRoute, RoutenameCell, useRoutename } from './routename'
+
 import { Json } from '../core/types'
 import { Stream } from 'stream'
 import { DirnameCell } from './dirname'
 
 export { Response, ResponseInfo }
+
+export { useRoutename, useBasename }
 
 const RequestCell = createCell<IncomingMessage | null>(null)
 
@@ -120,6 +125,7 @@ export const createHttpPipeline = (options: HttpPipelineOptions) => {
       request: RequestCell.create(req),
       response: ResponseCell.create(res),
       basename: BasenameCell.create(''),
+      routename: RoutenameCell.create(''),
     })
 
     let responser = await pipeline.run(requestInfo, {
@@ -160,14 +166,19 @@ export const createHttpPipeline = (options: HttpPipelineOptions) => {
 
   let run = pipeline.run
 
-  let listen = (port: number, callback: () => void) => {
+  let listen = (port: number, callback?: Function) => {
     let server = createServer(handle)
     server.listen(port, callback)
     return server
   }
 
+  let route = (name: string, middleware: HttpMiddleware) => {
+    add(createRoute(name, middleware))
+  }
+
   return {
     add,
+    route,
     run,
     handle,
     listen,
@@ -201,6 +212,7 @@ export const handleResponse = async (params: ResponseParams) => {
   let { req, res, requestInfo, responseInfo, context } = params
   let basename = context.read(BasenameCell)
   let dirname = context.read(DirnameCell)
+  let routename = context.read(RoutenameCell)
   let accept = accepts(req)
 
   // handle response status
@@ -282,15 +294,23 @@ export const handleResponse = async (params: ResponseParams) => {
     res.end(html)
   }
 
-  let handleRedirect = (url: string, useBasename: boolean) => {
+  let handleRedirect = (body: RedirectBody) => {
+    let url = body.value
+    let { useBasename, useRoutename } = body
+
     if (url === 'back') {
       let referrer = req.headers['referer'] + '' || '/'
       url = referrer
     }
 
-    // attach basename
-    if (useBasename && !url.startsWith('//') && url.startsWith('/')) {
-      url = basename + url
+    // handle routename and basename
+    if (!url.startsWith('//') && url.startsWith('/')) {
+      if (useRoutename) {
+        url = routename + url
+      }
+      if (useBasename) {
+        url = basename + url
+      }
     }
 
     let code = responseInfo.status?.code ?? 302
@@ -361,7 +381,7 @@ export const handleResponse = async (params: ResponseParams) => {
   }
 
   if (body.type === 'redirect') {
-    return handleRedirect(body.value, body.useBasename)
+    return handleRedirect(body)
   }
 
   if (body.type === 'stream') {

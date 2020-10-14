@@ -14,16 +14,28 @@ export const basename = <T extends { pathname: string }>(
   return async (request, next) => {
     let basenameCell = useCell(BasenameCell)
 
-    let { basename, pathname } = findBasename(basenames, request.pathname)
+    let result = handleBasenames(basenames, request)
 
-    let newRequest = {
-      ...request,
-      pathname,
-    }
+    basenameCell.value = result.basename
 
-    basenameCell.value = basename
+    return next(result.request)
+  }
+}
 
-    return next(newRequest)
+export const handleBasenames = <T extends { pathname: string }>(
+  basenames: string[],
+  request: T
+) => {
+  let { basename, pathname } = findBasename(basenames, request.pathname)
+
+  let newRequest = {
+    ...request,
+    pathname,
+  }
+
+  return {
+    basename,
+    request: newRequest,
   }
 }
 

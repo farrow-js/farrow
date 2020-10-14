@@ -51,12 +51,14 @@ const raw = (value) => {
     };
 };
 exports.raw = raw;
-const redirect = (url, useBasename = true) => {
+const redirect = (url, options) => {
+    var _a, _b;
     return {
         body: {
             type: 'redirect',
             value: url,
-            useBasename,
+            useBasename: (_a = options === null || options === void 0 ? void 0 : options.useBasename) !== null && _a !== void 0 ? _a : true,
+            useRoutename: (_b = options === null || options === void 0 ? void 0 : options.useRoutename) !== null && _b !== void 0 ? _b : true
         },
     };
 };

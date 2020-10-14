@@ -46,6 +46,7 @@ export declare type EmptyBody = {
 export declare type RedirectBody = {
     type: 'redirect';
     useBasename: boolean;
+    useRoutename: boolean;
     value: string;
 };
 export declare type StreamBody = {
@@ -91,7 +92,11 @@ export declare const text: (value: string) => ResponseInfo;
 export declare const html: (value: string) => ResponseInfo;
 export declare const empty: () => ResponseInfo;
 export declare const raw: (value: string) => ResponseInfo;
-export declare const redirect: (url: string, useBasename?: boolean) => ResponseInfo;
+export declare type RedirectOptions = {
+    useBasename: boolean;
+    useRoutename: boolean;
+};
+export declare const redirect: (url: string, options?: RedirectOptions | undefined) => ResponseInfo;
 export declare const custom: (handler: CustomBodyHandler) => ResponseInfo;
 export declare const stream: (stream: Stream) => ResponseInfo;
 export declare const buffer: (buffer: Buffer) => ResponseInfo;

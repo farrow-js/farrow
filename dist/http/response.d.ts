@@ -27,5 +27,5 @@ export declare const toResponse: <T extends ResponseInfoCreator>(f: T, info: Res
 export declare const createResponse: (info: ResponseInfo) => Response;
 export declare const Response: Response;
 export declare type MaybeAsyncResponse = Response | Promise<Response>;
-export declare const match: <T extends "json" | "text" | "html" | "empty" | "redirect" | "stream" | "buffer" | "file" | "raw" | "custom">(type: T, f: (body: BodyMap[T]) => MaybeAsyncResponse) => Middleware<any, MaybeAsyncResponse>;
+export declare const match: <T extends "json" | "text" | "html" | "empty" | "redirect" | "stream" | "buffer" | "raw" | "file" | "custom">(type: T, f: (body: BodyMap[T]) => MaybeAsyncResponse) => Middleware<any, MaybeAsyncResponse>;
 export {};

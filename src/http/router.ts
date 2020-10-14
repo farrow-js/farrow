@@ -3,6 +3,7 @@ import { createPipeline, Next, Middleware, RunPipelineOptions, useContext } from
 import * as Schema from '../core/schema'
 import { MaybeAsyncResponse, match as matchType } from './response'
 import { BodyMap } from './responseInfo'
+import { route as createRoute } from './routename'
 
 export type RouterPipelineOptions = {
   pathname: string
@@ -45,6 +46,7 @@ export type RouterPipeline<I, O> = {
   add: (input: Middleware<I, O>) => void
   run: (input: I, options?: RunPipelineOptions<I, O>) => O
   match: <T extends keyof BodyMap>(type: T, f: (body: BodyMap[T]) => MaybeAsyncResponse) => void
+  route: (name: string, middleware: Middleware<I, O>) => void
 }
 
 export type RouterInput = {
@@ -101,10 +103,15 @@ export const createRouterPipeline = <T extends RouterPipelineOptions>(
     pipeline.add(matchType(type, f))
   }
 
+  let route: ResultPipeline['route'] = (name, middleware) => {
+    pipeline.add(createRoute(name, middleware))
+  }
+
   return {
     middleware,
     add: pipeline.add,
     run: pipeline.run,
     match: match,
+    route: route,
   }
 }

@@ -1,13 +1,10 @@
-import path from 'path'
-import { createHttpPipeline, RequestInfo } from './http'
-import { Response } from './http/response'
+import { createHttpPipeline, RequestInfo, Response, useRoutename } from './http'
 import { createRouterPipeline } from './http/router'
 import { object, number, string, nullable, list } from './core/schema'
 import { createCell, Middleware, useCell } from './core/pipeline'
 import { DirnameCell } from './http/dirname'
-import { basename } from './http/basename'
-import * as Res from './http/responseInfo'
-import { assert } from 'console'
+import { basename, useBasename } from './http/basename'
+import { route } from './http/routename'
 
 const logger: Middleware<any, any> = async (request, next) => {
   let start = Date.now()
@@ -38,24 +35,35 @@ home.match('html', (body) => {
 })
 
 home.add(async (request) => {
+  let basename = useBasename().value
+
   return Response.html(`
     <h1>Home:${request.pathname}</h1>
     <ul>
       <li>
-        <a href="/detail/1">detail 1</a>
+        <a href="${basename}/detail/1">detail 1</a>
       </li>
       <li>
-        <a href="/detail/2">detail 2</a>
+        <a href="${basename}/detail/2">detail 2</a>
       </li>
       <li>
-        <a href="/detail/3">detail 3</a>
+        <a href="${basename}/detail/3">detail 3</a>
       </li>
+      <li>
+        <a href="${basename}/detail/4">detail 4</a>
+      </li>
+      <li>
+        <a href="${basename}/detail/5">detail 5</a>
+      </li>
+      <li>
+      <a href="${basename}/detail/6">detail 6</a>
+    </li>
     </ul>
   `)
 })
 
 const detail = createRouterPipeline({
-  pathname: '/detail/:detailId',
+  pathname: '/:detailId',
   params: object({
     detailId: number,
   }),
@@ -65,7 +73,16 @@ const detail = createRouterPipeline({
 })
 
 detail.add(async (request) => {
+  let basename = useBasename().value
+  let routename = useRoutename().value
+
+  if (request.params.detailId > 4) {
+    return Response.redirect(`/3?tab=from=${request.params.detailId}`)
+  }
+
   return Response.json({
+    basename: basename,
+    routename: routename,
     pathname: request.pathname,
     detailId: request.params.detailId,
     tab: request.query.tab,
@@ -125,7 +142,7 @@ app.add(logger)
 app.add(history)
 
 app.add(home.middleware)
-app.add(detail.middleware)
+app.route('/detail', detail.middleware)
 
 app.add(attachment.middleware)
 

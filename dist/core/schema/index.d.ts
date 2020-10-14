@@ -1,6 +1,6 @@
 import { Json, Err, Ok, Result } from '../types';
 export { Json, Err, Ok, Result };
-export declare type SchemaError = {
+export declare type SchemaValidationError = {
     path?: (string | number)[];
     message: string;
 };
@@ -11,7 +11,7 @@ export declare type Type<T = any> = {
     toJSON: () => Json;
     is: (term: Term) => term is Term<T>;
     assert: (term: Term) => asserts term is Term<T>;
-    validate: (input: unknown) => Result<T, SchemaError>;
+    validate: (input: unknown) => Result<T, SchemaValidationError>;
 };
 export declare const isType: (input: any) => input is Type<any>;
 declare const TermSymbol: unique symbol;
@@ -23,7 +23,7 @@ export declare const isTerm: (input: any) => input is Term<any>;
 export declare type RawType<T extends Type> = T extends Type<infer R> ? R : T;
 export declare type CreateTypeOptions<T, I = unknown> = {
     toJSON?: () => Json;
-    validate: (input: I) => Result<T, SchemaError>;
+    validate: (input: I) => Result<T, SchemaValidationError>;
 };
 export declare const createType: <T>(options: CreateTypeOptions<T, unknown>) => Type<T>;
 export declare const thunk: <T>(f: () => Type<T>) => Type<T>;

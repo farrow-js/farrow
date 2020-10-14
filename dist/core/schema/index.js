@@ -369,34 +369,3 @@ exports.term = exports.createType({
         }
     },
 });
-const Data = exports.object({
-    a: exports.number,
-    b: exports.string,
-    c: exports.boolean,
-    d: exports.list(exports.number),
-    e: exports.record(exports.string),
-    f: exports.literal(1),
-    g: exports.nullable(exports.number),
-    h: exports.json,
-    i: exports.any,
-});
-const result = Data.validate({
-    a: 1,
-    b: '1',
-    c: false,
-    d: [1, 23, 4],
-    e: {
-        a: '1',
-        b: '2',
-    },
-    f: 1,
-    g: null,
-    h: {
-        a: {
-            b: 1,
-            c: [1, 2],
-        },
-    },
-    i: '123',
-});
-// console.log(result.value)

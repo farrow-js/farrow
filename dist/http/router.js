@@ -23,6 +23,7 @@ exports.createRouterPipeline = void 0;
 const path_to_regexp_1 = require("path-to-regexp");
 const pipeline_1 = require("../core/pipeline");
 const Schema = __importStar(require("../core/schema"));
+const response_1 = require("./response");
 const createRequestSchema = (options) => {
     let fileds = {};
     for (let key in options) {
@@ -43,15 +44,16 @@ const createRequestSchema = (options) => {
 const createRouterPipeline = (options) => {
     let pipeline = pipeline_1.createPipeline();
     let schema = createRequestSchema(options);
-    let match = path_to_regexp_1.match(options.pathname);
+    let matcher = path_to_regexp_1.match(options.pathname);
     let middleware = function (input, next) {
-        let runPipeline = pipeline_1.usePipeline(pipeline);
+        var _a;
+        let context = pipeline_1.useContext();
         if (typeof options.method === 'string') {
-            if (options.method !== input.method) {
+            if (options.method.toLowerCase() !== ((_a = input.method) === null || _a === void 0 ? void 0 : _a.toLowerCase())) {
                 return next();
             }
         }
-        let matches = match(input.pathname);
+        let matches = matcher(input.pathname);
         if (!matches) {
             return next();
         }
@@ -63,12 +65,19 @@ const createRouterPipeline = (options) => {
         if (result.isErr) {
             throw new Error(result.value.message);
         }
-        return runPipeline(result.value);
+        return pipeline.run(result.value, {
+            context,
+            onLast: () => next(),
+        });
+    };
+    let match = (type, f) => {
+        pipeline.add(response_1.match(type, f));
     };
     return {
         middleware,
         add: pipeline.add,
         run: pipeline.run,
+        match: match,
     };
 };
 exports.createRouterPipeline = createRouterPipeline;

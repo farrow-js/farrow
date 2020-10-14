@@ -1,18 +1,13 @@
+import path from 'path'
 import { createHttpPipeline, RequestInfo } from './http'
-import {
-  html,
-  status,
-  json,
-  text,
-  TextResponser,
-  HTMLResponser,
-  StatusResponser,
-  JsonResponser,
-} from './http/responser'
+import { Response } from './http/response'
 import { createRouterPipeline } from './http/router'
-import { object, number, string, nullable, createType, Err, Ok } from './core/schema'
+import { object, number, string, nullable, list } from './core/schema'
 import { createCell, Middleware, useCell } from './core/pipeline'
-import { Request } from 'node-fetch'
+import { DirnameCell } from './http/dirname'
+import { basename } from './http/basename'
+import * as Res from './http/responseInfo'
+import { assert } from 'console'
 
 const logger: Middleware<any, any> = async (request, next) => {
   let start = Date.now()
@@ -23,24 +18,12 @@ const logger: Middleware<any, any> = async (request, next) => {
   return response
 }
 
-const NotFound = () => {
-  return status({
-    code: 404,
-  })
-}
-
 const home = createRouterPipeline({
   pathname: '/',
 })
 
-home.add(async (request, next) => {
-  let response = await next(request)
-
-  if (!html.is(response)) {
-    return response
-  }
-
-  return html(`
+home.match('html', (body) => {
+  return Response.html(`
     <html lang="en">
     <head>
       <meta charset="UTF-8">
@@ -48,14 +31,14 @@ home.add(async (request, next) => {
       <title>Document</title>
     </head>
     <body>
-      ${response.value}
+      ${body.value}
     </body>
     </html>
-  `)
+`)
 })
 
 home.add(async (request) => {
-  return html(`
+  return Response.html(`
     <h1>Home:${request.pathname}</h1>
     <ul>
       <li>
@@ -82,11 +65,31 @@ const detail = createRouterPipeline({
 })
 
 detail.add(async (request) => {
-  return json({
+  return Response.json({
     pathname: request.pathname,
     detailId: request.params.detailId,
     tab: request.query.tab,
   })
+})
+
+const files = createRouterPipeline({
+  pathname: '/static/:pathname*',
+  params: object({
+    pathname: list(string),
+  }),
+})
+
+files.add(async (request) => {
+  let filename = request.params.pathname.join('/')
+  return Response.file(filename)
+})
+
+const attachment = createRouterPipeline({
+  pathname: '/src/index.js',
+})
+
+attachment.add(async () => {
+  return Response.file('index.js').attachment('bundle.js')
 })
 
 const HistoryCell = createCell([] as string[])
@@ -110,11 +113,13 @@ const history: Middleware<RequestInfo, any> = async (request, next) => {
 }
 
 const app = createHttpPipeline({
-  responsers: [JsonResponser, TextResponser, StatusResponser, HTMLResponser],
   contexts: {
     history: HistoryCell.create([]),
+    dirname: DirnameCell.create(__dirname),
   },
 })
+
+app.add(basename('/base'))
 
 app.add(logger)
 app.add(history)
@@ -122,10 +127,10 @@ app.add(history)
 app.add(home.middleware)
 app.add(detail.middleware)
 
-app.add(NotFound)
+app.add(attachment.middleware)
+
+app.add(files.middleware)
 
 const server = app.listen(3002, () => {
   console.log('server start at port: 3002')
 })
-
-server

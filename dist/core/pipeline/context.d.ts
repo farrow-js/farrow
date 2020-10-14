@@ -34,4 +34,5 @@ export declare const useContext: () => Context, useCell: <T>(Cell: Cell<T>) => {
     value: T;
 }, useCellValue: <T>(Cell: Cell<T>) => T;
 export declare const fromContext: (context: Context) => Hooks;
+export declare const runWithContext: <F extends (...args: any) => any>(f: F, context: Context) => ReturnType<F>;
 export {};

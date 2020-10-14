@@ -1,5 +1,4 @@
 import type { ResponseOutput } from '.';
-import type { Middleware } from '../core/pipeline';
 import { ResponseInfo, json, html, text, raw, redirect, stream, file, vary, cookie, cookies, header, headers, status, buffer, empty, attachment, custom, BodyMap } from './response';
 declare type ToResponser<T extends ResponseInfoCreator> = (...args: Parameters<T>) => Responser;
 declare type ResponseInfoCreator = (...args: any) => ResponseInfo;
@@ -28,4 +27,4 @@ export declare const toResponser: <T extends ResponseInfoCreator>(f: T, info: an
 export declare const createResponser: (info: any) => Responser;
 declare const _default: Responser;
 export default _default;
-export declare const match: <T extends string | number | symbol>(type: T, f: (body: any) => ResponseOutput) => Middleware<any, ResponseOutput>;
+export declare const match: <T extends string | number | symbol>(type: T, f: (body: any) => any) => any;

@@ -11,12 +11,23 @@ import {
   useCellValue,
   useContext,
   Hooks,
+  runWithContext,
 } from './context'
 import { Next, createCounter } from './counter'
 
 export { Next }
 
-export { createCell, createContext, CellStorage, Cell, Context, useCellValue, useCell, useContext }
+export {
+  createCell,
+  createContext,
+  CellStorage,
+  Cell,
+  Context,
+  useCellValue,
+  useCell,
+  useContext,
+  runWithContext,
+}
 
 export type Middleware<I = unknown, O = unknown> = (input: I, next: Next<I, O>) => O
 
@@ -30,18 +41,22 @@ const PipelineSymbol = Symbol('pipeline')
 
 type PipelineSymbol = typeof PipelineSymbol
 
-export type PipelineOptions<O = unknown> = {
-  defaultOutput?: O
+export type PipelineOptions = {
   contexts?: CellStorage
+}
+
+export type RunPipelineOptions<I = unknown, O = unknown> = {
+  context?: Context
+  onLast?: Next<I, O>
 }
 
 export type Pipeline<I = unknown, O = unknown> = {
   [PipelineSymbol]: true
   add: (input: Middleware<I, O>) => void
-  run: (input: I, context?: Context) => O
+  run: (input: I, options?: RunPipelineOptions<I, O>) => O
 }
 
-export const createPipeline = <I, O>(options?: PipelineOptions<O>): Pipeline<I, O> => {
+export const createPipeline = <I, O>(options?: PipelineOptions): Pipeline<I, O> => {
   type Add = Pipeline<I, O>['add']
   type Run = Pipeline<I, O>['run']
 
@@ -55,12 +70,10 @@ export const createPipeline = <I, O>(options?: PipelineOptions<O>): Pipeline<I, 
     middlewares.push(middleware)
   }
 
-  let createCurrentCounter = (hooks: Hooks) => {
+  let createCurrentCounter = (hooks: Hooks, onLast?: Next<I, O>) => {
     return createCounter<I, O>((index, input, next) => {
       if (index >= middlewares.length) {
-        if (settings.defaultOutput !== undefined) {
-          return settings.defaultOutput
-        }
+        if (onLast) return onLast(input)
         throw new Error(`Expect returning a value, but all middlewares just calling next()`)
       }
 
@@ -75,11 +88,15 @@ export const createPipeline = <I, O>(options?: PipelineOptions<O>): Pipeline<I, 
   let currentHooks = fromContext(currentContext)
   let currentCounter = createCurrentCounter(currentHooks)
 
-  let run: Run = (input, context = currentContext) => {
-    assertContext(context)
-
+  let run: Run = (input, options) => {
+    let context = options?.context ?? currentContext
     let hooks = context === currentContext ? currentHooks : fromContext(context)
     let counter = context === currentContext ? currentCounter : createCurrentCounter(hooks)
+
+    if (options?.onLast) {
+      counter = createCurrentCounter(hooks, options.onLast)
+    }
+
     let result = counter.start(input)
 
     return result
@@ -98,8 +115,8 @@ export type PipelineOutput<T extends Pipeline> = T extends Pipeline<any, infer O
 export const usePipeline = <I, O>(pipeline: Pipeline<I, O>) => {
   let context = useContext()
 
-  let runPipeline = (input: I): O => {
-    return pipeline.run(input, context)
+  let runPipeline = (input: I, options?: RunPipelineOptions<I, O>): O => {
+    return pipeline.run(input, { ...options, context })
   }
 
   return runPipeline

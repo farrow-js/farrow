@@ -1,10 +1,12 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const http_1 = require("./http");
-const responser_1 = require("./http/responser");
+const response_1 = require("./http/response");
 const router_1 = require("./http/router");
 const schema_1 = require("./core/schema");
 const pipeline_1 = require("./core/pipeline");
+const dirname_1 = require("./http/dirname");
+const basename_1 = require("./http/basename");
 const logger = async (request, next) => {
     let start = Date.now();
     let response = await next(request);
@@ -13,20 +15,11 @@ const logger = async (request, next) => {
     console.log(`path: ${request.pathname}, time: ${time}ms`);
     return response;
 };
-const NotFound = () => {
-    return responser_1.status({
-        code: 404,
-    });
-};
 const home = router_1.createRouterPipeline({
     pathname: '/',
 });
-home.add(async (request, next) => {
-    let response = await next(request);
-    if (!responser_1.html.is(response)) {
-        return response;
-    }
-    return responser_1.html(`
+home.match('html', (body) => {
+    return response_1.Response.html(`
     <html lang="en">
     <head>
       <meta charset="UTF-8">
@@ -34,13 +27,13 @@ home.add(async (request, next) => {
       <title>Document</title>
     </head>
     <body>
-      ${response.value}
+      ${body.value}
     </body>
     </html>
-  `);
+`);
 });
 home.add(async (request) => {
-    return responser_1.html(`
+    return response_1.Response.html(`
     <h1>Home:${request.pathname}</h1>
     <ul>
       <li>
@@ -65,11 +58,27 @@ const detail = router_1.createRouterPipeline({
     }),
 });
 detail.add(async (request) => {
-    return responser_1.json({
+    return response_1.Response.json({
         pathname: request.pathname,
         detailId: request.params.detailId,
         tab: request.query.tab,
     });
+});
+const files = router_1.createRouterPipeline({
+    pathname: '/static/:pathname*',
+    params: schema_1.object({
+        pathname: schema_1.list(schema_1.string),
+    }),
+});
+files.add(async (request) => {
+    let filename = request.params.pathname.join('/');
+    return response_1.Response.file(filename);
+});
+const attachment = router_1.createRouterPipeline({
+    pathname: '/src/index.js',
+});
+attachment.add(async () => {
+    return response_1.Response.file('index.js').attachment('bundle.js');
 });
 const HistoryCell = pipeline_1.createCell([]);
 const useHistory = () => {
@@ -88,17 +97,18 @@ const history = async (request, next) => {
     return response;
 };
 const app = http_1.createHttpPipeline({
-    responsers: [responser_1.JsonResponser, responser_1.TextResponser, responser_1.StatusResponser, responser_1.HTMLResponser],
     contexts: {
         history: HistoryCell.create([]),
+        dirname: dirname_1.DirnameCell.create(__dirname),
     },
 });
+app.add(basename_1.basename('/base'));
 app.add(logger);
 app.add(history);
 app.add(home.middleware);
 app.add(detail.middleware);
-app.add(NotFound);
+app.add(attachment.middleware);
+app.add(files.middleware);
 const server = app.listen(3002, () => {
     console.log('server start at port: 3002');
 });
-server;

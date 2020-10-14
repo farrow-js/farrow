@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.fromContext = exports.useCellValue = exports.useCell = exports.useContext = exports.runContextHooks = exports.createContext = exports.assertContext = exports.isContext = exports.ContextSymbol = exports.createCell = exports.assertCell = exports.isCell = void 0;
+exports.runWithContext = exports.fromContext = exports.useCellValue = exports.useCell = exports.useContext = exports.runContextHooks = exports.createContext = exports.assertContext = exports.isContext = exports.ContextSymbol = exports.createCell = exports.assertCell = exports.isCell = void 0;
 const hook_1 = require("./hook");
 const CellSymbol = Symbol('Cell');
 const isCell = (input) => {
@@ -95,3 +95,7 @@ const fromContext = (context) => ({
     },
 });
 exports.fromContext = fromContext;
+const runWithContext = (f, context) => {
+    return exports.runContextHooks(f, exports.fromContext(context));
+};
+exports.runWithContext = runWithContext;

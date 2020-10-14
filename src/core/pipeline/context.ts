@@ -138,3 +138,7 @@ export const fromContext = (context: Context): Hooks => ({
     return context.read(Cell)
   },
 })
+
+export const runWithContext = <F extends (...args: any) => any>(f: F, context: Context) => {
+  return runContextHooks(f, fromContext(context))
+}

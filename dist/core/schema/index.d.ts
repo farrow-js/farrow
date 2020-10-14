@@ -1,24 +1,8 @@
-export declare type Err<T = any> = {
-    kind: 'Err';
-    value: T;
-    isErr: true;
-    isOk: false;
-};
-export declare type Ok<T = any> = {
-    kind: 'Ok';
-    value: T;
-    isErr: false;
-    isOk: true;
-};
-export declare type Result<T = any, E = string> = Err<E> | Ok<T>;
-export declare const Err: <E = string>(value: E) => Err<E>;
-export declare const Ok: <T, E = string>(value: T) => Result<T, E>;
+import { Json, Err, Ok, Result } from '../types';
+export { Json, Err, Ok, Result };
 export declare type SchemaError = {
     path?: (string | number)[];
     message: string;
-};
-export declare type Json = number | string | boolean | null | object | Json[] | {
-    [key: string]: Json;
 };
 declare const TypeSymbol: unique symbol;
 export declare type Type<T = any> = {
@@ -69,4 +53,3 @@ export declare const json: JsonSchema;
 export declare const any: Type<any>;
 export declare type TermSchema = Type<Term>;
 export declare const term: TermSchema;
-export {};

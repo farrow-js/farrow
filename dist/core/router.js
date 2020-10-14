@@ -4,7 +4,6 @@ exports.createRouterPipeline = void 0;
 const pipeline_1 = require("./pipeline");
 const createRouterPipeline = (options) => {
     let pipeline = pipeline_1.createPipeline({
-        defaultOutput: options.defaultOutput,
         contexts: options.contexts,
     });
     let middleware = function (input, next) {

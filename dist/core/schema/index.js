@@ -2,26 +2,9 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.term = exports.any = exports.json = exports.record = exports.literal = exports.union = exports.nullable = exports.object = exports.list = exports.boolean = exports.string = exports.number = exports.thunk = exports.createType = exports.isTerm = exports.isType = exports.Ok = exports.Err = void 0;
 const util_1 = require("./util");
-const Err = (value) => {
-    let err = {
-        kind: 'Err',
-        value,
-        isErr: true,
-        isOk: false,
-    };
-    return err;
-};
-exports.Err = Err;
-const Ok = (value) => {
-    let ok = {
-        kind: 'Ok',
-        value,
-        isErr: false,
-        isOk: true,
-    };
-    return ok;
-};
-exports.Ok = Ok;
+const types_1 = require("../types");
+Object.defineProperty(exports, "Err", { enumerable: true, get: function () { return types_1.Err; } });
+Object.defineProperty(exports, "Ok", { enumerable: true, get: function () { return types_1.Ok; } });
 const TypeSymbol = Symbol('Type');
 const isType = (input) => {
     return !!(input && input[TypeSymbol]);
@@ -113,10 +96,10 @@ exports.number = exports.createType({
             }
         }
         if (typeof input === 'number') {
-            return exports.Ok(input);
+            return types_1.Ok(input);
         }
         else {
-            return exports.Err({
+            return types_1.Err({
                 message: `${input} is not a number`,
             });
         }
@@ -131,10 +114,10 @@ exports.string = exports.createType({
     },
     validate: (input) => {
         if (typeof input === 'string') {
-            return exports.Ok(input);
+            return types_1.Ok(input);
         }
         else {
-            return exports.Err({
+            return types_1.Err({
                 message: `${input} is not a string`,
             });
         }
@@ -155,10 +138,10 @@ exports.boolean = exports.createType({
             input = false;
         }
         if (typeof input === 'boolean') {
-            return exports.Ok(input);
+            return types_1.Ok(input);
         }
         else {
-            return exports.Err({
+            return types_1.Err({
                 message: `${input} is not a boolean`,
             });
         }
@@ -175,7 +158,7 @@ const list = (ItemType) => {
         validate: (input) => {
             var _a;
             if (!Array.isArray(input)) {
-                return exports.Err({
+                return types_1.Err({
                     message: `${input} is not a array`,
                 });
             }
@@ -184,14 +167,14 @@ const list = (ItemType) => {
                 let item = input[i];
                 let result = ItemType.validate(item);
                 if (result.isErr) {
-                    return exports.Err({
+                    return types_1.Err({
                         path: [i, ...((_a = result.value.path) !== null && _a !== void 0 ? _a : [])],
                         message: result.value.message,
                     });
                 }
                 list.push(result.value);
             }
-            return exports.Ok(list);
+            return types_1.Ok(list);
         },
     });
 };
@@ -213,17 +196,17 @@ const object = (fields) => {
         validate: (input) => {
             var _a;
             if (typeof input !== 'object') {
-                return exports.Err({
+                return types_1.Err({
                     message: `${input} is not an object`,
                 });
             }
             if (input === null) {
-                return exports.Err({
+                return types_1.Err({
                     message: `null is not an object`,
                 });
             }
             if (Array.isArray(input)) {
-                return exports.Err({
+                return types_1.Err({
                     message: `${input} is not an object`,
                 });
             }
@@ -234,14 +217,14 @@ const object = (fields) => {
                 let field = source[key];
                 let result = FieldType.validate(field);
                 if (result.isErr) {
-                    return exports.Err({
+                    return types_1.Err({
                         path: [key, ...((_a = result.value.path) !== null && _a !== void 0 ? _a : [])],
                         message: result.value.message,
                     });
                 }
                 object[key] = result.value;
             }
-            return exports.Ok(object);
+            return types_1.Ok(object);
         },
     });
     return Type;
@@ -257,10 +240,10 @@ const nullable = (Type) => {
         },
         validate: (input) => {
             if (input === null) {
-                return exports.Ok(input);
+                return types_1.Ok(input);
             }
             if (input === undefined) {
-                return exports.Ok(input);
+                return types_1.Ok(input);
             }
             return Type.validate(input);
         },
@@ -282,7 +265,7 @@ const union = (...Types) => {
                 if (result.isOk)
                     return result;
             }
-            return exports.Err({
+            return types_1.Err({
                 message: `${input} is not matched the union types: \n${JSON.stringify(Type.toJSON(), null, 2)}`,
             });
         },
@@ -300,10 +283,10 @@ const literal = (literal) => {
         },
         validate: (input) => {
             if (input === literal) {
-                return exports.Ok(literal);
+                return types_1.Ok(literal);
             }
             else {
-                return exports.Err({
+                return types_1.Err({
                     message: `${input} is not equal to ${literal}`,
                 });
             }
@@ -322,17 +305,17 @@ const record = (Type) => {
         validate: (input) => {
             var _a;
             if (typeof input !== 'object') {
-                return exports.Err({
+                return types_1.Err({
                     message: `${input} is not an object`,
                 });
             }
             if (input === null) {
-                return exports.Err({
+                return types_1.Err({
                     message: `null is not an object`,
                 });
             }
             if (Array.isArray(input)) {
-                return exports.Err({
+                return types_1.Err({
                     message: `${input} is not an object`,
                 });
             }
@@ -342,14 +325,14 @@ const record = (Type) => {
                 let value = source[key];
                 let result = Type.validate(value);
                 if (result.isErr) {
-                    return exports.Err({
+                    return types_1.Err({
                         path: [key, ...((_a = result.value.path) !== null && _a !== void 0 ? _a : [])],
                         message: result.value.message,
                     });
                 }
                 record[key] = result.value;
             }
-            return exports.Ok(record);
+            return types_1.Ok(record);
         },
     });
     return ResultType;
@@ -366,7 +349,7 @@ exports.any = exports.createType({
         };
     },
     validate: (input) => {
-        return exports.Ok(input);
+        return types_1.Ok(input);
     },
 });
 exports.term = exports.createType({
@@ -377,10 +360,10 @@ exports.term = exports.createType({
     },
     validate: (input) => {
         if (exports.isTerm(input)) {
-            return exports.Ok(input);
+            return types_1.Ok(input);
         }
         else {
-            return exports.Err({
+            return types_1.Err({
                 message: `${input} is not a term of any Type`,
             });
         }

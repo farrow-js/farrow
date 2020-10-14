@@ -1,6 +1,8 @@
 import { match as createMatch } from 'path-to-regexp'
-import { createPipeline, Next, usePipeline, Middleware, Context } from '../core/pipeline'
+import { createPipeline, Next, Middleware, RunPipelineOptions, useContext } from '../core/pipeline'
 import * as Schema from '../core/schema'
+import { MaybeAsyncResponse, match as matchType } from './response'
+import { BodyMap } from './responseInfo'
 
 export type RouterPipelineOptions = {
   pathname: string
@@ -36,16 +38,13 @@ const createRequestSchema = <T extends RouterPipelineOptions>(options: T): Reque
   return Schema.object(fileds) as RequestSchema<T>
 }
 
-type MaybePromise<T> = T | Promise<T>
-
 export type RouterRequest<T extends RouterPipelineOptions> = Schema.RawType<RequestSchema<T>>
-
-export type RouterResponse = MaybePromise<Schema.Term>
 
 export type RouterPipeline<I, O> = {
   middleware: <T extends RouterInput>(input: T, next: Next<T, O>) => O
   add: (input: Middleware<I, O>) => void
-  run: (input: I, context?: Context | undefined) => O
+  run: (input: I, options?: RunPipelineOptions<I, O>) => O
+  match: <T extends keyof BodyMap>(type: T, f: (body: BodyMap[T]) => MaybeAsyncResponse) => void
 }
 
 export type RouterInput = {
@@ -55,27 +54,27 @@ export type RouterInput = {
 
 export const createRouterPipeline = <T extends RouterPipelineOptions>(
   options: T
-): RouterPipeline<RouterRequest<T>, RouterResponse> => {
+): RouterPipeline<RouterRequest<T>, MaybeAsyncResponse> => {
   type Input = RouterRequest<T>
-  type Output = RouterResponse
+  type Output = MaybeAsyncResponse
   type ResultPipeline = RouterPipeline<Input, Output>
 
   let pipeline = createPipeline<Input, Output>()
 
   let schema: Schema.Type<Input> = createRequestSchema(options)
 
-  let match = createMatch(options.pathname)
+  let matcher = createMatch(options.pathname)
 
   let middleware: ResultPipeline['middleware'] = function (input, next) {
-    let runPipeline = usePipeline(pipeline)
+    let context = useContext()
 
     if (typeof options.method === 'string') {
-      if (options.method !== input.method) {
+      if (options.method.toLowerCase() !== input.method?.toLowerCase()) {
         return next()
       }
     }
 
-    let matches = match(input.pathname)
+    let matches = matcher(input.pathname)
 
     if (!matches) {
       return next()
@@ -92,12 +91,20 @@ export const createRouterPipeline = <T extends RouterPipelineOptions>(
       throw new Error(result.value.message)
     }
 
-    return runPipeline(result.value)
+    return pipeline.run(result.value, {
+      context,
+      onLast: () => next(),
+    })
+  }
+
+  let match: ResultPipeline['match'] = (type, f) => {
+    pipeline.add(matchType(type, f))
   }
 
   return {
     middleware,
     add: pipeline.add,
     run: pipeline.run,
+    match: match,
   }
 }

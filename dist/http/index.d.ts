@@ -1,15 +1,16 @@
 /// <reference types="node" />
-import { IncomingMessage, ServerResponse } from 'http';
+import { IncomingMessage, Server, ServerResponse } from 'http';
 import { Options as BodyOptions } from 'co-body';
 import { CookieParseOptions as CookieOptions } from 'cookie';
 import { IParseOptions as QueryOptions } from 'qs';
-import { Middleware, PipelineOptions, Context } from '../core/pipeline';
+import { Middleware, Context, Cell } from '../core/pipeline';
 import { MaybeAsyncResponse, Response } from './response';
 import { ResponseInfo } from './responseInfo';
-import { useBasename } from './basename';
-import { useRoutename } from './routename';
+import { useBasenames, usePrefix } from './basenames';
+import { createRouterPipeline } from './router';
+export { createRouterPipeline };
 export { Response, ResponseInfo };
-export { useRoutename, useBasename };
+export { useBasenames, usePrefix };
 export declare const useRequest: () => IncomingMessage;
 export declare const useResponse: () => ServerResponse;
 export declare const useReq: () => IncomingMessage;
@@ -23,10 +24,14 @@ export declare type RequestInfo = {
     cookies?: Record<string, any>;
 };
 export declare type ResponseOutput = MaybeAsyncResponse;
-export interface HttpPipelineOptions extends PipelineOptions {
+export interface HttpPipelineOptions {
+    basenames?: string[];
     body?: BodyOptions;
     cookie?: CookieOptions;
     query?: QueryOptions;
+    contexts?: {
+        [key: string]: () => Cell;
+    };
 }
 export declare type HttpMiddleware = Middleware<RequestInfo, ResponseOutput>;
 export declare const createHttpPipeline: (options: HttpPipelineOptions) => {
@@ -34,8 +39,10 @@ export declare const createHttpPipeline: (options: HttpPipelineOptions) => {
     route: (name: string, middleware: HttpMiddleware) => void;
     run: (input: RequestInfo, options?: import("../core/pipeline").RunPipelineOptions<RequestInfo, MaybeAsyncResponse> | undefined) => MaybeAsyncResponse;
     handle: (req: IncomingMessage, res: ServerResponse) => Promise<any>;
-    listen: (port: number, callback?: Function | undefined) => import("http").Server;
+    listen: (handle: any, listeningListener?: (() => void) | undefined) => Server;
+    middleware: Middleware<RequestInfo, MaybeAsyncResponse>;
 };
+export declare type HttpPipeline = ReturnType<typeof createHttpPipeline>;
 export declare type ResponseParams = {
     requestInfo: RequestInfo;
     responseInfo: ResponseInfo;

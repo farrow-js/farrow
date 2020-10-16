@@ -30,6 +30,7 @@ const createResponse = (info) => {
         empty: exports.toResponse(responseInfo_1.empty, info),
         attachment: exports.toResponse(responseInfo_1.attachment, info),
         custom: exports.toResponse(responseInfo_1.custom, info),
+        type: exports.toResponse(responseInfo_1.type, info)
     };
 };
 exports.createResponse = createResponse;

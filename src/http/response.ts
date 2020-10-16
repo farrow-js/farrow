@@ -18,6 +18,7 @@ import {
   empty,
   attachment,
   custom,
+  type,
   merge,
   BodyMap,
 } from './responseInfo'
@@ -49,6 +50,7 @@ export type Response = {
   empty: ToResponse<typeof empty>
   attachment: ToResponse<typeof attachment>
   custom: ToResponse<typeof custom>
+  type: ToResponse<typeof type>
 }
 
 export const toResponse = <T extends ResponseInfoCreator>(
@@ -82,6 +84,7 @@ export const createResponse = (info: ResponseInfo): Response => {
     empty: toResponse(empty, info),
     attachment: toResponse(attachment, info),
     custom: toResponse(custom, info),
+    type: toResponse(type, info)
   }
 }
 

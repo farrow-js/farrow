@@ -1,6 +1,7 @@
-import { createServer, IncomingMessage, ServerResponse } from 'http'
+import { createServer, IncomingMessage, Server, ServerResponse } from 'http'
 import fs from 'fs'
-import * as path from 'path'
+import path from 'path'
+import { Stream } from 'stream'
 
 import parseBody, { Options as BodyOptions } from 'co-body'
 import { parse as parseCookies, CookieParseOptions as CookieOptions } from 'cookie'
@@ -22,26 +23,34 @@ import {
   runWithContext,
   createPipeline,
   Middleware,
-  PipelineOptions,
   useCell,
   Context,
+  useContext,
+  CellStorage,
+  Cell,
 } from '../core/pipeline'
 
 import { MaybeAsyncResponse, Response } from './response'
 
 import { ResponseInfo, Status, Headers, Cookies, RedirectBody } from './responseInfo'
 
-import { BasenameCell, useBasename } from './basename'
-
-import { route as createRoute, RoutenameCell, useRoutename } from './routename'
+import {
+  BasenamesCell,
+  useBasenames,
+  handleBasenames,
+  route as createRoute,
+  usePrefix,
+} from './basenames'
 
 import { Json } from '../core/types'
-import { Stream } from 'stream'
-import { DirnameCell } from './dirname'
+
+import { createRouterPipeline } from './router'
+
+export { createRouterPipeline }
 
 export { Response, ResponseInfo }
 
-export { useRoutename, useBasename }
+export { useBasenames, usePrefix }
 
 const RequestCell = createCell<IncomingMessage | null>(null)
 
@@ -81,16 +90,29 @@ export type RequestInfo = {
 
 export type ResponseOutput = MaybeAsyncResponse
 
-export interface HttpPipelineOptions extends PipelineOptions {
+export interface HttpPipelineOptions {
+  basenames?: string[]
   body?: BodyOptions
   cookie?: CookieOptions
   query?: QueryOptions
+  contexts?: {
+    [key: string]: () => Cell
+  }
 }
 
 export type HttpMiddleware = Middleware<RequestInfo, ResponseOutput>
 
 export const createHttpPipeline = (options: HttpPipelineOptions) => {
   let pipeline = createPipeline<RequestInfo, ResponseOutput>()
+
+  let middleware: HttpMiddleware = (request, next) => {
+    let ctx = useContext()
+
+    return pipeline.run(request, {
+      context: ctx,
+      onLast: () => next(),
+    })
+  }
 
   let handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
     if (typeof req.url !== 'string') {
@@ -111,21 +133,22 @@ export const createHttpPipeline = (options: HttpPipelineOptions) => {
 
     let cookies = parseCookies(req.headers['cookie'] ?? '', options.cookie)
 
-    let requestInfo: RequestInfo = {
+    let { basename, requestInfo } = handleBasenames(options.basenames ?? [], {
       pathname,
       method,
       query,
       body,
       headers,
       cookies,
-    }
+    })
+
+    let storages = getStorage(options.contexts)
 
     let context = createContext({
-      ...options.contexts,
+      ...storages,
       request: RequestCell.create(req),
       response: ResponseCell.create(res),
-      basename: BasenameCell.create(''),
-      routename: RoutenameCell.create(''),
+      basenames: BasenamesCell.create([basename]),
     })
 
     let responser = await pipeline.run(requestInfo, {
@@ -136,7 +159,7 @@ export const createHttpPipeline = (options: HttpPipelineOptions) => {
     return handleResponse({
       req,
       res,
-      requestInfo,
+      requestInfo: requestInfo,
       responseInfo: responser.info,
       context,
     })
@@ -151,13 +174,12 @@ export const createHttpPipeline = (options: HttpPipelineOptions) => {
 
       if (!res.headersSent) {
         res.statusCode = 500
-        res.statusMessage = message
         res.setHeader('Content-Type', 'text/plain')
-        res.setHeader('Content-Length', Buffer.byteLength(res.statusMessage))
+        res.setHeader('Content-Length', Buffer.byteLength(message))
       }
 
       if (!res.writableEnded) {
-        res.end(message)
+        res.end(Buffer.from(message))
       }
     }
   }
@@ -166,9 +188,9 @@ export const createHttpPipeline = (options: HttpPipelineOptions) => {
 
   let run = pipeline.run
 
-  let listen = (port: number, callback?: Function) => {
+  let listen = (...args: Parameters<Server['listen']>) => {
     let server = createServer(handle)
-    server.listen(port, callback)
+    server.listen(...args)
     return server
   }
 
@@ -182,7 +204,21 @@ export const createHttpPipeline = (options: HttpPipelineOptions) => {
     run,
     handle,
     listen,
+    middleware,
   }
+}
+
+export type HttpPipeline = ReturnType<typeof createHttpPipeline>
+
+const getStorage = (contexts: HttpPipelineOptions['contexts']): CellStorage => {
+  let storage: CellStorage = {}
+
+  for (let key in contexts) {
+    let cell = contexts[key]()
+    storage[key] = cell
+  }
+
+  return storage
 }
 
 const jsonTypes = ['json', 'application/*+json', 'application/csp-report']
@@ -210,9 +246,8 @@ export type ResponseParams = {
 
 export const handleResponse = async (params: ResponseParams) => {
   let { req, res, requestInfo, responseInfo, context } = params
-  let basename = context.read(BasenameCell)
-  let dirname = context.read(DirnameCell)
-  let routename = context.read(RoutenameCell)
+  let basenames = context.read(BasenamesCell)
+  let prefix = basenames.join('')
   let accept = accepts(req)
 
   // handle response status
@@ -296,7 +331,6 @@ export const handleResponse = async (params: ResponseParams) => {
 
   let handleRedirect = (body: RedirectBody) => {
     let url = body.value
-    let { useBasename, useRoutename } = body
 
     if (url === 'back') {
       let referrer = req.headers['referer'] + '' || '/'
@@ -304,13 +338,8 @@ export const handleResponse = async (params: ResponseParams) => {
     }
 
     // handle routename and basename
-    if (!url.startsWith('//') && url.startsWith('/')) {
-      if (useRoutename) {
-        url = routename + url
-      }
-      if (useBasename) {
-        url = basename + url
-      }
+    if (body.usePrefix && !url.startsWith('//') && url.startsWith('/')) {
+      url = prefix + url
     }
 
     let code = responseInfo.status?.code ?? 302
@@ -335,10 +364,9 @@ export const handleResponse = async (params: ResponseParams) => {
     res.end(buffer)
   }
 
-  let handleFile = (name: string) => {
-    let filename = path.join(dirname, name)
+  let handleFile = (filename: string) => {
     let stream = fs.createReadStream(filename)
-    let ext = path.extname(name)
+    let ext = path.extname(filename)
     let contentType = mime.contentType(ext)
 
     if (contentType) {
@@ -404,7 +432,6 @@ export const handleResponse = async (params: ResponseParams) => {
         res,
         requestInfo,
         responseInfo: omitBody(responseInfo),
-        basename,
       })
     }
     return runWithContext(handleResponse, context)

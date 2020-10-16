@@ -1,31 +1,12 @@
 "use strict";
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleResponse = exports.createHttpPipeline = exports.useRes = exports.useReq = exports.useResponse = exports.useRequest = exports.useBasename = exports.useRoutename = exports.Response = void 0;
+exports.handleResponse = exports.createHttpPipeline = exports.useRes = exports.useReq = exports.useResponse = exports.useRequest = exports.usePrefix = exports.useBasenames = exports.Response = exports.createRouterPipeline = void 0;
 const http_1 = require("http");
 const fs_1 = __importDefault(require("fs"));
-const path = __importStar(require("path"));
+const path_1 = __importDefault(require("path"));
 const co_body_1 = __importDefault(require("co-body"));
 const cookie_1 = require("cookie");
 const qs_1 = require("qs");
@@ -42,11 +23,11 @@ const mime_types_1 = __importDefault(require("mime-types"));
 const pipeline_1 = require("../core/pipeline");
 const response_1 = require("./response");
 Object.defineProperty(exports, "Response", { enumerable: true, get: function () { return response_1.Response; } });
-const basename_1 = require("./basename");
-Object.defineProperty(exports, "useBasename", { enumerable: true, get: function () { return basename_1.useBasename; } });
-const routename_1 = require("./routename");
-Object.defineProperty(exports, "useRoutename", { enumerable: true, get: function () { return routename_1.useRoutename; } });
-const dirname_1 = require("./dirname");
+const basenames_1 = require("./basenames");
+Object.defineProperty(exports, "useBasenames", { enumerable: true, get: function () { return basenames_1.useBasenames; } });
+Object.defineProperty(exports, "usePrefix", { enumerable: true, get: function () { return basenames_1.usePrefix; } });
+const router_1 = require("./router");
+Object.defineProperty(exports, "createRouterPipeline", { enumerable: true, get: function () { return router_1.createRouterPipeline; } });
 const RequestCell = pipeline_1.createCell(null);
 const useRequest = () => {
     let request = pipeline_1.useCell(RequestCell);
@@ -69,8 +50,15 @@ exports.useReq = exports.useRequest;
 exports.useRes = exports.useResponse;
 const createHttpPipeline = (options) => {
     let pipeline = pipeline_1.createPipeline();
+    let middleware = (request, next) => {
+        let ctx = pipeline_1.useContext();
+        return pipeline.run(request, {
+            context: ctx,
+            onLast: () => next(),
+        });
+    };
     let handleRequest = async (req, res) => {
-        var _a, _b;
+        var _a, _b, _c;
         if (typeof req.url !== 'string') {
             throw new Error(`req.url is not existed`);
         }
@@ -81,20 +69,20 @@ const createHttpPipeline = (options) => {
         let body = await getBody(req, options.body);
         let headers = req.headers;
         let cookies = cookie_1.parse((_b = req.headers['cookie']) !== null && _b !== void 0 ? _b : '', options.cookie);
-        let requestInfo = {
+        let { basename, requestInfo } = basenames_1.handleBasenames((_c = options.basenames) !== null && _c !== void 0 ? _c : [], {
             pathname,
             method,
             query,
             body,
             headers,
             cookies,
-        };
+        });
+        let storages = getStorage(options.contexts);
         let context = pipeline_1.createContext({
-            ...options.contexts,
+            ...storages,
             request: RequestCell.create(req),
             response: ResponseCell.create(res),
-            basename: basename_1.BasenameCell.create(''),
-            routename: routename_1.RoutenameCell.create(''),
+            basenames: basenames_1.BasenamesCell.create([basename]),
         });
         let responser = await pipeline.run(requestInfo, {
             context,
@@ -103,7 +91,7 @@ const createHttpPipeline = (options) => {
         return exports.handleResponse({
             req,
             res,
-            requestInfo,
+            requestInfo: requestInfo,
             responseInfo: responser.info,
             context,
         });
@@ -116,24 +104,23 @@ const createHttpPipeline = (options) => {
             let message = process.env.NODE_ENV !== 'production' ? (error === null || error === void 0 ? void 0 : error.stack) || (error === null || error === void 0 ? void 0 : error.message) : error === null || error === void 0 ? void 0 : error.message;
             if (!res.headersSent) {
                 res.statusCode = 500;
-                res.statusMessage = message;
                 res.setHeader('Content-Type', 'text/plain');
-                res.setHeader('Content-Length', Buffer.byteLength(res.statusMessage));
+                res.setHeader('Content-Length', Buffer.byteLength(message));
             }
             if (!res.writableEnded) {
-                res.end(message);
+                res.end(Buffer.from(message));
             }
         }
     };
     let add = pipeline.add;
     let run = pipeline.run;
-    let listen = (port, callback) => {
+    let listen = (...args) => {
         let server = http_1.createServer(handle);
-        server.listen(port, callback);
+        server.listen(...args);
         return server;
     };
     let route = (name, middleware) => {
-        add(routename_1.route(name, middleware));
+        add(basenames_1.route(name, middleware));
     };
     return {
         add,
@@ -141,9 +128,18 @@ const createHttpPipeline = (options) => {
         run,
         handle,
         listen,
+        middleware,
     };
 };
 exports.createHttpPipeline = createHttpPipeline;
+const getStorage = (contexts) => {
+    let storage = {};
+    for (let key in contexts) {
+        let cell = contexts[key]();
+        storage[key] = cell;
+    }
+    return storage;
+};
 const jsonTypes = ['json', 'application/*+json', 'application/csp-report'];
 const formTypes = ['urlencoded'];
 const textTypes = ['text'];
@@ -157,9 +153,8 @@ const getBody = async (req, options) => {
 };
 const handleResponse = async (params) => {
     let { req, res, requestInfo, responseInfo, context } = params;
-    let basename = context.read(basename_1.BasenameCell);
-    let dirname = context.read(dirname_1.DirnameCell);
-    let routename = context.read(routename_1.RoutenameCell);
+    let basenames = context.read(basenames_1.BasenamesCell);
+    let prefix = basenames.join('');
     let accept = accepts_1.default(req);
     // handle response status
     let handleStatus = (status = { code: 200 }) => {
@@ -225,19 +220,13 @@ const handleResponse = async (params) => {
     let handleRedirect = (body) => {
         var _a, _b;
         let url = body.value;
-        let { useBasename, useRoutename } = body;
         if (url === 'back') {
             let referrer = req.headers['referer'] + '' || '/';
             url = referrer;
         }
         // handle routename and basename
-        if (!url.startsWith('//') && url.startsWith('/')) {
-            if (useRoutename) {
-                url = routename + url;
-            }
-            if (useBasename) {
-                url = basename + url;
-            }
+        if (body.usePrefix && !url.startsWith('//') && url.startsWith('/')) {
+            url = prefix + url;
         }
         let code = (_b = (_a = responseInfo.status) === null || _a === void 0 ? void 0 : _a.code) !== null && _b !== void 0 ? _b : 302;
         handleStatus({
@@ -257,10 +246,9 @@ const handleResponse = async (params) => {
         res.setHeader('Content-Length', buffer.length);
         res.end(buffer);
     };
-    let handleFile = (name) => {
-        let filename = path.join(dirname, name);
+    let handleFile = (filename) => {
         let stream = fs_1.default.createReadStream(filename);
-        let ext = path.extname(name);
+        let ext = path_1.default.extname(filename);
         let contentType = mime_types_1.default.contentType(ext);
         if (contentType) {
             res.setHeader('Content-Type', contentType);
@@ -310,7 +298,6 @@ const handleResponse = async (params) => {
                 res,
                 requestInfo,
                 responseInfo: omitBody(responseInfo),
-                basename,
             });
         };
         return pipeline_1.runWithContext(handleResponse, context);

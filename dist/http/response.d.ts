@@ -1,5 +1,5 @@
 import type { Middleware } from '../core/pipeline';
-import { ResponseInfo, json, html, text, raw, redirect, stream, file, vary, cookie, cookies, header, headers, status, buffer, empty, attachment, custom, BodyMap } from './responseInfo';
+import { ResponseInfo, json, html, text, raw, redirect, stream, file, vary, cookie, cookies, header, headers, status, buffer, empty, attachment, custom, type, BodyMap } from './responseInfo';
 declare type ResponseInfoCreator = (...args: any) => ResponseInfo;
 declare type ToResponse<T extends ResponseInfoCreator> = (...args: Parameters<T>) => Response;
 export declare type Response = {
@@ -22,10 +22,11 @@ export declare type Response = {
     empty: ToResponse<typeof empty>;
     attachment: ToResponse<typeof attachment>;
     custom: ToResponse<typeof custom>;
+    type: ToResponse<typeof type>;
 };
 export declare const toResponse: <T extends ResponseInfoCreator>(f: T, info: ResponseInfo) => ToResponse<T>;
 export declare const createResponse: (info: ResponseInfo) => Response;
 export declare const Response: Response;
 export declare type MaybeAsyncResponse = Response | Promise<Response>;
-export declare const match: <T extends "json" | "text" | "html" | "empty" | "redirect" | "stream" | "buffer" | "raw" | "file" | "custom">(type: T, f: (body: BodyMap[T]) => MaybeAsyncResponse) => Middleware<any, MaybeAsyncResponse>;
+export declare const match: <T extends "json" | "text" | "html" | "empty" | "redirect" | "stream" | "buffer" | "file" | "raw" | "custom">(type: T, f: (body: BodyMap[T]) => MaybeAsyncResponse) => Middleware<any, MaybeAsyncResponse>;
 export {};

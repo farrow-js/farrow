@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.term = exports.any = exports.json = exports.record = exports.literal = exports.union = exports.nullable = exports.object = exports.list = exports.boolean = exports.string = exports.number = exports.thunk = exports.createType = exports.isTerm = exports.isType = exports.Ok = exports.Err = void 0;
+exports.term = exports.any = exports.json = exports.record = exports.literal = exports.intersect = exports.union = exports.nullable = exports.object = exports.list = exports.boolean = exports.string = exports.number = exports.thunk = exports.createType = exports.isTerm = exports.isType = exports.Ok = exports.Err = void 0;
 const util_1 = require("./util");
 const types_1 = require("../types");
 Object.defineProperty(exports, "Err", { enumerable: true, get: function () { return types_1.Err; } });
@@ -273,6 +273,35 @@ const union = (...Types) => {
     return Type;
 };
 exports.union = union;
+const intersect = (...Types) => {
+    let Type = exports.createType({
+        toJSON: () => {
+            return {
+                type: 'Intersect',
+                contentTypes: Types.map((Type) => Type.toJSON()),
+            };
+        },
+        validate: (input) => {
+            let values = [];
+            for (let i = 0; i < Types.length; i++) {
+                let Type = Types[i];
+                let result = Type.validate(input);
+                if (result.isErr) {
+                    return types_1.Err({
+                        message: `${input} is not matched the union types: \n${JSON.stringify(Type.toJSON(), null, 2)}`,
+                    });
+                }
+                else {
+                    values.push(result.value);
+                }
+            }
+            let result = values.reduce((result, value) => Object.assign(result, value));
+            return types_1.Ok(result);
+        },
+    });
+    return Type;
+};
+exports.intersect = intersect;
 const literal = (literal) => {
     return exports.createType({
         toJSON: () => {

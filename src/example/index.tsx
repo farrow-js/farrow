@@ -4,7 +4,9 @@ import React from 'react'
 
 import { createHttpPipeline, Response, usePrefix, createRouterPipeline } from '../http'
 import { object, number, string, nullable, list, boolean, RawType } from '../core/schema'
+import * as S from '../core/schema'
 import { Middleware } from '../core/pipeline'
+import { createStatic } from '../http/static'
 
 import { useReactView } from '../react'
 
@@ -68,11 +70,11 @@ home.add(async (request) => {
 
 const detail = createRouterPipeline({
   pathname: '/:detailId',
-  params: object({
-    detailId: number,
+  params: S.object({
+    detailId: S.number,
   }),
-  query: object({
-    tab: nullable(string),
+  query: S.object({
+    tab: S.nullable(S.string),
   }),
 })
 
@@ -89,18 +91,6 @@ detail.add(async (request) => {
     detailId: request.params.detailId,
     tab: request.query.tab,
   })
-})
-
-const files = createRouterPipeline({
-  pathname: '/static/:pathname*',
-  params: object({
-    pathname: list(string),
-  }),
-})
-
-files.add(async (request) => {
-  let filename = request.params.pathname.join('/')
-  return Response.file(path.join(__dirname, '..', filename))
 })
 
 const attachment = createRouterPipeline({
@@ -148,14 +138,20 @@ const http = createHttpPipeline({
 
 http.add(logger('test'))
 
+http.route(
+  '/static',
+  createStatic({
+    dirname: __dirname,
+  })
+)
+
 http.add(home.middleware)
+
 http.route('/detail', detail.middleware)
 
 http.add(react.middleware)
 
 http.add(attachment.middleware)
-
-http.add(files.middleware)
 
 const server = http.listen(3002, () => {
   console.log('server start at port: 3002')

@@ -24,7 +24,7 @@ const path_to_regexp_1 = require("path-to-regexp");
 const pipeline_1 = require("../core/pipeline");
 const Schema = __importStar(require("../core/schema"));
 const response_1 = require("./response");
-const routename_1 = require("./routename");
+const basenames_1 = require("./basenames");
 const createRequestSchema = (options) => {
     let fileds = {};
     for (let key in options) {
@@ -75,7 +75,7 @@ const createRouterPipeline = (options) => {
         pipeline.add(response_1.match(type, f));
     };
     let route = (name, middleware) => {
-        pipeline.add(routename_1.route(name, middleware));
+        pipeline.add(basenames_1.route(name, middleware));
     };
     return {
         middleware,

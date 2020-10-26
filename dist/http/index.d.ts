@@ -3,7 +3,7 @@ import { IncomingMessage, Server, ServerResponse } from 'http';
 import { Options as BodyOptions } from 'co-body';
 import { CookieParseOptions as CookieOptions } from 'cookie';
 import { IParseOptions as QueryOptions } from 'qs';
-import { Middleware, Context, Cell } from '../core/pipeline';
+import { Middleware, Context, CellStorage } from '../core/pipeline';
 import { MaybeAsyncResponse, Response } from './response';
 import { ResponseInfo } from './responseInfo';
 import { useBasenames, usePrefix } from './basenames';
@@ -11,17 +11,21 @@ import { createRouterPipeline } from './router';
 export { createRouterPipeline };
 export { Response, ResponseInfo };
 export { useBasenames, usePrefix };
-export declare const useRequest: () => IncomingMessage;
-export declare const useResponse: () => ServerResponse;
-export declare const useReq: () => IncomingMessage;
-export declare const useRes: () => ServerResponse;
+export declare const useRequest: () => IncomingMessage | null;
+export declare const useResponse: () => ServerResponse | null;
+export declare const useReq: () => IncomingMessage | null;
+export declare const useRes: () => ServerResponse | null;
+export declare type RequestHeaders = Record<string, string>;
+export declare type RequestCookies = Record<string, string>;
+export declare const useHeaders: () => Record<string, string> | null;
+export declare const useCookies: () => Record<string, string> | null;
 export declare type RequestInfo = {
     pathname: string;
     method?: string;
     query?: Record<string, any>;
     body?: any;
-    headers?: Record<string, any>;
-    cookies?: Record<string, any>;
+    headers?: RequestCookies;
+    cookies?: RequestCookies;
 };
 export declare type ResponseOutput = MaybeAsyncResponse;
 export interface HttpPipelineOptions {
@@ -29,12 +33,10 @@ export interface HttpPipelineOptions {
     body?: BodyOptions;
     cookie?: CookieOptions;
     query?: QueryOptions;
-    contexts?: {
-        [key: string]: () => Cell;
-    };
+    contexts?: () => CellStorage;
 }
 export declare type HttpMiddleware = Middleware<RequestInfo, ResponseOutput>;
-export declare const createHttpPipeline: (options: HttpPipelineOptions) => {
+export declare const createHttpPipeline: (options?: HttpPipelineOptions | undefined) => {
     add: (input: Middleware<RequestInfo, MaybeAsyncResponse>) => void;
     route: (name: string, middleware: HttpMiddleware) => void;
     run: (input: RequestInfo, options?: import("../core/pipeline").RunPipelineOptions<RequestInfo, MaybeAsyncResponse> | undefined) => MaybeAsyncResponse;

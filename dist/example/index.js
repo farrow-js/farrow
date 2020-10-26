@@ -1,4 +1,23 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
+    Object.defineProperty(o, "default", { enumerable: true, value: v });
+}) : function(o, v) {
+    o["default"] = v;
+});
+var __importStar = (this && this.__importStar) || function (mod) {
+    if (mod && mod.__esModule) return mod;
+    var result = {};
+    if (mod != null) for (var k in mod) if (k !== "default" && Object.prototype.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
+    __setModuleDefault(result, mod);
+    return result;
+};
 var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
@@ -7,6 +26,8 @@ const path_1 = __importDefault(require("path"));
 const react_1 = __importDefault(require("react"));
 const http_1 = require("../http");
 const schema_1 = require("../core/schema");
+const S = __importStar(require("../core/schema"));
+const static_1 = require("../http/static");
 const react_2 = require("../react");
 const logger = (name) => async (request, next) => {
     let start = Date.now();
@@ -61,11 +82,11 @@ home.add(async (request) => {
 });
 const detail = http_1.createRouterPipeline({
     pathname: '/:detailId',
-    params: schema_1.object({
-        detailId: schema_1.number,
+    params: S.object({
+        detailId: S.number,
     }),
-    query: schema_1.object({
-        tab: schema_1.nullable(schema_1.string),
+    query: S.object({
+        tab: S.nullable(S.string),
     }),
 });
 detail.add(async (request) => {
@@ -79,16 +100,6 @@ detail.add(async (request) => {
         detailId: request.params.detailId,
         tab: request.query.tab,
     });
-});
-const files = http_1.createRouterPipeline({
-    pathname: '/static/:pathname*',
-    params: schema_1.object({
-        pathname: schema_1.list(schema_1.string),
-    }),
-});
-files.add(async (request) => {
-    let filename = request.params.pathname.join('/');
-    return http_1.Response.file(path_1.default.join(__dirname, '..', filename));
 });
 const attachment = http_1.createRouterPipeline({
     pathname: '/src/index.js',
@@ -120,11 +131,13 @@ const http = http_1.createHttpPipeline({
     basenames: ['/base'],
 });
 http.add(logger('test'));
+http.route('/static', static_1.createStatic({
+    dirname: __dirname,
+}));
 http.add(home.middleware);
 http.route('/detail', detail.middleware);
 http.add(react.middleware);
 http.add(attachment.middleware);
-http.add(files.middleware);
 const server = http.listen(3002, () => {
     console.log('server start at port: 3002');
 });

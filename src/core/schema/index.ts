@@ -356,6 +356,51 @@ export const union = <T extends Type[]>(...Types: T): Type<RawUnionItemType<T[nu
   return Type
 }
 
+/** Augmentation support for UserDefinedOptions. Used specifically for adding custom string formats. */
+type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never
+
+type ListToIntersectionType<T extends Type[]> = UnionToIntersection<
+  {
+    [key in keyof T]: T[key] extends Type<infer U> ? U : never
+  }[number]
+>
+
+export const intersect = <T extends Type[]>(...Types: T): Type<ListToIntersectionType<T>> => {
+  let Type: Type<ListToIntersectionType<T>> = createType({
+    toJSON: () => {
+      return {
+        type: 'Intersect',
+        contentTypes: Types.map((Type) => Type.toJSON()),
+      }
+    },
+    validate: (input) => {
+      let values: T[number][] = []
+      for (let i = 0; i < Types.length; i++) {
+        let Type = Types[i]
+        let result = Type.validate(input)
+
+        if (result.isErr) {
+          return Err({
+            message: `${input} is not matched the union types: \n${JSON.stringify(
+              Type.toJSON(),
+              null,
+              2
+            )}`,
+          })
+        } else {
+          values.push(result.value)
+        }
+      }
+
+      let result = values.reduce((result, value) => Object.assign(result, value))
+
+      return Ok(result as ListToIntersectionType<T>) 
+    },
+  })
+
+  return Type as any
+}
+
 export type LiteralType = string | number | boolean | null | undefined
 
 export const literal = <T extends LiteralType>(literal: T): Type<T> => {

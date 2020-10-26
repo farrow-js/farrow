@@ -43,6 +43,12 @@ export declare const object: <T extends Fields>(fields: T) => Type<{ [key in key
 export declare const nullable: <T extends Type<any>>(Type: T) => Type<RawType<T> | null | undefined>;
 declare type RawUnionItemType<T extends Type> = T extends Type ? RawType<T> : never;
 export declare const union: <T extends Type<any>[]>(...Types: T) => Type<RawUnionItemType<T[number]>>;
+/** Augmentation support for UserDefinedOptions. Used specifically for adding custom string formats. */
+declare type UnionToIntersection<U> = (U extends any ? (k: U) => void : never) extends ((k: infer I) => void) ? I : never;
+declare type ListToIntersectionType<T extends Type[]> = UnionToIntersection<{
+    [key in keyof T]: T[key] extends Type<infer U> ? U : never;
+}[number]>;
+export declare const intersect: <T extends Type<any>[]>(...Types: T) => Type<UnionToIntersection<{ [key in keyof T]: T[key] extends Type<infer U> ? U : never; }[number]>>;
 export declare type LiteralType = string | number | boolean | null | undefined;
 export declare const literal: <T extends LiteralType>(literal: T) => Type<T>;
 export declare const record: <T extends Type<any>>(Type: T) => Type<Record<string, RawType<T>>>;

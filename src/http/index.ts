@@ -2,6 +2,7 @@ import { createServer, IncomingMessage, Server, ServerResponse } from 'http'
 import fs from 'fs'
 import path from 'path'
 import { Stream } from 'stream'
+import { promisify } from 'util'
 
 import parseBody, { Options as BodyOptions } from 'co-body'
 import { parse as parseCookies, CookieParseOptions as CookieOptions } from 'cookie'
@@ -23,11 +24,10 @@ import {
   runWithContext,
   createPipeline,
   Middleware,
-  useCell,
   Context,
   useContext,
   CellStorage,
-  Cell,
+  useCellValue,
 } from '../core/pipeline'
 
 import { MaybeAsyncResponse, Response } from './response'
@@ -45,6 +45,7 @@ import {
 import { Json } from '../core/types'
 
 import { createRouterPipeline } from './router'
+import status from 'statuses'
 
 export { createRouterPipeline }
 
@@ -55,37 +56,46 @@ export { useBasenames, usePrefix }
 const RequestCell = createCell<IncomingMessage | null>(null)
 
 export const useRequest = () => {
-  let request = useCell(RequestCell)
+  let request = useCellValue(RequestCell)
 
-  if (request.value === null) {
-    throw new Error(`Expected Request, but found null`)
-  }
-
-  return request.value
+  return request
 }
 
 const ResponseCell = createCell<ServerResponse | null>(null)
 
 export const useResponse = () => {
-  let response = useCell(ResponseCell)
+  let response = useCellValue(ResponseCell)
 
-  if (response.value === null) {
-    throw new Error(`Expected Response, but found null`)
-  }
-
-  return response.value
+  return response
 }
 
 export const useReq = useRequest
 export const useRes = useResponse
+
+export type RequestHeaders = Record<string, string>
+export type RequestCookies = Record<string, string>
+
+const RequestHeadersCell = createCell<RequestHeaders | null>(null)
+
+export const useHeaders = () => {
+  let headers = useCellValue(RequestHeadersCell)
+  return headers
+}
+
+const RequestCookiesCell = createCell<RequestCookies | null>(null)
+
+export const useCookies = () => {
+  let cookies = useCellValue(RequestCookiesCell)
+  return cookies
+}
 
 export type RequestInfo = {
   pathname: string
   method?: string
   query?: Record<string, any>
   body?: any
-  headers?: Record<string, any>
-  cookies?: Record<string, any>
+  headers?: RequestCookies
+  cookies?: RequestCookies
 }
 
 export type ResponseOutput = MaybeAsyncResponse
@@ -95,14 +105,16 @@ export interface HttpPipelineOptions {
   body?: BodyOptions
   cookie?: CookieOptions
   query?: QueryOptions
-  contexts?: {
-    [key: string]: () => Cell
-  }
+  contexts?: () => CellStorage
 }
 
 export type HttpMiddleware = Middleware<RequestInfo, ResponseOutput>
 
-export const createHttpPipeline = (options: HttpPipelineOptions) => {
+export const createHttpPipeline = (options?: HttpPipelineOptions) => {
+  let config: HttpPipelineOptions = {
+    ...options,
+  }
+
   let pipeline = createPipeline<RequestInfo, ResponseOutput>()
 
   let middleware: HttpMiddleware = (request, next) => {
@@ -125,15 +137,15 @@ export const createHttpPipeline = (options: HttpPipelineOptions) => {
 
     let method = req.method ?? 'GET'
 
-    let query = parseQuery(search, options.query) as RequestInfo['query']
+    let query = parseQuery(search, config.query) as RequestInfo['query']
 
-    let body = await getBody(req, options.body)
+    let body = await getBody(req, config.body)
 
     let headers = req.headers as RequestInfo['headers']
 
-    let cookies = parseCookies(req.headers['cookie'] ?? '', options.cookie)
+    let cookies = parseCookies(req.headers['cookie'] ?? '', config.cookie)
 
-    let { basename, requestInfo } = handleBasenames(options.basenames ?? [], {
+    let { basename, requestInfo } = handleBasenames(config.basenames ?? [], {
       pathname,
       method,
       query,
@@ -142,7 +154,7 @@ export const createHttpPipeline = (options: HttpPipelineOptions) => {
       cookies,
     })
 
-    let storages = getStorage(options.contexts)
+    let storages = config.contexts?.()
 
     let context = createContext({
       ...storages,
@@ -209,17 +221,6 @@ export const createHttpPipeline = (options: HttpPipelineOptions) => {
 }
 
 export type HttpPipeline = ReturnType<typeof createHttpPipeline>
-
-const getStorage = (contexts: HttpPipelineOptions['contexts']): CellStorage => {
-  let storage: CellStorage = {}
-
-  for (let key in contexts) {
-    let cell = contexts[key]()
-    storage[key] = cell
-  }
-
-  return storage
-}
 
 const jsonTypes = ['json', 'application/*+json', 'application/csp-report']
 const formTypes = ['urlencoded']
@@ -364,7 +365,18 @@ export const handleResponse = async (params: ResponseParams) => {
     res.end(buffer)
   }
 
-  let handleFile = (filename: string) => {
+  let handleFile = async (filename: string) => {
+    try {
+      await access(filename, fs.constants.F_OK | fs.constants.R_OK)
+    } catch (error) {
+      await handleResponse({
+        ...params,
+        responseInfo: Response.status(404).text(error.message).info,
+      })
+
+      return
+    }
+
     let stream = fs.createReadStream(filename)
     let ext = path.extname(filename)
     let contentType = mime.contentType(ext)
@@ -464,3 +476,5 @@ const handleStream = (res: ServerResponse, stream: Stream) => {
     })
   })
 }
+
+const access = promisify(fs.access)

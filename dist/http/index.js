@@ -3,10 +3,11 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleResponse = exports.createHttpPipeline = exports.useRes = exports.useReq = exports.useResponse = exports.useRequest = exports.usePrefix = exports.useBasenames = exports.Response = exports.createRouterPipeline = void 0;
+exports.handleResponse = exports.createHttpPipeline = exports.useCookies = exports.useHeaders = exports.useRes = exports.useReq = exports.useResponse = exports.useRequest = exports.usePrefix = exports.useBasenames = exports.Response = exports.createRouterPipeline = void 0;
 const http_1 = require("http");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
+const util_1 = require("util");
 const co_body_1 = __importDefault(require("co-body"));
 const cookie_1 = require("cookie");
 const qs_1 = require("qs");
@@ -30,25 +31,34 @@ const router_1 = require("./router");
 Object.defineProperty(exports, "createRouterPipeline", { enumerable: true, get: function () { return router_1.createRouterPipeline; } });
 const RequestCell = pipeline_1.createCell(null);
 const useRequest = () => {
-    let request = pipeline_1.useCell(RequestCell);
-    if (request.value === null) {
-        throw new Error(`Expected Request, but found null`);
-    }
-    return request.value;
+    let request = pipeline_1.useCellValue(RequestCell);
+    return request;
 };
 exports.useRequest = useRequest;
 const ResponseCell = pipeline_1.createCell(null);
 const useResponse = () => {
-    let response = pipeline_1.useCell(ResponseCell);
-    if (response.value === null) {
-        throw new Error(`Expected Response, but found null`);
-    }
-    return response.value;
+    let response = pipeline_1.useCellValue(ResponseCell);
+    return response;
 };
 exports.useResponse = useResponse;
 exports.useReq = exports.useRequest;
 exports.useRes = exports.useResponse;
+const RequestHeadersCell = pipeline_1.createCell(null);
+const useHeaders = () => {
+    let headers = pipeline_1.useCellValue(RequestHeadersCell);
+    return headers;
+};
+exports.useHeaders = useHeaders;
+const RequestCookiesCell = pipeline_1.createCell(null);
+const useCookies = () => {
+    let cookies = pipeline_1.useCellValue(RequestCookiesCell);
+    return cookies;
+};
+exports.useCookies = useCookies;
 const createHttpPipeline = (options) => {
+    let config = {
+        ...options,
+    };
     let pipeline = pipeline_1.createPipeline();
     let middleware = (request, next) => {
         let ctx = pipeline_1.useContext();
@@ -58,18 +68,18 @@ const createHttpPipeline = (options) => {
         });
     };
     let handleRequest = async (req, res) => {
-        var _a, _b, _c;
+        var _a, _b, _c, _d;
         if (typeof req.url !== 'string') {
             throw new Error(`req.url is not existed`);
         }
         let url = req.url;
         let [pathname = '/', search = ''] = url.split('?');
         let method = (_a = req.method) !== null && _a !== void 0 ? _a : 'GET';
-        let query = qs_1.parse(search, options.query);
-        let body = await getBody(req, options.body);
+        let query = qs_1.parse(search, config.query);
+        let body = await getBody(req, config.body);
         let headers = req.headers;
-        let cookies = cookie_1.parse((_b = req.headers['cookie']) !== null && _b !== void 0 ? _b : '', options.cookie);
-        let { basename, requestInfo } = basenames_1.handleBasenames((_c = options.basenames) !== null && _c !== void 0 ? _c : [], {
+        let cookies = cookie_1.parse((_b = req.headers['cookie']) !== null && _b !== void 0 ? _b : '', config.cookie);
+        let { basename, requestInfo } = basenames_1.handleBasenames((_c = config.basenames) !== null && _c !== void 0 ? _c : [], {
             pathname,
             method,
             query,
@@ -77,7 +87,7 @@ const createHttpPipeline = (options) => {
             headers,
             cookies,
         });
-        let storages = getStorage(options.contexts);
+        let storages = (_d = config.contexts) === null || _d === void 0 ? void 0 : _d.call(config);
         let context = pipeline_1.createContext({
             ...storages,
             request: RequestCell.create(req),
@@ -132,14 +142,6 @@ const createHttpPipeline = (options) => {
     };
 };
 exports.createHttpPipeline = createHttpPipeline;
-const getStorage = (contexts) => {
-    let storage = {};
-    for (let key in contexts) {
-        let cell = contexts[key]();
-        storage[key] = cell;
-    }
-    return storage;
-};
 const jsonTypes = ['json', 'application/*+json', 'application/csp-report'];
 const formTypes = ['urlencoded'];
 const textTypes = ['text'];
@@ -246,7 +248,17 @@ const handleResponse = async (params) => {
         res.setHeader('Content-Length', buffer.length);
         res.end(buffer);
     };
-    let handleFile = (filename) => {
+    let handleFile = async (filename) => {
+        try {
+            await access(filename, fs_1.default.constants.F_OK | fs_1.default.constants.R_OK);
+        }
+        catch (error) {
+            await exports.handleResponse({
+                ...params,
+                responseInfo: response_1.Response.status(404).text(error.message).info,
+            });
+            return;
+        }
         let stream = fs_1.default.createReadStream(filename);
         let ext = path_1.default.extname(filename);
         let contentType = mime_types_1.default.contentType(ext);
@@ -328,3 +340,4 @@ const handleStream = (res, stream) => {
         });
     });
 };
+const access = util_1.promisify(fs_1.default.access);

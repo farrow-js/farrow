@@ -1,10 +1,10 @@
 import React from 'react';
 import * as Http from '../http';
-export declare type FarrowContext = {
+export declare type ReactRenderContext = {
     basenames: string[];
 };
-export declare const FarrowContext: React.Context<FarrowContext | null>;
-export declare const useFarrowContext: () => FarrowContext;
+export declare const ReactRenderContext: React.Context<ReactRenderContext | null>;
+export declare const useRenderContext: () => ReactRenderContext;
 export declare const usePrefix: () => string;
 export declare type ReactResponseOptions = {
     docType?: string;

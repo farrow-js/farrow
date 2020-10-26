@@ -2,15 +2,11 @@ import path from 'path'
 import { Middleware } from '../core/pipeline'
 import { Response, ResponseOutput } from './index'
 
-export type StaticOptions = {
+export const serve = <T extends { pathname: string }>(
   dirname: string
-}
-
-export const createStatic = <T extends { pathname: string }>(
-  options: StaticOptions
 ): Middleware<T, ResponseOutput> => {
   return (request) => {
-    let filename = path.join(options.dirname, request.pathname)
+    let filename = path.join(dirname, request.pathname)
     return Response.file(filename)
   }
 }

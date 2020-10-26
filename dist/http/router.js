@@ -77,10 +77,19 @@ const createRouterPipeline = (options) => {
     let route = (name, middleware) => {
         pipeline.add(basenames_1.route(name, middleware));
     };
+    let add = (...args) => {
+        if (args.length === 1) {
+            pipeline.add(args[0]);
+        }
+        else {
+            route(...args);
+        }
+    };
+    let run = pipeline.run;
     return {
         middleware,
-        add: pipeline.add,
-        run: pipeline.run,
+        add: add,
+        run: run,
         match: match,
         route: route,
     };

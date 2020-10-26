@@ -3,7 +3,7 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.handleResponse = exports.createHttpPipeline = exports.useCookies = exports.useHeaders = exports.useRes = exports.useReq = exports.useResponse = exports.useRequest = exports.usePrefix = exports.useBasenames = exports.Response = exports.createRouterPipeline = void 0;
+exports.handleResponse = exports.createHttpPipeline = exports.useQuery = exports.useCookies = exports.useHeaders = exports.useRes = exports.useReq = exports.useResponse = exports.useRequest = exports.usePrefix = exports.useBasenames = exports.Response = exports.createRouterPipeline = void 0;
 const http_1 = require("http");
 const fs_1 = __importDefault(require("fs"));
 const path_1 = __importDefault(require("path"));
@@ -55,6 +55,12 @@ const useCookies = () => {
     return cookies;
 };
 exports.useCookies = useCookies;
+const RequestQuereyCell = pipeline_1.createCell(null);
+const useQuery = () => {
+    let query = pipeline_1.useCellValue(RequestQuereyCell);
+    return query;
+};
+exports.useQuery = useQuery;
 const createHttpPipeline = (options) => {
     let config = {
         ...options,
@@ -93,6 +99,9 @@ const createHttpPipeline = (options) => {
             request: RequestCell.create(req),
             response: ResponseCell.create(res),
             basenames: basenames_1.BasenamesCell.create([basename]),
+            headers: RequestHeadersCell.create(headers),
+            cookies: RequestCookiesCell.create(cookies),
+            query: RequestQuereyCell.create(query),
         });
         let responser = await pipeline.run(requestInfo, {
             context,
@@ -122,7 +131,14 @@ const createHttpPipeline = (options) => {
             }
         }
     };
-    let add = pipeline.add;
+    let add = (...args) => {
+        if (args.length === 1) {
+            pipeline.add(args[0]);
+        }
+        else {
+            route(...args);
+        }
+    };
     let run = pipeline.run;
     let listen = (...args) => {
         let server = http_1.createServer(handle);

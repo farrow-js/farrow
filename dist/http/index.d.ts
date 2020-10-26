@@ -1,5 +1,6 @@
 /// <reference types="node" />
 import { IncomingMessage, Server, ServerResponse } from 'http';
+import path from 'path';
 import { Options as BodyOptions } from 'co-body';
 import { CookieParseOptions as CookieOptions } from 'cookie';
 import { IParseOptions as QueryOptions } from 'qs';
@@ -16,13 +17,15 @@ export declare const useResponse: () => ServerResponse | null;
 export declare const useReq: () => IncomingMessage | null;
 export declare const useRes: () => ServerResponse | null;
 export declare type RequestHeaders = Record<string, string>;
-export declare type RequestCookies = Record<string, string>;
 export declare const useHeaders: () => Record<string, string> | null;
+export declare type RequestCookies = Record<string, string>;
 export declare const useCookies: () => Record<string, string> | null;
+export declare type RequestQuery = Record<string, string | string[]>;
+export declare const useQuery: () => Record<string, string | string[]> | null;
 export declare type RequestInfo = {
     pathname: string;
     method?: string;
-    query?: Record<string, any>;
+    query?: RequestQuery;
     body?: any;
     headers?: RequestCookies;
     cookies?: RequestCookies;
@@ -37,7 +40,7 @@ export interface HttpPipelineOptions {
 }
 export declare type HttpMiddleware = Middleware<RequestInfo, ResponseOutput>;
 export declare const createHttpPipeline: (options?: HttpPipelineOptions | undefined) => {
-    add: (input: Middleware<RequestInfo, MaybeAsyncResponse>) => void;
+    add: (...args: [path: string, middleware: Middleware<RequestInfo, MaybeAsyncResponse>] | [middleware: Middleware<RequestInfo, MaybeAsyncResponse>]) => void;
     route: (name: string, middleware: HttpMiddleware) => void;
     run: (input: RequestInfo, options?: import("../core/pipeline").RunPipelineOptions<RequestInfo, MaybeAsyncResponse> | undefined) => MaybeAsyncResponse;
     handle: (req: IncomingMessage, res: ServerResponse) => Promise<any>;

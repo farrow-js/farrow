@@ -107,10 +107,24 @@ export const createRouterPipeline = <T extends RouterPipelineOptions>(
     pipeline.add(createRoute(name, middleware))
   }
 
+  let add = (
+    ...args:
+      | [path: string, middleware: Middleware<Input, Output>]
+      | [middleware: Middleware<Input, Output>]
+  ) => {
+    if (args.length === 1) {
+      pipeline.add(args[0])
+    } else {
+      route(...args)
+    }
+  }
+
+  let run = pipeline.run
+
   return {
     middleware,
-    add: pipeline.add,
-    run: pipeline.run,
+    add: add,
+    run: run,
     match: match,
     route: route,
   }

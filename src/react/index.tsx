@@ -7,14 +7,14 @@ import * as Http from '../http'
 
 import { Response } from '../http/response'
 
-export type FarrowContext = {
+export type ReactRenderContext = {
   basenames: string[]
 }
 
-export const FarrowContext = React.createContext<FarrowContext | null>(null)
+export const ReactRenderContext = React.createContext<ReactRenderContext | null>(null)
 
-export const useFarrowContext = () => {
-  let ctx = useContext(FarrowContext)
+export const useRenderContext = () => {
+  let ctx = useContext(ReactRenderContext)
 
   if (!ctx) {
     throw new Error(`You may forget to add farrow context provider`)
@@ -24,7 +24,7 @@ export const useFarrowContext = () => {
 }
 
 export const usePrefix = () => {
-  let ctx = useFarrowContext()
+  let ctx = useRenderContext()
 
   return ctx.basenames.join('')
 }
@@ -72,16 +72,16 @@ export const useReactView = (options?: ReactViewOptions) => {
   let basenames = Http.useBasenames()
 
   let config = {
-    ...options,
     useStream: true,
+    ...options,
   }
 
   let render = <T extends JSX.Element>(element: T) => {
-    let context: FarrowContext = {
+    let context: ReactRenderContext = {
       basenames,
     }
 
-    let view = <FarrowContext.Provider value={context}>{element}</FarrowContext.Provider>
+    let view = <ReactRenderContext.Provider value={context}>{element}</ReactRenderContext.Provider>
 
     if (config.useStream) {
       return renderToNodeStream(view)

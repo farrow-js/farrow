@@ -45,7 +45,6 @@ import {
 import { Json } from '../core/types'
 
 import { createRouterPipeline } from './router'
-import status from 'statuses'
 
 export { createRouterPipeline }
 
@@ -73,7 +72,6 @@ export const useReq = useRequest
 export const useRes = useResponse
 
 export type RequestHeaders = Record<string, string>
-export type RequestCookies = Record<string, string>
 
 const RequestHeadersCell = createCell<RequestHeaders | null>(null)
 
@@ -82,6 +80,8 @@ export const useHeaders = () => {
   return headers
 }
 
+export type RequestCookies = Record<string, string>
+
 const RequestCookiesCell = createCell<RequestCookies | null>(null)
 
 export const useCookies = () => {
@@ -89,10 +89,19 @@ export const useCookies = () => {
   return cookies
 }
 
+export type RequestQuery = Record<string, string | string[]>
+
+const RequestQuereyCell = createCell<RequestQuery | null>(null)
+
+export const useQuery = () => {
+  let query = useCellValue(RequestQuereyCell)
+  return query
+}
+
 export type RequestInfo = {
   pathname: string
   method?: string
-  query?: Record<string, any>
+  query?: RequestQuery
   body?: any
   headers?: RequestCookies
   cookies?: RequestCookies
@@ -137,13 +146,13 @@ export const createHttpPipeline = (options?: HttpPipelineOptions) => {
 
     let method = req.method ?? 'GET'
 
-    let query = parseQuery(search, config.query) as RequestInfo['query']
+    let query = parseQuery(search, config.query) as RequestQuery
 
     let body = await getBody(req, config.body)
 
-    let headers = req.headers as RequestInfo['headers']
+    let headers = req.headers as RequestHeaders
 
-    let cookies = parseCookies(req.headers['cookie'] ?? '', config.cookie)
+    let cookies = parseCookies(req.headers['cookie'] ?? '', config.cookie) as RequestCookies
 
     let { basename, requestInfo } = handleBasenames(config.basenames ?? [], {
       pathname,
@@ -161,6 +170,9 @@ export const createHttpPipeline = (options?: HttpPipelineOptions) => {
       request: RequestCell.create(req),
       response: ResponseCell.create(res),
       basenames: BasenamesCell.create([basename]),
+      headers: RequestHeadersCell.create(headers),
+      cookies: RequestCookiesCell.create(cookies),
+      query: RequestQuereyCell.create(query),
     })
 
     let responser = await pipeline.run(requestInfo, {
@@ -196,7 +208,15 @@ export const createHttpPipeline = (options?: HttpPipelineOptions) => {
     }
   }
 
-  let add = pipeline.add
+  let add = (
+    ...args: [path: string, middleware: HttpMiddleware] | [middleware: HttpMiddleware]
+  ) => {
+    if (args.length === 1) {
+      pipeline.add(args[0])
+    } else {
+      route(...args)
+    }
+  }
 
   let run = pipeline.run
 

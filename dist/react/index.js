@@ -22,24 +22,24 @@ var __importDefault = (this && this.__importDefault) || function (mod) {
     return (mod && mod.__esModule) ? mod : { "default": mod };
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.useReactView = exports.renderToNodeStream = exports.renderToString = exports.defaultDocType = exports.usePrefix = exports.useFarrowContext = exports.FarrowContext = void 0;
+exports.useReactView = exports.renderToNodeStream = exports.renderToString = exports.defaultDocType = exports.usePrefix = exports.useRenderContext = exports.ReactRenderContext = void 0;
 const react_1 = __importStar(require("react"));
 const server_1 = __importDefault(require("react-dom/server"));
 const stream_1 = require("stream");
 const multistream_1 = __importDefault(require("multistream"));
 const Http = __importStar(require("../http"));
 const response_1 = require("../http/response");
-exports.FarrowContext = react_1.default.createContext(null);
-const useFarrowContext = () => {
-    let ctx = react_1.useContext(exports.FarrowContext);
+exports.ReactRenderContext = react_1.default.createContext(null);
+const useRenderContext = () => {
+    let ctx = react_1.useContext(exports.ReactRenderContext);
     if (!ctx) {
         throw new Error(`You may forget to add farrow context provider`);
     }
     return ctx;
 };
-exports.useFarrowContext = useFarrowContext;
+exports.useRenderContext = useRenderContext;
 const usePrefix = () => {
-    let ctx = exports.useFarrowContext();
+    let ctx = exports.useRenderContext();
     return ctx.basenames.join('');
 };
 exports.usePrefix = usePrefix;
@@ -68,14 +68,14 @@ exports.renderToNodeStream = renderToNodeStream;
 const useReactView = (options) => {
     let basenames = Http.useBasenames();
     let config = {
-        ...options,
         useStream: true,
+        ...options,
     };
     let render = (element) => {
         let context = {
             basenames,
         };
-        let view = react_1.default.createElement(exports.FarrowContext.Provider, { value: context }, element);
+        let view = react_1.default.createElement(exports.ReactRenderContext.Provider, { value: context }, element);
         if (config.useStream) {
             return exports.renderToNodeStream(view);
         }

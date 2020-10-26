@@ -6,7 +6,7 @@ import { createHttpPipeline, Response, usePrefix, createRouterPipeline } from '.
 import { object, number, string, nullable, list, boolean, RawType } from '../core/schema'
 import * as S from '../core/schema'
 import { Middleware } from '../core/pipeline'
-import { createStatic } from '../http/static'
+import { serve } from '../http/static'
 
 import { useReactView } from '../react'
 
@@ -138,16 +138,11 @@ const http = createHttpPipeline({
 
 http.add(logger('test'))
 
-http.route(
-  '/static',
-  createStatic({
-    dirname: __dirname,
-  })
-)
+http.add('/static', serve(__dirname))
 
 http.add(home.middleware)
 
-http.route('/detail', detail.middleware)
+http.add('/detail', detail.middleware)
 
 http.add(react.middleware)
 

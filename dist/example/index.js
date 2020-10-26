@@ -131,11 +131,9 @@ const http = http_1.createHttpPipeline({
     basenames: ['/base'],
 });
 http.add(logger('test'));
-http.route('/static', static_1.createStatic({
-    dirname: __dirname,
-}));
+http.add('/static', static_1.serve(__dirname));
 http.add(home.middleware);
-http.route('/detail', detail.middleware);
+http.add('/detail', detail.middleware);
 http.add(react.middleware);
 http.add(attachment.middleware);
 const server = http.listen(3002, () => {

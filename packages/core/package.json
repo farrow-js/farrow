@@ -1,0 +1,19 @@
+{
+  "name": "farrow-core",
+  "version": "1.0.0",
+  "description": "Functional style web framework for node.js",
+  "main": "dist/index.js",
+  "module": "esm/index.js",
+  "esnext": "next/index.js",
+  "types": "esm/index.d.ts",
+  "keywords": [
+    "Web Framework",
+    "TypeScript",
+    "Functional Programming"
+  ],
+  "author": "Jade Gu",
+  "license": "MIT",
+  "dependencies": {
+    "tslib": "^2.0.3"
+  }
+}

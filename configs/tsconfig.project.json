@@ -1,0 +1,13 @@
+{
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "noEmit": true
+  },
+  "references": [
+    { "path": "../packages/core/tsconfig.json" },
+    { "path": "../packages/http/tsconfig.json" },
+    { "path": "../packages/schema/tsconfig.json" },
+    { "path": "../packages/react/tsconfig.json" },
+    { "path": "../packages/example/tsconfig.json" }
+  ]
+}

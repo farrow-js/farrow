@@ -1,0 +1,13 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2018",
+    "outDir": "./next"
+  },
+  "references": [
+    {
+      "path": "../http/tsconfig.json"
+    }
+  ],
+  "include": ["src"]
+}

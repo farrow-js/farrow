@@ -1,0 +1,24 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "module": "CommonJS",
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "../core/tsconfig.next.json"
+    },
+    {
+      "path": "../schema/tsconfig.next.json"
+    },
+    {
+      "path": "../http/tsconfig.next.json"
+    },
+    {
+      "path": "../react/tsconfig.next.json"
+    }
+  ],
+  "include": ["src"]
+}

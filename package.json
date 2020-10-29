@@ -1,178 +1,68 @@
 {
   "name": "farrow",
-  "version": "0.1.0",
+  "version": "0.0.0",
+  "license": "MIT",
   "description": "Functional style web framework for node.js",
-  "main": "index.js",
-  "engines": {
-    "node": ">=10.14.0"
-  },
+  "author": "https://github.com/Lucifier129",
+  "private": true,
   "scripts": {
-    "lint": "tslint  --project tsconfig.json -t codeFrame 'src/**/*.ts' 'test/**/*.ts'",
-    "prebuild": "rimraf dist",
-    "build:ts": "tsc --module commonjs",
-    "build": "npm run build:ts && npm run copy",
-    "copy": "copyfiles README.md package.json dist",
-    "start": "tsc -w --module commonjs",
-    "prestart": "rimraf dist",
-    "bench": "matcha bench/bench.js",
-    "test": "jest",
-    "test:coverage": "jest --coverage",
-    "test:watch": "jest --coverage --watch",
-    "test:prod": "npm run lint && npm run test -- --no-cache",
-    "report-coverage": "cat ./coverage/lcov.info | coveralls",
-    "commit": "git-cz",
-    "semantic-release": "semantic-release",
-    "semantic-release-prepare": "ts-node tools/semantic-release-prepare",
-    "precommit": "lint-staged",
-    "travis-deploy-once": "travis-deploy-once"
+    "build": "run-s clean build:esm build:next build:cjs clean:tests",
+    "build:esm": "tsc -b ./configs/tsconfig.project.json",
+    "build:next": "tsc -b ./configs/tsconfig.next.json",
+    "build:cjs": "rollup --config ./configs/rollup.config.js",
+    "clean": "shx rm -rf ./packages/**/*.tsbuildinfo && shx rm -rf ./packages/**/{esm,dist,next}",
+    "clean:tests": "shx rm -rf ./packages/**/{esm,next}/**/__tests__",
+    "format": "run-p format:md format:json format:source format:yml",
+    "format:json": "prettier --parser json --write **/*.json",
+    "format:md": "prettier --parser markdown --write ./*.md ./{examples,packages}/**/*.md",
+    "format:source": "prettier --config ./package.json ./{examples,packages}/**/*.{ts,tsx,js} --write",
+    "format:yml": "prettier --parser yaml --write ./*.{yml,yaml}",
+    "test": "jest --config ./configs/jest.config.js",
+    "test:coverage": "jest --config ./configs/jest.config.js --collectCoverage",
+    "bootstrap": "lerna bootstrap --hoist"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Lucifier129/farrow.git"
+  "devDependencies": {
+    "@types/jest": "^26.0.14",
+    "@types/node": "^14.11.10",
+    "codecov": "^3.8.0",
+    "husky": "^4.3.0",
+    "jest": "^26.6.0",
+    "lerna": "^3.22.1",
+    "lint-staged": "^10.4.2",
+    "npm-run-all": "^4.1.5",
+    "prettier": "^2.1.2",
+    "rollup": "^2.32.0",
+    "rollup-plugin-sourcemaps": "^0.6.3",
+    "shx": "^0.3.2",
+    "ts-jest": "^26.4.1",
+    "ts-node": "^9.0.0",
+    "tslib": "^2.0.3",
+    "typescript": "^4.1.0-dev.20201027"
   },
-  "keywords": [],
-  "author": "Jade Gu<guyingjie129@163.com>",
   "lint-staged": {
-    "{src,test}/**/*.ts": []
-  },
-  "config": {
-    "commitizen": {
-      "path": "node_modules/cz-conventional-changelog"
-    }
-  },
-  "jest": {
-    "transform": {
-      ".(ts|tsx|js|jsx)": "ts-jest"
-    },
-    "testEnvironment": "jsdom",
-    "testRegex": "(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$",
-    "moduleFileExtensions": [
-      "ts",
-      "tsx",
-      "js",
-      "jsx"
+    "*.@(js|ts|tsx)": [
+      "prettier --write"
     ],
-    "coveragePathIgnorePatterns": [
-      "/node_modules/",
-      "/test/"
+    "*.@(yml|yaml)": [
+      "prettier --parser yaml --write"
     ],
-    "coverageThreshold": {
-      "global": {
-        "branches": 90,
-        "functions": 95,
-        "lines": 95,
-        "statements": 95
-      }
-    },
-    "collectCoverageFrom": [
-      "src/*.{js,ts}"
+    "*.md": [
+      "prettier --parser markdown --write"
+    ],
+    "*.json": [
+      "prettier --parser json --write"
     ]
   },
   "prettier": {
+    "printWidth": 120,
     "semi": false,
-    "singleQuote": true
+    "trailingComma": "all",
+    "singleQuote": true,
+    "arrowParens": "always"
   },
-  "commitlint": {
-    "extends": [
-      "@commitlint/config-conventional"
-    ]
-  },
-  "peerDependencies": {
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0"
-  },
-  "devDependencies": {
-    "@commitlint/cli": "^8.3.5",
-    "@commitlint/config-conventional": "^7.1.2",
-    "@types/accepts": "^1.3.5",
-    "@types/co-body": "^5.1.0",
-    "@types/content-disposition": "^0.5.3",
-    "@types/content-type": "^1.1.3",
-    "@types/cookie": "^0.4.0",
-    "@types/cookies": "^0.7.4",
-    "@types/debug": "^4.1.5",
-    "@types/depd": "^1.1.32",
-    "@types/destroy": "^1.0.0",
-    "@types/encodeurl": "^1.0.0",
-    "@types/escape-html": "^1.0.0",
-    "@types/fresh": "^0.5.0",
-    "@types/http-assert": "^1.5.1",
-    "@types/http-errors": "^1.8.0",
-    "@types/is-generator-function": "^1.0.1",
-    "@types/jest": "^25.2.1",
-    "@types/koa": "^2.11.4",
-    "@types/mime-types": "^2.1.0",
-    "@types/multistream": "^2.1.1",
-    "@types/node": "^14.11.8",
-    "@types/node-fetch": "^2.5.7",
-    "@types/on-finished": "^2.3.1",
-    "@types/parseurl": "^1.3.1",
-    "@types/qs": "^6.9.2",
-    "@types/react": "^16.9.52",
-    "@types/react-dom": "^16.9.8",
-    "@types/statuses": "^2.0.0",
-    "@types/type-is": "^1.6.3",
-    "@types/vary": "^1.1.0",
-    "colors": "^1.3.2",
-    "commitizen": "^4.1.2",
-    "copyfiles": "^2.2.0",
-    "coveralls": "^3.1.0",
-    "cross-env": "^5.2.0",
-    "cz-conventional-changelog": "^2.1.0",
-    "husky": "^1.0.1",
-    "jest": "^25.2.1",
-    "jest-config": "^25.2.1",
-    "lint-staged": "^8.0.0",
-    "lodash.camelcase": "^4.3.0",
-    "matcha": "^0.7.0",
-    "node-fetch": "^2.6.0",
-    "prettier": "^2.1.1",
-    "prompt": "^1.0.0",
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0",
-    "replace-in-file": "^3.4.2",
-    "rimraf": "^2.6.2",
-    "semantic-release": "^15.9.16",
-    "shelljs": "^0.8.4",
-    "travis-deploy-once": "^5.0.9",
-    "ts-jest": "^25.5.0",
-    "ts-node": "^8.10.1",
-    "tslint": "^5.11.0",
-    "tslint-config-prettier": "^1.15.0",
-    "tslint-config-standard": "^8.0.1",
-    "typescript": "^4.1.0-dev.20200926"
-  },
-  "dependencies": {
-    "accepts": "^1.3.7",
-    "co-body": "^6.0.0",
-    "content-disposition": "^0.5.3",
-    "content-type": "^1.0.4",
-    "cookie": "^0.4.1",
-    "cookies": "^0.8.0",
-    "debug": "^4.1.1",
-    "delegates": "^1.0.0",
-    "depd": "^2.0.0",
-    "destroy": "^1.0.4",
-    "encodeurl": "^1.0.2",
-    "escape-html": "^1.0.3",
-    "fresh": "^0.5.2",
-    "http-assert": "^1.4.1",
-    "http-errors": "^1.8.0",
-    "is-generator-function": "^1.0.7",
-    "mime-types": "^2.1.27",
-    "multistream": "^4.0.0",
-    "on-finished": "^2.3.0",
-    "only": "0.0.2",
-    "parseurl": "^1.3.3",
-    "path-to-regexp": "^6.1.0",
-    "qs": "^6.9.4",
-    "statuses": "^2.0.0",
-    "type-is": "^1.6.18",
-    "vary": "^1.1.2"
-  },
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/Lucifier129/farrow/issues"
-  },
-  "homepage": "https://github.com/Lucifier129/farrow#readme"
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  }
 }

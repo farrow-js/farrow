@@ -1,22 +1,30 @@
 {
   "compilerOptions": {
-    "moduleResolution": "node",
-    "target": "ES2018",
-    "module": "es2015",
-    "lib": ["ES2015", "ES2016", "ES2017", "ES2018"],
     "jsx": "react",
-    "strict": true,
-    "noImplicitAny": true,
-    "allowJs": true,
-    "declaration": true,
-    "esModuleInterop": true,
-    "downlevelIteration": true,
     "allowSyntheticDefaultImports": true,
-    "experimentalDecorators": true,
+    "declaration": true,
+    "downlevelIteration": true,
     "emitDecoratorMetadata": true,
-    "resolveJsonModule": true,
-    "outDir": "dist",
-    "typeRoots": ["node_modules/@types"]
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "module": "esnext",
+    "moduleResolution": "node",
+    "newLine": "LF",
+    "strict": true,
+    "skipLibCheck": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "suppressExcessPropertyErrors": true,
+    "forceConsistentCasingInFileNames": true,
+    "target": "ES5",
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "stripInternal": true,
+    "lib": ["dom", "ES5", "ES2015", "ES2016", "ES2017", "ES2018", "ES2019", "esnext"],
+    "baseUrl": "./packages",
+    "paths": {
+      "react": ["node_modules/@types/react"],
+      "farrow-*": ["./*/src/index.ts"]
+    }
   },
-  "include": ["src", "example"]
+  "include": ["./packages/**/*"]
 }

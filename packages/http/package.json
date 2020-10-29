@@ -1,0 +1,59 @@
+{
+  "name": "farrow-http",
+  "version": "1.0.0",
+  "description": "Functional style web framework for node.js",
+  "main": "dist/index.js",
+  "module": "esm/index.js",
+  "esnext": "next/index.js",
+  "types": "esm/index.d.ts",
+  "keywords": [
+    "Web Framework",
+    "TypeScript",
+    "Functional Programming"
+  ],
+  "author": "Jade Gu",
+  "license": "MIT",
+  "peerDependencies": {
+    "farrow-core": "^1.0.0",
+    "farrow-schema": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/co-body": "^5.1.0",
+    "@types/content-disposition": "^0.5.3",
+    "@types/cookie": "^0.4.0",
+    "@types/cookies": "^0.7.4",
+    "@types/mime-types": "^2.1.0",
+    "@types/qs": "^6.9.2",
+    "@types/statuses": "^2.0.0",
+    "@types/type-is": "^1.6.3",
+    "@types/vary": "^1.1.0",
+    "@types/on-finished": "^2.3.1",
+    "@types/destroy": "^1.0.0",
+    "@types/encodeurl": "^1.0.0",
+    "@types/escape-html": "^1.0.0",
+    "@types/accepts": "^1.3.5",
+    "@types/bytes": "^3.1.0",
+    "farrow-core": "^1.0.0",
+    "farrow-schema": "^1.0.0"
+  },
+  "dependencies": {
+    "tslib": "^2.0.3",
+    "accepts": "^1.3.7",
+    "co-body": "^6.0.0",
+    "content-disposition": "^0.5.3",
+    "cookie": "^0.4.1",
+    "cookies": "^0.8.0",
+    "path-to-regexp": "^6.1.0",
+    "on-finished": "^2.3.0",
+    "destroy": "^1.0.4",
+    "qs": "^6.9.4",
+    "statuses": "^2.0.0",
+    "type-is": "^1.6.18",
+    "vary": "^1.1.2",
+    "encodeurl": "^1.0.2",
+    "escape-html": "^1.0.3",
+    "mime-types": "^2.1.27",
+    "bytes": "^3.1.0",
+    "chalk": "^4.1.0"
+  }
+}

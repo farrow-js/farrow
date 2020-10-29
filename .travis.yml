@@ -1,0 +1,7 @@
+language: node_js
+node_js:
+  - '10.14.0'
+install:
+  - npm run bootstrap
+script:
+  - npm run test

@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "description": "Functional style web framework for node.js",
   "main": "dist/index.js",
-  "module": "esm/index.js",
-  "esnext": "next/index.js",
-  "types": "esm/index.d.ts",
+  "files": [
+    "dist"
+  ],
   "keywords": [
     "Web Framework",
     "TypeScript",

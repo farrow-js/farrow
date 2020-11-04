@@ -35,20 +35,14 @@ export type ReactResponseOptions = {
 
 export const defaultDocType = `<!doctype html>`
 
-export const renderToString = <T extends JSX.Element>(
-  element: T,
-  options?: ReactResponseOptions
-) => {
+export const renderToString = <T extends JSX.Element>(element: T, options?: ReactResponseOptions) => {
   let html = ReactDOMServer.renderToString(element)
   let docType = options?.docType ?? defaultDocType
 
   return Response.html(`${docType}\n${html}`)
 }
 
-export const renderToNodeStream = <T extends JSX.Element>(
-  element: T,
-  options?: ReactResponseOptions
-) => {
+export const renderToNodeStream = <T extends JSX.Element>(element: T, options?: ReactResponseOptions) => {
   let contentStream = ReactDOMServer.renderToNodeStream(element)
   let docType = options?.docType ?? defaultDocType
 
@@ -69,7 +63,7 @@ export type ReactViewOptions = ReactResponseOptions & {
 }
 
 export const useReactView = (options?: ReactViewOptions) => {
-  let basenames = Http.useBasenames()
+  let basenames = Http.useBasenames().value
 
   let config = {
     useStream: true,
@@ -93,4 +87,10 @@ export const useReactView = (options?: ReactViewOptions) => {
   return {
     render,
   }
+}
+
+export const Link = (props: React.ComponentPropsWithoutRef<'a'>) => {
+  let prefix = usePrefix()
+  let href = props.href ? prefix + props.href : props.href
+  return <a {...props} href={href} />
 }

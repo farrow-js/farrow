@@ -1,28 +1,23 @@
-import { createCell, Middleware, useCell, useCellValue } from 'farrow-core'
+import { createCell, Middleware } from 'farrow-core'
 
 export const BasenamesCell = createCell([] as string[])
 
 export const useBasenames = () => {
-  let basenames = useCellValue(BasenamesCell)
+  let basenames = BasenamesCell.useCell()
   return basenames
 }
 
-export const useBasenamesCell = () => {
-  let basenamesCell = useCell(BasenamesCell)
-  return basenamesCell
-}
-
 export const usePrefix = () => {
-  let basenames = useCellValue(BasenamesCell)
+  let basenames = BasenamesCell.useCell().value
   return basenames.join('')
 }
 
 export const route = <T extends { pathname: string }, U>(
   name: string,
-  middleware: Middleware<T, U>
+  middleware: Middleware<T, U>,
 ): Middleware<T, U> => {
   return (request, next) => {
-    let basenamesCell = useBasenamesCell()
+    let basenames = BasenamesCell.useCell()
 
     if (!request.pathname.startsWith(name)) {
       return next()
@@ -30,21 +25,18 @@ export const route = <T extends { pathname: string }, U>(
 
     let { basename, requestInfo } = handleBasenames([name], request)
 
-    let currentBasenames = basenamesCell.value
+    let currentBasenames = basenames.value
 
-    basenamesCell.value = [...currentBasenames, basename]
+    basenames.value = [...currentBasenames, basename]
 
     return middleware(requestInfo, (request) => {
-      basenamesCell.value = currentBasenames
+      basenames.value = currentBasenames
       return next(request)
     })
   }
 }
 
-export const handleBasenames = <T extends { pathname: string }>(
-  basenames: string[],
-  requestInfo: T
-) => {
+export const handleBasenames = <T extends { pathname: string }>(basenames: string[], requestInfo: T) => {
   let { basename, pathname } = findBasename(basenames, requestInfo.pathname)
 
   let newRequestInfo = {

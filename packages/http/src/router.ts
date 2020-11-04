@@ -1,7 +1,7 @@
 import path from 'path'
 import { match as createMatch } from 'path-to-regexp'
 import { createPipeline, Next, Middleware, RunPipelineOptions, useContext } from 'farrow-core'
-import * as Schema from 'farrow-schema'
+import * as Schema from 'farrow-core/schema'
 import { MaybeAsyncResponse, match as matchType, Response } from './response'
 import { BodyMap } from './responseInfo'
 import { route as createRoute } from './basenames'

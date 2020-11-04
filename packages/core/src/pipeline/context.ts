@@ -6,6 +6,9 @@ export type Cell<T = any> = {
   id: symbol
   [CellSymbol]: T
   create: (value: T) => Cell<T>
+  useCell: () => {
+    value: T
+  }
 }
 
 export const isCell = (input: any): input is Cell => {
@@ -24,11 +27,24 @@ export const createCell = <T>(value: T) => {
   let id = Symbol('CellID')
 
   let create = (value: T): Cell<T> => {
-    return {
+    let useCell = () => {
+      let ctx = useContext()
+      return Object.seal({
+        get value() {
+          return ctx.read(Cell)
+        },
+        set value(v) {
+          ctx.write(Cell, v)
+        },
+      })
+    }
+    let Cell: Cell<T> = {
       id,
       [CellSymbol]: value,
       create,
+      useCell,
     }
+    return Cell
   }
 
   return create(value)
@@ -96,46 +112,21 @@ export const createContext = (ContextStorage: CellStorage = {}): Context => {
 
 export type Hooks = {
   useContext: () => Context
-  useCell: <T>(Cell: Cell<T>) => { value: T }
-  useCellValue: <T>(Cell: Cell<T>) => T
 }
 
 const { run, hooks } = createHooks<Hooks>({
   useContext: () => {
-    throw new Error(
-      `Can't call useContext out of scope, it should be placed on top of the function`
-    )
-  },
-  useCell: () => {
-    throw new Error(`Can't call useCell out of scope, it should be placed on top of the function`)
-  },
-  useCellValue: () => {
-    throw new Error(
-      `Can't call useCellValue out of scope, it should be placed on top of the function`
-    )
+    throw new Error(`Can't call useContext out of scope, it should be placed on top of the function`)
   },
 })
 
 export const runContextHooks = run
 
-export const { useContext, useCell, useCellValue } = hooks
+export const { useContext } = hooks
 
 export const fromContext = (context: Context): Hooks => ({
   useContext: () => {
     return context
-  },
-  useCell: (Cell) => {
-    return Object.seal({
-      get value() {
-        return context.read(Cell)
-      },
-      set value(v) {
-        context.write(Cell, v)
-      },
-    })
-  },
-  useCellValue: (Cell) => {
-    return context.read(Cell)
   },
 })
 

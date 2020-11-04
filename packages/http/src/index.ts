@@ -27,7 +27,6 @@ import {
   Context,
   useContext,
   CellStorage,
-  useCellValue,
   Json,
 } from 'farrow-core'
 
@@ -54,15 +53,14 @@ export { useBasenames, usePrefix }
 const RequestCell = createCell<IncomingMessage | null>(null)
 
 export const useRequest = () => {
-  let request = useCellValue(RequestCell)
-
+  let request = RequestCell.useCell().value
   return request
 }
 
 const ResponseCell = createCell<ServerResponse | null>(null)
 
 export const useResponse = () => {
-  let response = useCellValue(ResponseCell)
+  let response = ResponseCell.useCell().value
 
   return response
 }
@@ -73,21 +71,21 @@ export const useRes = useResponse
 const RequestHeadersCell = createCell<RequestHeaders | null>(null)
 
 export const useHeaders = () => {
-  let headers = useCellValue(RequestHeadersCell)
+  let headers = RequestHeadersCell.useCell().value
   return headers
 }
 
 const RequestCookiesCell = createCell<RequestCookies | null>(null)
 
 export const useCookies = () => {
-  let cookies = useCellValue(RequestCookiesCell)
+  let cookies = RequestCookiesCell.useCell().value
   return cookies
 }
 
 const RequestQuereyCell = createCell<RequestQuery | null>(null)
 
 export const useQuery = () => {
-  let query = useCellValue(RequestQuereyCell)
+  let query = RequestQuereyCell.useCell().value
   return query
 }
 

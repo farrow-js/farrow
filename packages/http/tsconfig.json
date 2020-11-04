@@ -2,15 +2,12 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "rootDir": "./src",
-    "outDir": "./esm",
+    "outDir": "./dist",
     "composite": true
   },
   "references": [
     {
-      "path": "../core/tsconfig.next.json"
-    },
-    {
-      "path": "../schema/tsconfig.next.json"
+      "path": "../core/tsconfig.json"
     }
   ],
   "include": ["src"]

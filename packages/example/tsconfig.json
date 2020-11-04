@@ -3,21 +3,20 @@
   "compilerOptions": {
     "rootDir": "./src",
     "outDir": "./dist",
-    "module": "CommonJS",
     "composite": true
   },
   "references": [
     {
-      "path": "../core/tsconfig.next.json"
+      "path": "../core/tsconfig.json"
     },
     {
-      "path": "../schema/tsconfig.next.json"
+      "path": "../schema/tsconfig.json"
     },
     {
-      "path": "../http/tsconfig.next.json"
+      "path": "../http/tsconfig.json"
     },
     {
-      "path": "../react/tsconfig.next.json"
+      "path": "../react/tsconfig.json"
     }
   ],
   "include": ["src"]

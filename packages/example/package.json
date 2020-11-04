@@ -3,10 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "description": "Functional style web framework for node.js",
-  "main": "dist/index.js",
-  "module": "esm/index.js",
-  "esnext": "next/index.js",
-  "types": "esm/index.d.ts",
+  "scripts": {
+    "start": "ts-node src"
+  },
   "keywords": [
     "Web Framework",
     "TypeScript",
@@ -16,6 +15,9 @@
   "license": "MIT",
   "dependencies": {
     "tslib": "^2.0.3",
+    "typeorm": "^0.2.29",
+    "reflect-metadata": "^0.1.13",
+    "sqlite3": "^5.0.0",
     "farrow-core": "^1.0.0",
     "farrow-schema": "^1.0.0",
     "farrow-http": "^1.0.0",

@@ -2,10 +2,9 @@ import path from 'path'
 
 import React from 'react'
 
-import { Middleware } from 'farrow-core'
-import { createHttpPipeline, Response, usePrefix, createRouterPipeline } from 'farrow-http'
-import { object, number, string, nullable, list, boolean, RawType } from 'farrow-schema'
-import { useReactView } from 'farrow-react'
+import { createHttpPipeline, createRouterPipeline, Response, usePrefix } from 'farrow-http'
+import { object, number, string, nullable, boolean, RawType } from 'farrow-core/schema'
+import { useReactView, Link } from 'farrow-react'
 
 const home = createRouterPipeline({
   pathname: '/',
@@ -100,6 +99,7 @@ const View = (props: { pathname: string; query: Query }) => {
   return (
     <div id="root">
       <h1>Hello React</h1>
+      <Link href="/">link</Link>
       <div style={{ fontSize: 18, color: 'red' }}>
         <pre>{JSON.stringify(props, null, 2)}</pre>
       </div>
@@ -119,8 +119,7 @@ react.add(async (request) => {
 })
 
 const http = createHttpPipeline({
-  basenames: ['/base'],
-  logger: true,
+  basenames: ['/base']
 })
 
 http.serve('/static', __dirname)

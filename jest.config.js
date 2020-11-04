@@ -1,5 +1,3 @@
-const { join } = require('path')
-
 module.exports = {
   transform: {
     '.(ts|tsx|js|jsx)': 'ts-jest',
@@ -16,7 +14,7 @@ module.exports = {
     },
   },
   collectCoverageFrom: ['src/*.{js,ts}'],
-  rootDir: join(__dirname, '..'),
+  rootDir: __dirname,
   testEnvironment: 'jsdom',
   moduleNameMapper: {
     'farrow-([^/]+)(.*)$': '<rootDir>/packages/$1/src$2',

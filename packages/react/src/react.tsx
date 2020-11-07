@@ -1,33 +1,13 @@
-import React, { useContext } from 'react'
+import React from 'react'
 import ReactDOMServer from 'react-dom/server'
 import { Stream } from 'stream'
 import MultiStream from 'multistream'
 
 import * as Http from 'farrow-http'
 
+import { ReactRenderContext } from './Context'
+
 const { Response } = Http
-
-export type ReactRenderContext = {
-  basenames: string[]
-}
-
-export const ReactRenderContext = React.createContext<ReactRenderContext | null>(null)
-
-export const useRenderContext = () => {
-  let ctx = useContext(ReactRenderContext)
-
-  if (!ctx) {
-    throw new Error(`You may forget to add farrow context provider`)
-  }
-
-  return ctx
-}
-
-export const usePrefix = () => {
-  let ctx = useRenderContext()
-
-  return ctx.basenames.join('')
-}
 
 export type ReactResponseOptions = {
   docType?: string
@@ -87,10 +67,4 @@ export const useReactView = (options?: ReactViewOptions) => {
   return {
     render,
   }
-}
-
-export const Link = (props: React.ComponentPropsWithoutRef<'a'>) => {
-  let prefix = usePrefix()
-  let href = props.href ? prefix + props.href : props.href
-  return <a {...props} href={href} />
 }

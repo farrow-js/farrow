@@ -4,7 +4,8 @@ import React from 'react'
 
 import { createHttpPipeline, createRouterPipeline, Response, usePrefix } from 'farrow-http'
 import { object, number, string, nullable, boolean, RawType } from 'farrow-core/schema'
-import { useReactView, Link } from 'farrow-react'
+import { useReactView } from 'farrow-react'
+import { Link } from 'farrow-react/Link'
 
 const home = createRouterPipeline({
   pathname: '/',

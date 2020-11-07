@@ -13,6 +13,9 @@
   ],
   "author": "Jade Gu",
   "license": "MIT",
+  "peerDependencies": {
+    "reflect-metadata": "^0.1.13"
+  },
   "dependencies": {
     "tslib": "^2.0.3"
   }

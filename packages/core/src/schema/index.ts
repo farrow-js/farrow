@@ -13,6 +13,8 @@ export type SchemaValidationError = {
   message: string
 }
 
+export type ValidationResult<T> = Result<T, SchemaValidationError>
+
 const TypeSymbol = Symbol('Type')
 
 export type Type<T = any> = {
@@ -21,8 +23,9 @@ export type Type<T = any> = {
   toJSON: () => Json
   is: (term: Term) => term is Term<T>
   assert: (term: Term) => asserts term is Term<T>
-  validate: (input: unknown) => Result<T, SchemaValidationError>
+  validate: (input: unknown) => ValidationResult<T>
 }
+
 
 export const isType = (input: any): input is Type => {
   return !!(input && input[TypeSymbol])
@@ -140,6 +143,17 @@ export const number = createType<number>({
         input = n
       }
     }
+    return strictNumber.validate(input)
+  },
+})
+
+export const strictNumber = createType<number>({
+  toJSON: () => {
+    return {
+      type: 'Number',
+    }
+  },
+  validate: (input) => {
     if (typeof input === 'number') {
       return Ok(input)
     } else {
@@ -181,6 +195,17 @@ export const boolean = createType<boolean>({
     } else if (input === 'false') {
       input = false
     }
+    return strictBoolean.validate(input)
+  },
+})
+
+export const strictBoolean = createType<boolean>({
+  toJSON: () => {
+    return {
+      type: 'Boolean',
+    }
+  },
+  validate: (input) => {
     if (typeof input === 'boolean') {
       return Ok(input)
     } else {
@@ -479,9 +504,9 @@ export type ListSchema = Type<any[]>
 
 export type JsonSchema = Type<Json>
 
-export const json: JsonSchema = thunk(() => {
-  return union(number, string, boolean, any, literal(null), list(json), record(json))
-})
+export const json = thunk(() => {
+  return union(strictNumber, string, strictBoolean, literal(null), list(json), record(json))
+}) as JsonSchema
 
 // tslint:disable-next-line: variable-name
 export const any = createType<any>({

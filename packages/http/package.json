@@ -14,8 +14,7 @@
   "author": "Jade Gu",
   "license": "MIT",
   "peerDependencies": {
-    "farrow-core": "^1.0.0",
-    "farrow-schema": "^1.0.0"
+    "farrow-core": "^1.0.0"
   },
   "devDependencies": {
     "@types/co-body": "^5.1.0",
@@ -33,8 +32,7 @@
     "@types/escape-html": "^1.0.0",
     "@types/accepts": "^1.3.5",
     "@types/bytes": "^3.1.0",
-    "farrow-core": "^1.0.0",
-    "farrow-schema": "^1.0.0"
+    "farrow-core": "^1.0.0"
   },
   "dependencies": {
     "tslib": "^2.0.3",

@@ -50,7 +50,7 @@ export type PipelineOptions = {
 
 export type RunPipelineOptions<I = unknown, O = unknown> = {
   context?: Context
-  onLast?: Next<I, O>
+  onLast?: (input: I) => O
 }
 
 export type Pipeline<I = unknown, O = unknown> = {
@@ -73,7 +73,7 @@ export const createPipeline = <I, O>(options?: PipelineOptions): Pipeline<I, O> 
     middlewares.push(middleware)
   }
 
-  let createCurrentCounter = (hooks: Hooks, onLast?: Next<I, O>) => {
+  let createCurrentCounter = (hooks: Hooks, onLast?: (input: I) => O) => {
     return createCounter<I, O>((index, input, next) => {
       if (index >= middlewares.length) {
         if (onLast) return onLast(input)

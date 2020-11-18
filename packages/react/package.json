@@ -1,7 +1,7 @@
 {
   "name": "farrow-react",
   "version": "1.0.0",
-  "description": "Functional style web framework for node.js",
+  "description": "React bindings for farrow-http",
   "main": "dist/index.js",
   "files": [
     "dist"

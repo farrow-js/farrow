@@ -7,7 +7,7 @@
   },
   "references": [
     {
-      "path": "../core/tsconfig.json"
+      "path": "../pipeline/tsconfig.json"
     },
     {
       "path": "../schema/tsconfig.json"

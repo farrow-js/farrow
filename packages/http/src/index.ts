@@ -27,8 +27,9 @@ import {
   Context,
   useContext,
   CellStorage,
-  Json,
-} from 'farrow-core'
+} from 'farrow-pipeline'
+
+import { Json } from 'farrow-schema'
 
 import { RequestCookies, RequestHeaders, RequestQuery, RequestInfo } from './requestInfo'
 
@@ -38,7 +39,7 @@ import { MaybeAsyncResponse, Response } from './response'
 
 import { BasenamesCell, useBasenames, handleBasenames, route as createRoute, usePrefix } from './basenames'
 
-import { createRouterPipeline } from './router'
+import { createRouterPipeline } from './createRouterPipeline'
 
 import { createLogger, LoggerEvent, LoggerOptions } from './logger'
 

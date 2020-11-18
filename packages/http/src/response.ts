@@ -1,4 +1,4 @@
-import type { Middleware } from 'farrow-core'
+import type { Middleware } from 'farrow-pipeline'
 import {
   ResponseInfo,
   json,

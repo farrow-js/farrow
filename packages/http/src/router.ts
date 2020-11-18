@@ -1,139 +1,73 @@
-import path from 'path'
-import { match as createMatch } from 'path-to-regexp'
-import { createPipeline, Next, Middleware, RunPipelineOptions, useContext } from 'farrow-core'
-import * as Schema from 'farrow-core/schema'
-import { MaybeAsyncResponse, match as matchType, Response } from './response'
-import { BodyMap } from './responseInfo'
-import { route as createRoute } from './basenames'
+import { createPipeline, Middleware } from 'farrow-pipeline'
+import { createRouterPipeline } from './createRouterPipeline'
+import { Response } from './response'
 
-export type RouterPipelineOptions = {
-  pathname: string
-  method?: string
-  params?: Schema.Type
-  query?: Schema.Type
-  body?: Schema.Type
-  headers?: Schema.Type
-  cookies?: Schema.Type
+const middlewaresMap = new WeakMap<Schema, Middleware<any, any>[]>()
+
+export abstract class Schema {
+  __typename?: string
 }
 
-export type RequestSchema<T extends RouterPipelineOptions> = Schema.Type<
-  {
-    [key in keyof T]: T[key] extends Schema.Type ? Schema.RawType<T[key]> : T[key]
-  }
->
+export type SchemaCtor<T extends Schema> = new () => T
 
-const createRequestSchema = <T extends RouterPipelineOptions>(options: T): RequestSchema<T> => {
-  let fileds: Schema.Fields = {}
+export const typename = <T extends string>(name: T) => name
 
-  for (let key in options) {
-    let value = options[key]
-    if (Schema.isType(value)) {
-      fileds[key] = value
-      // tslint:disable-next-line: strict-type-predicates
-    } else if (typeof value === 'string') {
-      fileds[key] = Schema.string
-    } else {
-      throw new Error(`Unknown option, ${key}: ${value}`)
-    }
-  }
-
-  return Schema.object(fileds) as RequestSchema<T>
+export class Number extends Schema {
+  __typename = typename('Number')
 }
 
-export type RouterRequest<T extends RouterPipelineOptions> = Schema.RawType<RequestSchema<T>>
-
-export type RouterPipeline<I, O> = {
-  middleware: <T extends RouterInput>(input: T, next: Next<T, O>) => O
-  add: (input: Middleware<I, O>) => void
-  run: (input: I, options?: RunPipelineOptions<I, O>) => O
-  match: <T extends keyof BodyMap>(type: T, f: (body: BodyMap[T]) => MaybeAsyncResponse) => void
-  route: (name: string, middleware: Middleware<I, O>) => void
-  serve: (name: string, dirname: string) => void
+export class Int extends Schema {
+  __typename = typename('Int')
 }
 
-export type RouterInput = {
-  pathname: string
-  method?: string
+export class Float extends Schema {
+  __typename = typename('Float')
 }
 
-export const createRouterPipeline = <T extends RouterPipelineOptions>(
-  options: T,
-): RouterPipeline<RouterRequest<T>, MaybeAsyncResponse> => {
-  type Input = RouterRequest<T>
-  type Output = MaybeAsyncResponse
-  type ResultPipeline = RouterPipeline<Input, Output>
+export class String extends Schema {
+  __typename = typename('String')
+}
 
-  let pipeline = createPipeline<Input, Output>()
+export class Boolean extends Schema {
+  __typename = typename('Boolean')
+}
 
-  let schema: Schema.Type<Input> = createRequestSchema(options)
+export class Record extends Schema {
+  __typename = typename('Record')
+}
 
-  let matcher = createMatch(options.pathname)
 
-  let middleware: ResultPipeline['middleware'] = function (input, next) {
-    let context = useContext()
+export abstract class ListType<T extends SchemaCtor<Schema>> extends Schema {
+  abstract itemType: T
+}
 
-    if (typeof options.method === 'string') {
-      if (options.method.toLowerCase() !== input.method?.toLowerCase()) {
-        return next()
-      }
-    }
-
-    let matches = matcher(input.pathname)
-
-    if (!matches) {
-      return next()
-    }
-
-    let params = matches.params
-
-    let result = schema.validate({
-      ...input,
-      params,
-    })
-
-    if (result.isErr) {
-      throw new Error(result.value.message)
-    }
-
-    return pipeline.run(result.value, {
-      context,
-      onLast: () => next(),
-    })
+export const List = <T extends SchemaCtor<Schema>>(Type: T) => {
+  return class List extends ListType<T> {
+    __typename = typename(`[${new Type().__typename ?? ''}]`)
+    itemType = Type
   }
+}
 
-  let match: ResultPipeline['match'] = (type, f) => {
-    pipeline.add(matchType(type, f))
+export type TypeOf<T> = 
+  T extends new () => Schema ? TypeOf<InstanceType<T>> :
+  T extends Number ? number :
+  T extends String ? string :
+  T extends Boolean ? boolean :
+  T extends Record ? {
+    [key in keyof T as T[key] extends new () => Schema ? key : never]: TypeOf<T[key]>
   }
+  : T
 
-  let route: ResultPipeline['route'] = (name, middleware) => {
-    pipeline.add(createRoute(name, middleware))
-  }
+class Detail extends Record {
+  id = Number
+  tab = String
+  isOpen = Boolean
+}
 
-  let add = (
-    ...args: [path: string, middleware: Middleware<Input, Output>] | [middleware: Middleware<Input, Output>]
-  ) => {
-    if (args.length === 1) {
-      pipeline.add(args[0])
-    } else {
-      route(...args)
-    }
-  }
+type T0 = TypeOf<Detail>
 
-  let run = pipeline.run
+type T1 = Detail['id']
 
-  let serve = (name: string, dirname: string) => {
-    route(name, (request) => {
-      let filename = path.join(dirname, request.pathname)
-      return Response.file(filename)
-    })
-  }
-
-  return {
-    middleware,
-    add: add,
-    run: run,
-    match: match,
-    route: route,
-    serve: serve,
-  }
+const createRouter = <T extends new () => Schema>(Schema: T) => {
+  let router = createPipeline
 }

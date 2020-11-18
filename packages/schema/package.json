@@ -1,11 +1,14 @@
 {
-  "name": "farrow-core",
+  "name": "farrow-schema",
   "version": "1.0.0",
-  "description": "Functional style web framework for node.js",
+  "description": "Type-Friendly schema library",
   "main": "dist/index.js",
   "files": [
     "dist"
   ],
+  "scripts": {
+    "start": "ts-node src/schema/class"
+  },
   "keywords": [
     "Web Framework",
     "TypeScript",

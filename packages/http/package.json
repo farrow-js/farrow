@@ -1,7 +1,7 @@
 {
   "name": "farrow-http",
   "version": "1.0.0",
-  "description": "Functional style web framework for node.js",
+  "description": "A Type-Friendly Web Framework",
   "main": "dist/index.js",
   "files": [
     "dist"
@@ -13,9 +13,6 @@
   ],
   "author": "Jade Gu",
   "license": "MIT",
-  "peerDependencies": {
-    "farrow-core": "^1.0.0"
-  },
   "devDependencies": {
     "@types/co-body": "^5.1.0",
     "@types/content-disposition": "^0.5.3",
@@ -31,11 +28,12 @@
     "@types/encodeurl": "^1.0.0",
     "@types/escape-html": "^1.0.0",
     "@types/accepts": "^1.3.5",
-    "@types/bytes": "^3.1.0",
-    "farrow-core": "^1.0.0"
+    "@types/bytes": "^3.1.0"
   },
   "dependencies": {
     "tslib": "^2.0.3",
+    "farrow-pipeline": "^1.0.0",
+    "farrow-schema": "^1.0.0",
     "accepts": "^1.3.7",
     "co-body": "^6.0.0",
     "content-disposition": "^0.5.3",

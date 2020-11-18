@@ -1,0 +1,22 @@
+{
+  "name": "farrow-pipeline",
+  "version": "1.0.0",
+  "description": "Type-Friendly middleware library",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "ts-node src/schema/class"
+  },
+  "keywords": [
+    "Web Framework",
+    "TypeScript",
+    "Functional Programming"
+  ],
+  "author": "Jade Gu",
+  "license": "MIT",
+  "dependencies": {
+    "tslib": "^2.0.3"
+  }
+}

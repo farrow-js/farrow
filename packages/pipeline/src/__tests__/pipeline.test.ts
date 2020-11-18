@@ -1,4 +1,3 @@
-import { pipeline } from 'stream'
 import { createCell, createContext, createPipeline, usePipeline, useContext } from '../pipeline/pipeline'
 
 describe('createContext', () => {

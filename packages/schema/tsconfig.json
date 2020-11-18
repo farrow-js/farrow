@@ -5,13 +5,6 @@
     "outDir": "./dist",
     "composite": true
   },
-  "references": [
-    {
-      "path": "../pipeline/tsconfig.json"
-    },
-    {
-      "path": "../schema/tsconfig.json"
-    }
-  ],
+  "references": [],
   "include": ["src"]
 }

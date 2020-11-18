@@ -1,4 +1,4 @@
-import { createCell, Middleware } from 'farrow-core'
+import { createCell, Middleware } from 'farrow-pipeline'
 
 export const BasenamesCell = createCell([] as string[])
 

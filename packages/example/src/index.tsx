@@ -3,7 +3,7 @@ import path from 'path'
 import React from 'react'
 
 import { createHttpPipeline, createRouterPipeline, Response, usePrefix } from 'farrow-http'
-import { object, number, string, nullable, boolean, RawType } from 'farrow-core/schema'
+import { object, number, string, nullable, boolean, RawType } from 'farrow-schema'
 import { useReactView } from 'farrow-react'
 import { Link } from 'farrow-react/Link'
 

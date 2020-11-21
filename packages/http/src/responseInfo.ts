@@ -5,7 +5,7 @@ import mime from 'mime-types'
 import contentDisposition, { Options as ContentDispositionOptions } from 'content-disposition'
 
 import { RequestInfo } from './requestInfo'
-import { Json } from 'farrow-schema'
+import { JsonType } from 'farrow-schema'
 
 export type Value = string | number
 
@@ -37,7 +37,7 @@ export type SharedResponseInfo = {
 
 export type JsonBody = {
   type: 'json'
-  value: Json
+  value: JsonType
 }
 
 export type TextBody = {
@@ -117,7 +117,7 @@ export type ResponseInfo = {
   vary?: string[]
 }
 
-export const json = (value: Json): ResponseInfo => {
+export const json = (value: JsonType): ResponseInfo => {
   return {
     body: {
       type: 'json',

@@ -1,27 +1,7 @@
-import {
-  nullable,
-  number,
-  string,
-  boolean,
-  list,
-  object,
-  literal,
-  json,
-  record,
-  union,
-  intersect,
-  isTerm,
-  isType,
-  createType,
-  thunk,
-  any,
-  term,
-  Type,
-  Term,
-  ValidationResult,
-  strictNumber,
-  strictBoolean,
-} from '../schema'
+import * as Schema from '../schema'
+import { createValidator, NonStrictValidatorVisitor, ValidationResult } from '../transformer'
+
+const { Type, ObjectType, Struct, Int, Float, Literal, List, Union, Intersect, Nullable, Record, Json, Any } = Schema
 
 let assertOk = <T>(result: ValidationResult<T>): T => {
   if (result.isOk) return result.value
@@ -29,202 +9,193 @@ let assertOk = <T>(result: ValidationResult<T>): T => {
 }
 
 describe('Schema', () => {
-  it('can distinguish type and term', () => {
-    type Result = {
-      name: string
-      list: boolean[]
-    }
-    let checkList = [] as Result[]
+  it('supports number validation', () => {
+    let validate = createValidator(Schema.Number)
 
-    let check = (name: string, type: Type, term: Term) => {
-      let result: Result = {
-        name,
-        list: [],
-      }
+    expect(assertOk(validate(1))).toBe(1)
 
-      result.list.push(isType(type))
-      result.list.push(isTerm(term))
+    expect(assertOk(validate(1.1))).toBe(1.1)
 
-      result.list.push(isType(term))
-      result.list.push(isTerm(type))
+    expect(() => assertOk(validate('1'))).toThrow()
 
-      checkList.push(result)
-    }
+    expect(() => assertOk(validate('abc'))).toThrow()
 
-    check('number', number, number(10))
-    check('string', string, string('test'))
-    check('boolean', boolean, boolean(false))
+    expect(() => assertOk(validate(false))).toThrow()
 
-    let numbers = list(number)
+    expect(() => assertOk(validate(Number))).toThrow()
 
-    check('list<number>', numbers, numbers([1, 2, 3]))
+    expect(() => assertOk(validate([]))).toThrow()
 
-    let strings = list(string)
+    expect(() => assertOk(validate(null))).toThrow()
 
-    check('list<string>', strings, strings(['1', '2', '3']))
-
-    let booleans = list(boolean)
-
-    check('list<boolean>', booleans, booleans([false, true, false]))
-
-    let obj = object({
-      a: number,
-      b: string,
-      c: boolean,
-    })
-
-    check(
-      'object',
-      obj,
-      obj({
-        a: 1,
-        b: '2',
-        c: false,
-      }),
-    )
-
-    expect(checkList).toEqual([
-      {
-        name: 'number',
-        list: [true, true, false, false],
-      },
-      {
-        name: 'string',
-        list: [true, true, false, false],
-      },
-      {
-        name: 'boolean',
-        list: [true, true, false, false],
-      },
-      {
-        name: 'list<number>',
-        list: [true, true, false, false],
-      },
-      {
-        name: 'list<string>',
-        list: [true, true, false, false],
-      },
-      {
-        name: 'list<boolean>',
-        list: [true, true, false, false],
-      },
-      {
-        name: 'object',
-        list: [true, true, false, false],
-      },
-    ])
+    expect(() => assertOk(validate({}))).toThrow()
   })
 
-  it('supports number validation', () => {
-    expect(assertOk(number.validate(1))).toBe(1)
+  it('supports integer validation', () => {
+    let validate = createValidator(Int)
 
-    expect(assertOk(number.validate('1'))).toBe(1)
+    expect(assertOk(validate(1))).toBe(1)
 
-    expect(() => assertOk(number.validate('abc'))).toThrow()
+    expect(() => assertOk(validate(1.1))).toThrow()
 
-    expect(() => assertOk(number.validate(false))).toThrow()
+    expect(() => assertOk(validate('1'))).toThrow()
 
-    expect(() => assertOk(number.validate(Number))).toThrow()
+    expect(() => assertOk(validate('abc'))).toThrow()
 
-    expect(() => assertOk(number.validate([]))).toThrow()
+    expect(() => assertOk(validate(false))).toThrow()
 
-    expect(() => assertOk(number.validate(null))).toThrow()
+    expect(() => assertOk(validate(Number))).toThrow()
 
-    expect(() => assertOk(number.validate({}))).toThrow()
+    expect(() => assertOk(validate([]))).toThrow()
+
+    expect(() => assertOk(validate(null))).toThrow()
+
+    expect(() => assertOk(validate({}))).toThrow()
+  })
+
+  it('supports float validation', () => {
+    let validate = createValidator(Float)
+
+    expect(assertOk(validate(1))).toBe(1)
+
+    expect(assertOk(validate(1.1))).toBe(1.1)
+
+    expect(() => assertOk(validate('1'))).toThrow()
+
+    expect(() => assertOk(validate('abc'))).toThrow()
+
+    expect(() => assertOk(validate(false))).toThrow()
+
+    expect(() => assertOk(validate(Number))).toThrow()
+
+    expect(() => assertOk(validate([]))).toThrow()
+
+    expect(() => assertOk(validate(null))).toThrow()
+
+    expect(() => assertOk(validate({}))).toThrow()
   })
 
   it('supports string validation', () => {
-    expect(assertOk(string.validate(''))).toBe('')
-    expect(assertOk(string.validate('123'))).toBe('123')
+    let validate = createValidator(Schema.String)
 
-    expect(() => assertOk(string.validate(123))).toThrow()
+    expect(assertOk(validate(''))).toBe('')
+    expect(assertOk(validate('123'))).toBe('123')
 
-    expect(() => assertOk(string.validate(false))).toThrow()
+    expect(() => assertOk(validate(123))).toThrow()
 
-    expect(() => assertOk(string.validate(Number))).toThrow()
+    expect(() => assertOk(validate(false))).toThrow()
 
-    expect(() => assertOk(string.validate([]))).toThrow()
+    expect(() => assertOk(validate(Number))).toThrow()
 
-    expect(() => assertOk(string.validate(null))).toThrow()
+    expect(() => assertOk(validate([]))).toThrow()
 
-    expect(() => assertOk(string.validate({}))).toThrow()
+    expect(() => assertOk(validate(null))).toThrow()
+
+    expect(() => assertOk(validate({}))).toThrow()
   })
 
   it('supports boolean validation', () => {
-    expect(assertOk(boolean.validate(true))).toBe(true)
-    expect(assertOk(boolean.validate(false))).toBe(false)
+    let validate = createValidator(Schema.Boolean)
 
-    expect(assertOk(boolean.validate('true'))).toBe(true)
-    expect(assertOk(boolean.validate('false'))).toBe(false)
+    expect(assertOk(validate(true))).toBe(true)
+    expect(assertOk(validate(false))).toBe(false)
 
-    expect(() => assertOk(boolean.validate(123))).toThrow()
+    expect(() => assertOk(validate('true'))).toThrow()
+    expect(() => assertOk(validate('false'))).toThrow()
 
-    expect(() => assertOk(boolean.validate('adf'))).toThrow()
+    expect(() => assertOk(validate(123))).toThrow()
 
-    expect(() => assertOk(boolean.validate(Number))).toThrow()
+    expect(() => assertOk(validate('adf'))).toThrow()
 
-    expect(() => assertOk(boolean.validate([]))).toThrow()
+    expect(() => assertOk(validate(Number))).toThrow()
 
-    expect(() => assertOk(boolean.validate(null))).toThrow()
+    expect(() => assertOk(validate([]))).toThrow()
 
-    expect(() => assertOk(boolean.validate({}))).toThrow()
+    expect(() => assertOk(validate(null))).toThrow()
+
+    expect(() => assertOk(validate({}))).toThrow()
+  })
+
+  it('supports ID validation', () => {
+    let validate = createValidator(Schema.ID)
+
+    expect(() => assertOk(validate(''))).toThrow()
+    expect(assertOk(validate('123'))).toBe('123')
+
+    expect(() => assertOk(validate(123))).toThrow()
+
+    expect(() => assertOk(validate(false))).toThrow()
+
+    expect(() => assertOk(validate(Number))).toThrow()
+
+    expect(() => assertOk(validate([]))).toThrow()
+
+    expect(() => assertOk(validate(null))).toThrow()
+
+    expect(() => assertOk(validate({}))).toThrow()
   })
 
   it('supports nullable validation', () => {
-    let maybeNumber = nullable(number)
-    let maybeString = nullable(string)
-    let maybeBoolean = nullable(boolean)
+    let validateNullableNumber = createValidator(Nullable(Number))
+    let validateNullableString = createValidator(Nullable(String))
+    let validateNullableBoolean = createValidator(Nullable(Boolean))
 
-    expect(assertOk(maybeNumber.validate(null))).toBe(null)
-    expect(assertOk(maybeNumber.validate(undefined))).toBe(undefined)
-    expect(assertOk(maybeNumber.validate(1))).toBe(1)
+    expect(assertOk(validateNullableNumber(null))).toBe(null)
+    expect(assertOk(validateNullableNumber(undefined))).toBe(undefined)
+    expect(assertOk(validateNullableNumber(1))).toBe(1)
 
-    expect(assertOk(maybeString.validate(null))).toBe(null)
-    expect(assertOk(maybeString.validate(undefined))).toBe(undefined)
-    expect(assertOk(maybeString.validate('1'))).toBe('1')
+    expect(assertOk(validateNullableString(null))).toBe(null)
+    expect(assertOk(validateNullableString(undefined))).toBe(undefined)
+    expect(assertOk(validateNullableString('1'))).toBe('1')
 
-    expect(assertOk(maybeBoolean.validate(null))).toBe(null)
-    expect(assertOk(maybeBoolean.validate(undefined))).toBe(undefined)
-    expect(assertOk(maybeBoolean.validate(true))).toBe(true)
-    expect(assertOk(maybeBoolean.validate(false))).toBe(false)
+    expect(assertOk(validateNullableBoolean(null))).toBe(null)
+    expect(assertOk(validateNullableBoolean(undefined))).toBe(undefined)
+    expect(assertOk(validateNullableBoolean(true))).toBe(true)
+    expect(assertOk(validateNullableBoolean(false))).toBe(false)
   })
 
   it('supports list validation', () => {
-    let numbers = list(number)
-    let strings = list(string)
-    let booleans = list(boolean)
+    let validateNumbers = createValidator(List(Number))
+    let validateStrings = createValidator(List(String))
+    let validateBooleans = createValidator(List(Boolean))
 
-    expect(assertOk(numbers.validate([1, 2, 3]))).toEqual([1, 2, 3])
+    expect(assertOk(validateNumbers([1, 2, 3]))).toEqual([1, 2, 3])
 
-    expect(assertOk(numbers.validate(['1', '2', '3']))).toEqual([1, 2, 3])
+    expect(() => assertOk(validateNumbers(['1', '2', '3']))).toThrow()
 
-    expect(() => assertOk(numbers.validate(['a', 'b', 'c']))).toThrow()
+    expect(() => assertOk(validateNumbers(['a', 'b', 'c']))).toThrow()
 
-    expect(assertOk(strings.validate(['a', 'b', 'c']))).toEqual(['a', 'b', 'c'])
+    expect(assertOk(validateStrings(['a', 'b', 'c']))).toEqual(['a', 'b', 'c'])
 
-    expect(assertOk(strings.validate(['1', '2', '3']))).toEqual(['1', '2', '3'])
+    expect(assertOk(validateStrings(['1', '2', '3']))).toEqual(['1', '2', '3'])
 
-    expect(() => assertOk(strings.validate([1, 2, 3]))).toThrow()
+    expect(() => assertOk(validateStrings([1, 2, 3]))).toThrow()
 
-    expect(assertOk(booleans.validate([true, false, true]))).toEqual([true, false, true])
+    expect(assertOk(validateBooleans([true, false, true]))).toEqual([true, false, true])
 
-    expect(assertOk(booleans.validate(['true', false, 'true']))).toEqual([true, false, true])
+    expect(() => assertOk(validateBooleans(['true', false, 'true']))).toThrow()
 
-    expect(() => assertOk(booleans.validate([1, 2, 3]))).toThrow()
+    expect(() => assertOk(validateBooleans([1, 2, 3]))).toThrow()
   })
 
   it('supports object validation', () => {
-    let obj = object({
-      a: number,
-      b: string,
-      c: boolean,
-      d: list(number),
-      e: nullable(string),
-    })
+    class Obj extends ObjectType {
+      a = Number
+      b = String
+      c = Boolean
+      d = {
+        [Type]: List(Number),
+      }
+      e = {
+        [Type]: Nullable(String),
+      }
+    }
+
+    let validate = createValidator(Obj)
 
     expect(
       assertOk(
-        obj.validate({
+        validate({
           a: 1,
           b: '1',
           c: false,
@@ -242,7 +213,7 @@ describe('Schema', () => {
 
     expect(
       assertOk(
-        obj.validate({
+        validate({
           a: 1,
           b: '1',
           c: false,
@@ -258,7 +229,7 @@ describe('Schema', () => {
 
     expect(
       assertOk(
-        obj.validate({
+        validate({
           a: 1,
           b: '1',
           c: false,
@@ -276,7 +247,7 @@ describe('Schema', () => {
 
     expect(
       assertOk(
-        obj.validate({
+        validate({
           a: 1,
           b: '1',
           c: false,
@@ -295,7 +266,7 @@ describe('Schema', () => {
 
     expect(() =>
       assertOk(
-        obj.validate({
+        validate({
           a: 1,
           b: '1',
           c: false,
@@ -304,38 +275,111 @@ describe('Schema', () => {
       ),
     ).toThrow()
 
-    expect(() => assertOk(obj.validate(null))).toThrow()
-    expect(() => assertOk(obj.validate(123))).toThrow()
+    expect(() => assertOk(validate(null))).toThrow()
+    expect(() => assertOk(validate(123))).toThrow()
   })
 
-  it('supports union validation', () => {
-    let numberOrString = union(strictNumber, strictBoolean, string)
-
-    expect(assertOk(numberOrString.validate('10'))).toBe('10')
-    expect(assertOk(numberOrString.validate(10))).toBe(10)
-    expect(assertOk(numberOrString.validate('abc'))).toBe('abc')
-    expect(assertOk(numberOrString.validate(false))).toBe(false)
-  })
-
-  it('supports intersect validation', () => {
-    let obj0 = object({
-      a: number,
+  it('supports struct validation', () => {
+    let Struct0 = Struct({
+      a: {
+        [Type]: Number,
+      },
+      b: {
+        [Type]: String,
+      },
+      c: Boolean,
     })
-    let obj1 = object({
-      b: string,
+
+    let Struct1 = Struct({
+      struct0: {
+        [Type]: Struct0,
+      },
+      d: List(Number),
     })
-    let obj2 = intersect(obj0, obj1)
 
-    expect(assertOk(obj0.validate({ a: 1 }))).toEqual({ a: 1 })
-    expect(assertOk(obj1.validate({ b: '1' }))).toEqual({ b: '1' })
-
-    expect(() => assertOk(obj0.validate({ b: '1' }))).toThrow()
-
-    expect(() => assertOk(obj1.validate({ a: 1 }))).toThrow()
+    let validateStruct0 = createValidator(Struct0)
+    let validateStruct1 = createValidator(Struct1)
 
     expect(
       assertOk(
-        obj2.validate({
+        validateStruct0({
+          a: 1,
+          b: '1',
+          c: false,
+        }),
+      ),
+    ).toEqual({
+      a: 1,
+      b: '1',
+      c: false,
+    })
+
+    expect(() =>
+      assertOk(
+        validateStruct0({
+          a: 1,
+          b: 1,
+          c: false,
+        }),
+      ),
+    ).toThrow()
+
+    expect(
+      assertOk(
+        validateStruct1({
+          struct0: {
+            a: 1,
+            b: '1',
+            c: false,
+          },
+          d: [1, 2, 3],
+          f: 123,
+        }),
+      ),
+    ).toEqual({
+      struct0: {
+        a: 1,
+        b: '1',
+        c: false,
+      },
+      d: [1, 2, 3],
+    })
+  })
+
+  it('supports union validation', () => {
+    let validate = createValidator(Union(Number, Boolean, String))
+
+    expect(assertOk(validate('10'))).toBe('10')
+    expect(assertOk(validate(10))).toBe(10)
+    expect(assertOk(validate('abc'))).toBe('abc')
+    expect(assertOk(validate(false))).toBe(false)
+  })
+
+  it('supports intersect validation', () => {
+    class Obj0 extends ObjectType {
+      a = Number
+    }
+
+    class Obj1 extends ObjectType {
+      b = String
+    }
+
+    let Obj2 = Intersect(Obj0, Obj1)
+
+    let validateObj0 = createValidator(Obj0)
+    let validateObj1 = createValidator(Obj1)
+    let validateObj2 = createValidator(Obj2)
+
+    expect(assertOk(validateObj0({ a: 1 }))).toEqual({ a: 1 })
+    expect(assertOk(validateObj1({ b: '1' }))).toEqual({ b: '1' })
+
+    expect(() => assertOk(validateObj0({ b: '1' }))).toThrow()
+
+    expect(() => assertOk(validateObj1({ a: 1 }))).toThrow()
+
+    expect(
+      assertOk(
+        validateObj2({
           a: 1,
           b: '1',
         }),
@@ -347,7 +391,7 @@ describe('Schema', () => {
 
     expect(
       assertOk(
-        obj2.validate({
+        validateObj2({
           a: 1,
           b: '1',
           c: 3,
@@ -358,38 +402,40 @@ describe('Schema', () => {
       b: '1',
     })
 
-    expect(() => assertOk(obj2.validate({ b: '1' }))).toThrow()
+    expect(() => assertOk(validateObj2({ b: '1' }))).toThrow()
 
-    expect(() => assertOk(obj2.validate({ a: 1 }))).toThrow()
+    expect(() => assertOk(validateObj2({ a: 1 }))).toThrow()
   })
 
   it('supports literal validation', () => {
-    let literalOne = literal(1)
-    let literalTwo = literal(2)
-    let literalAAA = literal('AAA')
-    let literalTrue = literal(true)
+    let validateLiteralOne = createValidator(Literal(1))
+    let validateLiteralTwo = createValidator(Literal(2))
+    let validateLiteralAAA = createValidator(Literal('AAA'))
+    let validateLiteralTrue = createValidator(Literal(true))
 
-    expect(assertOk(literalOne.validate(1))).toBe(1)
-    expect(assertOk(literalTwo.validate(2))).toBe(2)
-    expect(assertOk(literalAAA.validate('AAA'))).toBe('AAA')
-    expect(assertOk(literalTrue.validate(true))).toBe(true)
+    expect(assertOk(validateLiteralOne(1))).toBe(1)
+    expect(assertOk(validateLiteralTwo(2))).toBe(2)
+    expect(assertOk(validateLiteralAAA('AAA'))).toBe('AAA')
+    expect(assertOk(validateLiteralTrue(true))).toBe(true)
 
-    expect(() => assertOk(literalOne.validate(2))).toThrow()
-    expect(() => assertOk(literalTwo.validate(1))).toThrow()
-    expect(() => assertOk(literalAAA.validate('aaa'))).toThrow()
-    expect(() => assertOk(literalTrue.validate(false))).toThrow()
+    expect(() => assertOk(validateLiteralOne(2))).toThrow()
+    expect(() => assertOk(validateLiteralTwo(1))).toThrow()
+    expect(() => assertOk(validateLiteralAAA('aaa'))).toThrow()
+    expect(() => assertOk(validateLiteralTrue(false))).toThrow()
   })
 
   it('supports json validation', () => {
-    expect(assertOk(json.validate(null))).toEqual(null)
-    expect(assertOk(json.validate(1))).toEqual(1)
-    expect(assertOk(json.validate('1'))).toEqual('1')
-    expect(assertOk(json.validate(false))).toEqual(false)
-    expect(assertOk(json.validate(true))).toEqual(true)
+    let validateJson = createValidator(Json)
+
+    expect(assertOk(validateJson(null))).toEqual(null)
+    expect(assertOk(validateJson(1))).toEqual(1)
+    expect(assertOk(validateJson('1'))).toEqual('1')
+    expect(assertOk(validateJson(false))).toEqual(false)
+    expect(assertOk(validateJson(true))).toEqual(true)
 
     expect(
       assertOk(
-        json.validate({
+        validateJson({
           a: 1,
           b: 2,
           c: null,
@@ -403,48 +449,45 @@ describe('Schema', () => {
       d: [1, '1', false],
     })
 
-    expect(assertOk(json.validate([1, 2, 3, 'false']))).toEqual([1, 2, 3, 'false'])
+    expect(assertOk(validateJson([1, 2, 3, 'false']))).toEqual([1, 2, 3, 'false'])
 
-    expect(() => assertOk(json.validate(() => {}))).toThrow()
+    expect(() => assertOk(validateJson(() => {}))).toThrow()
   })
 
   it('supports record validation', () => {
-    let numberRecord = record(number)
-    let stringRecord = record(string)
+    let validateNumberRecord = createValidator(Record(Number))
+    let validateStringRecord = createValidator(Record(String))
 
-    expect(assertOk(numberRecord.validate({ a: 1, b: 1 }))).toEqual({ a: 1, b: 1 })
+    expect(assertOk(validateNumberRecord({ a: 1, b: 1 }))).toEqual({ a: 1, b: 1 })
 
-    expect(assertOk(stringRecord.validate({ a: 'a', b: 'b' }))).toEqual({ a: 'a', b: 'b' })
+    expect(assertOk(validateStringRecord({ a: 'a', b: 'b' }))).toEqual({ a: 'a', b: 'b' })
 
-    expect(() => assertOk(numberRecord.validate({ a: 'a', b: 1 }))).toThrow()
+    expect(() => assertOk(validateNumberRecord({ a: 'a', b: 1 }))).toThrow()
 
-    expect(() => assertOk(stringRecord.validate({ a: 'a', b: 1 }))).toThrow()
+    expect(() => assertOk(validateStringRecord({ a: 'a', b: 1 }))).toThrow()
   })
 
   it('supports any pattern', () => {
-    expect(assertOk(any.validate(0))).toEqual(0)
-    expect(assertOk(any.validate('1'))).toEqual('1')
-    expect(assertOk(any.validate(null))).toEqual(null)
-    expect(assertOk(any.validate([1, 2, 3]))).toEqual([1, 2, 3])
-    expect(assertOk(any.validate({ a: 1, b: 2 }))).toEqual({ a: 1, b: 2 })
-    expect(assertOk(any.validate(false))).toEqual(false)
+    let validateAny = createValidator(Any)
+    expect(assertOk(validateAny(0))).toEqual(0)
+    expect(assertOk(validateAny('1'))).toEqual('1')
+    expect(assertOk(validateAny(null))).toEqual(null)
+    expect(assertOk(validateAny([1, 2, 3]))).toEqual([1, 2, 3])
+    expect(assertOk(validateAny({ a: 1, b: 2 }))).toEqual({ a: 1, b: 2 })
+    expect(assertOk(validateAny(false))).toEqual(false)
   })
 
-  it('supports defining recursive schema via thunk', () => {
-    type Nest = Type<{
-      value: number
-      nest?: Nest
-    }>
-    let nest: Nest = thunk(() => {
-      return object({
-        value: number,
-        nest: nullable(nest),
-      }) as Nest
-    })
+  it('supports defining recursive schema', () => {
+    class Nest extends ObjectType {
+      value = Number
+      nest = Nullable(Nest)
+    }
+
+    let validateNest = createValidator(Nest)
 
     expect(
       assertOk(
-        nest.validate({
+        validateNest({
           value: 0,
           nest: {
             value: 1,
@@ -470,13 +513,91 @@ describe('Schema', () => {
       },
     })
 
-    expect(() => assertOk(nest.validate(null))).toThrow()
+    expect(() => assertOk(validateNest(null))).toThrow()
     expect(() =>
       assertOk(
-        nest.validate({
+        validateNest({
           value: 'abc',
         }),
       ),
     ).toThrow()
+  })
+})
+
+describe('createValidator', () => {
+  it('support custom visitor', () => {
+    let struct = Struct({
+      a: Number,
+      b: Int,
+      c: Boolean,
+    })
+
+    let validate0 = createValidator(struct)
+
+    let validate1 = createValidator(struct, {
+      visitor: NonStrictValidatorVisitor,
+    })
+
+    // valid data for both
+    let data0 = {
+      a: 1.23,
+      b: 1,
+      c: false,
+    }
+
+    // invalid for strict mode, valid for non-strict mode
+    let data1 = {
+      a: 1,
+      b: 1.1,
+      c: 'false',
+    }
+
+    let data2 = {
+      a: '1',
+      b: '1.1',
+      c: true,
+    }
+
+    let data3 = {
+      a: '1.1',
+      b: '1',
+      c: 'true',
+    }
+
+    expect(assertOk(validate0(data0))).toEqual({
+      a: 1.23,
+      b: 1,
+      c: false,
+    })
+
+    expect(assertOk(validate1(data0))).toEqual({
+      a: 1.23,
+      b: 1,
+      c: false,
+    })
+
+    expect(() => assertOk(validate0(data1))).toThrow()
+
+    expect(assertOk(validate1(data1))).toEqual({
+      a: 1,
+      b: 1,
+      c: false,
+    })
+
+    expect(() => assertOk(validate0(data2))).toThrow()
+
+    expect(assertOk(validate1(data2))).toEqual({
+      a: 1,
+      b: 1,
+      c: true,
+    })
+
+    expect(() => assertOk(validate0(data3))).toThrow()
+
+    expect(assertOk(validate1(data3))).toEqual({
+      a: 1.1,
+      b: 1,
+      c: true,
+    })
   })
 })

@@ -29,7 +29,7 @@ import {
   CellStorage,
 } from 'farrow-pipeline'
 
-import { Json } from 'farrow-schema'
+import { JsonType } from 'farrow-schema'
 
 import { RequestCookies, RequestHeaders, RequestQuery, RequestInfo } from './requestInfo'
 
@@ -356,7 +356,7 @@ export const handleResponse = async (params: ResponseParams) => {
     res.end(body)
   }
 
-  let handleJson = (json: Json) => {
+  let handleJson = (json: JsonType) => {
     let content = JSON.stringify(json)
     let length = Buffer.byteLength(content)
 

@@ -1,14 +1,3 @@
-export type Json =
-  | number
-  | string
-  | boolean
-  | null
-  | object
-  | Json[]
-  | {
-      [key: string]: Json
-    }
-
 export type Err<T = any> = {
   kind: 'Err'
   value: T

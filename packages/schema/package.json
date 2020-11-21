@@ -4,10 +4,12 @@
   "description": "Type-Friendly schema library",
   "main": "dist/index.js",
   "files": [
-    "dist"
+    "dist",
+    "validator.d.ts",
+    "validator.js"
   ],
   "scripts": {
-    "start": "ts-node src/schema/class"
+    "start": ""
   },
   "keywords": [
     "Web Framework",
@@ -16,9 +18,6 @@
   ],
   "author": "Jade Gu",
   "license": "MIT",
-  "peerDependencies": {
-    "reflect-metadata": "^0.1.13"
-  },
   "dependencies": {
     "tslib": "^2.0.3"
   }

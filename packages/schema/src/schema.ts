@@ -127,6 +127,8 @@ export const Struct = <T extends FieldDescriptors>(descriptors: T) => {
 
 type TypeOfList<T extends SchemaCtor> = Array<TypeOfSchemaCtor<T>>
 
+export type TypeOfListItem<T extends ListType> = T extends ListType<infer I> ? TypeOf<I> : never
+
 export abstract class ListType<T extends SchemaCtor = SchemaCtor> extends Schema<TypeOfList<T>> {
   [Kind] = kind('List')
   abstract Item: T

@@ -1,5 +1,5 @@
 import * as Schema from '../schema'
-import { createValidator, NonStrictValidatorVisitor, ValidationResult } from '../transformer'
+import { createStrictValidator, NonStrictValidatorVisitor, ValidationResult } from '../validator'
 
 const { Type, ObjectType, Struct, Int, Float, Literal, List, Union, Intersect, Nullable, Record, Json, Any } = Schema
 
@@ -10,7 +10,7 @@ let assertOk = <T>(result: ValidationResult<T>): T => {
 
 describe('Schema', () => {
   it('supports number validation', () => {
-    let validate = createValidator(Schema.Number)
+    let validate = createStrictValidator(Schema.Number)
 
     expect(assertOk(validate(1))).toBe(1)
 
@@ -32,7 +32,7 @@ describe('Schema', () => {
   })
 
   it('supports integer validation', () => {
-    let validate = createValidator(Int)
+    let validate = createStrictValidator(Int)
 
     expect(assertOk(validate(1))).toBe(1)
 
@@ -54,7 +54,7 @@ describe('Schema', () => {
   })
 
   it('supports float validation', () => {
-    let validate = createValidator(Float)
+    let validate = createStrictValidator(Float)
 
     expect(assertOk(validate(1))).toBe(1)
 
@@ -76,7 +76,7 @@ describe('Schema', () => {
   })
 
   it('supports string validation', () => {
-    let validate = createValidator(Schema.String)
+    let validate = createStrictValidator(Schema.String)
 
     expect(assertOk(validate(''))).toBe('')
     expect(assertOk(validate('123'))).toBe('123')
@@ -95,7 +95,7 @@ describe('Schema', () => {
   })
 
   it('supports boolean validation', () => {
-    let validate = createValidator(Schema.Boolean)
+    let validate = createStrictValidator(Schema.Boolean)
 
     expect(assertOk(validate(true))).toBe(true)
     expect(assertOk(validate(false))).toBe(false)
@@ -117,7 +117,7 @@ describe('Schema', () => {
   })
 
   it('supports ID validation', () => {
-    let validate = createValidator(Schema.ID)
+    let validate = createStrictValidator(Schema.ID)
 
     expect(() => assertOk(validate(''))).toThrow()
     expect(assertOk(validate('123'))).toBe('123')
@@ -136,9 +136,9 @@ describe('Schema', () => {
   })
 
   it('supports nullable validation', () => {
-    let validateNullableNumber = createValidator(Nullable(Number))
-    let validateNullableString = createValidator(Nullable(String))
-    let validateNullableBoolean = createValidator(Nullable(Boolean))
+    let validateNullableNumber = createStrictValidator(Nullable(Number))
+    let validateNullableString = createStrictValidator(Nullable(String))
+    let validateNullableBoolean = createStrictValidator(Nullable(Boolean))
 
     expect(assertOk(validateNullableNumber(null))).toBe(null)
     expect(assertOk(validateNullableNumber(undefined))).toBe(undefined)
@@ -155,9 +155,9 @@ describe('Schema', () => {
   })
 
   it('supports list validation', () => {
-    let validateNumbers = createValidator(List(Number))
-    let validateStrings = createValidator(List(String))
-    let validateBooleans = createValidator(List(Boolean))
+    let validateNumbers = createStrictValidator(List(Number))
+    let validateStrings = createStrictValidator(List(String))
+    let validateBooleans = createStrictValidator(List(Boolean))
 
     expect(assertOk(validateNumbers([1, 2, 3]))).toEqual([1, 2, 3])
 
@@ -191,7 +191,7 @@ describe('Schema', () => {
       }
     }
 
-    let validate = createValidator(Obj)
+    let validate = createStrictValidator(Obj)
 
     expect(
       assertOk(
@@ -297,8 +297,8 @@ describe('Schema', () => {
       d: List(Number),
     })
 
-    let validateStruct0 = createValidator(Struct0)
-    let validateStruct1 = createValidator(Struct1)
+    let validateStruct0 = createStrictValidator(Struct0)
+    let validateStruct1 = createStrictValidator(Struct1)
 
     expect(
       assertOk(
@@ -347,7 +347,7 @@ describe('Schema', () => {
   })
 
   it('supports union validation', () => {
-    let validate = createValidator(Union(Number, Boolean, String))
+    let validate = createStrictValidator(Union(Number, Boolean, String))
 
     expect(assertOk(validate('10'))).toBe('10')
     expect(assertOk(validate(10))).toBe(10)
@@ -366,9 +366,9 @@ describe('Schema', () => {
 
     let Obj2 = Intersect(Obj0, Obj1)
 
-    let validateObj0 = createValidator(Obj0)
-    let validateObj1 = createValidator(Obj1)
-    let validateObj2 = createValidator(Obj2)
+    let validateObj0 = createStrictValidator(Obj0)
+    let validateObj1 = createStrictValidator(Obj1)
+    let validateObj2 = createStrictValidator(Obj2)
 
     expect(assertOk(validateObj0({ a: 1 }))).toEqual({ a: 1 })
     expect(assertOk(validateObj1({ b: '1' }))).toEqual({ b: '1' })
@@ -408,10 +408,10 @@ describe('Schema', () => {
   })
 
   it('supports literal validation', () => {
-    let validateLiteralOne = createValidator(Literal(1))
-    let validateLiteralTwo = createValidator(Literal(2))
-    let validateLiteralAAA = createValidator(Literal('AAA'))
-    let validateLiteralTrue = createValidator(Literal(true))
+    let validateLiteralOne = createStrictValidator(Literal(1))
+    let validateLiteralTwo = createStrictValidator(Literal(2))
+    let validateLiteralAAA = createStrictValidator(Literal('AAA'))
+    let validateLiteralTrue = createStrictValidator(Literal(true))
 
     expect(assertOk(validateLiteralOne(1))).toBe(1)
     expect(assertOk(validateLiteralTwo(2))).toBe(2)
@@ -425,7 +425,7 @@ describe('Schema', () => {
   })
 
   it('supports json validation', () => {
-    let validateJson = createValidator(Json)
+    let validateJson = createStrictValidator(Json)
 
     expect(assertOk(validateJson(null))).toEqual(null)
     expect(assertOk(validateJson(1))).toEqual(1)
@@ -455,8 +455,8 @@ describe('Schema', () => {
   })
 
   it('supports record validation', () => {
-    let validateNumberRecord = createValidator(Record(Number))
-    let validateStringRecord = createValidator(Record(String))
+    let validateNumberRecord = createStrictValidator(Record(Number))
+    let validateStringRecord = createStrictValidator(Record(String))
 
     expect(assertOk(validateNumberRecord({ a: 1, b: 1 }))).toEqual({ a: 1, b: 1 })
 
@@ -468,7 +468,7 @@ describe('Schema', () => {
   })
 
   it('supports any pattern', () => {
-    let validateAny = createValidator(Any)
+    let validateAny = createStrictValidator(Any)
     expect(assertOk(validateAny(0))).toEqual(0)
     expect(assertOk(validateAny('1'))).toEqual('1')
     expect(assertOk(validateAny(null))).toEqual(null)
@@ -483,7 +483,7 @@ describe('Schema', () => {
       nest = Nullable(Nest)
     }
 
-    let validateNest = createValidator(Nest)
+    let validateNest = createStrictValidator(Nest)
 
     expect(
       assertOk(
@@ -524,7 +524,7 @@ describe('Schema', () => {
   })
 })
 
-describe('createValidator', () => {
+describe('createStrictValidator', () => {
   it('support custom visitor', () => {
     let struct = Struct({
       a: Number,
@@ -532,9 +532,9 @@ describe('createValidator', () => {
       c: Boolean,
     })
 
-    let validate0 = createValidator(struct)
+    let validate0 = createStrictValidator(struct)
 
-    let validate1 = createValidator(struct, {
+    let validate1 = createStrictValidator(struct, {
       visitor: NonStrictValidatorVisitor,
     })
 

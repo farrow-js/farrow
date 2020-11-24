@@ -1,5 +1,5 @@
 import * as Schema from '../schema'
-import { createStrictValidator, NonStrictValidatorVisitor, ValidationResult } from '../validator'
+import { createNonStrictValidator, createStrictValidator, ValidationResult } from '../validator'
 
 const { Type, ObjectType, Struct, Int, Float, Literal, List, Union, Intersect, Nullable, Record, Json, Any } = Schema
 
@@ -524,7 +524,7 @@ describe('Schema', () => {
   })
 })
 
-describe('createStrictValidator', () => {
+describe('createValidator', () => {
   it('support custom visitor', () => {
     let struct = Struct({
       a: Number,
@@ -534,9 +534,7 @@ describe('createStrictValidator', () => {
 
     let validate0 = createStrictValidator(struct)
 
-    let validate1 = createStrictValidator(struct, {
-      visitor: NonStrictValidatorVisitor,
-    })
+    let validate1 = createNonStrictValidator(struct)
 
     // valid data for both
     let data0 = {

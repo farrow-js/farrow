@@ -1,19 +1,21 @@
 import * as Schema from './schema'
 
-const Cache = Symbol('transform-cache')
+const Cache = Symbol('transformer-cache')
 
 type Cache = typeof Cache
 
-export const PASS = Symbol('pass')
-
-export type PASS = typeof PASS
+export type TransformContext<Context extends {}, Output = any> = Context & {
+  rules: TransformRules<Output, Context>
+}
 
 export type TransformRule<T extends Schema.Schema, Output, Context extends {}> = {
   test(schema: Schema.Schema): boolean
-  transform(schema: T, context: Context, rules: TransformRules<any, Context>): Output
+  transform(schema: T, context: TransformContext<Context>): Output
 }
 
-export type TransformRules<Output, Context extends {}> = Array<TransformRule<Schema.Schema, Output, Context>>
+export type TransformRules<Output, Context extends {}> = {
+  [key: string]: TransformRule<Schema.Schema, Output, Context>
+}
 
 export type TransfromCache<T = any> = {
   [Cache]?: WeakMap<Schema.SchemaCtor, T>
@@ -24,10 +26,11 @@ const getCache = <T>(context: TransfromCache<T>): WeakMap<Schema.SchemaCtor, T> 
 }
 
 export const createTransformer = <Output, Context extends {}>(
-  rules: TransformRules<Output, Context>,
-  context: Context & TransfromCache<Output>,
+  context: TransformContext<Context, Output> & TransfromCache<Output>,
 ) => {
   let cache = getCache(context)
+
+  let values = Object.values(context.rules)
 
   let transformer = <SC extends Schema.SchemaCtor>(SchemaCtor: SC): Output => {
     let Ctor: new () => Schema.Schema
@@ -50,9 +53,9 @@ export const createTransformer = <Output, Context extends {}>(
 
     let schema = new Ctor()
 
-    for (let rule of rules) {
+    for (let rule of values) {
       if (rule.test(schema)) {
-        let result = rule.transform(schema, context, rules)
+        let result = rule.transform(schema, context)
 
         cache.set(Ctor, result)
 

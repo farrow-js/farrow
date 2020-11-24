@@ -1,6 +1,6 @@
 import * as Schema from './schema'
 import { Err, Ok, Result } from './result'
-import { createTransformer, TransformRule } from './transformer'
+import { createTransformer, TransformRule, TransformContext } from './transformer'
 
 export type ValidationError = {
   path?: (string | number)[]
@@ -9,8 +9,6 @@ export type ValidationError = {
 
 export type ValidationResult<T = any> = Result<T, ValidationError>
 
-export type Validator<T = any> = (input: unknown) => ValidationResult<T>
-
 export const SchemaErr = (message: string, path?: ValidationError['path']): Err<ValidationError> => {
   return Err({
     path,
@@ -18,24 +16,27 @@ export const SchemaErr = (message: string, path?: ValidationError['path']): Err<
   })
 }
 
-export type ValidatorRule<S extends Schema.Schema, Context extends {} = ValidatorContext> = TransformRule<
+export type Validator<T = any> = (input: unknown) => ValidationResult<T>
+
+export type ValidatorRule<S extends Schema.Schema, Context extends {} = {}> = TransformRule<
   S,
   Validator<Schema.TypeOf<S>>,
-  Context & ValidatorContext
+  Context
 >
 
-export type ValidatorRules<Context extends {} = ValidatorContext> = Array<ValidatorRule<any, Context>>
+export type ValidatorRules<Context extends {} = {}> = {
+  [key: string]: ValidatorRule<any, Context>
+}
 
-export const createValidator = <T extends Schema.SchemaCtor, Context = {}>(
-  SchemaCtor: T,
-  rules: ValidatorRules<Context>,
-  context: Context,
-) => {
-  let transformer = createTransformer<Validator<Schema.TypeOf<T>>, Context>(rules, context)
+export const createValidator = <S extends Schema.SchemaCtor, Context = {}>(
+  SchemaCtor: S,
+  context: TransformContext<Context, Validator>,
+): Validator<Schema.TypeOf<S>> => {
+  let transformer = createTransformer(context)
 
-  let validator: Validator<Schema.TypeOf<T>> | undefined
+  let validator: Validator<Schema.TypeOf<S>> | undefined
 
-  return (input: unknown) => {
+  return (input) => {
     if (validator) {
       return validator(input)
     }
@@ -44,86 +45,27 @@ export const createValidator = <T extends Schema.SchemaCtor, Context = {}>(
   }
 }
 
-export type ValidatorContext = {
-  visitor?: {
-    Number?: (input: any) => number | void
-    Int?: (input: any) => number | void
-    Float?: (input: any) => number | void
-    String?: (input: any) => string | void
-    Boolean?: (input: any) => boolean | void
-    ID?: (input: any) => string | void
-  }
-}
-
-export const createStrictValidator = <T extends Schema.SchemaCtor>(SchemaCtor: T, context: ValidatorContext = {}) => {
-  return createValidator(
-    SchemaCtor,
-    [
-      StringValidatorRule,
-      BooleanValidatorRule,
-      NumberValidatorRule,
-      IntValidatorRule,
-      FloatValidatorRule,
-      IDValidatorRule,
-      ListValidatorRule,
-      ObjectValidatorRule,
-      UnionValidatorRule,
-      IntersectValidatorRule,
-      NullableValidatorRule,
-      JsonValidatorRule,
-      AnyValidatorRule,
-      LiteralValidatorRule,
-      RecordValidatorRule,
-    ],
-    context,
-  )
+export const createStrictValidator = <T extends Schema.SchemaCtor>(SchemaCtor: T) => {
+  return createValidator(SchemaCtor, {
+    rules: defaultValidatorRules,
+  })
 }
 
 export const createNonStrictValidator = <T extends Schema.SchemaCtor>(SchemaCtor: T) => {
-  return createStrictValidator(SchemaCtor, { visitor: NonStrictValidatorVisitor })
-}
-
-export const NonStrictValidatorVisitor: ValidatorContext['visitor'] = {
-  Number: (input) => {
-    if (typeof input === 'string') {
-      let value = parseFloat(input)
-      if (typeof value === 'number' && !isNaN(value)) {
-        return value
-      }
-    }
-  },
-  Int: (input) => {
-    if (typeof input === 'number') {
-      return Math.floor(input)
-    }
-  },
-  Boolean: (input) => {
-    if (typeof input === 'string') {
-      if (input === 'false') return false
-      if (input === 'true') return true
-    }
-  },
+  return createValidator(SchemaCtor, {
+    rules: loose(defaultValidatorRules),
+  })
 }
 
 const StringValidatorRule: ValidatorRule<Schema.String> = {
   test: (schema) => {
     return schema instanceof Schema.String
   },
-  transform: (schema, context) => {
-    let handleString = context.visitor?.String
-
+  transform: () => {
     return (input) => {
       if (typeof input === 'string') {
         return Ok(input)
       }
-
-      if (handleString) {
-        let value = handleString(input)
-        if (typeof value === 'string') {
-          return Ok(value)
-        }
-      }
-
       return SchemaErr(`${input} is not a string`)
     }
   },
@@ -133,21 +75,11 @@ const NumberValidatorRule: ValidatorRule<Schema.Number> = {
   test: (schema) => {
     return schema instanceof Schema.Number
   },
-  transform: (schema, context) => {
-    let handleNumber = context.visitor?.Number
-
+  transform: () => {
     return (input) => {
       if (typeof input === 'number') {
         return Ok(input)
       }
-
-      if (handleNumber) {
-        let value = handleNumber(input)
-        if (typeof value === 'number') {
-          return Ok(value)
-        }
-      }
-
       return SchemaErr(`${input} is not a number`)
     }
   },
@@ -157,24 +89,11 @@ const IntValidatorRule: ValidatorRule<Schema.Int> = {
   test: (schema) => {
     return schema instanceof Schema.Int
   },
-  transform: (schema, context, rules) => {
-    let handleInt = context.visitor?.Int
-    let validateNumber = createValidator(Schema.Number, rules, context)
-
+  transform: () => {
     return (input) => {
-      let result = validateNumber(input)
-
-      if (result.isOk && Number.isInteger(result.value)) {
-        return result
+      if (typeof input === 'number' && Number.isInteger(input)) {
+        return Ok(input)
       }
-
-      if (handleInt) {
-        let value = handleInt(result.isOk ? result.value : input)
-        if (typeof value === 'number') {
-          return Ok(value)
-        }
-      }
-
       return SchemaErr(`${input} is not an integer`)
     }
   },
@@ -184,25 +103,12 @@ const FloatValidatorRule: ValidatorRule<Schema.Float> = {
   test: (schema) => {
     return schema instanceof Schema.Float
   },
-  transform: (schema, context, rules) => {
-    let handleFloat = context.visitor?.Float
-    let validateNumber = createValidator(Schema.Number, rules, context)
-
+  transform: () => {
     return (input) => {
-      let result = validateNumber(input)
-
-      if (result.isOk) {
-        return result
+      if (typeof input === 'number') {
+        return Ok(input)
       }
-
-      if (handleFloat) {
-        let value = handleFloat(input)
-        if (typeof value === 'number') {
-          return Ok(value)
-        }
-      }
-
-      return SchemaErr(`${input} is not a float`)
+      return SchemaErr(`${input} is not a number`)
     }
   },
 }
@@ -211,29 +117,13 @@ const IDValidatorRule: ValidatorRule<Schema.ID> = {
   test: (schema) => {
     return schema instanceof Schema.ID
   },
-  transform: (schema, context, rules) => {
-    let handleID = context?.visitor?.ID
-    let validateString = createValidator(Schema.String, rules, context)
-
+  transform: () => {
     return (input) => {
-      let result = validateString(input)
-
-      if (result.isOk) {
-        if (result.value === '') {
-          return SchemaErr(`ID can't be empty. input: ${input}`)
+      if (typeof input === 'string') {
+        if (input === '') {
+          return SchemaErr(`ID can't be empty.`)
         }
-
-        return result
-      }
-
-      if (handleID) {
-        let value = handleID(input)
-        if (typeof value === 'string') {
-          if (value === '') {
-            return SchemaErr(`ID can't be empty`)
-          }
-          return Ok(value)
-        }
+        return Ok(input)
       }
 
       return SchemaErr(`${input} is not an ID`)
@@ -245,21 +135,11 @@ const BooleanValidatorRule: ValidatorRule<Schema.Boolean> = {
   test: (schema) => {
     return schema instanceof Schema.Boolean
   },
-  transform: (schema, context) => {
-    let handleBoolean = context?.visitor?.Boolean
-
+  transform: () => {
     return (input) => {
       if (typeof input === 'boolean') {
         return Ok(input)
       }
-
-      if (handleBoolean) {
-        let value = handleBoolean(input)
-        if (typeof value === 'boolean') {
-          return Ok(value)
-        }
-      }
-
       return SchemaErr(`${input} is not a boolean`)
     }
   },
@@ -269,7 +149,7 @@ const LiteralValidatorRule: ValidatorRule<Schema.LiteralType> = {
   test: (schema) => {
     return schema instanceof Schema.LiteralType
   },
-  transform: (schema, context, rules) => {
+  transform: (schema) => {
     let value = schema.value
 
     return (input) => {
@@ -285,8 +165,8 @@ const ListValidatorRule: ValidatorRule<Schema.ListType> = {
   test: (schema) => {
     return schema instanceof Schema.ListType
   },
-  transform: (schema, context, rules) => {
-    let validateItem = createValidator(schema.Item, rules, context)
+  transform: (schema, context) => {
+    let validateItem = createValidator(schema.Item, context)
 
     return (input) => {
       if (!Array.isArray(input)) {
@@ -315,25 +195,24 @@ type FieldsValidators<T> = {
   [key in keyof T]: Validator<T[key]>
 }
 
-const createFieldsValidators = <T extends Schema.FieldDescriptors, Context extends {}>(
+const createFieldsValidators = <T extends Schema.FieldDescriptors>(
   descriptors: T,
-  rules: ValidatorRules<Context>,
-  context: Context,
+  context: TransformContext<any>,
 ): FieldsValidators<Schema.TypeOfFieldDescriptors<T>> => {
   let fieldsValidators = {}
 
   for (let [key, field] of Object.entries(descriptors)) {
     if (!Schema.isFieldDescriptor(field)) {
       if (Schema.isFieldDescriptors(field)) {
-        fieldsValidators[key] = createValidator(Schema.Struct(field), rules, context)
+        fieldsValidators[key] = createValidator(Schema.Struct(field), context)
       }
       continue
     }
 
     if (typeof field === 'function') {
-      fieldsValidators[key] = createValidator(field, rules, context)
+      fieldsValidators[key] = createValidator(field, context)
     } else {
-      fieldsValidators[key] = createValidator(field[Schema.Type], rules, context)
+      fieldsValidators[key] = createValidator(field[Schema.Type], context)
     }
   }
 
@@ -344,9 +223,9 @@ const ObjectValidatorRule: ValidatorRule<Schema.ObjectType | Schema.StructType> 
   test: (schema) => {
     return schema instanceof Schema.ObjectType || schema instanceof Schema.StructType
   },
-  transform: (schema, context, rules) => {
+  transform: (schema, context) => {
     let descriptors = (schema instanceof Schema.StructType ? schema.descriptors : schema) as Schema.FieldDescriptors
-    let fieldsValidators = createFieldsValidators(descriptors, rules, context)
+    let fieldsValidators = createFieldsValidators(descriptors, context)
 
     return (input) => {
       if (typeof input !== 'object' || !input) {
@@ -375,8 +254,8 @@ const RecordValidatorRule: ValidatorRule<Schema.RecordType> = {
   test: (schema) => {
     return schema instanceof Schema.RecordType
   },
-  transform: (schema, context, rules) => {
-    let validateItem = createValidator(schema.Item, rules, context)
+  transform: (schema, context) => {
+    let validateItem = createValidator(schema.Item, context)
 
     return (input) => {
       if (typeof input !== 'object' || !input) {
@@ -403,8 +282,8 @@ const NullableValidatorRule: ValidatorRule<Schema.NullableType> = {
   test: (schema) => {
     return schema instanceof Schema.NullableType
   },
-  transform: (schema, context, rules) => {
-    let validateItem = createValidator(schema.Item, rules, context)
+  transform: (schema, context) => {
+    let validateItem = createValidator(schema.Item, context)
 
     return (input) => {
       if (input === null || input === undefined) {
@@ -419,8 +298,8 @@ const UnionValidatorRule: ValidatorRule<Schema.UnionType> = {
   test: (schema) => {
     return schema instanceof Schema.UnionType
   },
-  transform: (schema, context, rules) => {
-    let itemsValidators = (schema.Items as Schema.SchemaCtor[]).map((Item) => createValidator(Item, rules, context))
+  transform: (schema, context) => {
+    let itemsValidators = (schema.Items as Schema.SchemaCtor[]).map((Item) => createValidator(Item, context))
 
     return (input) => {
       let messages: string[] = []
@@ -441,8 +320,8 @@ const IntersectValidatorRule: ValidatorRule<Schema.IntersectType> = {
   test: (schema) => {
     return schema instanceof Schema.IntersectType
   },
-  transform: (schema, context, rules) => {
-    let itemsValidators = (schema.Items as Schema.SchemaCtor[]).map((Item) => createValidator(Item, rules, context))
+  transform: (schema, context) => {
+    let itemsValidators = (schema.Items as Schema.SchemaCtor[]).map((Item) => createValidator(Item, context))
 
     return (input) => {
       let results = {}
@@ -454,7 +333,7 @@ const IntersectValidatorRule: ValidatorRule<Schema.IntersectType> = {
         Object.assign(results, result.value)
       }
 
-      return Ok(results as Schema.TypeOf<typeof schema>)
+      return Ok(results as any)
     }
   },
 }
@@ -501,4 +380,111 @@ const AnyValidatorRule: ValidatorRule<Schema.Any> = {
   transform: (schema) => {
     return (input) => Ok(input)
   },
+}
+
+export const defaultValidatorRules = {
+  String: StringValidatorRule,
+  Boolean: BooleanValidatorRule,
+  Number: NumberValidatorRule,
+  Int: IntValidatorRule,
+  Float: FloatValidatorRule,
+  ID: IDValidatorRule,
+  List: ListValidatorRule,
+  Object: ObjectValidatorRule,
+  Union: UnionValidatorRule,
+  Intersect: IntersectValidatorRule,
+  Nullable: NullableValidatorRule,
+  Json: JsonValidatorRule,
+  Any: AnyValidatorRule,
+  Literal: LiteralValidatorRule,
+  Record: RecordValidatorRule,
+}
+
+export type DefaultValidatorRules = typeof defaultValidatorRules
+
+export const loose = <T extends DefaultValidatorRules>(rules: T): T => {
+  return {
+    ...rules,
+    Number: {
+      ...rules.Number,
+      transform: (schema, context) => {
+        let validator = rules.Number.transform(schema, context)
+        return (input) => {
+          let result = validator(input)
+
+          if (result.isOk) return result
+
+          if (typeof input === 'string') {
+            let value = parseFloat(input)
+            if (typeof value === 'number' && !isNaN(value)) {
+              return Ok(value)
+            }
+          }
+          return result
+        }
+      },
+    },
+    Int: {
+      ...rules.Int,
+      transform: (schema, context) => {
+        let validator = rules.Int.transform(schema, context)
+
+        return (input) => {
+          let result = validator(input)
+
+          if (result.isOk) return result
+
+          if (typeof input === 'string') {
+            input = parseFloat(input)
+          }
+
+          if (typeof input === 'number' && !isNaN(input)) {
+            return Ok(Math.floor(input))
+          }
+
+          return result
+        }
+      },
+    },
+    Float: {
+      ...rules.Float,
+      transform: (schema, context) => {
+        let validator = rules.Float.transform(schema, context)
+
+        return (input) => {
+          let result = validator(input)
+
+          if (result.isOk) return result
+
+          if (typeof input === 'string') {
+            input = parseFloat(input)
+          }
+
+          if (typeof input === 'number' && !isNaN(input)) {
+            return Ok(input)
+          }
+
+          return result
+        }
+      },
+    },
+    Boolean: {
+      ...rules.Boolean,
+      transform: (schema, context) => {
+        let validator = rules.Boolean.transform(schema, context)
+        return (input) => {
+          let result = validator(input)
+
+          if (result.isOk) return result
+
+          if (typeof input === 'string') {
+            if (input === 'false') return Ok(false)
+            if (input === 'true') return Ok(true)
+          }
+
+          return result
+        }
+      },
+    },
+  }
 }

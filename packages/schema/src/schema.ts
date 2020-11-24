@@ -153,13 +153,9 @@ export const Union = <T extends SchemaCtor[]>(...Items: T) => {
   }
 }
 
-type TypeOfIntersect<T extends SchemaCtor[]> = T extends [SchemaCtor]
-  ? TypeOfSchemaCtor<T[0]>
-  : T extends [SchemaCtor, ...infer R]
-  ? R extends SchemaCtor[]
-    ? TypeOfSchemaCtor<T[0]> & TypeOfIntersect<R>
-    : never
-  : never
+type UnionToIntersection<T> = (T extends any ? (x: T) => any : never) extends (x: infer R) => any ? R : never
+
+type TypeOfIntersect<T extends SchemaCtor[]> = UnionToIntersection<TypeOf<T[number]>>
 
 export abstract class IntersectType<T extends SchemaCtor[] = SchemaCtor[]> extends Schema<TypeOfIntersect<T>> {
   [Kind] = kind('Intersect')
@@ -231,69 +227,68 @@ export class Any extends Schema<any> {
   [Kind] = kind('Any')
 }
 
+// class User extends ObjectType {
+//   id = ID
+//   name = String
+//   orders = List(Order)
+// }
 
-class User extends ObjectType {
-  id = ID
-  name = String
-  orders = List(Order)
-}
+// class Order extends ObjectType {
+//   id = ID
+//   product = Product
+//   user = User
+// }
 
-class Order extends ObjectType {
-  id = ID
-  product = Product
-  user = User
-}
+// class Product extends ObjectType {
+//   id = ID
+//   title = String
+//   description = String
+//   price = Float
+// }
 
-class Product extends ObjectType {
-  id = ID
-  title = String
-  description = String
-  price = Float
-}
+// class Query extends ObjectType {
+//   descriptors = {
+//     a: Boolean,
+//     b: Struct({
+//       c: {
+//         d: List(Nullable(String)),
+//       },
+//     }),
+//   }
 
-class Query extends ObjectType {
-  descriptors = {
-    a: Boolean,
-    b: Struct({
-      c: {
-        d: List(Nullable(String)),
-      },
-    }),
-  }
+//   struct = Struct({
+//     a: Number,
+//     b: String,
+//     c: {
+//       deep: {
+//         d: List(Boolean),
+//       },
+//     },
+//   })
 
-  struct = Struct({
-    a: Number,
-    b: String,
-    c: {
-      deep: {
-        d: List(Boolean),
-      },
-    },
-  })
+//   nullable = Nullable(List(Number))
 
-  nullable = Nullable(List(Number))
+//   union = Union(List(Number), List(String), List(Boolean))
 
-  union = Union(List(Number), List(String), List(Boolean))
+//   intersect = Intersect(Struct({ a: String }), Struct({ b: Boolean }))
 
-  intersect = Intersect(Struct({ a: String }), Struct({ b: Boolean }))
+//   record = Record(Product)
 
-  record = Record(Product)
+//   literal = Literal(12)
 
-  literal = Literal(12)
+//   json = Json
 
-  json = Json
+//   any = Any
 
-  any = Any
+//   getUser = User
+//   getOrder = Order
+//   getProduct = {
+//     [Type]: Product,
+//   }
+// }
 
-  getUser = User
-  getOrder = Order
-  getProduct = {
-    [Type]: Product,
-  }
-}
+// type T0 = TypeOf<typeof Query>
 
-type T0 = TypeOf<typeof Query>
+// type T1 = TypeOf<User>
 
-type T1 = TypeOf<User>
-
-type T2 = TypeOf<Product>
+// type T2 = TypeOf<Product>

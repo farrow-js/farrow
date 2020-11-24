@@ -3,7 +3,7 @@ import { match as createMatch } from 'path-to-regexp'
 
 import { createPipeline, Next, Middleware, RunPipelineOptions, useContext } from 'farrow-pipeline'
 import * as Schema from 'farrow-schema'
-import { Validator, createValidator, createNonStrictValidator } from 'farrow-schema/validator'
+import { Validator, createStrictValidator, createNonStrictValidator } from 'farrow-schema/validator'
 
 import { MaybeAsyncResponse, match as matchType, Response } from './response'
 import { BodyMap } from './responseInfo'
@@ -11,60 +11,87 @@ import { route as createRoute } from './basenames'
 
 export type RouterSchemaDescriptor =
   | Schema.FieldDescriptors
-  | Schema.SchemaCtor<Schema.ObjectType>
-  | Schema.SchemaCtor<Schema.StructType>
-
-export type TypeOfRouterSchemaDescriptor<T extends RouterSchemaDescriptor> = T extends Schema.FieldDescriptors
-  ? Schema.TypeOfSchemaCtor<Schema.StructType<T>>
-  : Schema.TypeOfSchemaCtor<T>
+  | (new () => Schema.ObjectType)
+  | (new () => Schema.StructType)
 
 export type RouterRequestSchema = {
   pathname: string
   method?: string
   params?: RouterSchemaDescriptor
   query?: RouterSchemaDescriptor
-  body?: RouterSchemaDescriptor
+  body?: Schema.FieldDescriptor
   headers?: RouterSchemaDescriptor
   cookies?: RouterSchemaDescriptor
 }
 
+export type TypeOfRouterRequestField<T> = T extends string
+  ? string
+  : T extends Schema.FieldDescriptors
+  ? Schema.TypeOf<Schema.StructType<T>>
+  : T extends Schema.FieldDescriptor
+  ? Schema.TypeOfFieldDescriptor<T>
+  : never
+
 export type TypeOfRequestSchema<T extends RouterRequestSchema> = {
-  [key in keyof T]: T[key] extends RouterSchemaDescriptor ? TypeOfRouterSchemaDescriptor<T[key]> : T[key]
+  [key in keyof T]: TypeOfRouterRequestField<T[key]>
 }
 
-class Params extends Schema.ObjectType {
-  id = Schema.Int
+class Body extends Schema.ObjectType {
+  a = String
 }
 
 const request = {
-  pathname: '/detail/id',
-  method: 'POST',
-  params: Params,
-  query: Schema.Struct({
-    tab: String,
-  }),
+  pathname: '/detail/:id',
+  params: {
+    id: Number,
+  },
+  body: Schema.Nullable(Body),
 }
 
-type Req = TypeOfRequestSchema<typeof request>
+type T0 = Schema.Prettier<TypeOfRequestSchema<typeof request>>
 
 const createRequestValidator = <T extends RouterRequestSchema>(
   options: T,
   strict = false,
 ): Validator<TypeOfRequestSchema<T>> => {
-  let { params, query, body, headers, cookies } = options
+  let descriptors = {} as Schema.FieldDescriptors
 
-  let Request = Schema.Struct({
-    pathname: Schema.String,
-    method: typeof options.method === 'string' ? Schema.String : null,
-    params: typeof params === 'function' ? params : params ? Schema.Struct(params) : null,
-    query: typeof query === 'function' ? query : query ? Schema.Struct(query) : null,
-    body: typeof body === 'function' ? body : body ? Schema.Struct(body) : null,
-    headers: typeof headers === 'function' ? headers : headers ? Schema.Struct(headers) : null,
-    cookies: typeof cookies === 'function' ? cookies : cookies ? Schema.Struct(cookies) : null,
-  })
+  if (typeof options.pathname === 'string') {
+    descriptors.pathname = Schema.String
+  }
+
+  if (typeof options.method === 'string') {
+    descriptors.method = Schema.String
+  }
+
+  if (options.params) {
+    descriptors.params = options.params
+  }
+
+  if (options.query) {
+    descriptors.query = options.query
+  }
+
+  if (options.body) {
+    descriptors.body = options.body
+  }
+
+  if (options.headers) {
+    descriptors.headers = options.headers
+  }
+
+  if (options.cookies) {
+    descriptors.cookies = options.cookies
+  }
+
+  let RequestStruct = Schema.Struct(descriptors)
+
+  if (strict) {
+    return createStrictValidator(RequestStruct) as Validator<TypeOfRequestSchema<T>>
+  } else {
+    return createNonStrictValidator(RequestStruct) as Validator<TypeOfRequestSchema<T>>
+  }
 }
-
-export type RouterRequest<T extends RouterRequestSchema> = Schema.RawType<TypeOfRequestSchema<T>>
 
 export type RouterPipeline<I, O> = {
   middleware: <T extends RouterInput>(input: T, next: Next<T, O>) => O
@@ -82,14 +109,14 @@ export type RouterInput = {
 
 export const createRouterPipeline = <T extends RouterRequestSchema>(
   options: T,
-): RouterPipeline<RouterRequest<T>, MaybeAsyncResponse> => {
-  type Input = RouterRequest<T>
+): RouterPipeline<TypeOfRequestSchema<T>, MaybeAsyncResponse> => {
+  type Input = TypeOfRequestSchema<T>
   type Output = MaybeAsyncResponse
   type ResultPipeline = RouterPipeline<Input, Output>
 
   let pipeline = createPipeline<Input, Output>()
 
-  let schema: Schema.Type<Input> = createRequestValidator(options)
+  let validator = createRequestValidator(options)
 
   let matcher = createMatch(options.pathname)
 
@@ -110,7 +137,7 @@ export const createRouterPipeline = <T extends RouterRequestSchema>(
 
     let params = matches.params
 
-    let result = schema.validate({
+    let result = validator({
       ...input,
       params,
     })

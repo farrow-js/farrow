@@ -3,7 +3,7 @@ import path from 'path'
 import React from 'react'
 
 import { createHttpPipeline, createRouterPipeline, Response, usePrefix } from 'farrow-http'
-import { object, number, string, nullable, boolean, RawType } from 'farrow-schema'
+import * as Schema from 'farrow-schema'
 import { useReactView } from 'farrow-react'
 import { Link } from 'farrow-react/Link'
 
@@ -56,12 +56,12 @@ home.add(async (request) => {
 
 const detail = createRouterPipeline({
   pathname: '/:detailId',
-  params: object({
-    detailId: number,
-  }),
-  query: object({
-    tab: nullable(string),
-  }),
+  params: {
+    detailId: Number,
+  },
+  query: {
+    tab: Schema.Nullable(String),
+  },
 })
 
 detail.add(async (request) => {
@@ -88,13 +88,13 @@ attachment.add(async () => {
   return Response.file(filename).attachment('bundle.js')
 })
 
-const query = object({
-  a: nullable(number),
-  b: nullable(string),
-  c: nullable(boolean),
+const query = Schema.Struct({
+  a: Schema.Nullable(Number),
+  b: Schema.Nullable(String),
+  c: Schema.Nullable(Boolean),
 })
 
-type Query = RawType<typeof query>
+type Query = Schema.TypeOf<typeof query>
 
 const View = (props: { pathname: string; query: Query }) => {
   return (
@@ -120,7 +120,7 @@ react.add(async (request) => {
 })
 
 const http = createHttpPipeline({
-  basenames: ['/base']
+  basenames: ['/base'],
 })
 
 http.serve('/static', __dirname)

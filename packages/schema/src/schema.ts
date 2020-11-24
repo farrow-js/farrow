@@ -214,6 +214,7 @@ export type JsonType =
   | string
   | boolean
   | null
+  | undefined
   | JsonType[]
   | {
       [key: string]: JsonType

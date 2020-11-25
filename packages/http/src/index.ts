@@ -27,6 +27,7 @@ import {
   Context,
   useContext,
   CellStorage,
+  MiddlewareInput,
 } from 'farrow-pipeline'
 
 import { JsonType } from 'farrow-schema'
@@ -102,6 +103,8 @@ export type HttpPipelineOptions = {
 }
 
 export type HttpMiddleware = Middleware<RequestInfo, ResponseOutput>
+
+export type HttpMiddlewareInput = MiddlewareInput<RequestInfo, ResponseOutput>
 
 export const createHttpPipeline = (options?: HttpPipelineOptions) => {
   let config: HttpPipelineOptions = {
@@ -230,7 +233,7 @@ export const createHttpPipeline = (options?: HttpPipelineOptions) => {
     }
   }
 
-  let add = (...args: [path: string, middleware: HttpMiddleware] | [middleware: HttpMiddleware]) => {
+  let add = (...args: [path: string, middleware: HttpMiddlewareInput] | [middleware: HttpMiddlewareInput]) => {
     if (args.length === 1) {
       pipeline.add(args[0])
     } else {
@@ -246,7 +249,7 @@ export const createHttpPipeline = (options?: HttpPipelineOptions) => {
     return server
   }
 
-  let route = (name: string, middleware: HttpMiddleware) => {
+  let route = (name: string, middleware: HttpMiddlewareInput) => {
     add(createRoute(name, middleware))
   }
 

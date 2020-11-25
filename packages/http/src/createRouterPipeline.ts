@@ -1,7 +1,7 @@
 import path from 'path'
 import { match as createMatch } from 'path-to-regexp'
 
-import { createPipeline, Next, Middleware, RunPipelineOptions, useContext } from 'farrow-pipeline'
+import { createPipeline, Next, Middleware, RunPipelineOptions, useContext, MiddlewareInput } from 'farrow-pipeline'
 import * as Schema from 'farrow-schema'
 import { Validator, createStrictValidator, createNonStrictValidator } from 'farrow-schema/validator'
 
@@ -95,10 +95,10 @@ const createRequestValidator = <T extends RouterRequestSchema>(
 
 export type RouterPipeline<I, O> = {
   middleware: <T extends RouterInput>(input: T, next: Next<T, O>) => O
-  add: (input: Middleware<I, O>) => void
+  add: (...args: [path: string, middleware: MiddlewareInput<I, O>] | [middleware: MiddlewareInput<I, O>]) => void
   run: (input: I, options?: RunPipelineOptions<I, O>) => O
   match: <T extends keyof BodyMap>(type: T, f: (body: BodyMap[T]) => MaybeAsyncResponse) => void
-  route: (name: string, middleware: Middleware<I, O>) => void
+  route: (name: string, middleware: MiddlewareInput<I, O>) => void
   serve: (name: string, dirname: string) => void
 }
 
@@ -160,9 +160,7 @@ export const createRouterPipeline = <T extends RouterRequestSchema>(
     pipeline.add(createRoute(name, middleware))
   }
 
-  let add = (
-    ...args: [path: string, middleware: Middleware<Input, Output>] | [middleware: Middleware<Input, Output>]
-  ) => {
+  let add: ResultPipeline['add'] = (...args) => {
     if (args.length === 1) {
       pipeline.add(args[0])
     } else {
@@ -172,7 +170,7 @@ export const createRouterPipeline = <T extends RouterRequestSchema>(
 
   let run = pipeline.run
 
-  let serve = (name: string, dirname: string) => {
+  let serve: ResultPipeline['serve'] = (name: string, dirname: string) => {
     route(name, (request) => {
       let filename = path.join(dirname, request.pathname)
       return Response.file(filename)

@@ -1,4 +1,4 @@
-import { createCell, createContext, createPipeline, usePipeline, useContext } from '../pipeline/pipeline'
+import { createCell, createContext, createPipeline, usePipeline, useContext } from '../'
 
 describe('createContext', () => {
   it('basic usage', () => {

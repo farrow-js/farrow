@@ -125,13 +125,13 @@ const http = createHttpPipeline({
 
 http.serve('/static', __dirname)
 
-http.add(home.middleware)
+http.add(home)
 
-http.add('/detail', detail.middleware)
+http.add('/detail', detail)
 
-http.add(react.middleware)
+http.add(react)
 
-http.add(attachment.middleware)
+http.add(attachment)
 
 const server = http.listen(3002, () => {
   console.log('server start at port: 3002')

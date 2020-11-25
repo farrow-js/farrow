@@ -14,6 +14,7 @@ import {
   Hooks,
   runWithContext,
 } from './context'
+
 import { Next, createCounter } from './counter'
 
 export { Next }
@@ -53,9 +54,24 @@ export type RunPipelineOptions<I = unknown, O = unknown> = {
   onLast?: (input: I) => O
 }
 
+export type MiddlewareInput<I = unknown, O = unknown> = Middleware<I, O> | { middleware: Middleware<I, O> }
+
+export type MiddlewareType<T extends MiddlewareInput> = T extends MiddlewareInput<infer I, infer O>
+  ? Middleware<I, O>
+  : never
+
+export const getMiddleware = <I, O>(input: MiddlewareInput<I, O>) => {
+  if (typeof input === 'function') {
+    return input
+  } else if (input && typeof input.middleware === 'function') {
+    return input.middleware
+  }
+  throw new Error(`${input} is not a Middleware or { middleware: Middleware }`)
+}
+
 export type Pipeline<I = unknown, O = unknown> = {
   [PipelineSymbol]: true
-  add: (input: Middleware<I, O>) => void
+  add: (input: MiddlewareInput<I, O>) => void
   run: (input: I, options?: RunPipelineOptions<I, O>) => O
 }
 
@@ -69,8 +85,8 @@ export const createPipeline = <I, O>(options?: PipelineOptions): Pipeline<I, O> 
 
   let middlewares: Middlewares<I, O> = []
 
-  let add: Add = (middleware) => {
-    middlewares.push(middleware)
+  let add: Add = (input) => {
+    middlewares.push(getMiddleware(input))
   }
 
   let createCurrentCounter = (hooks: Hooks, onLast?: (input: I) => O) => {

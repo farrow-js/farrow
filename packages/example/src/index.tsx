@@ -2,12 +2,12 @@ import path from 'path'
 
 import React from 'react'
 
-import { createHttpPipeline, createRouterPipeline, Response, usePrefix } from 'farrow-http'
+import { Http, Router, Response, usePrefix } from 'farrow-http'
 import * as Schema from 'farrow-schema'
 import { useReactView } from 'farrow-react'
 import { Link } from 'farrow-react/Link'
 
-const home = createRouterPipeline({
+const home = Router({
   pathname: '/',
 })
 
@@ -26,7 +26,7 @@ home.match('html', (body) => {
 `)
 })
 
-home.add(async (request) => {
+home.use(async (request) => {
   let prefix = usePrefix()
 
   return Response.html(`
@@ -54,7 +54,7 @@ home.add(async (request) => {
   `)
 })
 
-const detail = createRouterPipeline({
+const detail = Router({
   pathname: '/:detailId',
   params: {
     detailId: Number,
@@ -64,7 +64,7 @@ const detail = createRouterPipeline({
   },
 })
 
-detail.add(async (request) => {
+detail.use(async (request) => {
   let prefix = usePrefix()
 
   if (request.params.detailId > 4) {
@@ -79,22 +79,22 @@ detail.add(async (request) => {
   })
 })
 
-const attachment = createRouterPipeline({
+const attachment = Router({
   pathname: '/src/index.js',
 })
 
-attachment.add(async () => {
+attachment.use(async () => {
   let filename = path.join(__dirname, '../index.js')
   return Response.file(filename).attachment('bundle.js')
 })
 
-const query = Schema.Struct({
+const Query = Schema.Struct({
   a: Schema.Nullable(Number),
   b: Schema.Nullable(String),
   c: Schema.Nullable(Boolean),
 })
 
-type Query = Schema.TypeOf<typeof query>
+type Query = Schema.TypeOf<typeof Query>
 
 const View = (props: { pathname: string; query: Query }) => {
   return (
@@ -108,30 +108,30 @@ const View = (props: { pathname: string; query: Query }) => {
   )
 }
 
-const react = createRouterPipeline({
+const react = Router({
   pathname: '/react',
-  query: query,
+  query: Query,
 })
 
-react.add(async (request) => {
+react.use(async (request) => {
   let ReactView = useReactView()
 
   return ReactView.render(<View {...request} />).header('view-engine', 'react')
 })
 
-const http = createHttpPipeline({
+const http = Http({
   basenames: ['/base'],
 })
 
 http.serve('/static', __dirname)
 
-http.add(home)
+http.use(home)
 
-http.add('/detail', detail)
+http.use('/detail', detail)
 
-http.add(react)
+http.use(react)
 
-http.add(attachment)
+http.use(attachment)
 
 const server = http.listen(3002, () => {
   console.log('server start at port: 3002')

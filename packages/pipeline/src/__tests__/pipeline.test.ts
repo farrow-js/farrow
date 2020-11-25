@@ -76,22 +76,22 @@ describe('createPipeline', () => {
 
     let list: number[] = []
 
-    pipeline.add((input, next) => {
+    pipeline.use((input, next) => {
       list.push(1)
       return next()
     })
 
-    pipeline.add((input, next) => {
+    pipeline.use((input, next) => {
       list.push(2)
       return next()
     })
 
-    pipeline.add((input, next) => {
+    pipeline.use((input, next) => {
       list.push(3)
       return next()
     })
 
-    pipeline.add((input, next) => {
+    pipeline.use((input, next) => {
       if (input.count < 10) {
         return input.count + 1
       } else {
@@ -99,7 +99,7 @@ describe('createPipeline', () => {
       }
     })
 
-    pipeline.add((input) => {
+    pipeline.use((input) => {
       list.push(4)
       return input.count + 2
     })
@@ -126,14 +126,14 @@ describe('createPipeline', () => {
 
     let list: number[] = []
 
-    pipeline.add(async (input, next) => {
+    pipeline.use(async (input, next) => {
       list.push(input)
       let result = await next(input + 1)
       list.push(result)
       return result + 1
     })
 
-    pipeline.add(async (input) => {
+    pipeline.use(async (input) => {
       list.push(input)
       return input + 1
     })
@@ -158,7 +158,7 @@ describe('createPipeline', () => {
 
     let list: number[] = []
 
-    pipeline.add((input, next) => {
+    pipeline.use((input, next) => {
       let cell = Cell0.useCell()
 
       list.push(cell.value)
@@ -168,7 +168,7 @@ describe('createPipeline', () => {
       return next()
     })
 
-    pipeline.add((input, next) => {
+    pipeline.use((input, next) => {
       let cell = Cell0.useCell()
 
       list.push(cell.value)
@@ -178,7 +178,7 @@ describe('createPipeline', () => {
       return next()
     })
 
-    pipeline.add((input) => {
+    pipeline.use((input) => {
       let cell = Cell0.useCell()
       list.push(cell.value)
       return input + cell.value
@@ -197,7 +197,7 @@ describe('createPipeline', () => {
 
     let list: number[] = []
 
-    pipeline.add(async (input, next) => {
+    pipeline.use(async (input, next) => {
       let cell = Cell0.useCell()
 
       list.push(cell.value)
@@ -211,7 +211,7 @@ describe('createPipeline', () => {
       return result
     })
 
-    pipeline.add(async (input, next) => {
+    pipeline.use(async (input, next) => {
       let cell = Cell0.useCell()
 
       list.push(cell.value)
@@ -227,7 +227,7 @@ describe('createPipeline', () => {
       return result
     })
 
-    pipeline.add(async (input) => {
+    pipeline.use(async (input) => {
       let cell = Cell0.useCell()
       list.push(cell.value)
       cell.value += 1
@@ -248,7 +248,7 @@ describe('createPipeline', () => {
       },
     })
 
-    pipeline.add((input) => {
+    pipeline.use((input) => {
       let cell = Cell.useCell()
       cell.value += input
       return cell.value
@@ -288,19 +288,19 @@ describe('createPipeline', () => {
   it('should throw error if there are no middlewares returned value', async () => {
     let pipeline = createPipeline<number, number>()
 
-    pipeline.add((input, next) => {
+    pipeline.use((input, next) => {
       return next()
     })
 
-    pipeline.add((input, next) => {
+    pipeline.use((input, next) => {
       return next()
     })
 
-    pipeline.add((input, next) => {
+    pipeline.use((input, next) => {
       return next()
     })
 
-    pipeline.add((input, next) => {
+    pipeline.use((input, next) => {
       return next()
     })
 
@@ -320,22 +320,22 @@ describe('createPipeline', () => {
 
     let list: number[] = []
 
-    pipeline.add((input, next) => {
+    pipeline.use((input, next) => {
       list.push(1)
       return next()
     })
 
-    pipeline.add((input, next) => {
+    pipeline.use((input, next) => {
       list.push(2)
       return next()
     })
 
-    pipeline.add((input, next) => {
+    pipeline.use((input, next) => {
       list.push(3)
       return next()
     })
 
-    pipeline.add((input, next) => {
+    pipeline.use((input, next) => {
       list.push(4)
       return next()
     })
@@ -352,11 +352,11 @@ describe('createPipeline', () => {
     let pipeline0 = createPipeline<string, string>()
     let pipeline1 = createPipeline<string, string>()
 
-    pipeline0.add((input) => {
+    pipeline0.use((input) => {
       return input + ' from pipeline0'
     })
 
-    pipeline1.add((input) => {
+    pipeline1.use((input) => {
       let runPipeline1 = usePipeline(pipeline0)
 
       let text = runPipeline1(' pipeline1')
@@ -382,7 +382,7 @@ describe('createPipeline', () => {
 
     let list: boolean[] = []
 
-    pipeline.add((input) => {
+    pipeline.use((input) => {
       let ctx = useContext()
       let count0 = Cell0.useCell().value
       let count1 = Cell1.useCell().value

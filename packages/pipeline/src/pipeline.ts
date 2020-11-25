@@ -71,12 +71,12 @@ export const getMiddleware = <I, O>(input: MiddlewareInput<I, O>) => {
 
 export type Pipeline<I = unknown, O = unknown> = {
   [PipelineSymbol]: true
-  add: (input: MiddlewareInput<I, O>) => void
+  use: (input: MiddlewareInput<I, O>) => void
   run: (input: I, options?: RunPipelineOptions<I, O>) => O
 }
 
 export const createPipeline = <I, O>(options?: PipelineOptions): Pipeline<I, O> => {
-  type Add = Pipeline<I, O>['add']
+  type Use = Pipeline<I, O>['use']
   type Run = Pipeline<I, O>['run']
 
   let settings = {
@@ -85,7 +85,7 @@ export const createPipeline = <I, O>(options?: PipelineOptions): Pipeline<I, O> 
 
   let middlewares: Middlewares<I, O> = []
 
-  let add: Add = (input) => {
+  let use: Use = (input) => {
     middlewares.push(getMiddleware(input))
   }
 
@@ -123,7 +123,7 @@ export const createPipeline = <I, O>(options?: PipelineOptions): Pipeline<I, O> 
 
   return {
     [PipelineSymbol]: true,
-    add,
+    use: use,
     run,
   }
 }

@@ -36,20 +36,6 @@ export type TypeOfRequestSchema<T extends RouterRequestSchema> = {
   [key in keyof T]: TypeOfRouterRequestField<T[key]>
 }
 
-class Body extends Schema.ObjectType {
-  a = String
-}
-
-const request = {
-  pathname: '/detail/:id',
-  params: {
-    id: Number,
-  },
-  body: Schema.Nullable(Body),
-}
-
-type T0 = Schema.Prettier<TypeOfRequestSchema<typeof request>>
-
 const createRequestValidator = <T extends RouterRequestSchema>(
   options: T,
   strict = false,
@@ -95,7 +81,7 @@ const createRequestValidator = <T extends RouterRequestSchema>(
 
 export type RouterPipeline<I, O> = {
   middleware: <T extends RouterInput>(input: T, next: Next<T, O>) => O
-  add: (...args: [path: string, middleware: MiddlewareInput<I, O>] | [middleware: MiddlewareInput<I, O>]) => void
+  use: (...args: [path: string, middleware: MiddlewareInput<I, O>] | [middleware: MiddlewareInput<I, O>]) => void
   run: (input: I, options?: RunPipelineOptions<I, O>) => O
   match: <T extends keyof BodyMap>(type: T, f: (body: BodyMap[T]) => MaybeAsyncResponse) => void
   route: (name: string, middleware: MiddlewareInput<I, O>) => void
@@ -107,8 +93,13 @@ export type RouterInput = {
   method?: string
 }
 
+export type RouterPipelineOptions = {
+  strict: boolean
+}
+
 export const createRouterPipeline = <T extends RouterRequestSchema>(
-  options: T,
+  routerRequestSchema: T,
+  options?: RouterPipelineOptions,
 ): RouterPipeline<TypeOfRequestSchema<T>, MaybeAsyncResponse> => {
   type Input = TypeOfRequestSchema<T>
   type Output = MaybeAsyncResponse
@@ -116,15 +107,15 @@ export const createRouterPipeline = <T extends RouterRequestSchema>(
 
   let pipeline = createPipeline<Input, Output>()
 
-  let validator = createRequestValidator(options)
+  let validator = createRequestValidator(routerRequestSchema, options?.strict)
 
-  let matcher = createMatch(options.pathname)
+  let matcher = createMatch(routerRequestSchema.pathname)
 
   let middleware: ResultPipeline['middleware'] = function (input, next) {
     let context = useContext()
 
-    if (typeof options.method === 'string') {
-      if (options.method.toLowerCase() !== input.method?.toLowerCase()) {
+    if (typeof routerRequestSchema.method === 'string') {
+      if (routerRequestSchema.method.toLowerCase() !== input.method?.toLowerCase()) {
         return next()
       }
     }
@@ -153,16 +144,16 @@ export const createRouterPipeline = <T extends RouterRequestSchema>(
   }
 
   let match: ResultPipeline['match'] = (type, f) => {
-    pipeline.add(matchType(type, f))
+    pipeline.use(matchType(type, f))
   }
 
   let route: ResultPipeline['route'] = (name, middleware) => {
-    pipeline.add(createRoute(name, middleware))
+    pipeline.use(createRoute(name, middleware))
   }
 
-  let add: ResultPipeline['add'] = (...args) => {
+  let use: ResultPipeline['use'] = (...args) => {
     if (args.length === 1) {
-      pipeline.add(args[0])
+      pipeline.use(args[0])
     } else {
       route(...args)
     }
@@ -179,7 +170,7 @@ export const createRouterPipeline = <T extends RouterRequestSchema>(
 
   return {
     middleware,
-    add: add,
+    use: use,
     run: run,
     match: match,
     route: route,

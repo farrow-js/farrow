@@ -321,7 +321,7 @@ const IntersectValidatorRule: ValidatorRule<Schema.IntersectType> = {
     return schema instanceof Schema.IntersectType
   },
   transform: (schema, context) => {
-    let itemsValidators = (schema.Items as Schema.SchemaCtor[]).map((Item) => createValidator(Item, context))
+    let itemsValidators = schema.Items.map((Item) => createValidator(Item, context))
 
     return (input) => {
       let results = {}

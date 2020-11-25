@@ -1,13 +1,14 @@
 import path from 'path'
 import { match as createMatch } from 'path-to-regexp'
 
-import { createPipeline, Next, Middleware, RunPipelineOptions, useContext, MiddlewareInput } from 'farrow-pipeline'
+import { createPipeline, Next, RunPipelineOptions, useContext, MiddlewareInput } from 'farrow-pipeline'
 import * as Schema from 'farrow-schema'
 import { Validator, createStrictValidator, createNonStrictValidator } from 'farrow-schema/validator'
 
 import { MaybeAsyncResponse, match as matchType, Response } from './response'
 import { BodyMap } from './responseInfo'
 import { route as createRoute } from './basenames'
+import { Prettier } from 'farrow-schema'
 
 export type RouterSchemaDescriptor =
   | Schema.FieldDescriptors
@@ -19,7 +20,7 @@ export type RouterRequestSchema = {
   method?: string
   params?: RouterSchemaDescriptor
   query?: RouterSchemaDescriptor
-  body?: Schema.FieldDescriptor
+  body?: Schema.FieldDescriptor | Schema.FieldDescriptors
   headers?: RouterSchemaDescriptor
   cookies?: RouterSchemaDescriptor
 }
@@ -32,9 +33,11 @@ export type TypeOfRouterRequestField<T> = T extends string
   ? Schema.TypeOfFieldDescriptor<T>
   : never
 
-export type TypeOfRequestSchema<T extends RouterRequestSchema> = {
-  [key in keyof T]: TypeOfRouterRequestField<T[key]>
-}
+export type TypeOfRequestSchema<T extends RouterRequestSchema> = Prettier<
+  {
+    [key in keyof T]: TypeOfRouterRequestField<T[key]>
+  }
+>
 
 const createRequestValidator = <T extends RouterRequestSchema>(
   options: T,
@@ -73,24 +76,24 @@ const createRequestValidator = <T extends RouterRequestSchema>(
   let RequestStruct = Schema.Struct(descriptors)
 
   if (strict) {
-    return createStrictValidator(RequestStruct) as Validator<TypeOfRequestSchema<T>>
+    return createStrictValidator(RequestStruct as any)
   } else {
-    return createNonStrictValidator(RequestStruct) as Validator<TypeOfRequestSchema<T>>
+    return createNonStrictValidator(RequestStruct as any)
   }
-}
-
-export type RouterPipeline<I, O> = {
-  middleware: <T extends RouterInput>(input: T, next: Next<T, O>) => O
-  use: (...args: [path: string, middleware: MiddlewareInput<I, O>] | [middleware: MiddlewareInput<I, O>]) => void
-  run: (input: I, options?: RunPipelineOptions<I, O>) => O
-  match: <T extends keyof BodyMap>(type: T, f: (body: BodyMap[T]) => MaybeAsyncResponse) => void
-  route: (name: string, middleware: MiddlewareInput<I, O>) => void
-  serve: (name: string, dirname: string) => void
 }
 
 export type RouterInput = {
   pathname: string
   method?: string
+}
+
+export type RouterPipeline<I, O> = {
+  middleware: <II extends RouterInput>(input: II, next: Next<II, O>) => O
+  use: (...args: [path: string, middleware: MiddlewareInput<I, O>] | [middleware: MiddlewareInput<I, O>]) => void
+  run: <II extends RouterInput>(input: II, options?: RunPipelineOptions<I, O>) => O
+  match: <T extends keyof BodyMap>(type: T, f: (body: BodyMap[T]) => MaybeAsyncResponse) => void
+  route: (name: string, middleware: MiddlewareInput<I, O>) => void
+  serve: (name: string, dirname: string) => void
 }
 
 export type RouterPipelineOptions = {
@@ -111,38 +114,6 @@ export const createRouterPipeline = <T extends RouterRequestSchema>(
 
   let matcher = createMatch(routerRequestSchema.pathname)
 
-  let middleware: ResultPipeline['middleware'] = function (input, next) {
-    let context = useContext()
-
-    if (typeof routerRequestSchema.method === 'string') {
-      if (routerRequestSchema.method.toLowerCase() !== input.method?.toLowerCase()) {
-        return next()
-      }
-    }
-
-    let matches = matcher(input.pathname)
-
-    if (!matches) {
-      return next()
-    }
-
-    let params = matches.params
-
-    let result = validator({
-      ...input,
-      params,
-    })
-
-    if (result.isErr) {
-      throw new Error(result.value.message)
-    }
-
-    return pipeline.run(result.value, {
-      context,
-      onLast: () => next(),
-    })
-  }
-
   let match: ResultPipeline['match'] = (type, f) => {
     pipeline.use(matchType(type, f))
   }
@@ -159,7 +130,40 @@ export const createRouterPipeline = <T extends RouterRequestSchema>(
     }
   }
 
-  let run = pipeline.run
+  let run: ResultPipeline['run'] = (input, options) => {
+    if (typeof routerRequestSchema.method === 'string') {
+      if (routerRequestSchema.method.toLowerCase() !== input.method?.toLowerCase()) {
+        throw new Error(`Expected method to be ${routerRequestSchema.method}, but received ${input.method}`)
+      }
+    }
+
+    let matches = matcher(input.pathname)
+
+    if (!matches) {
+      throw new Error(`${routerRequestSchema.pathname} is not matched, received: ${input.pathname}`)
+    }
+
+    let params = matches.params
+
+    let result = validator({
+      ...input,
+      params,
+    })
+
+    if (result.isErr) {
+      throw new Error(result.value.message)
+    }
+
+    return pipeline.run(result.value, options)
+  }
+
+  let middleware: ResultPipeline['middleware'] = (input, next) => {
+    let context = useContext()
+    return run(input, {
+      context,
+      onLast: () => next(),
+    })
+  }
 
   let serve: ResultPipeline['serve'] = (name: string, dirname: string) => {
     route(name, (request) => {

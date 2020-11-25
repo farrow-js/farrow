@@ -23,6 +23,91 @@ export abstract class Schema<T = unknown> {
 
 export type SchemaCtor = Primitives | (new () => Schema)
 
+export const isSchemaCtor = (input: any): input is SchemaCtor => {
+  if (isNumberConstructor(input) || isStringConstructor(input) || isBooleanConstructor(input)) {
+    return true
+  }
+
+  return input?.prototype instanceof Schema
+}
+
+export const Type = Symbol('type')
+
+export type Type = typeof Type
+
+export type FieldDescriptor = SchemaCtor | { [Type]: SchemaCtor }
+
+export const isFieldDescriptor = (input: any): input is FieldDescriptor => {
+  return isSchemaCtor(input?.[Type] ?? input)
+}
+
+export type FieldDescriptors = {
+  [key: string]: FieldDescriptor | FieldDescriptors
+}
+
+export const isFieldDescriptors = (input: any): input is FieldDescriptors => {
+  return !!(input && typeof input === 'object')
+}
+
+export type TypeOfFieldDescriptor<T extends FieldDescriptor> = T extends SchemaCtor
+  ? TypeOfSchemaCtor<T>
+  : T extends { [Type]: SchemaCtor }
+  ? TypeOfSchemaCtor<T[Type]>
+  : never
+
+export type TypeOfFieldDescriptors<T extends FieldDescriptors> = {
+  [key in keyof T]: T[key] extends FieldDescriptor
+    ? TypeOfFieldDescriptor<T[key]>
+    : T[key] extends FieldDescriptors
+    ? TypeOfFieldDescriptors<T[key]>
+    : never
+}
+
+export type SchemaCtorInput = SchemaCtor | FieldDescriptors
+
+export type ToSchemaCtor<T extends SchemaCtorInput> = T extends SchemaCtor
+  ? T
+  : T extends FieldDescriptors
+  ? new () => StructType<T>
+  : never
+
+export type SchemaCtorInputs =
+  | SchemaCtorInput[]
+  | {
+      [key: string]: SchemaCtorInput
+    }
+
+export type ToSchemaCtors<T extends SchemaCtorInputs> = {
+  [key in keyof T]: T[key] extends SchemaCtorInput ? ToSchemaCtor<T[key]> : never
+}
+
+export const toSchemaCtor = <T extends SchemaCtorInput>(Item: T) => {
+  if (isSchemaCtor(Item)) {
+    return Item as ToSchemaCtor<T>
+  }
+  return Struct(Item as FieldDescriptors) as ToSchemaCtor<T>
+}
+
+export const toSchemaCtors = <T extends SchemaCtorInputs>(Inputs: T): ToSchemaCtors<T> => {
+  if (Array.isArray(Inputs)) {
+    // @ts-ignore
+    return Inputs.map(toSchemaCtor)
+  }
+
+  if (Inputs && typeof Inputs === 'object') {
+    let result = {} as ToSchemaCtors<T>
+
+    for (let key in Inputs) {
+      // @ts-ignore
+      result[key] = toSchemaCtor(Inputs[key])
+    }
+    
+    return result
+  }
+
+  throw new Error(`Unknown inputs: ${Inputs}`)
+}
+
 export type TypeOfSchemaCtor<T extends SchemaCtor> = T extends Primitives
   ? ReturnType<T>
   : InstanceType<T> extends ObjectType
@@ -74,44 +159,6 @@ export class ID extends Schema<string> {
   [Kind] = kind('ID')
 }
 
-export const Type = Symbol('type')
-
-export type Type = typeof Type
-
-export type FieldDescriptor = SchemaCtor | { [Type]: SchemaCtor }
-
-export const isFieldDescriptor = (input: any): input is FieldDescriptor => {
-  let TargetSchema = input?.[Type] ?? input
-
-  if (isNumberConstructor(TargetSchema) || isStringConstructor(TargetSchema) || isBooleanConstructor(TargetSchema)) {
-    return true
-  }
-
-  return TargetSchema?.prototype instanceof Schema
-}
-
-export type FieldDescriptors = {
-  [key: string]: FieldDescriptor | FieldDescriptors
-}
-
-export const isFieldDescriptors = (input: any): input is FieldDescriptors => {
-  return !!(input && typeof input === 'object')
-}
-
-export type TypeOfFieldDescriptor<T extends FieldDescriptor> = T extends SchemaCtor
-  ? TypeOfSchemaCtor<T>
-  : T extends { [Type]: SchemaCtor }
-  ? TypeOfSchemaCtor<T[Type]>
-  : never
-
-export type TypeOfFieldDescriptors<T extends FieldDescriptors> = {
-  [key in keyof T]: T[key] extends FieldDescriptor
-    ? TypeOfFieldDescriptor<T[key]>
-    : T[key] extends FieldDescriptors
-    ? TypeOfFieldDescriptors<T[key]>
-    : never
-}
-
 type TypeOfStruct<T extends FieldDescriptors> = TypeOfFieldDescriptors<T>
 
 export abstract class StructType<T extends FieldDescriptors = FieldDescriptors> extends Schema<TypeOfStruct<T>> {
@@ -127,29 +174,29 @@ export const Struct = <T extends FieldDescriptors>(descriptors: T) => {
 
 type TypeOfList<T extends SchemaCtor> = Array<TypeOfSchemaCtor<T>>
 
-export type TypeOfListItem<T extends ListType> = T extends ListType<infer I> ? TypeOf<I> : never
-
-export abstract class ListType<T extends SchemaCtor = SchemaCtor> extends Schema<TypeOfList<T>> {
+export abstract class ListType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<
+  TypeOfList<ToSchemaCtor<T>>
+> {
   [Kind] = kind('List')
-  abstract Item: T
+  abstract Item: ToSchemaCtor<T>
 }
 
-export const List = <T extends SchemaCtor>(Item: T) => {
+export const List = <T extends SchemaCtorInput>(Item: T) => {
   return class List extends ListType<T> {
-    Item = Item
+    Item = toSchemaCtor(Item)
   }
 }
 
 type TypeofUnion<T extends SchemaCtor[]> = TypeOfSchemaCtor<T[number]>
 
-export abstract class UnionType<T extends SchemaCtor[] = SchemaCtor[]> extends Schema<TypeofUnion<T>> {
+export abstract class UnionType<T extends SchemaCtorInput[] = SchemaCtorInput[]> extends Schema<TypeofUnion<ToSchemaCtors<T>>> {
   [Kind] = kind('Union')
-  abstract Items: T
+  abstract Items: ToSchemaCtors<T>
 }
 
-export const Union = <T extends SchemaCtor[]>(...Items: T) => {
+export const Union = <T extends SchemaCtorInput[]>(...Items: T) => {
   return class Union extends UnionType<T> {
-    Items = Items
+    Items = toSchemaCtors(Items)
   }
 }
 
@@ -157,27 +204,27 @@ type UnionToIntersection<T> = (T extends any ? (x: T) => any : never) extends (x
 
 type TypeOfIntersect<T extends SchemaCtor[]> = UnionToIntersection<TypeOf<T[number]>>
 
-export abstract class IntersectType<T extends SchemaCtor[] = SchemaCtor[]> extends Schema<TypeOfIntersect<T>> {
+export abstract class IntersectType<T extends SchemaCtorInput[] = SchemaCtorInput[]> extends Schema<TypeOfIntersect<ToSchemaCtors<T>>> {
   [Kind] = kind('Intersect')
-  abstract Items: T
+  abstract Items: ToSchemaCtors<T>
 }
 
-export const Intersect = <T extends SchemaCtor[]>(...items: T) => {
+export const Intersect = <T extends SchemaCtorInput[]>(...Items: T) => {
   return class Intersect extends IntersectType<T> {
-    Items = items
+    Items = toSchemaCtors(Items)
   }
 }
 
-export abstract class NullableType<T extends SchemaCtor = SchemaCtor> extends Schema<
-  TypeOfSchemaCtor<T> | null | undefined
+export abstract class NullableType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<
+  TypeOf<ToSchemaCtor<T>> | null | undefined
 > {
   [Kind] = kind('Nullable')
-  abstract Item: T
+  abstract Item: ToSchemaCtor<T>
 }
 
-export const Nullable = <T extends SchemaCtor>(item: T) => {
+export function Nullable<T extends SchemaCtorInput>(Item: T) {
   return class Nullable extends NullableType<T> {
-    Item = item
+    Item = toSchemaCtor(Item)
   }
 }
 
@@ -198,14 +245,14 @@ type TypeOfRecord<T extends SchemaCtor> = {
   [key: string]: TypeOfSchemaCtor<T>
 }
 
-export abstract class RecordType<T extends SchemaCtor = SchemaCtor> extends Schema<TypeOfRecord<T>> {
+export abstract class RecordType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<TypeOfRecord<ToSchemaCtor<T>>> {
   [Kind] = kind('Record')
-  abstract Item: T
+  abstract Item: ToSchemaCtor<T>
 }
 
-export const Record = <T extends SchemaCtor>(Item: T) => {
+export const Record = <T extends SchemaCtorInput>(Item: T) => {
   return class Record extends RecordType<T> {
-    Item = Item
+    Item = toSchemaCtor(Item)
   }
 }
 

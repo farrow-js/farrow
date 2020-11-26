@@ -477,7 +477,7 @@ describe('Schema', () => {
     expect(assertOk(validateAny(false))).toEqual(false)
   })
 
-  it('supports defining recursive schema', () => {
+  it('supports defining recursive schema via ObjectType', () => {
     class Nest extends ObjectType {
       value = Number
       nest = Nullable(Nest)
@@ -521,6 +521,103 @@ describe('Schema', () => {
         }),
       ),
     ).toThrow()
+  })
+
+  it('should support flexible FieldDescriptors as argument', () => {
+    let list = List({
+      a: Number,
+    })
+
+    let nullable = Nullable({
+      a: Number,
+    })
+
+    let union = Union(
+      {
+        a: Number,
+      },
+      {
+        b: String,
+      },
+    )
+
+    let intersect = Intersect(
+      {
+        a: Number,
+      },
+      {
+        b: String,
+      },
+    )
+
+    let record = Record({
+      a: Number,
+    })
+
+    let validateList = createStrictValidator(list)
+    let validateNullable = createStrictValidator(nullable)
+    let validateUnion = createStrictValidator(union)
+    let validateIntersect = createStrictValidator(intersect)
+    let validateRecord = createStrictValidator(record)
+
+    expect(assertOk(validateList([]))).toEqual([])
+    expect(
+      assertOk(
+        validateList([
+          {
+            a: 1,
+            b: 2,
+          },
+          {
+            a: 2,
+            b: 3,
+          },
+        ]),
+      ),
+    ).toEqual([
+      {
+        a: 1,
+      },
+      {
+        a: 2,
+      },
+    ])
+
+    expect(assertOk(validateNullable(null))).toEqual(null)
+    expect(assertOk(validateNullable(undefined))).toEqual(undefined)
+
+    expect(assertOk(validateUnion({ a: 1 }))).toEqual({
+      a: 1,
+    })
+
+    expect(assertOk(validateUnion({ b: '1' }))).toEqual({
+      b: '1',
+    })
+
+    expect(assertOk(validateIntersect({ a: 1, b: '1' }))).toEqual({
+      a: 1,
+      b: '1',
+    })
+
+    expect(
+      assertOk(
+        validateRecord({
+          key0: {
+            a: 1,
+          },
+          key1: {
+            a: 2,
+          },
+        }),
+      ),
+    ).toEqual({
+      key0: {
+        a: 1,
+      },
+      key1: {
+        a: 2,
+      },
+    })
   })
 })
 

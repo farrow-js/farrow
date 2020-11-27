@@ -94,7 +94,7 @@ export type RouterPipeline = Pipeline<RequestInfo, MaybeAsyncResponse> & {
 
 export type RouterPipelineOptions = {}
 
-export const createRouterPipeline = (options?: RouterPipelineOptions): RouterPipeline => {
+export const createRouterPipeline = (): RouterPipeline => {
   let pipeline = createPipeline<RequestInfo, MaybeAsyncResponse>()
 
   let capture: RouterPipeline['capture'] = (type, f) => {
@@ -128,14 +128,14 @@ export const createRouterPipeline = (options?: RouterPipelineOptions): RouterPip
 
       if (typeof schema.method === 'string') {
         if (schema.method.toLowerCase() !== input.method?.toLowerCase()) {
-          throw new Error(`Expected method to be ${schema.method}, but received ${input.method}`)
+          return next()
         }
       }
 
       let matches = matcher(input.pathname)
 
       if (!matches) {
-        throw new Error(`${schema.pathname} is not matched, received: ${input.pathname}`)
+        return next()
       }
 
       let params = matches.params

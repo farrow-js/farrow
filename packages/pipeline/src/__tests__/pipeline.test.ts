@@ -285,7 +285,7 @@ describe('createPipeline', () => {
     expect(error === null).toBe(false)
   })
 
-  it('should throw error if there are no middlewares returned value', async () => {
+  it('should throw error if there are no middlewares returning value', async () => {
     let pipeline = createPipeline<number, number>()
 
     pipeline.use((input, next) => {
@@ -397,5 +397,87 @@ describe('createPipeline', () => {
 
     expect(result).toEqual(0)
     expect(list).toEqual([true, true])
+  })
+
+  it('should support multiple middlewares in pipeline.use', async () => {
+    let pipeline = createPipeline<number, number>()
+
+    pipeline.use(
+      (input, next) => {
+        return next(input + 1)
+      },
+      (input, next) => {
+        return next(input + 1)
+      },
+      (input, next) => {
+        return next(input + 1)
+      },
+      (input, next) => {
+        return next(input + 1)
+      },
+      (input) => {
+        return input + 1
+      },
+    )
+
+    let result = pipeline.run(0)
+
+    expect(result).toBe(5)
+  })
+
+  it('should support the shape of { middleware } as arguments in pipeline.use', async () => {
+    let pipeline = createPipeline<number, number>()
+
+    pipeline.use(
+      {
+        middleware: (input, next) => {
+          return next(input + 1)
+        },
+      },
+      {
+        middleware: (input, next) => {
+          return next(input + 1)
+        },
+      },
+      {
+        middleware: (input, next) => {
+          return next(input + 1)
+        },
+      },
+      {
+        middleware: (input, next) => {
+          return next(input + 1)
+        },
+      },
+      (input) => {
+        return input + 1
+      },
+    )
+
+    let result = pipeline.run(0)
+
+    expect(result).toBe(5)
+  })
+
+  it('should support pipeline.use(anotherPipeline) if their type is matched', async () => {
+    let pipeline0 = createPipeline<number, number>()
+
+    let pipeline1 = createPipeline<number, number>()
+
+    pipeline0.use((input, next) => {
+      return next(input + 1)
+    })
+
+    pipeline0.use(pipeline1)
+
+    pipeline1.use((input) => {
+      return input + 1
+    })
+
+    let result0 = pipeline1.run(0)
+    let result1 = pipeline0.run(0)
+
+    expect(result0).toEqual(1)
+    expect(result1).toEqual(2)
   })
 })

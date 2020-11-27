@@ -18,17 +18,21 @@ export const SchemaErr = (message: string, path?: ValidationError['path']): Err<
 
 export type Validator<T = any> = (input: unknown) => ValidationResult<T>
 
-export type ValidatorRule<S extends Schema.Schema, Context extends {} = {}> = TransformRule<
+export type ValidatorContext = {
+  strict?: boolean
+}
+
+export type ValidatorRule<S extends Schema.Schema, Context extends ValidatorContext = ValidatorContext> = TransformRule<
   S,
   Validator<Schema.TypeOf<S>>,
   Context
 >
 
-export type ValidatorRules<Context extends {} = {}> = {
+export type ValidatorRules<Context extends ValidatorContext = ValidatorContext> = {
   [key: string]: ValidatorRule<any, Context>
 }
 
-export const createValidator = <S extends Schema.SchemaCtor, Context = {}>(
+export const createValidator = <S extends Schema.SchemaCtor, Context extends ValidatorContext = ValidatorContext>(
   SchemaCtor: S,
   context: TransformContext<Context, Validator>,
 ): Validator<Schema.TypeOf<S>> => {
@@ -45,16 +49,34 @@ export const createValidator = <S extends Schema.SchemaCtor, Context = {}>(
   }
 }
 
-export const createStrictValidator = <T extends Schema.SchemaCtor>(SchemaCtor: T) => {
+export const createSchemaValidator = <T extends Schema.SchemaCtor>(SchemaCtor: T) => {
   return createValidator(SchemaCtor, {
     rules: defaultValidatorRules,
   })
 }
 
-export const createNonStrictValidator = <T extends Schema.SchemaCtor>(SchemaCtor: T) => {
-  return createValidator(SchemaCtor, {
-    rules: loose(defaultValidatorRules),
-  })
+const StrictValidatorRule: ValidatorRule<Schema.StrictType> = {
+  test: (schema) => {
+    return schema instanceof Schema.StrictType
+  },
+  transform: (schema, context) => {
+    return createValidator(schema.Item, {
+      ...context,
+      strict: true,
+    })
+  },
+}
+
+const NonStrictValidatorRule: ValidatorRule<Schema.NonStrictType> = {
+  test: (schema) => {
+    return schema instanceof Schema.NonStrictType
+  },
+  transform: (schema, context) => {
+    return createValidator(schema.Item, {
+      ...context,
+      strict: false,
+    })
+  },
 }
 
 const StringValidatorRule: ValidatorRule<Schema.String> = {
@@ -75,11 +97,21 @@ const NumberValidatorRule: ValidatorRule<Schema.Number> = {
   test: (schema) => {
     return schema instanceof Schema.Number
   },
-  transform: () => {
+  transform: (_, { strict }) => {
     return (input) => {
-      if (typeof input === 'number') {
+      if (typeof input === 'number' && !isNaN(input)) {
         return Ok(input)
       }
+
+      if (strict === false) {
+        if (typeof input === 'string') {
+          let value = parseFloat(input)
+          if (typeof value === 'number' && !isNaN(value)) {
+            return Ok(value)
+          }
+        }
+      }
+
       return SchemaErr(`${input} is not a number`)
     }
   },
@@ -89,11 +121,22 @@ const IntValidatorRule: ValidatorRule<Schema.Int> = {
   test: (schema) => {
     return schema instanceof Schema.Int
   },
-  transform: () => {
+  transform: (_, { strict }) => {
     return (input) => {
       if (typeof input === 'number' && Number.isInteger(input)) {
         return Ok(input)
       }
+
+      if (strict === false) {
+        if (typeof input === 'string') {
+          input = parseFloat(input)
+        }
+
+        if (typeof input === 'number' && !isNaN(input)) {
+          return Ok(Math.floor(input))
+        }
+      }
+
       return SchemaErr(`${input} is not an integer`)
     }
   },
@@ -103,11 +146,22 @@ const FloatValidatorRule: ValidatorRule<Schema.Float> = {
   test: (schema) => {
     return schema instanceof Schema.Float
   },
-  transform: () => {
+  transform: (_, { strict }) => {
     return (input) => {
-      if (typeof input === 'number') {
+      if (typeof input === 'number' && !isNaN(input)) {
         return Ok(input)
       }
+
+      if (strict === false) {
+        if (typeof input === 'string') {
+          input = parseFloat(input)
+        }
+
+        if (typeof input === 'number' && !isNaN(input)) {
+          return Ok(input)
+        }
+      }
+
       return SchemaErr(`${input} is not a number`)
     }
   },
@@ -135,11 +189,19 @@ const BooleanValidatorRule: ValidatorRule<Schema.Boolean> = {
   test: (schema) => {
     return schema instanceof Schema.Boolean
   },
-  transform: () => {
+  transform: (_, { strict }) => {
     return (input) => {
       if (typeof input === 'boolean') {
         return Ok(input)
       }
+
+      if (strict === false) {
+        if (typeof input === 'string') {
+          if (input === 'false') return Ok(false)
+          if (input === 'true') return Ok(true)
+        }
+      }
+
       return SchemaErr(`${input} is not a boolean`)
     }
   },
@@ -398,93 +460,8 @@ export const defaultValidatorRules = {
   Any: AnyValidatorRule,
   Literal: LiteralValidatorRule,
   Record: RecordValidatorRule,
+  Strict: StrictValidatorRule,
+  NonStrict: NonStrictValidatorRule,
 }
 
 export type DefaultValidatorRules = typeof defaultValidatorRules
-
-export const loose = <T extends DefaultValidatorRules>(rules: T): T => {
-  return {
-    ...rules,
-    Number: {
-      ...rules.Number,
-      transform: (schema, context) => {
-        let validator = rules.Number.transform(schema, context)
-        return (input) => {
-          let result = validator(input)
-
-          if (result.isOk) return result
-
-          if (typeof input === 'string') {
-            let value = parseFloat(input)
-            if (typeof value === 'number' && !isNaN(value)) {
-              return Ok(value)
-            }
-          }
-          return result
-        }
-      },
-    },
-    Int: {
-      ...rules.Int,
-      transform: (schema, context) => {
-        let validator = rules.Int.transform(schema, context)
-
-        return (input) => {
-          let result = validator(input)
-
-          if (result.isOk) return result
-
-          if (typeof input === 'string') {
-            input = parseFloat(input)
-          }
-
-          if (typeof input === 'number' && !isNaN(input)) {
-            return Ok(Math.floor(input))
-          }
-
-          return result
-        }
-      },
-    },
-    Float: {
-      ...rules.Float,
-      transform: (schema, context) => {
-        let validator = rules.Float.transform(schema, context)
-
-        return (input) => {
-          let result = validator(input)
-
-          if (result.isOk) return result
-
-          if (typeof input === 'string') {
-            input = parseFloat(input)
-          }
-
-          if (typeof input === 'number' && !isNaN(input)) {
-            return Ok(input)
-          }
-
-          return result
-        }
-      },
-    },
-    Boolean: {
-      ...rules.Boolean,
-      transform: (schema, context) => {
-        let validator = rules.Boolean.transform(schema, context)
-        return (input) => {
-          let result = validator(input)
-
-          if (result.isOk) return result
-
-          if (typeof input === 'string') {
-            if (input === 'false') return Ok(false)
-            if (input === 'true') return Ok(true)
-          }
-
-          return result
-        }
-      },
-    },
-  }
-}

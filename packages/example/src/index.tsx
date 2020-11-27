@@ -7,11 +7,9 @@ import * as Schema from 'farrow-schema'
 import { useReactView } from 'farrow-react'
 import { Link } from 'farrow-react/Link'
 
-const home = Router({
-  pathname: '/',
-})
+const home = Router()
 
-home.match('html', (body) => {
+home.capture('html', (body) => {
   return Response.html(`
     <html lang="en">
     <head>
@@ -26,10 +24,14 @@ home.match('html', (body) => {
 `)
 })
 
-home.use(async (request) => {
-  let prefix = usePrefix()
+home
+  .match({
+    pathname: '/',
+  })
+  .use(async (request) => {
+    let prefix = usePrefix()
 
-  return Response.html(`
+    return Response.html(`
     <h1>Home:${request.pathname}</h1>
     <ul>
       <li>
@@ -52,41 +54,45 @@ home.use(async (request) => {
     </li>
     </ul>
   `)
-})
-
-const detail = Router({
-  pathname: '/:detailId',
-  params: {
-    detailId: Number,
-  },
-  query: {
-    tab: Schema.Nullable(String),
-  },
-})
-
-detail.use(async (request) => {
-  let prefix = usePrefix()
-
-  if (request.params.detailId > 4) {
-    return Response.redirect(`/3?tab=from=${request.params.detailId}`)
-  }
-
-  return Response.json({
-    prefix: prefix,
-    pathname: request.pathname,
-    detailId: request.params.detailId,
-    tab: request.query.tab,
   })
-})
 
-const attachment = Router({
-  pathname: '/src/index.js',
-})
+const detail = Router()
 
-attachment.use(async () => {
-  let filename = path.join(__dirname, '../index.js')
-  return Response.file(filename).attachment('bundle.js')
-})
+detail
+  .match({
+    pathname: '/:detailId',
+    params: {
+      detailId: Number,
+    },
+    query: {
+      tab: Schema.Nullable(String),
+    },
+  })
+  .use(async (request) => {
+    let prefix = usePrefix()
+
+    if (request.params.detailId > 4) {
+      return Response.redirect(`/3?tab=from=${request.params.detailId}`)
+    }
+
+    return Response.json({
+      prefix: prefix,
+      pathname: request.pathname,
+      detailId: request.params.detailId,
+      tab: request.query.tab,
+    })
+  })
+
+const attachment = Router()
+
+attachment
+  .match({
+    pathname: '/src/index.js',
+  })
+  .use(async () => {
+    let filename = path.join(__dirname, '../index.js')
+    return Response.file(filename).attachment('bundle.js')
+  })
 
 const Query = Schema.Struct({
   a: Schema.Nullable(Number),
@@ -108,16 +114,18 @@ const View = (props: { pathname: string; query: Query }) => {
   )
 }
 
-const react = Router({
-  pathname: '/react',
-  query: Query,
-})
+const react = Router()
 
-react.use(async (request) => {
-  let ReactView = useReactView()
+react
+  .match({
+    pathname: '/react',
+    query: Query,
+  })
+  .use(async (request) => {
+    let ReactView = useReactView()
 
-  return ReactView.render(<View {...request} />).header('view-engine', 'react')
-})
+    return ReactView.render(<View {...request} />).header('view-engine', 'react')
+  })
 
 const http = Http({
   basenames: ['/base'],
@@ -127,7 +135,7 @@ http.serve('/static', __dirname)
 
 http.use(home)
 
-http.use('/detail', detail)
+http.route('/detail', detail)
 
 http.use(react)
 

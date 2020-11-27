@@ -1,6 +1,6 @@
 import request from 'supertest'
 
-import { Http, Router } from '../http' 
+import { Http, Router } from '../' 
 
 
 

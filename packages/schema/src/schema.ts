@@ -275,6 +275,28 @@ export class Any extends Schema<any> {
   [Kind] = kind('Any')
 }
 
+export abstract class StrictType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<TypeOf<ToSchemaCtor<T>>> {
+  [Kind] = kind('Strict')
+  abstract Item: ToSchemaCtor<T>
+}
+
+export const Strict = <T extends SchemaCtorInput>(Item: T) => {
+  return class Strict extends StrictType<T> {
+    Item = toSchemaCtor(Item)
+  }
+}
+
+export abstract class NonStrictType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<TypeOf<ToSchemaCtor<T>>> {
+  [Kind] = kind('Strict')
+  abstract Item: ToSchemaCtor<T>
+}
+
+export const NonStrict = <T extends SchemaCtorInput>(Item: T) => {
+  return class NonStrict extends NonStrictType<T> {
+    Item = toSchemaCtor(Item)
+  }
+}
+
 // class User extends ObjectType {
 //   id = ID
 //   name = String

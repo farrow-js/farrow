@@ -1,4 +1,4 @@
-import { createCell, getMiddleware, Middleware, MiddlewareInput } from 'farrow-pipeline'
+import { createCell, Middleware, MiddlewareInput, createPipeline } from 'farrow-pipeline'
 
 export const BasenamesCell = createCell([] as string[])
 
@@ -14,9 +14,12 @@ export const usePrefix = () => {
 
 export const route = <T extends { pathname: string }, U>(
   name: string,
-  input: MiddlewareInput<T, U>,
+  ...inputs: MiddlewareInput<T, U>[]
 ): Middleware<T, U> => {
-  let middleware = getMiddleware(input)
+  let pipeline = createPipeline<T, U>()
+
+  pipeline.use(...inputs)
+
   return (request, next) => {
     let basenames = BasenamesCell.useCell()
 
@@ -30,7 +33,7 @@ export const route = <T extends { pathname: string }, U>(
 
     basenames.value = [...currentBasenames, basename]
 
-    return middleware(requestInfo, (request) => {
+    return pipeline.middleware(requestInfo, (request) => {
       basenames.value = currentBasenames
       return next(request)
     })

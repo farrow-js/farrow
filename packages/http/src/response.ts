@@ -89,7 +89,7 @@ export const Response = createResponse(empty())
 
 export type MaybeAsyncResponse = Response | Promise<Response>
 
-export const match = <T extends keyof BodyMap>(
+export const matchBodyType = <T extends keyof BodyMap>(
   type: T,
   f: (body: BodyMap[T]) => MaybeAsyncResponse
 ): Middleware<any, MaybeAsyncResponse> => {

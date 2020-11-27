@@ -1,14 +1,15 @@
 import { createRouterPipeline as Router } from '../router'
 import { Response } from '../response'
-import { Nullable, Struct } from 'farrow-schema'
+import { Nullable, Schema, Struct, Strict } from 'farrow-schema'
 
 describe('Router', () => {
   it('should validating pathname & method', async () => {
-    let router = Router({
+    let router = Router()
+    let schema = {
       pathname: '/test',
-    })
+    }
 
-    router.use(async (request) => {
+    router.match(schema, async (request) => {
       return Response.json(request)
     })
 
@@ -31,7 +32,9 @@ describe('Router', () => {
   })
 
   it('should validating method & params & query & body & headers & cookies', async () => {
-    let router = Router({
+    let router = Router()
+
+    let schema = {
       pathname: '/detail/:id',
       method: 'POST',
       params: {
@@ -62,9 +65,9 @@ describe('Router', () => {
         b: String,
         c: Boolean,
       },
-    })
+    }
 
-    router.use(async (request) => {
+    router.match(schema, async (request) => {
       return Response.json(request)
     })
 
@@ -81,20 +84,20 @@ describe('Router', () => {
         id: 123,
       },
       query: {
-        a: 1,
+        a: '1',
         b: '1',
-        c: false,
+        c: 'false',
       },
       body: null,
       headers: {
-        a: 1,
+        a: '1',
         b: '1',
-        c: false,
+        c: 'false',
       },
       cookies: {
-        a: 1,
+        a: '1',
         b: '1',
-        c: false,
+        c: 'false',
       },
     }
 
@@ -102,7 +105,29 @@ describe('Router', () => {
 
     expect(result0.info.body).toEqual({
       type: 'json',
-      value: request0,
+      value: {
+        pathname: '/detail/123',
+        method: 'POST',
+        params: {
+          id: 123,
+        },
+        query: {
+          a: 1,
+          b: '1',
+          c: false,
+        },
+        body: null,
+        headers: {
+          a: 1,
+          b: '1',
+          c: false,
+        },
+        cookies: {
+          a: 1,
+          b: '1',
+          c: false,
+        },
+      },
     })
 
     let request1 = {
@@ -123,12 +148,43 @@ describe('Router', () => {
 
     expect(result1.info.body).toEqual({
       type: 'json',
-      value: request1,
+      value: {
+        pathname: '/detail/123',
+        method: 'POST',
+        params: {
+          id: 123,
+        },
+        query: {
+          a: 1,
+          b: '1',
+          c: false,
+        },
+        body: {
+          a: 1,
+          b: '1',
+          c: false,
+          d: {
+            a: 1,
+            b: '1',
+            c: false,
+          },
+        },
+        headers: {
+          a: 1,
+          b: '1',
+          c: false,
+        },
+        cookies: {
+          a: 1,
+          b: '1',
+          c: false,
+        },
+      },
     })
 
     let request2 = {
       ...request1,
-      query: null,
+      query: {},
     }
 
     expect(() => {
@@ -137,32 +193,33 @@ describe('Router', () => {
   })
 
   it('should validate number | int | float | boolean strictly', async () => {
-    let router0 = Router(
+    let router0 = Router()
+
+    let router1 = Router()
+
+    router0.match(
+      {
+        pathname: '/',
+        query: {
+          id: Strict(Number),
+        },
+      },
+      (request) => {
+        return Response.json(request)
+      },
+    )
+
+    router1.match(
       {
         pathname: '/',
         query: {
           id: Number,
         },
       },
-      {
-        strict: true,
+      (request) => {
+        return Response.json(request)
       },
     )
-
-    let router1 = Router({
-      pathname: '/',
-      query: {
-        id: Number,
-      },
-    })
-
-    router0.use((request) => {
-      return Response.json(request)
-    })
-
-    router1.use((request) => {
-      return Response.json(request)
-    })
 
     expect(() => {
       router0.run({

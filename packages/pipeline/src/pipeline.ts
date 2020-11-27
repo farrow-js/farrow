@@ -71,22 +71,20 @@ export const getMiddleware = <I, O>(input: MiddlewareInput<I, O>) => {
 
 export type Pipeline<I = unknown, O = unknown> = {
   [PipelineSymbol]: true
-  use: (input: MiddlewareInput<I, O>) => void
+  use: (...inputs: MiddlewareInput<I, O>[]) => void
   run: (input: I, options?: RunPipelineOptions<I, O>) => O
+  middleware: Middleware<I, O>
 }
 
 export const createPipeline = <I, O>(options?: PipelineOptions): Pipeline<I, O> => {
-  type Use = Pipeline<I, O>['use']
-  type Run = Pipeline<I, O>['run']
-
-  let settings = {
+  let config = {
     ...options,
   }
 
   let middlewares: Middlewares<I, O> = []
 
-  let use: Use = (input) => {
-    middlewares.push(getMiddleware(input))
+  let use: Pipeline<I, O>['use'] = (...inputs) => {
+    middlewares.push(...inputs.map(getMiddleware))
   }
 
   let createCurrentCounter = (hooks: Hooks, onLast?: (input: I) => O) => {
@@ -103,11 +101,11 @@ export const createPipeline = <I, O>(options?: PipelineOptions): Pipeline<I, O> 
     })
   }
 
-  let currentContext = createContext(settings.contexts)
+  let currentContext = createContext(config.contexts)
   let currentHooks = fromContext(currentContext)
   let currentCounter = createCurrentCounter(currentHooks)
 
-  let run: Run = (input, options) => {
+  let run: Pipeline<I, O>['run'] = (input, options) => {
     let context = options?.context ?? currentContext
     let hooks = context === currentContext ? currentHooks : fromContext(context)
     let counter = context === currentContext ? currentCounter : createCurrentCounter(hooks)
@@ -121,10 +119,19 @@ export const createPipeline = <I, O>(options?: PipelineOptions): Pipeline<I, O> 
     return result
   }
 
+  let middleware: Pipeline<I, O>['middleware'] = (input, next) => {
+    let context = useContext()
+    return run(input, {
+      context,
+      onLast: next,
+    })
+  }
+
   return {
     [PipelineSymbol]: true,
-    use: use,
+    use,
     run,
+    middleware,
   }
 }
 

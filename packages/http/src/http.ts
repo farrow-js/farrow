@@ -18,18 +18,7 @@ import onfinish from 'on-finished'
 import destroy from 'destroy'
 import mime from 'mime-types'
 
-import {
-  createCell,
-  createContext,
-  runWithContext,
-  createPipeline,
-  Middleware,
-  Context,
-  useContext,
-  CellStorage,
-  MiddlewareInput,
-  RunPipelineOptions,
-} from 'farrow-pipeline'
+import { createCell, createContext, runWithContext, Context, CellStorage } from 'farrow-pipeline'
 
 import { JsonType } from 'farrow-schema'
 
@@ -37,21 +26,13 @@ import { RequestCookies, RequestHeaders, RequestQuery, RequestInfo } from './req
 
 import { ResponseInfo, Status, Headers, Cookies, RedirectBody } from './responseInfo'
 
-import { MaybeAsyncResponse, Response } from './response'
+import { Response } from './response'
 
-import { BasenamesCell, useBasenames, handleBasenames, route as createRoute, usePrefix } from './basenames'
+import { BasenamesCell, handleBasenames } from './basenames'
 
-import { createRouterPipeline } from './router'
+import { Router, RouterPipeline, HttpMiddleware, HttpMiddlewareInput } from './router'
 
 import { createLogger, LoggerEvent, LoggerOptions } from './logger'
-
-export { createRouterPipeline, createRouterPipeline as Router }
-
-export { RequestCookies, RequestHeaders, RequestQuery, RequestInfo }
-
-export { Response, ResponseInfo }
-
-export { useBasenames, usePrefix }
 
 const RequestCell = createCell<IncomingMessage | null>(null)
 
@@ -92,8 +73,6 @@ export const useQuery = () => {
   return query
 }
 
-export type ResponseOutput = MaybeAsyncResponse
-
 export type HttpPipelineOptions = {
   basenames?: string[]
   body?: BodyOptions
@@ -103,18 +82,9 @@ export type HttpPipelineOptions = {
   logger?: boolean | LoggerOptions
 }
 
-export type HttpMiddleware = Middleware<RequestInfo, ResponseOutput>
-
-export type HttpMiddlewareInput = MiddlewareInput<RequestInfo, ResponseOutput>
-
-export type HttpPipeline = {
-  middleware: HttpMiddleware
+export type HttpPipeline = RouterPipeline & {
   handle: (req: IncomingMessage, res: ServerResponse) => Promise<void>
-  use: (...args: [path: string, middleware: HttpMiddlewareInput] | [middleware: HttpMiddlewareInput]) => void
-  run: (input: RequestInfo, options?: RunPipelineOptions<RequestInfo, MaybeAsyncResponse>) => MaybeAsyncResponse
   listen: (...args: Parameters<Server['listen']>) => Server
-  route: (name: string, middleware: HttpMiddlewareInput) => void
-  serve: (name: string, dirname: string) => void
 }
 
 export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline => {
@@ -127,16 +97,7 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
 
   let logger = config.logger ? createLogger(loggerOptions) : null
 
-  let pipeline = createPipeline<RequestInfo, ResponseOutput>()
-
-  let middleware: HttpMiddleware = (request, next) => {
-    let ctx = useContext()
-
-    return pipeline.run(request, {
-      context: ctx,
-      onLast: () => next(),
-    })
-  }
+  let router = Router()
 
   let handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
     if (typeof req.url !== 'string') {
@@ -178,7 +139,7 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
       query: RequestQuereyCell.create(query),
     })
 
-    let responser = await pipeline.run(requestInfo, {
+    let responser = await router.run(requestInfo, {
       context,
       onLast: () => Response.status(404).text('404 Not Found'),
     })
@@ -245,41 +206,16 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
     }
   }
 
-  let use: HttpPipeline['use'] = (...args) => {
-    if (args.length === 1) {
-      pipeline.use(args[0])
-    } else {
-      route(...args)
-    }
-  }
-
-  let run = pipeline.run
-
   let listen: HttpPipeline['listen'] = (...args) => {
     let server = createServer(handle)
     server.listen(...args)
     return server
   }
 
-  let route: HttpPipeline['route'] = (name, middleware) => {
-    use(createRoute(name, middleware))
-  }
-
-  let serve: HttpPipeline['serve'] = (name, dirname) => {
-    route(name, (request) => {
-      let filename = path.join(dirname, request.pathname)
-      return Response.file(filename)
-    })
-  }
-
   return {
-    use,
-    route,
-    serve,
-    run,
+    ...router,
     handle,
     listen,
-    middleware,
   }
 }
 

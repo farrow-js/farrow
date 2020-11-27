@@ -1,4 +1,4 @@
-import { createServer, IncomingMessage, Server, ServerResponse } from 'http'
+import { createServer, IncomingMessage, request, Server, ServerResponse } from 'http'
 import fs from 'fs'
 import path from 'path'
 import { Stream } from 'stream'
@@ -30,7 +30,7 @@ import { Response } from './response'
 
 import { BasenamesCell, handleBasenames } from './basenames'
 
-import { Router, RouterPipeline, HttpMiddleware, HttpMiddlewareInput } from './router'
+import { Router, RouterPipeline } from './router'
 
 import { createLogger, LoggerEvent, LoggerOptions } from './logger'
 
@@ -52,25 +52,16 @@ export const useResponse = () => {
 export const useReq = useRequest
 export const useRes = useResponse
 
-const RequestHeadersCell = createCell<RequestHeaders | null>(null)
+const RequestInfoCell = createCell<RequestInfo | null>(null)
 
-export const useHeaders = () => {
-  let headers = RequestHeadersCell.useCell().value
-  return headers
-}
+export const useRequestInfo = () => {
+  let requestInfo = RequestInfoCell.useCell().value
 
-const RequestCookiesCell = createCell<RequestCookies | null>(null)
+  if (!requestInfo) {
+    throw new Error(`Expected request info, but got: ${requestInfo}`)
+  }
 
-export const useCookies = () => {
-  let cookies = RequestCookiesCell.useCell().value
-  return cookies
-}
-
-const RequestQuereyCell = createCell<RequestQuery | null>(null)
-
-export const useQuery = () => {
-  let query = RequestQuereyCell.useCell().value
-  return query
+  return requestInfo
 }
 
 export type HttpPipelineOptions = {
@@ -85,6 +76,7 @@ export type HttpPipelineOptions = {
 export type HttpPipeline = RouterPipeline & {
   handle: (req: IncomingMessage, res: ServerResponse) => Promise<void>
   listen: (...args: Parameters<Server['listen']>) => Server
+  server: () => Server
 }
 
 export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline => {
@@ -134,9 +126,7 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
       request: RequestCell.create(req),
       response: ResponseCell.create(res),
       basenames: BasenamesCell.create([basename]),
-      headers: RequestHeadersCell.create(headers),
-      cookies: RequestCookiesCell.create(cookies),
-      query: RequestQuereyCell.create(query),
+      requestInfo: RequestInfoCell.create(requestInfo),
     })
 
     let responser = await router.run(requestInfo, {
@@ -206,16 +196,19 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
     }
   }
 
+  let server: HttpPipeline['server'] = () => {
+    return createServer(handle)
+  }
+
   let listen: HttpPipeline['listen'] = (...args) => {
-    let server = createServer(handle)
-    server.listen(...args)
-    return server
+    return server().listen(...args)
   }
 
   return {
     ...router,
     handle,
     listen,
+    server,
   }
 }
 

@@ -619,10 +619,8 @@ describe('Schema', () => {
       },
     })
   })
-})
 
-describe('createValidator', () => {
-  it('support custom visitor', () => {
+  it('support strict or non-strict validation', () => {
     let struct = Struct({
       a: Number,
       b: Int,

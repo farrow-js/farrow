@@ -105,7 +105,7 @@ export const createRouterPipeline = (): RouterPipeline => {
     pipeline.use(createRoute(name, ...middlewares))
   }
 
-  let serve: RouterPipeline['serve'] = (name: string, dirname: string) => {
+  let serve: RouterPipeline['serve'] = (name, dirname) => {
     route(name, (request) => {
       let filename = path.join(dirname, request.pathname)
       return Response.file(filename)
@@ -157,7 +157,9 @@ export const createRouterPipeline = (): RouterPipeline => {
 
       return schemaPipeline.run(result.value, {
         context,
-        onLast: () => next(),
+        onLast: () => {
+          throw new Error(`Unhandled request: ${input.pathname}`)
+        },
       })
     })
 

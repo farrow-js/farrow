@@ -50,10 +50,7 @@ export type Response = {
   type: ToResponse<typeof type>
 }
 
-export const toResponse = <T extends ResponseInfoCreator>(
-  f: T,
-  info: ResponseInfo
-): ToResponse<T> => {
+export const toResponse = <T extends ResponseInfoCreator>(f: T, info: ResponseInfo): ToResponse<T> => {
   return (...args) => createResponse(merge(info, f(...(args as any[]))))
 }
 
@@ -81,7 +78,7 @@ export const createResponse = (info: ResponseInfo): Response => {
     empty: toResponse(empty, info),
     attachment: toResponse(attachment, info),
     custom: toResponse(custom, info),
-    type: toResponse(type, info)
+    type: toResponse(type, info),
   }
 }
 
@@ -91,7 +88,7 @@ export type MaybeAsyncResponse = Response | Promise<Response>
 
 export const matchBodyType = <T extends keyof BodyMap>(
   type: T,
-  f: (body: BodyMap[T]) => MaybeAsyncResponse
+  f: (body: BodyMap[T]) => MaybeAsyncResponse,
 ): Middleware<any, MaybeAsyncResponse> => {
   return async (request, next) => {
     let response = await next(request)

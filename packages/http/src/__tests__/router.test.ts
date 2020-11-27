@@ -192,7 +192,7 @@ describe('Router', () => {
     }).toThrow()
   })
 
-  it('should validate number | int | float | boolean strictly', async () => {
+  it('can validate number | int | float | boolean strictly', async () => {
     let router0 = Router()
 
     let router1 = Router()

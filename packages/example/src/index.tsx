@@ -131,6 +131,17 @@ const http = Http({
   basenames: ['/base'],
 })
 
+http
+  .match({
+    pathname: '/greet',
+    query: {
+      name: String,
+    },
+  })
+  .use((request) => {
+    return Response.text(`Hello ${request.query.name}`)
+  })
+
 http.serve('/static', __dirname)
 
 http.use(home)

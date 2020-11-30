@@ -71,12 +71,12 @@ export const getMiddleware = <I, O>(input: MiddlewareInput<I, O>) => {
 
 export type Pipeline<I = unknown, O = unknown> = {
   [PipelineSymbol]: true
-  use: (...inputs: MiddlewareInput<I, O>[]) => void
+  use: (...inputs: MiddlewareInput<I, O>[]) => Pipeline<I, O>
   run: (input: I, options?: RunPipelineOptions<I, O>) => O
   middleware: Middleware<I, O>
 }
 
-export const createPipeline = <I, O>(options?: PipelineOptions): Pipeline<I, O> => {
+export const createPipeline = <I, O>(options?: PipelineOptions) => {
   let config = {
     ...options,
   }
@@ -85,6 +85,7 @@ export const createPipeline = <I, O>(options?: PipelineOptions): Pipeline<I, O> 
 
   let use: Pipeline<I, O>['use'] = (...inputs) => {
     middlewares.push(...inputs.map(getMiddleware))
+    return pipeline
   }
 
   let createCurrentCounter = (hooks: Hooks, onLast?: (input: I) => O) => {
@@ -127,12 +128,14 @@ export const createPipeline = <I, O>(options?: PipelineOptions): Pipeline<I, O> 
     })
   }
 
-  return {
+  let pipeline: Pipeline<I, O> = {
     [PipelineSymbol]: true,
     use,
     run,
     middleware,
   }
+
+  return pipeline
 }
 
 export type PipelineInput<T extends Pipeline> = T extends Pipeline<infer I> ? I : never

@@ -49,8 +49,25 @@ export const useResponse = () => {
   return response
 }
 
-export const useReq = useRequest
-export const useRes = useResponse
+export const useReq = () => {
+  let req = useRequest()
+
+  if (!req) {
+    throw new Error(`Expected request, but got: ${req}`)
+  }
+
+  return req
+}
+
+export const useRes = () => {
+  let res = useResponse()
+
+  if (!res) {
+    throw new Error(`Expected response, but got: ${res}`)
+  }
+
+  return res
+}
 
 const RequestInfoCell = createCell<RequestInfo | null>(null)
 

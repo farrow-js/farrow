@@ -176,7 +176,7 @@ export const redirect = (url: string, options?: RedirectOptions): ResponseInfo =
   }
 }
 
-export const custom = (handler: CustomBodyHandler): ResponseInfo => {
+export const custom = (handler: CustomBodyHandler = () => {}): ResponseInfo => {
   return {
     body: {
       type: 'custom',

@@ -3,8 +3,9 @@ import request from 'supertest'
 import fs from 'fs'
 import { Stream } from 'stream'
 
-import { Http, HttpPipelineOptions, Router, Response, useRequestInfo, useReq, useRes } from '../'
+import { Http, HttpPipelineOptions, Router, Response, useRequestInfo, useReq, useRes, usePrefix } from '../'
 import path from 'path'
+import { Nullable } from 'farrow-schema'
 
 const delay = (time: number) => {
   return new Promise((resolve) => {
@@ -479,6 +480,39 @@ describe('Http', () => {
         })
         .expect('Content-Type', 'application/json; charset=utf-8')
     })
+
+    it('support merging response in two directions', async () => {
+      let http = createHttp()
+      let server = http.server()
+
+      http
+        .match({
+          pathname: '/test-merge-01',
+        })
+        .use(async (request, next) => {
+          let response = await next(request)
+          return response.merge(Response.text('one'))
+        })
+        .use(() => {
+          return Response.text('two')
+        })
+
+      http
+        .match({
+          pathname: '/test-merge-02',
+        })
+        .use(async (request, next) => {
+          let response = await next(request)
+          return Response.text('one').merge(response)
+        })
+        .use(() => {
+          return Response.text('two')
+        })
+
+      await request(server).get('/test-merge-01').expect(200, 'one')
+      await request(server).get('/test-merge-02').expect(200, 'two')
+      await request(server).get('/test-merge-03').expect(404)
+    })
   })
 
   describe('Request', () => {
@@ -498,11 +532,12 @@ describe('Http', () => {
       await request(http.server()).get('/test-abc').expect(200, '/test-abc')
     })
 
-    it('support access request info via useRequestInfo', async () => {
+    it('support accessing request info via useRequestInfo', async () => {
       let http = createHttp()
 
       http.use(() => {
         let info = useRequestInfo()
+
         return Response.json({
           ...info,
           headers: {
@@ -535,6 +570,146 @@ describe('Http', () => {
           },
           cookies: { nameOne: 'valueOne', nameTwo: 'valueTwo' },
         })
+    })
+
+    it('support passing new request info to downstream', async () => {
+      let http = createHttp()
+      let server = http.server()
+
+      http.use((request, next) => {
+        if (request.pathname.startsWith('/new')) {
+          return next({
+            ...request,
+            pathname: request.pathname.replace('/new', ''),
+            query: {
+              ...request.query,
+              new: true,
+            },
+          })
+        } else {
+          return next()
+        }
+      })
+
+      http
+        .match({
+          pathname: '/test',
+          query: {
+            a: String,
+            new: Nullable(Boolean),
+          },
+        })
+        .use((request) => {
+          return Response.json(request)
+        })
+
+      await request(server)
+        .get('/test?a=1')
+        .expect(200, {
+          pathname: '/test',
+          query: {
+            a: '1',
+          },
+        })
+
+      await request(server)
+        .get('/new/test?a=1')
+        .expect(200, {
+          pathname: '/test',
+          query: {
+            a: '1',
+            new: true,
+          },
+        })
+    })
+  })
+
+  describe('Router', () => {
+    it('should support add router', async () => {
+      let http = createHttp()
+      let router = Router()
+      let server = http.server()
+
+      router
+        .match({
+          pathname: '/abc',
+        })
+        .use((request) => {
+          return Response.text(request.pathname)
+        })
+
+      http.use(router)
+      http.route('/base', router)
+
+      await request(server).get('/abc').expect(200, '/abc')
+      await request(server).get('/base/abc').expect(200, '/abc')
+    })
+
+    it('should support using router in another router', async () => {
+      let http = createHttp()
+      let router0 = Router()
+      let router1 = Router()
+      let server = http.server()
+
+      http.route('/router0', router0)
+      router0.route('/router1', router1)
+
+      http
+        .match({
+          pathname: '/abc',
+        })
+        .use((request) => {
+          let prefix = usePrefix()
+          return Response.json({
+            from: 'http',
+            prefix,
+            pathname: request.pathname,
+          })
+        })
+
+      router0
+        .match({
+          pathname: '/abc',
+        })
+        .use((request) => {
+          let prefix = usePrefix()
+          return Response.json({
+            from: 'router0',
+            prefix,
+            pathname: request.pathname,
+          })
+        })
+
+      router1
+        .match({
+          pathname: '/abc',
+        })
+        .use((request) => {
+          let prefix = usePrefix()
+          return Response.json({
+            from: 'router1',
+            prefix,
+            pathname: request.pathname,
+          })
+        })
+
+      await request(server).get('/abc').expect(200, {
+        from: 'http',
+        prefix: '',
+        pathname: '/abc',
+      })
+
+      await request(server).get('/router0/abc').expect(200, {
+        from: 'router0',
+        prefix: '/router0',
+        pathname: '/abc',
+      })
+
+      await request(server).get('/router0/router1/abc').expect(200, {
+        from: 'router1',
+        prefix: '/router0/router1',
+        pathname: '/abc',
+      })
     })
   })
 })

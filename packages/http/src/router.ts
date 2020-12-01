@@ -1,5 +1,5 @@
 import path from 'path'
-import { match as createMatch } from 'path-to-regexp'
+import { match as createMatch, Path as Pathname } from 'path-to-regexp'
 
 import { createPipeline, useContainer, MiddlewareInput, Pipeline, Middleware } from 'farrow-pipeline'
 
@@ -13,13 +13,15 @@ import { BodyMap } from './responseInfo'
 import { route as createRoute } from './basenames'
 import { MaybeAsyncResponse, matchBodyType, Response } from './response'
 
+export { Pathname }
+
 export type RouterSchemaDescriptor =
   | Schema.FieldDescriptors
   | (new () => Schema.ObjectType)
   | (new () => Schema.StructType)
 
 export type RouterRequestSchema = {
-  pathname: string
+  pathname: Pathname
   method?: string
   params?: RouterSchemaDescriptor
   query?: RouterSchemaDescriptor
@@ -43,10 +45,8 @@ export type TypeOfRequestSchema<T extends RouterRequestSchema> = Prettier<
 >
 
 const createRequestValidator = <T extends RouterRequestSchema>(options: T): Validator<TypeOfRequestSchema<T>> => {
-  let descriptors = {} as Schema.FieldDescriptors
-
-  if (typeof options.pathname === 'string') {
-    descriptors.pathname = Schema.String
+  let descriptors: Schema.FieldDescriptors = {
+    pathname: Schema.String,
   }
 
   if (typeof options.method === 'string') {
@@ -117,7 +117,7 @@ export const createRouterPipeline = (): RouterPipeline => {
     ...middlewares: MiddlewareInput<TypeOfRequestSchema<T>, MaybeAsyncResponse>[]
   ) => {
     let matchedPipeline = createPipeline<TypeOfRequestSchema<T>, MaybeAsyncResponse>()
-    
+
     let validator = createRequestValidator(schema)
 
     let matcher = createMatch(schema.pathname)

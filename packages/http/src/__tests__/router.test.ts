@@ -247,4 +247,50 @@ describe('Router', () => {
       },
     })
   })
+
+  it('support passing regexp to schema.pathname', async () => {
+    let router = Router()
+
+    router
+      .match({
+        pathname: /^\/test/i,
+      })
+      .use((request) => {
+        return Response.json(request)
+      })
+
+    expect(() => {
+      router.run({
+        pathname: '/abc',
+      })
+    }).toThrow()
+
+    expect(() => {
+      router.run({
+        pathname: '/abc/test',
+      })
+    }).toThrow()
+
+    let result0 = await router.run({
+      pathname: '/test/abc',
+    })
+
+    let result1 = await router.run({
+      pathname: '/test/efg',
+    })
+
+    expect(result0.info.body).toEqual({
+      type: 'json',
+      value: {
+        pathname: '/test/abc',
+      },
+    })
+
+    expect(result1.info.body).toEqual({
+      type: 'json',
+      value: {
+        pathname: '/test/efg',
+      },
+    })
+  })
 })

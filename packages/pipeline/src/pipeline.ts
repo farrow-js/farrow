@@ -8,11 +8,11 @@ import {
   isContext,
   isContainer,
   assertContext,
-  fromContext,
-  runContextHooks,
+  fromContainer,
+  runHooks,
   useContainer,
   Hooks,
-  runWithContext,
+  runWithContainer,
 } from './context'
 
 import { Next, createCounter } from './counter'
@@ -26,7 +26,7 @@ export {
   Context,
   Container,
   useContainer,
-  runWithContext,
+  runWithContainer,
   assertContainer,
   isContext,
   isContainer,
@@ -96,19 +96,19 @@ export const createPipeline = <I, O>(options?: PipelineOptions) => {
       }
 
       let middleware = middlewares[index]
-      let result = runContextHooks(() => middleware(input, next), hooks)
+      let result = runHooks(() => middleware(input, next), hooks)
 
       return result
     })
   }
 
   let currentContainer = createContainer(config.contexts)
-  let currentHooks = fromContext(currentContainer)
+  let currentHooks = fromContainer(currentContainer)
   let currentCounter = createCurrentCounter(currentHooks)
 
   let run: Pipeline<I, O>['run'] = (input, options) => {
     let container = options?.container ?? currentContainer
-    let hooks = container === currentContainer ? currentHooks : fromContext(container)
+    let hooks = container === currentContainer ? currentHooks : fromContainer(container)
     let counter = container === currentContainer ? currentCounter : createCurrentCounter(hooks)
 
     if (options?.onLast) {

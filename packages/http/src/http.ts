@@ -18,7 +18,7 @@ import onfinish from 'on-finished'
 import destroy from 'destroy'
 import mime from 'mime-types'
 
-import { createContext, createContainer, runWithContext, Container, ContextStorage } from 'farrow-pipeline'
+import { createContext, createContainer, runWithContainer, Container, ContextStorage } from 'farrow-pipeline'
 
 import { JsonType } from 'farrow-schema'
 
@@ -86,7 +86,7 @@ export type HttpPipelineOptions = {
   body?: BodyOptions
   cookie?: CookieOptions
   query?: QueryOptions
-  contexts?: () => ContextStorage
+  contexts?: () => ContextStorage | Promise<ContextStorage>
   logger?: boolean | LoggerOptions
 }
 
@@ -136,7 +136,7 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
       cookies,
     })
 
-    let storages = config.contexts?.()
+    let storages = await config.contexts?.()
 
     let container = createContainer({
       ...storages,
@@ -467,7 +467,7 @@ export const handleResponse = async (params: ResponseParams) => {
         responseInfo: omitBody(responseInfo),
       })
     }
-    return runWithContext(handleResponse, container)
+    return runWithContainer(handleResponse, container)
   }
 
   if (body.type === 'raw') {

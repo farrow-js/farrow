@@ -120,16 +120,16 @@ const { run, hooks } = createHooks<Hooks>({
   },
 })
 
-export const runContextHooks = run
+export const runHooks = run
 
 export const { useContainer } = hooks
 
-export const fromContext = (container: Container): Hooks => ({
+export const fromContainer = (container: Container): Hooks => ({
   useContainer: () => {
     return container
   },
 })
 
-export const runWithContext = <F extends (...args: any) => any>(f: F, container: Container) => {
-  return runContextHooks(f, fromContext(container))
+export const runWithContainer = <F extends (...args: any) => any>(f: F, container: Container) => {
+  return runHooks(f, fromContainer(container))
 }

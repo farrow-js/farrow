@@ -1,65 +1,65 @@
-import { createCell, createContext, createPipeline, usePipeline, useContext } from '../'
+import { createContext, createContainer, createPipeline, usePipeline, useContainer } from '../'
 
 describe('createContext', () => {
   it('basic usage', () => {
-    let Cell0 = createCell({
+    let Context0 = createContext({
       count: 0,
     })
 
-    let Cell1 = createCell({
+    let Context1 = createContext({
       text: 'test',
     })
 
-    let ctx = createContext()
+    let container = createContainer()
 
-    expect(ctx.read(Cell0)).toEqual({
+    expect(container.read(Context0)).toEqual({
       count: 0,
     })
 
-    expect(ctx.read(Cell1)).toEqual({
+    expect(container.read(Context1)).toEqual({
       text: 'test',
     })
 
-    ctx.write(Cell0, {
+    container.write(Context0, {
       count: 1,
     })
 
-    expect(ctx.read(Cell0)).toEqual({
+    expect(container.read(Context0)).toEqual({
       count: 1,
     })
 
-    ctx.write(Cell1, {
+    container.write(Context1, {
       text: 'update test',
     })
 
-    expect(ctx.read(Cell1)).toEqual({
+    expect(container.read(Context1)).toEqual({
       text: 'update test',
     })
   })
 
-  it('inject new cell', () => {
-    let Cell0 = createCell({
+  it('inject new Context', () => {
+    let Context0 = createContext({
       count: 0,
     })
 
-    let Cell1 = createCell({
+    let Context1 = createContext({
       text: 'test',
     })
 
-    let ctx = createContext({
-      count: Cell0.create({
+    let container = createContainer({
+      count: Context0.create({
         count: 1,
       }),
-      text: Cell1.create({
+      text: Context1.create({
         text: 'new text',
       }),
     })
 
-    expect(ctx.read(Cell0)).toEqual({
+    expect(container.read(Context0)).toEqual({
       count: 1,
     })
 
-    expect(ctx.read(Cell1)).toEqual({
+    expect(container.read(Context1)).toEqual({
       text: 'new text',
     })
   })
@@ -152,36 +152,36 @@ describe('createPipeline', () => {
   })
 
   it('supports hooks in sync middleware', async () => {
-    let Cell0 = createCell(0)
+    let Context0 = createContext(0)
 
     let pipeline = createPipeline<number, number>()
 
     let list: number[] = []
 
     pipeline.use((input, next) => {
-      let cell = Cell0.useCell()
+      let Context = Context0.use()
 
-      list.push(cell.value)
+      list.push(Context.value)
 
-      cell.value += 1
+      Context.value += 1
 
       return next()
     })
 
     pipeline.use((input, next) => {
-      let cell = Cell0.useCell()
+      let Context = Context0.use()
 
-      list.push(cell.value)
+      list.push(Context.value)
 
-      cell.value += 2
+      Context.value += 2
 
       return next()
     })
 
     pipeline.use((input) => {
-      let cell = Cell0.useCell()
-      list.push(cell.value)
-      return input + cell.value
+      let Context = Context0.use()
+      list.push(Context.value)
+      return input + Context.value
     })
 
     let result = await pipeline.run(10)
@@ -191,47 +191,47 @@ describe('createPipeline', () => {
   })
 
   it('supports hooks in async middleware', async () => {
-    let Cell0 = createCell(0)
+    let Context0 = createContext(0)
 
     let pipeline = createPipeline<number, Promise<number>>()
 
     let list: number[] = []
 
     pipeline.use(async (input, next) => {
-      let cell = Cell0.useCell()
+      let Context = Context0.use()
 
-      list.push(cell.value)
+      list.push(Context.value)
 
-      cell.value += 1
+      Context.value += 1
 
       let result = await next()
 
-      list.push(cell.value)
+      list.push(Context.value)
 
       return result
     })
 
     pipeline.use(async (input, next) => {
-      let cell = Cell0.useCell()
+      let Context = Context0.use()
 
-      list.push(cell.value)
+      list.push(Context.value)
 
-      cell.value += 2
+      Context.value += 2
 
       let result = await next()
 
-      list.push(cell.value)
+      list.push(Context.value)
 
-      cell.value += 3
+      Context.value += 3
 
       return result
     })
 
     pipeline.use(async (input) => {
-      let cell = Cell0.useCell()
-      list.push(cell.value)
-      cell.value += 1
-      return input + cell.value
+      let Context = Context0.use()
+      list.push(Context.value)
+      Context.value += 1
+      return input + Context.value
     })
 
     let result = await pipeline.run(10)
@@ -241,34 +241,35 @@ describe('createPipeline', () => {
   })
 
   it('can inject context', async () => {
-    let Cell = createCell(10)
+    let TestContext = createContext(10)
+
     let pipeline = createPipeline<number, number>({
       contexts: {
-        count: Cell.create(100),
+        count: TestContext.create(100),
       },
     })
 
     pipeline.use((input) => {
-      let cell = Cell.useCell()
-      cell.value += input
-      return cell.value
+      let Context = TestContext.use()
+      Context.value += input
+      return Context.value
     })
 
     let result0 = await pipeline.run(20)
 
     expect(result0).toEqual(120)
 
-    let ctx = createContext({
-      count: Cell.create(10),
+    let container = createContainer({
+      count: TestContext.create(10),
     })
 
     let rseult1 = await pipeline.run(30, {
-      context: ctx,
+      container: container,
     })
 
     expect(rseult1).toEqual(40)
 
-    expect(ctx.read(Cell)).toEqual(40)
+    expect(container.read(TestContext)).toEqual(40)
   })
 
   it('should throw error if there are no middlewares in pipeline', async () => {
@@ -370,25 +371,25 @@ describe('createPipeline', () => {
   })
 
   it('can access current context in pipeline', async () => {
-    let Cell0 = createCell(0)
-    let Cell1 = createCell(1)
+    let Context0 = createContext(0)
+    let Context1 = createContext(1)
 
     let pipeline = createPipeline<number, number>({
       contexts: {
-        count0: Cell0.create(10),
-        count1: Cell1.create(20),
+        count0: Context0.create(10),
+        count1: Context1.create(20),
       },
     })
 
     let list: boolean[] = []
 
     pipeline.use((input) => {
-      let ctx = useContext()
-      let count0 = Cell0.useCell().value
-      let count1 = Cell1.useCell().value
+      let container = useContainer()
+      let count0 = Context0.use().value
+      let count1 = Context1.use().value
 
-      list.push(ctx.read(Cell0) === count0)
-      list.push(ctx.read(Cell1) === count1)
+      list.push(container.read(Context0) === count0)
+      list.push(container.read(Context1) === count1)
 
       return input
     })
@@ -460,24 +461,32 @@ describe('createPipeline', () => {
   })
 
   it('should support pipeline.use(anotherPipeline) if their type is matched', async () => {
+    let StepContext = createContext(1)
+
     let pipeline0 = createPipeline<number, number>()
 
     let pipeline1 = createPipeline<number, number>()
 
+    let steps = [] as number[]
+
     pipeline0.use((input, next) => {
-      return next(input + 1)
+      let step = StepContext.use()
+      return next(input + step.value++)
     })
 
     pipeline0.use(pipeline1)
 
     pipeline1.use((input) => {
-      return input + 1
+      let step = StepContext.use()
+      steps.push(step.value)
+      return input + step.value
     })
 
     let result0 = pipeline1.run(0)
     let result1 = pipeline0.run(0)
 
     expect(result0).toEqual(1)
-    expect(result1).toEqual(2)
+    expect(result1).toEqual(3)
+    expect(steps).toEqual([1, 2])
   })
 })

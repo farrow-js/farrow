@@ -1,7 +1,7 @@
 import path from 'path'
 import { match as createMatch } from 'path-to-regexp'
 
-import { createPipeline, useContext, MiddlewareInput, Pipeline, Middleware } from 'farrow-pipeline'
+import { createPipeline, useContainer, MiddlewareInput, Pipeline, Middleware } from 'farrow-pipeline'
 
 import * as Schema from 'farrow-schema'
 import { Prettier } from 'farrow-schema'
@@ -116,15 +116,16 @@ export const createRouterPipeline = (): RouterPipeline => {
     schema: T,
     ...middlewares: MiddlewareInput<TypeOfRequestSchema<T>, MaybeAsyncResponse>[]
   ) => {
-    let schemaPipeline = createPipeline<TypeOfRequestSchema<T>, MaybeAsyncResponse>()
+    let matchedPipeline = createPipeline<TypeOfRequestSchema<T>, MaybeAsyncResponse>()
+    
     let validator = createRequestValidator(schema)
 
     let matcher = createMatch(schema.pathname)
 
-    schemaPipeline.use(...middlewares)
+    matchedPipeline.use(...middlewares)
 
     pipeline.use((input, next) => {
-      let context = useContext()
+      let container = useContainer()
 
       if (typeof schema.method === 'string') {
         if (schema.method.toLowerCase() !== input.method?.toLowerCase()) {
@@ -155,15 +156,15 @@ export const createRouterPipeline = (): RouterPipeline => {
         throw new Error(message)
       }
 
-      return schemaPipeline.run(result.value, {
-        context,
+      return matchedPipeline.run(result.value, {
+        container: container,
         onLast: () => {
           throw new Error(`Unhandled request: ${input.pathname}`)
         },
       })
     })
 
-    return schemaPipeline
+    return matchedPipeline
   }
 
   return {

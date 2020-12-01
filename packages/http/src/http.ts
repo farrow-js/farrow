@@ -18,7 +18,7 @@ import onfinish from 'on-finished'
 import destroy from 'destroy'
 import mime from 'mime-types'
 
-import { createCell, createContext, runWithContext, Context, CellStorage } from 'farrow-pipeline'
+import { createContext, createContainer, runWithContext, Container, ContextStorage } from 'farrow-pipeline'
 
 import { JsonType } from 'farrow-schema'
 
@@ -28,23 +28,23 @@ import { ResponseInfo, Status, Headers, Cookies, RedirectBody } from './response
 
 import { Response } from './response'
 
-import { BasenamesCell, handleBasenames } from './basenames'
+import { BasenamesContext, handleBasenames } from './basenames'
 
 import { Router, RouterPipeline } from './router'
 
 import { createLogger, LoggerEvent, LoggerOptions } from './logger'
 
-const RequestCell = createCell<IncomingMessage | null>(null)
+const RequestContext = createContext<IncomingMessage | null>(null)
 
 export const useRequest = () => {
-  let request = RequestCell.useCell().value
+  let request = RequestContext.use().value
   return request
 }
 
-const ResponseCell = createCell<ServerResponse | null>(null)
+const ResponseContext = createContext<ServerResponse | null>(null)
 
 export const useResponse = () => {
-  let response = ResponseCell.useCell().value
+  let response = ResponseContext.use().value
 
   return response
 }
@@ -69,10 +69,10 @@ export const useRes = () => {
   return res
 }
 
-const RequestInfoCell = createCell<RequestInfo | null>(null)
+const RequestInfoContext = createContext<RequestInfo | null>(null)
 
 export const useRequestInfo = () => {
-  let requestInfo = RequestInfoCell.useCell().value
+  let requestInfo = RequestInfoContext.use().value
 
   if (!requestInfo) {
     throw new Error(`Expected request info, but got: ${requestInfo}`)
@@ -86,7 +86,7 @@ export type HttpPipelineOptions = {
   body?: BodyOptions
   cookie?: CookieOptions
   query?: QueryOptions
-  contexts?: () => CellStorage
+  contexts?: () => ContextStorage
   logger?: boolean | LoggerOptions
 }
 
@@ -138,16 +138,16 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
 
     let storages = config.contexts?.()
 
-    let context = createContext({
+    let container = createContainer({
       ...storages,
-      request: RequestCell.create(req),
-      response: ResponseCell.create(res),
-      basenames: BasenamesCell.create([basename]),
-      requestInfo: RequestInfoCell.create(requestInfo),
+      request: RequestContext.create(req),
+      response: ResponseContext.create(res),
+      basenames: BasenamesContext.create([basename]),
+      requestInfo: RequestInfoContext.create(requestInfo),
     })
 
     let responser = await router.run(requestInfo, {
-      context,
+      container: container,
       onLast: () => Response.status(404).text('404 Not Found'),
     })
 
@@ -156,7 +156,7 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
       res,
       requestInfo: requestInfo,
       responseInfo: responser.info,
-      context,
+      container: container,
     })
   }
 
@@ -263,12 +263,12 @@ export type ResponseParams = {
   responseInfo: ResponseInfo
   req: IncomingMessage
   res: ServerResponse
-  context: Context
+  container: Container
 }
 
 export const handleResponse = async (params: ResponseParams) => {
-  let { req, res, requestInfo, responseInfo, context } = params
-  let basenames = context.read(BasenamesCell)
+  let { req, res, requestInfo, responseInfo, container } = params
+  let basenames = container.read(BasenamesContext)
   let prefix = basenames.join('')
   let accept = accepts(req)
 
@@ -467,7 +467,7 @@ export const handleResponse = async (params: ResponseParams) => {
         responseInfo: omitBody(responseInfo),
       })
     }
-    return runWithContext(handleResponse, context)
+    return runWithContext(handleResponse, container)
   }
 
   if (body.type === 'raw') {

@@ -119,9 +119,9 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
 
     let method = req.method ?? 'GET'
 
-    let query = parseQuery(search, config.query) as RequestQuery
+    let query = (req as any).query ?? (parseQuery(search, config.query) as RequestQuery)
 
-    let body = await getBody(req, config.body)
+    let body = (req as any).body ?? (await getBody(req, config.body))
 
     let headers = req.headers as RequestHeaders
 

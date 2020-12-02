@@ -1,1 +1,1 @@
-# farrow-pipeline
+# farrow-schema

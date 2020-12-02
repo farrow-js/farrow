@@ -2,7 +2,7 @@
   "name": "farrow",
   "version": "0.0.0",
   "license": "MIT",
-  "description": "Functional style web framework for node.js",
+  "description": "A type-friendly web framework",
   "author": "https://github.com/Lucifier129",
   "private": true,
   "scripts": {

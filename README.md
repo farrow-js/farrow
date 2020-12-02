@@ -1,13 +1,15 @@
 # farrow
 
-**Farrow** is a functional-style web framework for node.js written by TypeScript
-
 [![npm version](https://img.shields.io/npm/v/farrow-http.svg?style=flat)](https://www.npmjs.com/package/farrow-http)
 [![Build Status](https://travis-ci.org/Lucifier129/farrow.svg?branch=master)](https://travis-ci.org/Lucifier129/farrow)
 [![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen.svg)](https://github.com/Lucifier129/farrow#readme)
 [![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/Lucifier129/farrow/graphs/commit-activity)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Lucifier129/farrow/blob/master/LICENSE)
 [![Twitter: guyingjie129](https://img.shields.io/twitter/follow/guyingjie129.svg?style=social)](https://twitter.com/guyingjie129)
+
+**Farrow** is a functional-style web framework for node.js written by TypeScript
+
+[API Documentation](./docs/index.md)
 
 ## Benefits
 
@@ -22,8 +24,6 @@
 - Node.js 12.0
 
 ## Usage
-
-[API Doc](./docs/index.md)
 
 - [How to install](#how-to-install)
 - [How to setup a server](#how-to-setup-a-server)

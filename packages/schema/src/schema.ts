@@ -131,7 +131,7 @@ type TypeOfObjectType<T extends ObjectType> = {
 
 export const kind = <T extends string>(name: T) => name
 
-export class ObjectType extends Schema<unknown> {
+export abstract class ObjectType extends Schema<unknown> {
   [Kind] = kind('Object')
 }
 

@@ -24,7 +24,7 @@ import { JsonType } from 'farrow-schema'
 
 import { RequestCookies, RequestHeaders, RequestQuery, RequestInfo } from './requestInfo'
 
-import { ResponseInfo, Status, Headers, Cookies, RedirectBody } from './responseInfo'
+import { ResponseInfo, Status, Headers, Cookies, RedirectBody, FileBodyOptions } from './responseInfo'
 
 import { Response } from './response'
 
@@ -86,7 +86,11 @@ export type HttpPipelineOptions = {
   body?: BodyOptions
   cookie?: CookieOptions
   query?: QueryOptions
-  contexts?: () => ContextStorage | Promise<ContextStorage>
+  contexts?: (params: {
+    req: IncomingMessage
+    requestInfo: RequestInfo
+    basename: string
+  }) => ContextStorage | Promise<ContextStorage>
   logger?: boolean | LoggerOptions
 }
 
@@ -136,7 +140,11 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
       cookies,
     })
 
-    let storages = await config.contexts?.()
+    let storages = await config.contexts?.({
+      req,
+      requestInfo,
+      basename,
+    })
 
     let container = createContainer({
       ...storages,
@@ -386,7 +394,7 @@ export const handleResponse = async (params: ResponseParams) => {
     res.end(buffer)
   }
 
-  let handleFile = async (filename: string) => {
+  let handleFile = async (filename: string, options?: FileBodyOptions) => {
     try {
       await access(filename, fs.constants.F_OK | fs.constants.R_OK)
     } catch (error) {
@@ -394,11 +402,10 @@ export const handleResponse = async (params: ResponseParams) => {
         ...params,
         responseInfo: Response.status(404).text(error.message).info,
       })
-
       return
     }
 
-    let stream = fs.createReadStream(filename)
+    let stream = fs.createReadStream(filename, options)
     let ext = path.extname(filename)
     let contentType = mime.contentType(ext)
 

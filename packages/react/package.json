@@ -4,7 +4,13 @@
   "description": "React bindings for farrow-http",
   "main": "dist/index.js",
   "files": [
-    "dist"
+    "dist",
+    "Context.d.ts",
+    "Context.js",
+    "hooks.d.ts",
+    "hooks.js",
+    "Link.d.ts",
+    "Link.js"
   ],
   "keywords": [
     "Web Framework",

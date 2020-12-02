@@ -1,12 +1,14 @@
 {
   "name": "farrow-schema",
   "version": "1.0.0",
-  "description": "Type-Friendly schema library",
+  "description": "Type-Friendly schema builder",
   "main": "dist/index.js",
   "files": [
     "dist",
     "validator.d.ts",
-    "validator.js"
+    "validator.js",
+    "transformer.js",
+    "transformer.d.ts"
   ],
   "scripts": {
     "start": ""

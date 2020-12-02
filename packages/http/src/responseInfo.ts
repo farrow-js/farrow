@@ -76,9 +76,22 @@ export type RawBody = {
   value: string
 }
 
+export type FileBodyOptions =  string | {
+  flags?: string;
+  encoding?: BufferEncoding;
+  fd?: number;
+  mode?: number;
+  autoClose?: boolean;
+  emitClose?: boolean;
+  start?: number;
+  end?: number;
+  highWaterMark?: number;
+}
+
 export type FileBody = {
   type: 'file'
   value: string
+  options?: FileBodyOptions
 }
 
 export type CustomBodyHandler = (arg: {
@@ -203,11 +216,12 @@ export const buffer = (buffer: Buffer): ResponseInfo => {
   }
 }
 
-export const file = (filename: string): ResponseInfo => {
+export const file = (filename: string, options?: FileBodyOptions): ResponseInfo => {
   return {
     body: {
       type: 'file',
       value: filename,
+      options
     },
   }
 }

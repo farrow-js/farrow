@@ -6,6 +6,7 @@ import { Stream } from 'stream'
 import { Http, HttpPipelineOptions, Router, Response, useRequestInfo, useReq, useRes, usePrefix } from '../'
 import path from 'path'
 import { Nullable } from 'farrow-schema'
+import { createContext } from 'farrow-pipeline'
 
 const delay = (time: number) => {
   return new Promise((resolve) => {
@@ -512,6 +513,106 @@ describe('Http', () => {
       await request(server).get('/test-merge-01').expect(200, 'one')
       await request(server).get('/test-merge-02').expect(200, 'two')
       await request(server).get('/test-merge-03').expect(404)
+    })
+
+    it('support serving static files', async () => {
+      let http = createHttp()
+      let server = http.server()
+
+      let dirname = path.join(__dirname, '../../')
+
+      let read = async (filename: string) => {
+        let buffer = await fs.promises.readFile(path.join(dirname, filename))
+        return buffer.toString()
+      }
+
+      http.serve('/static', dirname)
+
+      await request(server)
+        .get('/static/package.json')
+        .expect('Content-Type', /json/)
+        .expect(200, await read('package.json'))
+
+      await request(server)
+        .get('/static/README.md')
+        .expect('Content-Type', /markdown/)
+        .expect(200, await read('README.md'))
+
+      await request(server)
+        .get('/static/dist/index.js')
+        .expect(200, await read('dist/index.js'))
+
+      await request(server).get('/static/abc').expect(404)
+    })
+
+    it('support capturing response by type', async () => {
+      let http = createHttp()
+      let server = http.server()
+
+      http.capture('text', (textBody) => {
+        return Response.text(`capture: ${textBody.value}`)
+      })
+
+      http.capture('json', (jsonBody) => {
+        return Response.json({
+          capture: true,
+          original: jsonBody.value,
+        })
+      })
+
+      http
+        .match({
+          pathname: '/test-text',
+        })
+        .use(() => {
+          return Response.text('some text')
+        })
+
+      http
+        .match({
+          pathname: '/test-json',
+        })
+        .use(() => {
+          return Response.json({
+            data: 'ok',
+          })
+        })
+
+      await request(server).get('/test-text').expect('Content-Type', /text/).expect(200, 'capture: some text')
+
+      await request(server)
+        .get('/test-json')
+        .expect('Content-Type', /json/)
+        .expect(200, {
+          capture: true,
+          original: {
+            data: 'ok',
+          },
+        })
+    })
+
+    it('support injecting context', async () => {
+      let TestContext = createContext(0)
+
+      let http = createHttp({
+        contexts: () => {
+          return {
+            test: TestContext.create(10),
+          }
+        },
+      })
+
+      let server = http.server()
+
+      http.use(async () => {
+        let ctx = TestContext.use()
+        let value = ctx.value
+        ctx.value += 1
+        return Response.text(value.toString())
+      })
+
+      await request(server).get('/').expect(200, '10')
+      await request(server).get('/any').expect(200, '10')
     })
   })
 

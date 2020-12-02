@@ -54,6 +54,63 @@ type LoggerOptions = {
 }
 ```
 
+## Response
+
+`Response` can be used to describe the shape of the real server response, farrow-http will perform it later
+
+```typescript
+type ResponseInfo = {
+  status?: Status
+  headers?: Headers
+  cookies?: Cookies
+  body?: Body
+  vary?: string[]
+}
+
+type Response = {
+  // response info
+  info: ResponseInfo
+  // merger all responses
+  merge: (...responses: Response[]) => Response
+  // set json response body
+  json: (value: JsonType) => Response
+  // set html response body
+  html: (value: string) => Response
+  // set text response body
+  text: (value: string) => Response
+  // set raw response body without content-type
+  raw: (value: string) => Response
+  // redirect response
+  redirect: (url: string, options?: { usePrefix?: boolean }) => Response
+  // set stream response body
+  stream: (stream: Stream) => Response
+  // set file response body
+  file: (filename: string) => Response
+  // set vary header fields
+  vary: (...fileds: string[]) => Response
+  // set response cookie
+  cookie: (name: string, value: string | number | null, options?: Cookies.SetOption) => Response
+  // set response cookies
+  cookies: (cookies: { [key: string]: string | number | null }, options?: Cookies.SetOption) => Response
+  // set response header
+  header: (name: string, value: Value) => Response
+  // set response headers
+  headers: (headers: Headers) => Response
+  // set response status
+  status: (code: number, message?: string) => Response
+  // set buffer response body
+  buffer: (buffer: Buffer) => Response
+  // set empty content response body
+  empty: () => Response
+  // set attachment response header
+  attachment: (filename?: string) => Response
+  // set custom response body
+  custom: (handler?: CustomBodyHandler) => Response
+  // set content-type via mime-type/extname
+  type: (type: string) => Response
+}
+```
+
 ## Router(): RouterPipeline
 
 create a router

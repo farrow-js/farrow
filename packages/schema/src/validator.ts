@@ -49,9 +49,16 @@ export const createValidator = <S extends Schema.SchemaCtor, Context extends Val
   }
 }
 
-export const createSchemaValidator = <T extends Schema.SchemaCtor>(SchemaCtor: T) => {
+export const createSchemaValidator = <S extends Schema.SchemaCtor, Context extends ValidatorContext = ValidatorContext>(
+  SchemaCtor: S,
+  context?: TransformContext<Context, Validator>,
+) => {
   return createValidator(SchemaCtor, {
-    rules: defaultValidatorRules,
+    ...context,
+    rules: {
+      ...defaultValidatorRules,
+      ...context?.rules,
+    },
   })
 }
 

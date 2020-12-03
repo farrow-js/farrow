@@ -40,7 +40,7 @@
 - [How to merge responses](#how-to-merge-responses)
 - [How to add router](#how-to-add-router)
 - [How to add view-engine](#how-to-add-view-engine)
-- [How to add router](#how-to-add-router)
+- [How to write a farrow hooks](#how-to-write-a-farrow-hooks)
 
 ### How to install
 
@@ -363,6 +363,81 @@ http.use(() => {
     </>,
   )
 })
+```
+
+### How to write a farrow hooks
+
+**Note**: farrow-hooks shared similar rules or limitations with react-hooks, all farrow-hooks have to place before the first `await` in the function body.
+
+```tsx
+import { createContext } from 'farrow-pipeline'
+import { Http, HttpMiddleware } from 'farrow-http'
+import { useReactView } from 'farrow-react'
+
+// declare an interface
+interface User {
+  id: string
+  name: string
+  email: string
+}
+
+// define a farrow context via interface
+const UserContext = createContext<User | null>(null)
+
+// define a custom farrow hooks
+const useUser = (): User => {
+  // every farrow context provide a built-in hooks, Context.use()
+  let ctx = UserContext.use()
+
+  if (ctx.value === null) {
+    throw new Error(`user not found`)
+  }
+
+  return ctx.value
+}
+
+// define a provider middleware
+const UserProvider = (): HttpMiddleware => {
+  return async (request, next) => {
+    let userCtx = UserContext.use()
+    // assume defining somewhere
+    let session = SessionContext.use().value
+    let db = DbContext.use().value
+
+    if (!request?.cookies?.token) {
+      return next()
+    }
+
+    let userId = await session.read(request?.cookies?.token)
+
+    let user = await db.query({
+      User: {
+        token,
+      },
+    })
+
+    // write user context
+    userCtx.value = user
+
+    return next()
+  }
+}
+
+const http = Http()
+
+http.use(UserProvider)
+
+http
+  .match({
+    pathname: '/userinfo',
+  })
+  .use(async (request, next) => {
+    let ReactView = useReactView()
+    // read user from hooks
+    let user = useUser()
+
+    return ReactView.render(<div>{JSON.stringify(user)}</div>)
+  })
 ```
 
 ## Author

@@ -4,7 +4,9 @@ import { router as api } from './api'
 import { router as pages } from './pages'
 import { Action2Api } from './middleware/Action2Page'
 
-const http = Http()
+const http = Http({
+  basenames: ['/base'],
+})
 
 http.use(pages)
 

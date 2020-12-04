@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react'
 
+import { Form } from '../../components/Form'
+
 type TodoActionProps = {
   action: string
   method?: string
@@ -11,11 +13,11 @@ export const TodoAction: React.FC<TodoActionProps> = (props) => {
 
   return (
     <>
-      <form action={`/action/todos${props.action}`} method={props.method ?? 'POST'} style={{ display: 'none' }}>
+      <Form action={`/action/todos${props.action}`} method={props.method ?? 'POST'} style={{ display: 'none' }}>
         <button id={formId} type="submit">
           submit form
         </button>
-      </form>
+      </Form>
       <label style={{ display: 'inline' }} htmlFor={formId}>
         {props.children}
       </label>

@@ -2,6 +2,8 @@ import React from 'react'
 
 import { Link } from 'farrow-react/Link'
 
+import { Form } from '../components/Form'
+
 export const Create: React.FC = () => {
   return (
     <>
@@ -15,14 +17,14 @@ export const Create: React.FC = () => {
       </header>
       <main>
         <section>
-          <form action="/action/todos/create" method="POST">
+          <Form action={`/action/todos/create`} method="POST">
             <header>
               <h2>Create Todo</h2>
             </header>
             <label htmlFor="content">content:</label>
             <input type="text" name="content" placeholder="input your todo content" />
             <button type="submit">Submit</button>
-          </form>
+          </Form>
         </section>
       </main>
     </>

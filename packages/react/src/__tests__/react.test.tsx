@@ -51,7 +51,7 @@ describe('Farrow-React', () => {
     let server = http.server()
     let router = Router()
 
-    http.route('/base0', router)
+    http.route('/base0').use(router)
 
     router
       .match({

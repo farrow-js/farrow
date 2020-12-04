@@ -82,13 +82,17 @@ export type HttpMiddleware = Middleware<RequestInfo, MaybeAsyncResponse>
 
 export type HttpMiddlewareInput = MiddlewareInput<RequestInfo, MaybeAsyncResponse>
 
+export type MatchOptions = {
+  block: boolean
+}
+
 export type RouterPipeline = Pipeline<RequestInfo, MaybeAsyncResponse> & {
   capture: <T extends keyof BodyMap>(type: T, f: (body: BodyMap[T]) => MaybeAsyncResponse) => void
-  route: (name: string, ...middlewares: HttpMiddlewareInput[]) => void
+  route: (name: string) => Pipeline<RequestInfo, MaybeAsyncResponse>
   serve: (name: string, dirname: string) => void
   match: <T extends RouterRequestSchema>(
     schema: T,
-    ...middlewares: MiddlewareInput<TypeOfRequestSchema<T>, MaybeAsyncResponse>[]
+    options?: MatchOptions,
   ) => Pipeline<TypeOfRequestSchema<T>, MaybeAsyncResponse>
 }
 
@@ -101,28 +105,30 @@ export const createRouterPipeline = (): RouterPipeline => {
     pipeline.use(matchBodyType(type, f))
   }
 
-  let route: RouterPipeline['route'] = (name, ...middlewares) => {
-    pipeline.use(createRoute(name, ...middlewares))
+  let route: RouterPipeline['route'] = (name) => {
+    let routePipeline = createRoute(name)
+    pipeline.use(routePipeline)
+    return routePipeline
   }
 
   let serve: RouterPipeline['serve'] = (name, dirname) => {
-    route(name, (request) => {
+    route(name).use((request) => {
       let filename = path.join(dirname, request.pathname)
       return Response.file(filename)
     })
   }
 
-  let match = <T extends RouterRequestSchema>(
-    schema: T,
-    ...middlewares: MiddlewareInput<TypeOfRequestSchema<T>, MaybeAsyncResponse>[]
-  ) => {
+  let match = <T extends RouterRequestSchema>(schema: T, options?: MatchOptions) => {
+    let config = {
+      block: true,
+      ...options,
+    }
+
     let matchedPipeline = createPipeline<TypeOfRequestSchema<T>, MaybeAsyncResponse>()
 
     let validator = createRequestValidator(schema)
 
     let matcher = createMatch(schema.pathname)
-
-    matchedPipeline.use(...middlewares)
 
     pipeline.use((input, next) => {
       let container = useContainer()
@@ -159,7 +165,11 @@ export const createRouterPipeline = (): RouterPipeline => {
       return matchedPipeline.run(result.value, {
         container: container,
         onLast: () => {
-          throw new Error(`Unhandled request: ${input.pathname}`)
+          if (config.block) {
+            throw new Error(`Unhandled request: ${input.pathname}`)
+          } else {
+            return next()
+          }
         },
       })
     })

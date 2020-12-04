@@ -14,7 +14,7 @@ http.use(Action2Api('/'))
 
 http.serve('/static', path.join(__dirname, '../static'))
 
-http.route('/api', api)
+http.route('/api').use(api)
 
 http.listen(3002, () => {
   console.log(`server started at http://localhost:3002`)

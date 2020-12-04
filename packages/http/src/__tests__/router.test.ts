@@ -9,7 +9,7 @@ describe('Router', () => {
       pathname: '/test',
     }
 
-    router.match(schema, async (request) => {
+    router.match(schema).use(async (request) => {
       return Response.json(request)
     })
 
@@ -67,7 +67,7 @@ describe('Router', () => {
       },
     }
 
-    router.match(schema, async (request) => {
+    router.match(schema).use(async (request) => {
       return Response.json(request)
     })
 
@@ -197,29 +197,27 @@ describe('Router', () => {
 
     let router1 = Router()
 
-    router0.match(
-      {
+    router0
+      .match({
         pathname: '/',
         query: {
           id: Strict(Number),
         },
-      },
-      (request) => {
+      })
+      .use((request) => {
         return Response.json(request)
-      },
-    )
+      })
 
-    router1.match(
-      {
+    router1
+      .match({
         pathname: '/',
         query: {
           id: Number,
         },
-      },
-      (request) => {
+      })
+      .use((request) => {
         return Response.json(request)
-      },
-    )
+      })
 
     expect(() => {
       router0.run({

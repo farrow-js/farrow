@@ -120,15 +120,20 @@ create a router
 type RouterPipeline = Pipeline<RequestInfo, MaybeAsyncResponse> & {
   // capture the response body if the specific type is matched, should returning response in callback function
   capture: <T extends keyof BodyMap>(type: T, callback: (body: BodyMap[T]) => MaybeAsyncResponse) => void
-  // add sub route
-  route: (name: string, ...middlewares: HttpMiddlewareInput[]) => void
+  // add sub route and return a route-pipeline which can handle the matched request info
+  route: (name: string) => Pipeline<RequestInfo, MaybeAsyncResponse>
   // serve static assets
   serve: (name: string, dirname: string) => void
   // match specific request via router-request-schema and return a schema-pipeline which can handle the matched request info
   match: <T extends RouterRequestSchema>(
     schema: T,
-    ...middlewares: MiddlewareInput<TypeOfRequestSchema<T>, MaybeAsyncResponse>[]
+    options?: MatchOptions,
   ) => Pipeline<TypeOfRequestSchema<T>, MaybeAsyncResponse>
+}
+
+type MatchOptions = {
+  // if true, it will throw error when there are no middlewares handle the request, or it will calling next()
+  block: boolean
 }
 
 const router = Router()

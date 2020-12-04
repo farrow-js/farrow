@@ -257,7 +257,7 @@ describe('Http', () => {
       })
     })
 
-    it('should responding 500 when there are no middlewares handling request', async () => {
+    it('should respond 500 when there are no middlewares handling request', async () => {
       let http = createHttp()
 
       http.match({
@@ -265,6 +265,21 @@ describe('Http', () => {
       })
 
       await request(http.server()).get('/test').expect(500)
+    })
+
+    it('should not respond 404 if matchOptions.bloack = false when there are no middlewares handling request', async () => {
+      let http = createHttp()
+
+      http.match(
+        {
+          pathname: '/test',
+        },
+        {
+          block: false,
+        },
+      )
+
+      await request(http.server()).get('/test').expect(404)
     })
 
     it('should responding 500 when middleware throwed error', async () => {
@@ -740,7 +755,7 @@ describe('Http', () => {
         })
 
       http.use(router)
-      http.route('/base', router)
+      http.route('/base').use(router)
 
       await request(server).get('/abc').expect(200, '/abc')
       await request(server).get('/base/abc').expect(200, '/abc')
@@ -752,8 +767,8 @@ describe('Http', () => {
       let router1 = Router()
       let server = http.server()
 
-      http.route('/router0', router0)
-      router0.route('/router1', router1)
+      http.route('/router0').use(router0)
+      router0.route('/router1').use(router1)
 
       http
         .match({

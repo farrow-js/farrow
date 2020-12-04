@@ -1,5 +1,6 @@
-import { createContext, Middleware, MiddlewareInput, createPipeline } from 'farrow-pipeline'
+import { createContext, Middleware, createPipeline, Pipeline, useContainer } from 'farrow-pipeline'
 import { MaybeAsyncResponse } from './response'
+import { RequestInfo } from './requestInfo'
 
 export const BasenamesContext = createContext([] as string[])
 
@@ -13,15 +14,11 @@ export const usePrefix = () => {
   return basenames.join('')
 }
 
-export const route = <T extends { pathname: string }>(
-  name: string,
-  ...inputs: MiddlewareInput<T, MaybeAsyncResponse>[]
-): Middleware<T, MaybeAsyncResponse> => {
-  let pipeline = createPipeline<T, MaybeAsyncResponse>()
+export const route = (name: string): Pipeline<RequestInfo, MaybeAsyncResponse> => {
+  let pipeline = createPipeline<RequestInfo, MaybeAsyncResponse>()
 
-  pipeline.use(...inputs)
-
-  return async (request, next) => {
+  let middleware: Middleware<RequestInfo, MaybeAsyncResponse> = async (request, next) => {
+    let container = useContainer()
     let basenames = BasenamesContext.use()
 
     if (!request.pathname.startsWith(name)) {
@@ -34,14 +31,22 @@ export const route = <T extends { pathname: string }>(
 
     basenames.value = [...currentBasenames, basename]
 
-    let response = await pipeline.middleware(requestInfo, (request) => {
-      basenames.value = currentBasenames
-      return next(request)
+    let response = await pipeline.run(requestInfo, {
+      container,
+      onLast: () => {
+        basenames.value = currentBasenames
+        return next(request)
+      },
     })
 
     basenames.value = currentBasenames
 
     return response
+  }
+
+  return {
+    ...pipeline,
+    middleware,
   }
 }
 

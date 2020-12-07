@@ -14,7 +14,7 @@
 ## Benefits
 
 - Expressive HTTP middleware like [Koa](https://github.com/koajs/koa) but no need to modify `req/res` or `ctx`
-- Strongly typed and type-safe from request to response via powerful schema validation
+- Strongly typed and type-safe from request to response via powerful schema-based validation
 - Provide React-Hooks-like mechanism which is useful for reusing code and integrating other parts of Server like database connection
 - Easy to learn and use if you were experienced in expressjs/koajs
 
@@ -133,18 +133,17 @@ http.use((request) => {
 // schema has the similar shape like request info: { pathname, method, query, body, headers, cookies, params }
 // the params is readed from path-to-regexp if you config schema.pathname to be /product/:id, and params is equal to { id }
 // learn more about pathname: https://github.com/pillarjs/path-to-regexp#usage
-http.match(
-  {
+http
+  .match({
     pathname: '/product',
     query: {
       productId: Number,
     },
-  },
-  (request) => {
+  })
+  .use((request) => {
     // productId is a number
     console.log('productId', request.query.productId)
-  },
-)
+  })
 ```
 
 ### How to pass new request info for downstream middleware
@@ -262,79 +261,75 @@ const product = Router()
 const user = Router()
 
 // add sub route for product
-http.route('/product', product)
+http.route('/product').use(product)
 
 // add sub route for user
-http.route('/user', user)
+http.route('/user').use(user)
 
 http.listen(3000)
 
 // handle product router
-product.match(
-  {
+product
+  .match({
     // this will match /product/:id
     pathname: '/:id',
     params: {
       id: Number,
     },
-  },
-  async (request) => {
+  })
+  .use(async (request) => {
     return Response.json({
       productId: request.params.id,
     })
-  },
-)
+  })
 
-product.match(
-  {
+product
+  .match({
     // this will match /product/info
     pathname: '/info',
     params: {
       id: Number,
     },
-  },
-  async (request) => {
+  })
+  .use(async (request) => {
     return Response.json({
       productInfo: {},
     })
-  },
-)
+  })
 
 // handle user router
-user.match(
-  {
+user
+  .match({
     // this will match /user/:id
     pathname: '/:id',
     params: {
       id: Number,
     },
-  },
-  async (request) => {
+  })
+  .use(async (request) => {
     return Response.json({
       userId: request.params.id,
     })
-  },
-)
+  })
 
-user.match(
-  {
+user
+  .match({
     // this will match /user/info
     pathname: '/info',
     params: {
       id: Number,
     },
-  },
-  async (request) => {
+  })
+  .use(async (request) => {
     return Response.json({
       userInfo: {},
     })
-  },
-)
+  })
 ```
 
 ### How to add view-engine
 
-`Farrow` provide an official server-side rendering library via `React`, but you can implement your own via `Response.html(...)` or `Response.stream(...)`.
+`Farrow` provide an official server-side rendering library based on `React`, but you can implement your own via `Response.html(...)` or `Response.stream(...)`.
 
 ```shell
 # via npm

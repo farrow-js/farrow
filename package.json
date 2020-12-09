@@ -16,7 +16,7 @@
     "format:source": "prettier --config ./package.json ./{examples,packages}/**/*.{ts,tsx,js} --write",
     "format:yml": "prettier --parser yaml --write ./*.{yml,yaml}",
     "test": "jest --config ./jest.config.js",
-    "test:coverage": "jest --config ./jest.config.js --collectCoverage",
+    "test:coverage": "jest --config ./jest.config.js --collectCoverage --coverage",
     "bootstrap": "lerna bootstrap --hoist"
   },
   "devDependencies": {

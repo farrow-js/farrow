@@ -1,0 +1,32 @@
+{
+  "name": "farrow-graphql",
+  "version": "1.0.0",
+  "description": "Code-first GraphQL",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "start": "ts-node src/schema/class"
+  },
+  "keywords": [
+    "Web Framework",
+    "TypeScript",
+    "Functional Programming"
+  ],
+  "author": "Jade Gu",
+  "license": "MIT",
+  "peerDependencies": {
+    "graphql": "^15.4.0",
+    "farrow-schema": "^1.0.0",
+    "reflect-metadata": "^0.1.13"
+  },
+  "devDependencies": {
+    "graphql": "^15.4.0",
+    "farrow-schema": "^1.0.0",
+    "reflect-metadata": "^0.1.13"
+  },
+  "dependencies": {
+    "tslib": "^2.0.3"
+  }
+}

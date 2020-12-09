@@ -131,31 +131,35 @@ type TypeOfObjectType<T extends ObjectType> = {
 
 export const kind = <T extends string>(name: T) => name
 
-export abstract class ObjectType extends Schema<unknown> {
-  [Kind] = kind('Object')
+const Scalar = Symbol('Scalar')
+
+type Scalar = typeof Scalar
+
+export abstract class ScalarType<T = unknown> extends Schema<T> {
+  [Scalar] = true
 }
 
-export class Number extends Schema<number> {
+export class Number extends ScalarType<number> {
   [Kind] = kind('Number')
 }
 
-export class String extends Schema<string> {
+export class String extends ScalarType<string> {
   [Kind] = kind('String')
 }
 
-export class Boolean extends Schema<boolean> {
+export class Boolean extends ScalarType<boolean> {
   [Kind] = kind('Boolean')
 }
 
-export class Int extends Schema<number> {
+export class Int extends ScalarType<number> {
   [Kind] = kind('Int')
 }
 
-export class Float extends Schema<number> {
+export class Float extends ScalarType<number> {
   [Kind] = kind('Float')
 }
 
-export class ID extends Schema<string> {
+export class ID extends ScalarType<string> {
   [Kind] = kind('ID')
 }
 
@@ -170,6 +174,10 @@ export const Struct = <T extends FieldDescriptors>(descriptors: T) => {
   return class Struct extends StructType<T> {
     descriptors = descriptors
   }
+}
+
+export abstract class ObjectType extends Schema<unknown> {
+  [Kind] = kind('Object')
 }
 
 type TypeOfList<T extends SchemaCtor> = Array<TypeOfSchemaCtor<T>>
@@ -297,18 +305,22 @@ export const NonStrict = <T extends SchemaCtorInput>(Item: T) => {
   }
 }
 
+
+// // define User Object, it supports recursive definition
 // class User extends ObjectType {
 //   id = ID
 //   name = String
-//   orders = List(Order)
+//   orders = List(Order) // order list type
 // }
 
+// // define Order Object
 // class Order extends ObjectType {
 //   id = ID
 //   product = Product
 //   user = User
 // }
 
+// // define Product Object
 // class Product extends ObjectType {
 //   id = ID
 //   title = String
@@ -316,9 +328,11 @@ export const NonStrict = <T extends SchemaCtorInput>(Item: T) => {
 //   price = Float
 // }
 
-// class Query extends ObjectType {
+// // define AppState Object
+// class AppState extends ObjectType {
 //   descriptors = {
 //     a: Boolean,
+//     // a light way to construct struct type
 //     b: Struct({
 //       c: {
 //         d: List(Nullable(String)),
@@ -352,12 +366,14 @@ export const NonStrict = <T extends SchemaCtorInput>(Item: T) => {
 
 //   getUser = User
 //   getOrder = Order
+//   // supports { [Type]: SchemaCtor }
 //   getProduct = {
 //     [Type]: Product,
+//     description: 'get product',
 //   }
 // }
 
-// type T0 = TypeOf<typeof Query>
+// type T0 = TypeOf<AppState>
 
 // type T1 = TypeOf<User>
 

@@ -4,7 +4,7 @@ module.exports = {
   },
   testRegex: '(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
-  coveragePathIgnorePatterns: ['/examples/', '/node_modules/', '/test/'],
+  coveragePathIgnorePatterns: ['/example/', '/node_modules/', '/__tests__/'],
   coverageThreshold: {
     global: {
       branches: 90,
@@ -13,11 +13,9 @@ module.exports = {
       statements: 95,
     },
   },
-  collectCoverageFrom: ['src/*.{js,ts}'],
+  collectCoverageFrom: ['packages/*/src/**/*.{js,ts,tsx}'],
   rootDir: __dirname,
   testEnvironment: 'jsdom',
-  moduleNameMapper: {
-    'farrow-([^/]+)(.*)$': '<rootDir>/packages/$1/src$2',
-  },
+  moduleNameMapper: {},
   testPathIgnorePatterns: ['/node_modules/', '/examples/'],
 }

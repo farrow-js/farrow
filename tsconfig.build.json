@@ -8,6 +8,7 @@
     { "path": "./packages/schema/tsconfig.json" },
     { "path": "./packages/http/tsconfig.json" },
     { "path": "./packages/react/tsconfig.json" },
+    { "path": "./packages/graphql/tsconfig.json" },
     { "path": "./packages/example/tsconfig.json" }
   ]
 }

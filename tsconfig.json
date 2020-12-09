@@ -23,6 +23,7 @@
     "baseUrl": "./packages",
     "paths": {
       "react": ["node_modules/@types/react"],
+      "graphql": ["node_modules/graphql"],
       "farrow-*": ["./*/src/index.ts"]
     }
   },

@@ -28,10 +28,6 @@ export type ValidatorRule<S extends Schema.Schema, Context extends ValidatorCont
   Context
 >
 
-export type ValidatorRules<Context extends ValidatorContext = ValidatorContext> = {
-  [key: string]: ValidatorRule<any, Context>
-}
-
 export const createValidator = <S extends Schema.SchemaCtor, Context extends ValidatorContext = ValidatorContext>(
   SchemaCtor: S,
   context: TransformContext<Context, Validator>,

@@ -19,7 +19,7 @@ import {
   TypeOfObject,
   UnionType,
   Type,
-  identity,
+  typename,
   Prettier,
 } from './graphql'
 
@@ -28,7 +28,7 @@ import { printSchema } from 'graphql'
 import { build } from './build'
 
 class Point2D extends InputObjectType {
-  name = identity('Point2D')
+  name = typename('Point2D')
 
   fields = {
     x: {
@@ -43,7 +43,7 @@ class Point2D extends InputObjectType {
 type T0 = Prettier<TypeOf<Point2D>>
 
 class City extends ObjectType {
-  name = identity('City')
+  name = typename('City')
 
   description = 'City'
 
@@ -80,7 +80,7 @@ class City extends ObjectType {
 }
 
 class Coordinates extends ObjectType {
-  name = identity('Coordinates')
+  name = typename('Coordinates')
 
   fields = {
     lon: {
@@ -94,7 +94,7 @@ class Coordinates extends ObjectType {
 }
 
 class Clouds extends ObjectType {
-  name = identity('Clouds')
+  name = typename('Clouds')
 
   description = 'Clouds'
 
@@ -114,7 +114,7 @@ class Clouds extends ObjectType {
 }
 
 class ConfigInput extends InputObjectType {
-  name = identity('ConfigInput')
+  name = typename('ConfigInput')
 
   fields = {
     units: {

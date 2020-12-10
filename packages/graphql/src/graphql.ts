@@ -22,8 +22,6 @@ export type Prettier<T> = T extends Promise<infer U>
     }
   : T
 
-export type Thunk<T> = T extends (...args: any) => any ? T : T | (() => T) | (() => Promise<T>)
-
 export type TypeOf<T> = T extends TypeCtor
   ? TypeOf<InstanceType<T>>
   : T extends ObjectType
@@ -41,15 +39,11 @@ export type TypeOf<T> = T extends TypeCtor
   : never
 
 export type TypeOfObject<T extends ObjectType> = T['interfaces'] extends any[]
-  ? { __typename?: T['name'] } & TypeOfFields<T['fields']> & TypeOfInterfaces<T['interfaces']>
-  : { __typename?: T['name'] } & TypeOfFields<T['fields']>
+  ? { __typename: T['name'] } & TypeOfFields<T['fields']> & TypeOfInterfaces<T['interfaces']>
+  : { __typename: T['name'] } & TypeOfFields<T['fields']>
 
 type TypeOfFields<T extends FieldConfigs> = {
-  [key in keyof T]?: T[key] extends FieldConfig
-    ? Thunk<TypeOfField<T[key]>>
-    : T[key] extends TypeCtor
-    ? TypeOf<T[key]>
-    : never
+  [key in keyof T]: T[key] extends FieldConfig ? TypeOfField<T[key]> : T[key] extends TypeCtor ? TypeOf<T[key]> : never
 }
 
 type TypeOfField<T extends FieldConfig> = T extends FunctionFieldConfig
@@ -105,7 +99,7 @@ export abstract class ScalarType<T = unknown> extends InternalScalarType<T> {
   parseLiteral?(astNode: ValueNode): any
 }
 
-export const identity = <T>(x: T): T => x
+export const typename = <T extends string>(x: T): T => x
 
 export class String extends InternalScalarType<string> {
   name = 'String' as const

@@ -20,7 +20,6 @@ import {
   ArgumentConfigMap,
   OutputType,
   InputType,
-  InputFieldConfigs,
   InputFieldConfig,
   InternalScalarType,
 } from './graphql'

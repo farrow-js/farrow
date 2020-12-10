@@ -3,17 +3,11 @@
   "version": "1.0.0",
   "description": "Type-Friendly middleware library",
   "main": "dist/index.js",
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "scripts": {
-    "start": "ts-node src/schema/class"
+    "start": ""
   },
-  "keywords": [
-    "Web Framework",
-    "TypeScript",
-    "Functional Programming"
-  ],
+  "keywords": ["Web Framework", "TypeScript", "Functional Programming"],
   "author": "Jade Gu",
   "license": "MIT",
   "dependencies": {

@@ -1,23 +1,13 @@
 {
   "name": "farrow-schema",
   "version": "1.0.0",
-  "description": "Type-Friendly schema builder",
+  "description": "A powerful and extensible schema builder",
   "main": "dist/index.js",
-  "files": [
-    "dist",
-    "validator.d.ts",
-    "validator.js",
-    "transformer.js",
-    "transformer.d.ts"
-  ],
+  "files": ["dist", "validator.d.ts", "validator.js", "transformer.js", "transformer.d.ts"],
   "scripts": {
     "start": ""
   },
-  "keywords": [
-    "Web Framework",
-    "TypeScript",
-    "Functional Programming"
-  ],
+  "keywords": ["Web Framework", "TypeScript", "Functional Programming"],
   "author": "Jade Gu",
   "license": "MIT",
   "dependencies": {

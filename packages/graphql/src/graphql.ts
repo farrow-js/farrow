@@ -1,108 +1,155 @@
+import type { ValueNode } from 'graphql'
+
 const Phantom = Symbol('phantom')
 
 type Phantom = typeof Phantom
 
 export abstract class Type<T = unknown> {
   [Phantom]: T | Phantom = Phantom
-  abstract __typename: string
-  __description: string = ''
-}
-
-export const typename = <T extends string>(name: T): T => {
-  return name
-}
-
-export const field = <T extends FieldConfig>(config: T): T => {
-  return config
+  abstract name: string
+  description?: string
 }
 
 export type TypeCtor = new () => Type
 
-export type TypeOf<T extends Type | TypeCtor> = T extends TypeCtor
+export type Prettier<T> = T extends Promise<infer U>
+  ? Promise<Prettier<U>>
+  : T extends (...args: infer Args) => infer Return
+  ? (...args: Prettier<Args>) => Prettier<Return>
+  : T extends object | any[]
+  ? {
+      [key in keyof T]: Prettier<T[key]>
+    }
+  : T
+
+export type Thunk<T> = T extends (...args: any) => any ? T : T | (() => T) | (() => Promise<T>)
+
+export type TypeOf<T> = T extends TypeCtor
   ? TypeOf<InstanceType<T>>
-  : T extends ObjectType ? TypeOfObject<T>
-  : T extends InputObjectType ? TypeOfInputObject<T>
-  : T extends EnumType ? TypeOfEnum<T>
-  : T extends InterfaceType ? TypeOfInterface<T>
+  : T extends ObjectType
+  ? TypeOfObject<T>
+  : T extends InputObjectType
+  ? TypeOfInputObject<T>
+  : T extends EnumType
+  ? TypeOfEnum<T>
+  : T extends UnionType
+  ? TypeOfUnion<T>
+  : T extends InterfaceType
+  ? TypeOfFields<T['fields']>
   : T extends Type<infer U>
   ? U
   : never
 
-type TypeOfObject<T extends ObjectType> = {
-  __typename: T['__typename']
-} & {
-  [key in keyof T as T[key] extends FieldConfig ? key : never]?: T[key] extends FieldConfig ? TypeOfField<T[key]> : never
-} & TypeOfInterfaces<T['__interfaces']>
+export type TypeOfObject<T extends ObjectType> = T['interfaces'] extends any[]
+  ? { __typename?: T['name'] } & TypeOfFields<T['fields']> & TypeOfInterfaces<T['interfaces']>
+  : { __typename?: T['name'] } & TypeOfFields<T['fields']>
 
-type TypeOfField<T extends FieldConfig> = 
-  T extends FunctionFieldConfig ? TypeOfFunctionField<T> : 
-  T extends ValueFieldConfig ? TypeOfValueField<T> :
-  never
+type TypeOfFields<T extends FieldConfigs> = {
+  [key in keyof T]?: T[key] extends FieldConfig
+    ? Thunk<TypeOfField<T[key]>>
+    : T[key] extends TypeCtor
+    ? TypeOf<T[key]>
+    : never
+}
+
+type TypeOfField<T extends FieldConfig> = T extends FunctionFieldConfig
+  ? TypeOfFunctionField<T>
+  : T extends ValueFieldConfig
+  ? TypeOfValueField<T>
+  : never
 
 type TypeOfValueField<T extends ValueFieldConfig> = TypeOf<T['type']>
 
-type TypeOfFunctionField<T extends FunctionFieldConfig> = (args: TypeOfArgumentConfigMap<T['args']>) => TypeOf<T['type']>
+type TypeOfFunctionField<T extends FunctionFieldConfig> = (
+  args: TypeOfArgumentConfigMap<T['args']>,
+) => TypeOf<T['type']>
 
 type TypeOfArgumentConfigMap<T extends ArgumentConfigMap> = {
   [key in keyof T]: TypeOf<T[key]['type']>
 }
 
-type TypeOfInterface<T extends InterfaceType> = {
-  __typename: T['__typename']
-} & {
-  [key in keyof T as T[key] extends FieldConfig ? key : never]?: T[key] extends FieldConfig ? TypeOfField<T[key]> : never
-}
+export type TypeOfInterface<T extends InterfaceType> = TypeOfFields<T['fields']>
 
 type UnionToIntersection<T> = (T extends any ? (x: T) => any : never) extends (x: infer R) => any ? R : never
 
-type TypeOfInterfaces<T extends (new () => InterfaceType)[]> = UnionToIntersection<TypeOfInterface<InstanceType<T[number]>>>
+export type TypeOfInterfaces<T extends (new () => InterfaceType)[]> = UnionToIntersection<
+  TypeOfInterface<InstanceType<T[number]>>
+>
 
-type TypeOfInputObject<T extends InputObjectType> = {
-  __typename: T['__typename']
-} & {
-  [key in keyof T as T[key] extends InputFieldConfig ? key : never]?: T[key] extends InputFieldConfig ? TypeOf<T[key]['type']> : never
+type TypeOfInputObject<T extends InputObjectType> = TypeOfInputFields<T['fields']>
+
+type TypeOfInputFields<T extends InputFieldConfigs> = {
+  [key in keyof T]: T[key] extends InputFieldConfig
+    ? TypeOf<T[key]['type']>
+    : T[key] extends TypeCtor
+    ? TypeOf<T[key]>
+    : never
 }
 
-type TypeOfEnum<T extends EnumType> = TypeOfEnumValue<Extract<T[Extract<keyof T, string>], EnumValueConfig>>
+type TypeOfEnum<T extends EnumType> = TypeOfEnumValue<T['values'][keyof T['values']]>
 
 type TypeOfEnumValue<T extends EnumValueConfig> = T['value']
 
-export abstract class ScalarType<T = unknown> extends Type<T> {
+type TypeOfUnion<T extends UnionType> = TypeOf<T['types'][number]>
+
+export abstract class InternalScalarType<T = unknown> extends Type<T> {
   __scalar = true
 }
 
-export class String extends ScalarType<string> {
-  __typename = 'String' as const
+export abstract class ScalarType<T = unknown> extends InternalScalarType<T> {
+  // Serializes an internal value to include in a response.
+  serialize?(input: any): any
+  // Parses an externally provided value to use as an input.
+  parseValue?(input: any): any
+  // Parses an externally provided literal value to use as an input.
+  parseLiteral?(astNode: ValueNode): any
 }
 
-export class Boolean extends ScalarType<boolean> {
-  __typename = 'Boolean' as const
+export const identity = <T>(x: T): T => x
+
+export class String extends InternalScalarType<string> {
+  name = 'String' as const
 }
 
-export class Int extends ScalarType<number> {
-  __typename = 'Int' as const
+export class Boolean extends InternalScalarType<boolean> {
+  name = 'Boolean' as const
 }
 
-export class Float extends ScalarType<number> {
-  __typename = 'Float' as const
+export class Int extends InternalScalarType<number> {
+  name = 'Int' as const
 }
 
-export class ID extends ScalarType<string> {
-  __typename = 'ID' as const
+export class Float extends InternalScalarType<number> {
+  name = 'Float' as const
+}
+
+export class ID extends InternalScalarType<string> {
+  name = 'ID' as const
+}
+
+export abstract class InterfaceType extends Type {
+  __interface = true
+
+  abstract fields: FieldConfigs
 }
 
 export abstract class ObjectType extends Type {
   __object = true
-  __interfaces: (new () => InterfaceType)[] = []
+
+  interfaces?: (new () => InterfaceType)[]
+
+  abstract fields: FieldConfigs
 }
 
 export abstract class InputObjectType extends Type {
   __inputObject = true
+
+  abstract fields: InputFieldConfigs
 }
 
 export abstract class ListType<T extends TypeCtor = TypeCtor> extends Type<TypeOf<T>[]> {
   __list = true
-  __typename = '[]'
+  name = `[]`
   abstract Type: T
 }
 
@@ -114,7 +161,7 @@ export const List = <T extends TypeCtor>(Type: T) => {
 
 export abstract class NullableType<T extends TypeCtor = TypeCtor> extends Type<TypeOf<T> | null | undefined> {
   __nullable = true
-  __typename = '?'
+  name = '?'
   abstract Type: T
 }
 
@@ -130,27 +177,27 @@ export type EnumValueConfig<T extends string | number | boolean = any> = {
   deprecated?: string
 }
 
+export type EnumValueConfigs = {
+  [key: string]: EnumValueConfig
+}
+
 export abstract class EnumType extends Type {
   __enum = true
+
+  abstract values: EnumValueConfigs
 }
 
-
-type TypeOfUnionItem<T extends TypeCtor> = T extends TypeCtor ? TypeOf<T> : never
-
-export abstract class UnionType<T extends TypeCtor[] = TypeCtor[]> extends Type<TypeOfUnionItem<T[number]>> {
+export abstract class UnionType extends Type {
   __union = true
-  abstract Types: T
+  abstract types: (new () => ObjectType)[]
+  resolveTypes?(value: any): new () => ObjectType
 }
 
-export abstract class InterfaceType extends Type {
-  __interface = true
-}
-
-export type InputPrimitiveType = ScalarType | EnumType | InputObjectType | ListType
+export type InputPrimitiveType = InternalScalarType | EnumType | InputObjectType | ListType
 
 export type InputType = InputPrimitiveType | NullableType<new () => InputPrimitiveType>
 
-export type OutputPrimitiveType = ScalarType | ObjectType | InterfaceType | UnionType | EnumType | ListType
+export type OutputPrimitiveType = InternalScalarType | ObjectType | InterfaceType | UnionType | EnumType | ListType
 
 export type OutputType = OutputPrimitiveType | NullableType<new () => OutputPrimitiveType>
 
@@ -165,8 +212,9 @@ export type ValueFieldConfig = {
   deprecated?: string
 }
 
-export type ArgumentConfig = Describable & {
-  type: new () => InputType
+export type ArgumentConfig<T extends InputType = InputType> = Describable & {
+  type: new () => T
+  defaultValue?: TypeOf<T>
 }
 
 export type ArgumentConfigMap = {
@@ -179,7 +227,15 @@ export type FunctionFieldConfig = ValueFieldConfig & {
 
 export type FieldConfig = ValueFieldConfig | FunctionFieldConfig
 
-export type InputFieldConfig<T extends InputType = InputType> = Describable & {
-  type: new () => T,
+export type FieldConfigs = {
+  [key: string]: (new () => OutputType) | FieldConfig
+}
+
+export type InputFieldConfig<T extends InputType = any> = Describable & {
+  type: T
   defaultValue?: TypeOf<T>
+}
+
+export type InputFieldConfigs = {
+  [key: string]: (new () => InputType) | InputFieldConfig
 }

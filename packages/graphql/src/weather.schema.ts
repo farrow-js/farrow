@@ -1,10 +1,10 @@
+import fs from 'fs'
+import path from 'path'
 import {
   InputObjectType,
   Float,
   TypeOf,
   ObjectType,
-  field,
-  typename,
   ID,
   Int,
   String,
@@ -14,262 +14,293 @@ import {
   EnumType,
   InterfaceType,
   EnumValueConfig,
+  TypeOfInterface,
+  TypeOfInterfaces,
+  TypeOfObject,
+  UnionType,
+  Type,
+  identity,
+  Prettier,
 } from './graphql'
 
+import { printSchema } from 'graphql'
+
+import { build } from './build'
+
 class Point2D extends InputObjectType {
-  __typename = typename('Point2D')
+  name = identity('Point2D')
 
-  @format('abc')
-  x = field({
-    type: Float,
-  })
-
-  y = field({
-    type: Float,
-  })
+  fields = {
+    x: {
+      type: Float,
+    },
+    y: {
+      type: Float,
+    },
+  }
 }
 
-type T0 = TypeOf<Point2D>
-
-type T1 = typeof City['typename']
+type T0 = Prettier<TypeOf<Point2D>>
 
 class City extends ObjectType {
-  static typename = 'City'
+  name = identity('City')
 
-  static description = 'City'
+  description = 'City'
 
-  __typename = typename('City')
+  fields = {
+    id: {
+      type: ID,
+      description: 'City ID',
+    },
 
-  id = field({
-    type: ID,
-    description: 'City ID',
-  })
+    name: {
+      type: String,
+      description: 'City name',
+    },
 
-  name = field({
-    type: String,
-    description: 'City name',
-  })
+    country: {
+      type: String,
+      description: 'Country of City',
+    },
 
-  country = field({
-    type: String,
-    description: 'Country of City',
-  })
+    coord: {
+      type: Coordinates,
+      description: 'Coordinates of City',
+    },
 
-  coord = field({
-    type: Coordinates,
-    description: 'Coordinates of City',
-  })
+    weather: {
+      type: Weather,
+      description: 'Weather of City',
+    },
 
-  weather = field({
-    type: Weather,
-    description: 'Weather of City',
-  })
-
-  upload = field({
-    type: Upload,
-  })
+    upload: {
+      type: Upload,
+    },
+  }
 }
 
 class Coordinates extends ObjectType {
-  __typename = typename('Coordinates')
+  name = identity('Coordinates')
 
-  lon = field({
-    type: Float,
-  })
+  fields = {
+    lon: {
+      type: Float,
+    },
 
-  lat = field({
-    type: Float,
-  })
+    lat: {
+      type: Float,
+    },
+  }
 }
 
 class Clouds extends ObjectType {
-  __typename = typename('Clouds')
+  name = identity('Clouds')
 
-  all = field({
-    type: Int,
-  })
+  description = 'Clouds'
 
-  visibility = field({
-    type: Int,
-  })
+  fields = {
+    all: {
+      type: Int,
+    },
 
-  humidity = field({
-    type: Int,
-  })
+    visibility: {
+      type: Int,
+    },
+
+    humidity: {
+      type: Int,
+    },
+  }
 }
 
 class ConfigInput extends InputObjectType {
-  __typename = typename('ConfigInput')
+  name = identity('ConfigInput')
 
-  units = field({
-    type: Unit,
-  })
+  fields = {
+    units: {
+      type: Unit,
+    },
 
-  lang = field({
-    type: Language,
-  })
+    lang: {
+      type: Language,
+    },
+  }
 }
 
 class Language extends EnumType {
-  __typename = typename('Language')
+  name = 'Language' as const
 
-  af = {
-    value: 0 as const,
-  }
+  values = {
+    af: {
+      value: 0 as const,
+    },
 
-  al = {
-    value: 1 as const,
+    al: {
+      value: 1 as const,
+    },
   }
 }
 
 class Query extends ObjectType {
-  __typename = typename('Query')
+  name = 'Query' as const
 
-  getCityByName = field({
-    args: {
-      name: {
-        type: String,
+  fields = {
+    getCityByName: {
+      args: {
+        name: {
+          type: String,
+        },
+        country: {
+          type: Nullable(String),
+        },
+        config: {
+          type: Nullable(ConfigInput),
+        },
       },
-      country: {
-        type: Nullable(String),
-      },
-      config: {
-        type: Nullable(ConfigInput),
-      },
+      type: City,
     },
-    type: City,
-  })
 
-  getCityById = field({
-    args: {
-      id: {
-        type: Nullable(List(String)),
+    getCityById: {
+      args: {
+        id: {
+          type: Nullable(List(String)),
+        },
+        config: {
+          type: Nullable(ConfigInput),
+        },
       },
-      config: {
-        type: Nullable(ConfigInput),
-      },
+      type: List(City),
     },
-    type: List(City),
-  })
+
+    cityOrWeather: {
+      type: CityOrWeather,
+    },
+  }
 }
 
+class CityOrWeather extends UnionType {
+  name = 'CityOrWeather'
+
+  types = [City, Weather]
+}
+
+type T7 = TypeOf<CityOrWeather>
+
 class Summary extends ObjectType {
-  __typename = typename('Summary')
+  name = 'Summary' as const
 
-  title = field({
-    type: String,
-  })
+  fields = {
+    title: {
+      type: String,
+    },
 
-  description = field({
-    type: String,
-  })
+    description: {
+      type: String,
+    },
 
-  icon = field({
-    type: String,
-  })
+    icon: {
+      type: String,
+    },
+  }
 }
 
 class Temperature extends ObjectType {
-  __typename = typename('Temperature')
+  name = 'Temperature' as const
+  fields = {
+    actual: {
+      type: Float,
+    },
 
-  actual = field({
-    type: Float,
-  })
+    feelsLike: {
+      type: Float,
+    },
 
-  feelsLike = field({
-    type: Float,
-  })
+    min: {
+      type: Float,
+    },
 
-  min = field({
-    type: Float,
-  })
-
-  max = field({
-    type: Float,
-  })
+    max: {
+      type: Float,
+    },
+  }
 }
 
 class Unit extends EnumType {
-  __typename = typename('Unit')
+  name = 'Unit' as const
 
-  metric = {
-    value: 0 as const,
-  }
+  values = {
+    metric: {
+      value: 0 as const,
+    },
 
-  imperial = {
-    value: 1 as const,
-  }
-
-  kelvin = {
-    value: 2 as const,
+    imperial: {
+      value: 1 as const,
+    },
+    kelvin: {
+      value: 2 as const,
+    },
   }
 }
 
 class Upload extends ScalarType<'Upload'> {
-  __typename = typename('Upload')
+  name = 'Upload' as const
 }
 
 class Weather extends ObjectType {
-  __typename = typename('Weather')
+  name = 'Weather' as const
+  fields = {
+    summary: {
+      type: Summary,
+    },
 
-  summary = field({
-    type: Summary,
-  })
+    temperature: {
+      type: Temperature,
+    },
 
-  temperature = field({
-    type: Temperature,
-  })
+    wind: {
+      type: Wind,
+    },
 
-  wind = field({
-    type: Wind,
-  })
+    clouds: {
+      type: Clouds,
+    },
 
-  clouds = field({
-    type: Clouds,
-  })
-
-  timestamp = field({
-    type: Int,
-  })
+    timestamp: {
+      type: Int,
+    },
+  }
 }
 
 class Wind extends ObjectType {
-  __typename = typename('Wind')
+  name = 'Wind' as const
 
-  __interfaces = [Test, Error]
+  interfaces = [Test, Error]
 
-  speed = field({
-    type: Float,
-  })
-
-  deg = field({
-    type: Int,
-  })
+  fields = {
+    speed: Float,
+    deg: Int,
+  }
 }
 
 class Test extends InterfaceType {
-  __typename = 'Test'
+  name = 'Test' as const
 
-  a = field({
-    type: Int,
-  })
+  fields = {
+    a: {
+      type: Int,
+    },
+  }
 }
 
 class Error extends InterfaceType {
-  __typename = 'Error'
+  name = 'Error' as const
 
-  message = field({
-    type: Nullable(String),
-  })
+  fields = {
+    message: {
+      type: Nullable(String),
+    },
+  }
 }
-
-export type Prettier<T> = T extends (...args: infer Args) => infer Return
-  ? (...args: Prettier<Args>) => Prettier<Return>
-  : T extends object | any[]
-  ? {
-      [key in keyof T]: Prettier<T[key]>
-    }
-  : T
 
 type T2 = TypeOf<Query>
 
@@ -280,3 +311,16 @@ type T4 = Prettier<TypeOf<Wind>>
 type T5 = TypeOf<Language>
 
 type T6 = TypeOf<Unit>
+
+type T8 = Prettier<TypeOf<City>>
+
+const Schema = build({
+  Query: Query,
+})
+
+const test = async () => {
+  let filename = path.join(__dirname, 'weather.generate.graphql')
+  await fs.promises.writeFile(filename, printSchema(Schema))
+}
+
+test()

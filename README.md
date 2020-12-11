@@ -9,7 +9,7 @@
 
 **Farrow** is a functional-style web framework for node.js written by TypeScript
 
-[API Documentation](./docs/index.md)
+[API Documentation](./docs/index.md) | [Example](./packages/example)
 
 ## Benefits
 

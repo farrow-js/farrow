@@ -1,8 +1,9 @@
 {
   "name": "farrow-graphql",
   "version": "1.0.0",
-  "description": "Code-first GraphQL",
+  "description": "Code-first GraphQL(WIP)",
   "main": "dist/index.js",
+  "private": true,
   "files": ["dist"],
   "scripts": {
     "start": "ts-node src/weather.schema"

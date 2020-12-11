@@ -12,13 +12,13 @@
   "author": "Jade Gu",
   "license": "MIT",
   "peerDependencies": {
-    "graphql": "^15.4.0",
     "farrow-schema": "^1.0.0",
+    "graphql": "^15.4.0",
     "reflect-metadata": "^0.1.13"
   },
   "devDependencies": {
-    "graphql": "^15.4.0",
     "farrow-schema": "^1.0.0",
+    "graphql": "^15.4.0",
     "reflect-metadata": "^0.1.13"
   },
   "dependencies": {

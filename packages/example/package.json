@@ -6,17 +6,13 @@
   "scripts": {
     "start": "ts-node src"
   },
-  "keywords": [
-    "Web Framework",
-    "TypeScript",
-    "Functional Programming"
-  ],
+  "keywords": ["Web Framework", "TypeScript", "Functional Programming"],
   "author": "Jade Gu",
   "license": "MIT",
   "dependencies": {
-    "tslib": "^2.0.3",
     "farrow-http": "^1.0.0",
+    "farrow-react": "^1.0.0",
     "farrow-schema": "^1.0.0",
-    "farrow-react": "^1.0.0"
+    "tslib": "^2.0.3"
   }
 }

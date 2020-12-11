@@ -3,20 +3,8 @@
   "version": "1.0.0",
   "description": "React bindings for farrow-http",
   "main": "dist/index.js",
-  "files": [
-    "dist",
-    "Context.d.ts",
-    "Context.js",
-    "hooks.d.ts",
-    "hooks.js",
-    "Link.d.ts",
-    "Link.js"
-  ],
-  "keywords": [
-    "Web Framework",
-    "TypeScript",
-    "Functional Programming"
-  ],
+  "files": ["dist", "Context.d.ts", "Context.js", "hooks.d.ts", "hooks.js", "Link.d.ts", "Link.js"],
+  "keywords": ["Web Framework", "TypeScript", "Functional Programming"],
   "author": "Jade Gu",
   "license": "MIT",
   "peerDependencies": {
@@ -33,7 +21,7 @@
     "react-dom": "^16.14.0"
   },
   "dependencies": {
-    "tslib": "^2.0.3",
-    "multistream": "^4.0.0"
+    "multistream": "^4.0.0",
+    "tslib": "^2.0.3"
   }
 }

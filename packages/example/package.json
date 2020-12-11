@@ -10,9 +10,12 @@
   "author": "Jade Gu",
   "license": "MIT",
   "dependencies": {
+    "farrow-pipeline": "^1.0.0",
     "farrow-http": "^1.0.0",
     "farrow-react": "^1.0.0",
     "farrow-schema": "^1.0.0",
+    "react": "^16.14.0",
+    "react-dom": "^16.14.0",
     "tslib": "^2.0.3"
   }
 }

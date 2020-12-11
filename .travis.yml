@@ -2,6 +2,6 @@ language: node_js
 node_js:
   - '10.14.0'
 install:
-  - npm install --global lerna && npm run bootstrap
+  - npm install --global lerna && npm install && npm run bootstrap
 script:
-  - npm run test
+  - npm run build && npm run test

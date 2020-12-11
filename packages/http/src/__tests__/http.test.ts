@@ -1,12 +1,23 @@
 import request from 'supertest'
 
 import fs from 'fs'
+import path from 'path'
 import { Stream } from 'stream'
 
-import { Http, HttpPipelineOptions, Router, Response, useRequestInfo, useReq, useRes, usePrefix } from '../'
-import path from 'path'
 import { Nullable } from 'farrow-schema'
 import { createContext } from 'farrow-pipeline'
+
+import {
+  Http,
+  HttpPipelineOptions,
+  Router,
+  Response,
+  useRequestInfo,
+  useReq,
+  useRes,
+  usePrefix,
+  useBasenames,
+} from '../'
 
 const delay = (time: number) => {
   return new Promise((resolve) => {
@@ -765,10 +776,23 @@ describe('Http', () => {
       let http = createHttp()
       let router0 = Router()
       let router1 = Router()
+      let router2 = Router()
       let server = http.server()
+
+      http.use(async (request, next) => {
+        let basenames = useBasenames()
+        let before = basenames.value
+        let response = await next(request)
+        let after = basenames.value
+
+        // should reset basenames after next(...)
+        expect(before).toEqual(after)
+        return response
+      })
 
       http.route('/router0').use(router0)
       router0.route('/router1').use(router1)
+      http.route('/router2').use(router2)
 
       http
         .match({
@@ -809,6 +833,15 @@ describe('Http', () => {
           })
         })
 
+      router2.use((request) => {
+        let prefix = usePrefix()
+        return Response.json({
+          from: 'router2',
+          prefix,
+          pathname: request.pathname,
+        })
+      })
+
       await request(server).get('/abc').expect(200, {
         from: 'http',
         prefix: '',
@@ -825,6 +858,12 @@ describe('Http', () => {
         from: 'router1',
         prefix: '/router0/router1',
         pathname: '/abc',
+      })
+
+      await request(server).get('/router2').expect(200, {
+        from: 'router2',
+        prefix: '/router2',
+        pathname: '/',
       })
     })
   })

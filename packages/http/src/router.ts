@@ -22,7 +22,7 @@ export type RouterSchemaDescriptor =
 
 export type RouterRequestSchema = {
   pathname: Pathname
-  method?: string
+  method?: string | string[]
   params?: RouterSchemaDescriptor
   query?: RouterSchemaDescriptor
   body?: Schema.FieldDescriptor | Schema.FieldDescriptors
@@ -49,7 +49,7 @@ const createRequestValidator = <T extends RouterRequestSchema>(options: T): Vali
     pathname: Schema.String,
   }
 
-  if (typeof options.method === 'string') {
+  if (options.method) {
     descriptors.method = Schema.String
   }
 
@@ -130,13 +130,13 @@ export const createRouterPipeline = (): RouterPipeline => {
 
     let matcher = createMatch(schema.pathname)
 
+    let methods = getMethods(schema.method)
+
     pipeline.use((input, next) => {
       let container = useContainer()
 
-      if (typeof schema.method === 'string') {
-        if (schema.method.toLowerCase() !== input.method?.toLowerCase()) {
-          return next()
-        }
+      if (input.method && !methods.includes(input.method.toLowerCase())) {
+        return next()
       }
 
       let matches = matcher(input.pathname)
@@ -187,3 +187,15 @@ export const createRouterPipeline = (): RouterPipeline => {
 }
 
 export const Router = createRouterPipeline
+
+const getMethods = (method: RouterRequestSchema['method']) => {
+  let methods = ['get']
+
+  if (Array.isArray(method)) {
+    methods = method.map((str) => str.toLowerCase())
+  } else if (typeof method === 'string') {
+    methods = [method.toLowerCase()]
+  }
+
+  return methods
+}

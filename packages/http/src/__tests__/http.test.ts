@@ -640,6 +640,45 @@ describe('Http', () => {
       await request(server).get('/').expect(200, '10')
       await request(server).get('/any').expect(200, '10')
     })
+
+    it('should only handle GET method by default', async () => {
+      let http = createHttp()
+      let server = http.server()
+
+      http
+        .match({
+          pathname: '/test',
+        })
+        .use(() => {
+          return Response.text('test')
+        })
+
+      await request(server).get('/test').expect(200, 'test')
+      await request(server).options('/test').expect(404)
+      await request(server).post('/test').expect(404)
+      await request(server).delete('/test').expect(404)
+      await request(server).put('/test').expect(404)
+    })
+
+    it('support match multiple methods', async () => {
+      let http = createHttp()
+      let server = http.server()
+
+      http
+        .match({
+          pathname: '/test',
+          method: ['get', 'options', 'post', 'delete', 'put'],
+        })
+        .use(() => {
+          return Response.text('test')
+        })
+
+      await request(server).get('/test').expect(200, 'test')
+      await request(server).options('/test').expect(200, 'test')
+      await request(server).post('/test').expect(200, 'test')
+      await request(server).delete('/test').expect(200, 'test')
+      await request(server).put('/test').expect(200, 'test')
+    })
   })
 
   describe('Request', () => {

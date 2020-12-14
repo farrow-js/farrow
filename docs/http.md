@@ -131,6 +131,23 @@ type RouterPipeline = Pipeline<RequestInfo, MaybeAsyncResponse> & {
   ) => Pipeline<TypeOfRequestSchema<T>, MaybeAsyncResponse>
 }
 
+type RouterRequestSchema = {
+  // match pathname of req via https://github.com/pillarjs/path-to-regexp
+  pathname: Pathname
+  // match method of req.method, default is GET, supports multiple methods as array
+  method?: string | string[]
+  // match the params parsed by path-to-regexp
+  params?: RouterSchemaDescriptor
+  // match the req query
+  query?: RouterSchemaDescriptor
+  // match the req body
+  body?: Schema.FieldDescriptor | Schema.FieldDescriptors
+  // match the req headers
+  headers?: RouterSchemaDescriptor
+  // match the rqe cookies
+  cookies?: RouterSchemaDescriptor
+}
+
 type MatchOptions = {
   // if true, it will throw error when there are no middlewares handle the request, or it will calling next()
   block: boolean

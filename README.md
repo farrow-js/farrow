@@ -128,7 +128,7 @@ http.use((request) => {
 ### How to match specific request
 
 ```typescript
-// http.match(schema, ...middlewares)
+// http.match(schema).use(...middlewares)
 // farrow will validate request info and extract the data for middlewares
 // schema has the similar shape like request info: { pathname, method, query, body, headers, cookies, params }
 // the params is readed from path-to-regexp if you config schema.pathname to be /product/:id, and params is equal to { id }

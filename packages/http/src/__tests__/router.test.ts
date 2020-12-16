@@ -1,6 +1,7 @@
 import { createRouterPipeline as Router } from '../router'
 import { Response } from '../response'
-import { Nullable, Schema, Struct, Strict } from 'farrow-schema'
+import { Nullable, Schema, Struct, Strict, Union, Literal } from 'farrow-schema'
+import { Stream } from 'stream'
 
 describe('Router', () => {
   it('should validating pathname & method', async () => {
@@ -290,5 +291,115 @@ describe('Router', () => {
         pathname: '/test/efg',
       },
     })
+  })
+
+  it('support detect response body and content-type', async () => {
+    let router = Router()
+
+    let contentTypes = [] as string[]
+
+    let bodyTypes = [] as string[]
+
+    router.use(async (request, next) => {
+      let response = await next(request)
+
+      if (response.is('json')) {
+        contentTypes.push('json')
+      }
+
+      if (response.is('text')) {
+        contentTypes.push('text')
+      }
+
+      if (response.is('html')) {
+        contentTypes.push('html')
+      }
+
+      if (response.info.body?.type) {
+        bodyTypes.push(response.info.body?.type)
+      }
+
+      return response
+    })
+
+    router
+      .match({
+        pathname: '/:type',
+        params: {
+          type: Union(
+            Literal('json'),
+            Literal('text'),
+            Literal('html'),
+            Literal('string'),
+            Literal('buffer'),
+            Literal('stream'),
+          ),
+        },
+      })
+      .use((request) => {
+        if (request.params.type === 'string') {
+          return Response.string('test')
+        }
+
+        if (request.params.type === 'text') {
+          return Response.text('test')
+        }
+
+        if (request.params.type === 'buffer') {
+          return Response.buffer(Buffer.from('test'))
+        }
+
+        if (request.params.type === 'html') {
+          return Response.html('test')
+        }
+
+        if (request.params.type === 'json') {
+          return Response.json('test')
+        }
+
+        if (request.params.type === 'stream') {
+          return Response.stream(
+            new Stream.Readable({
+              read() {
+                this.push('test')
+                this.push(null)
+              },
+            }),
+          )
+        }
+
+        return Response.json(request)
+      })
+
+    await router.run({
+      pathname: '/json',
+    })
+
+    await router.run({
+      pathname: '/json',
+    })
+
+    await router.run({
+      pathname: '/text',
+    })
+
+    await router.run({
+      pathname: '/buffer',
+    })
+
+    await router.run({
+      pathname: '/html',
+    })
+
+    await router.run({
+      pathname: '/stream',
+    })
+
+    await router.run({
+      pathname: '/string',
+    })
+
+    expect(contentTypes).toEqual(['json', 'json', 'text', 'html'])
+    expect(bodyTypes).toEqual(['json', 'json', 'string', 'buffer', 'string', 'stream', 'string'])
   })
 })

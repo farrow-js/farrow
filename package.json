@@ -19,7 +19,7 @@
     "test:coverage": "jest --config ./jest.config.js --collectCoverage --coverage",
     "bootstrap": "lerna bootstrap --hoist",
     "release": "lerna publish",
-    "prerelease": "npm run build"
+    "prerelease": "npm run build && npm run test"
   },
   "devDependencies": {
     "@types/jest": "^26.0.14",

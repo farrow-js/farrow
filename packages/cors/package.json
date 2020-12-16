@@ -1,6 +1,6 @@
 {
   "name": "farrow-cors",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "Cross-Origin Resource Sharing(CORS) for farrow-http",
   "main": "dist/index.js",
   "private": true,
@@ -13,7 +13,7 @@
   },
   "devDependencies": {
     "@types/cors": "^2.8.9",
-    "farrow-http": "^1.0.1"
+    "farrow-http": "^1.1.0"
   },
   "dependencies": {
     "cors": "^2.8.5",

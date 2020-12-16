@@ -1,6 +1,6 @@
 {
   "name": "farrow-http",
-  "version": "1.0.1",
+  "version": "1.1.0",
   "description": "A Type-Friendly Web Framework",
   "main": "dist/index.js",
   "files": ["dist"],
@@ -29,7 +29,7 @@
     "@types/type-is": "^1.6.3",
     "@types/vary": "^1.1.0",
     "farrow-pipeline": "^1.0.1",
-    "farrow-schema": "^1.0.1",
+    "farrow-schema": "^1.1.0",
     "supertest": "^6.0.1"
   },
   "dependencies": {

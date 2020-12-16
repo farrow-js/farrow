@@ -17,7 +17,9 @@
     "format:yml": "prettier --parser yaml --write ./*.{yml,yaml}",
     "test": "jest --config ./jest.config.js",
     "test:coverage": "jest --config ./jest.config.js --collectCoverage --coverage",
-    "bootstrap": "lerna bootstrap --hoist"
+    "bootstrap": "lerna bootstrap --hoist",
+    "release": "lerna publish",
+    "prereliease": "npm run build"
   },
   "devDependencies": {
     "@types/jest": "^26.0.14",
@@ -36,18 +38,10 @@
     "typescript": "^4.1.2"
   },
   "lint-staged": {
-    "*.@(js|ts|tsx)": [
-      "prettier --write"
-    ],
-    "*.@(yml|yaml)": [
-      "prettier --parser yaml --write"
-    ],
-    "*.md": [
-      "prettier --parser markdown --write"
-    ],
-    "*.json": [
-      "prettier --parser json --write"
-    ]
+    "*.@(js|ts|tsx)": ["prettier --write"],
+    "*.@(yml|yaml)": ["prettier --parser yaml --write"],
+    "*.md": ["prettier --parser markdown --write"],
+    "*.json": ["prettier --parser json --write"]
   },
   "prettier": {
     "printWidth": 120,

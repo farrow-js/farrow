@@ -305,7 +305,6 @@ export const NonStrict = <T extends SchemaCtorInput>(Item: T) => {
   }
 }
 
-
 // // define User Object, it supports recursive definition
 // class User extends ObjectType {
 //   id = ID

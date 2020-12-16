@@ -311,9 +311,7 @@ export const handleResponse = async (params: ResponseParams) => {
   let handleEmpty = () => {
     let code = responseInfo.status?.code ?? 204
 
-    code = statuses.empty[code] ? code : 204
-
-    let body = code + ''
+    let body = statuses.message[code] ?? ''
 
     handleStatus({ code })
 

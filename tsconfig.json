@@ -10,6 +10,7 @@
     "module": "CommonJS",
     "moduleResolution": "node",
     "newLine": "LF",
+    "allowJs": true,
     "strict": true,
     "skipLibCheck": true,
     "suppressImplicitAnyIndexErrors": true,
@@ -24,6 +25,7 @@
     "paths": {
       "react": ["node_modules/@types/react"],
       "graphql": ["node_modules/graphql"],
+      "cors": ["node_modules/@types/cors"],
       "farrow-*": ["./*/src/index.ts"]
     }
   },

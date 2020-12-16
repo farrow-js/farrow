@@ -1,8 +1,8 @@
 module.exports = {
   transform: {
-    '.(ts|tsx|js|jsx)': 'ts-jest',
+    '.(ts|tsx)': 'ts-jest',
   },
-  testRegex: '(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js)$',
+  testRegex: '(/__tests__/.*|\\.(test|spec))\\.(ts|tsx|js|jsx)$',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],
   coveragePathIgnorePatterns: ['/example/', '/node_modules/', '/__tests__/'],
   coverageThreshold: {
@@ -13,7 +13,7 @@ module.exports = {
       statements: 95,
     },
   },
-  collectCoverageFrom: ['packages/*/src/**/*.{js,ts,tsx}'],
+  collectCoverageFrom: ['packages/*/src/**/*.{ts,tsx}'],
   rootDir: __dirname,
   testEnvironment: 'jsdom',
   moduleNameMapper: {},

@@ -82,6 +82,24 @@ const NonStrictValidatorRule: ValidatorRule<Schema.NonStrictType> = {
   },
 }
 
+const ReadOnlyValidatorRule: ValidatorRule<Schema.ReadOnlyType> = {
+  test: (schema) => {
+    return schema instanceof Schema.ReadOnlyType
+  },
+  transform: (schema, context) => {
+    return createValidator(schema.Item, context) as Validator<Readonly<unknown>>
+  },
+}
+
+const ReadOnlyDeepValidatorRule: ValidatorRule<Schema.ReadOnlyDeepType> = {
+  test: (schema) => {
+    return schema instanceof Schema.ReadOnlyDeepType
+  },
+  transform: (schema, context) => {
+    return createValidator(schema.Item, context) as Validator<Readonly<unknown>>
+  },
+}
+
 const StringValidatorRule: ValidatorRule<Schema.String> = {
   test: (schema) => {
     return schema instanceof Schema.String
@@ -96,23 +114,31 @@ const StringValidatorRule: ValidatorRule<Schema.String> = {
   },
 }
 
+const isNumber = (input: unknown): input is number => {
+  return typeof input === 'number' && !isNaN(input)
+}
+
+const parseNumberLiteral = (input: unknown): Result<number> => {
+  if (typeof input === 'string') {
+    let value = parseFloat(input)
+    if (isNumber(value)) {
+      return Ok(value)
+    }
+  }
+  return Err('')
+}
+
 const NumberValidatorRule: ValidatorRule<Schema.Number> = {
   test: (schema) => {
     return schema instanceof Schema.Number
   },
   transform: (_, { strict }) => {
     return (input) => {
-      if (typeof input === 'number' && !isNaN(input)) {
-        return Ok(input)
-      }
+      if (isNumber(input)) return Ok(input)
 
       if (strict === false) {
-        if (typeof input === 'string') {
-          let value = parseFloat(input)
-          if (typeof value === 'number' && !isNaN(value)) {
-            return Ok(value)
-          }
-        }
+        let result = parseNumberLiteral(input)
+        if (result.isOk) return result
       }
 
       return SchemaErr(`${input} is not a number`)
@@ -131,13 +157,9 @@ const IntValidatorRule: ValidatorRule<Schema.Int> = {
       }
 
       if (strict === false) {
-        if (typeof input === 'string') {
-          input = parseFloat(input)
-        }
-
-        if (typeof input === 'number' && !isNaN(input)) {
-          return Ok(Math.floor(input))
-        }
+        if (isNumber(input)) return Ok(Math.floor(input))
+        let result = parseNumberLiteral(input)
+        if (result.isOk) return Ok(Math.floor(result.value))
       }
 
       return SchemaErr(`${input} is not an integer`)
@@ -156,13 +178,8 @@ const FloatValidatorRule: ValidatorRule<Schema.Float> = {
       }
 
       if (strict === false) {
-        if (typeof input === 'string') {
-          input = parseFloat(input)
-        }
-
-        if (typeof input === 'number' && !isNaN(input)) {
-          return Ok(input)
-        }
+        let result = parseNumberLiteral(input)
+        if (result.isOk) return result
       }
 
       return SchemaErr(`${input} is not a number`)
@@ -188,6 +205,12 @@ const IDValidatorRule: ValidatorRule<Schema.ID> = {
   },
 }
 
+const parseBooleanLiteral = (input: unknown): Result<boolean> => {
+  if (input === 'false') return Ok(false)
+  if (input === 'true') return Ok(true)
+  return Err('')
+}
+
 const BooleanValidatorRule: ValidatorRule<Schema.Boolean> = {
   test: (schema) => {
     return schema instanceof Schema.Boolean
@@ -199,10 +222,8 @@ const BooleanValidatorRule: ValidatorRule<Schema.Boolean> = {
       }
 
       if (strict === false) {
-        if (typeof input === 'string') {
-          if (input === 'false') return Ok(false)
-          if (input === 'true') return Ok(true)
-        }
+        let result = parseBooleanLiteral(input)
+        if (result.isOk) return result
       }
 
       return SchemaErr(`${input} is not a boolean`)
@@ -214,13 +235,24 @@ const LiteralValidatorRule: ValidatorRule<Schema.LiteralType> = {
   test: (schema) => {
     return schema instanceof Schema.LiteralType
   },
-  transform: (schema) => {
+  transform: (schema, { strict }) => {
     let value = schema.value
 
     return (input) => {
       if (input === value) {
         return Ok(input as Schema.Literals)
       }
+
+      if (strict === false && typeof value !== 'string') {
+        if (typeof value === 'number') {
+          let result = parseNumberLiteral(input)
+          if (result.isOk) return result
+        } else if (typeof value === 'boolean') {
+          let result = parseBooleanLiteral(input)
+          if (result.isOk) return result
+        }
+      }
+
       return SchemaErr(`${input} is not a literal ${value}`)
     }
   },
@@ -465,6 +497,8 @@ export const defaultValidatorRules = {
   Record: RecordValidatorRule,
   Strict: StrictValidatorRule,
   NonStrict: NonStrictValidatorRule,
+  ReadOnly: ReadOnlyValidatorRule,
+  ReadOnlyDeep: ReadOnlyDeepValidatorRule,
 }
 
 export type DefaultValidatorRules = typeof defaultValidatorRules

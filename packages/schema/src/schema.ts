@@ -1,4 +1,5 @@
 import { isNumberConstructor, isStringConstructor, isBooleanConstructor } from './utils'
+import {  MarkReadOnlyDeep } from './types'
 
 export type Prettier<T> = T extends object | any[]
   ? {
@@ -301,6 +302,29 @@ export abstract class NonStrictType<T extends SchemaCtorInput = SchemaCtorInput>
 
 export const NonStrict = <T extends SchemaCtorInput>(Item: T) => {
   return class NonStrict extends NonStrictType<T> {
+    Item = toSchemaCtor(Item)
+  }
+}
+
+
+export abstract class ReadOnlyType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<Readonly<TypeOf<ToSchemaCtor<T>>>> {
+  [Kind] = kind('ReadOnly')
+  abstract Item: ToSchemaCtor<T>
+}
+
+export const ReadOnly = <T extends SchemaCtorInput>(Item: T) => {
+  return class ReadOnly extends ReadOnlyType<T> {
+    Item = toSchemaCtor(Item)
+  }
+}
+
+export abstract class ReadOnlyDeepType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<MarkReadOnlyDeep<TypeOf<ToSchemaCtor<T>>>> {
+  [Kind] = kind('ReadOnly')
+  abstract Item: ToSchemaCtor<T>
+}
+
+export const ReadOnlyDeep = <T extends SchemaCtorInput>(Item: T) => {
+  return class DeepReadOnly extends ReadOnlyDeepType<T> {
     Item = toSchemaCtor(Item)
   }
 }

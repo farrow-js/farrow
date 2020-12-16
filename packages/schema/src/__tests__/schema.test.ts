@@ -1,4 +1,5 @@
 import * as Schema from '../schema'
+import { Prettier, ReadOnly, TypeOf, ReadOnlyDeep } from '../schema'
 import { createSchemaValidator, ValidationResult } from '../validator'
 
 const { Type, ObjectType, Struct, Int, Float, Literal, List, Union, Intersect, Nullable, Record, Json, Any } = Schema
@@ -625,6 +626,8 @@ describe('Schema', () => {
       a: Number,
       b: Int,
       c: Boolean,
+      d: Literal(1),
+      e: Literal(false),
     })
 
     let validate0 = createSchemaValidator(struct)
@@ -636,6 +639,8 @@ describe('Schema', () => {
       a: 1.23,
       b: 1,
       c: false,
+      d: 1,
+      e: false,
     }
 
     // invalid for strict mode, valid for non-strict mode
@@ -643,30 +648,40 @@ describe('Schema', () => {
       a: 1,
       b: 1.1,
       c: 'false',
+      d: '1',
+      e: 'false',
     }
 
     let data2 = {
       a: '1',
       b: '1.1',
       c: true,
+      d: 1,
+      e: 'false',
     }
 
     let data3 = {
       a: '1.1',
       b: '1',
       c: 'true',
+      d: '1',
+      e: false,
     }
 
     expect(assertOk(validate0(data0))).toEqual({
       a: 1.23,
       b: 1,
       c: false,
+      d: 1,
+      e: false,
     })
 
     expect(assertOk(validate1(data0))).toEqual({
       a: 1.23,
       b: 1,
       c: false,
+      d: 1,
+      e: false,
     })
 
     expect(() => assertOk(validate0(data1))).toThrow()
@@ -675,6 +690,8 @@ describe('Schema', () => {
       a: 1,
       b: 1,
       c: false,
+      d: 1,
+      e: false,
     })
 
     expect(() => assertOk(validate0(data2))).toThrow()
@@ -683,6 +700,8 @@ describe('Schema', () => {
       a: 1,
       b: 1,
       c: true,
+      d: 1,
+      e: false,
     })
 
     expect(() => assertOk(validate0(data3))).toThrow()
@@ -691,6 +710,65 @@ describe('Schema', () => {
       a: 1.1,
       b: 1,
       c: true,
+      d: 1,
+      e: false,
+    })
+  })
+
+  it('supports read-only and read-only-deep', () => {
+    let Struct0 = Struct({
+      a: Number,
+      b: String,
+      c: {
+        d: Boolean,
+      },
+    })
+
+    let ReadOnlyStruct = ReadOnly(Struct0)
+    let ReadOnlyDeepStruct = ReadOnlyDeep(Struct0)
+
+    type T0 = Prettier<TypeOf<typeof Struct0>>
+
+    type T1 = Prettier<TypeOf<typeof ReadOnlyStruct>>
+
+    type T2 = Prettier<TypeOf<typeof ReadOnlyDeepStruct>>
+
+    let data: T0 = {
+      a: 1,
+      b: '1',
+      c: {
+        d: false,
+      },
+    }
+
+    let validate0 = createSchemaValidator(Struct0)
+
+    let validate1 = createSchemaValidator(ReadOnlyStruct)
+
+    let validate2 = createSchemaValidator(ReadOnlyDeepStruct)
+
+    expect(assertOk(validate0(data))).toEqual({
+      a: 1,
+      b: '1',
+      c: {
+        d: false,
+      },
+    })
+
+    expect(assertOk(validate1(data))).toEqual({
+      a: 1,
+      b: '1',
+      c: {
+        d: false,
+      },
+    })
+
+    expect(assertOk(validate2(data))).toEqual({
+      a: 1,
+      b: '1',
+      c: {
+        d: false,
+      },
     })
   })
 })

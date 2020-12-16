@@ -1,10 +1,10 @@
 import type { Middleware } from 'farrow-pipeline'
 import {
   ResponseInfo,
+  string,
   json,
   html,
   text,
-  raw,
   redirect,
   stream,
   file,
@@ -20,6 +20,7 @@ import {
   custom,
   type,
   merge,
+  is,
   BodyMap,
 } from './responseInfo'
 
@@ -30,10 +31,11 @@ type ToResponse<T extends ResponseInfoCreator> = (...args: Parameters<T>) => Res
 export type Response = {
   info: ResponseInfo
   merge: (...responsers: Response[]) => Response
+  is: (...types: string[]) => string | false
+  string: ToResponse<typeof string>
   json: ToResponse<typeof json>
   html: ToResponse<typeof html>
   text: ToResponse<typeof text>
-  raw: ToResponse<typeof raw>
   redirect: ToResponse<typeof redirect>
   stream: ToResponse<typeof stream>
   file: ToResponse<typeof file>
@@ -61,10 +63,13 @@ export const createResponse = (info: ResponseInfo): Response => {
       let infos = responsers.map((responser) => responser.info)
       return createResponse(merge(info, ...infos))
     },
+    is: (...types) => {
+      return is(info, ...types)
+    },
+    string: toResponse(string, info),
     json: toResponse(json, info),
     html: toResponse(html, info),
     text: toResponse(text, info),
-    raw: toResponse(raw, info),
     redirect: toResponse(redirect, info),
     stream: toResponse(stream, info),
     file: toResponse(file, info),

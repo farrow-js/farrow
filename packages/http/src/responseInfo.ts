@@ -2,6 +2,7 @@ import type { SetOption as CookieOptions } from 'cookies'
 import type { IncomingMessage, ServerResponse } from 'http'
 import type Stream from 'stream'
 import mime from 'mime-types'
+import typeis from 'type-is'
 import contentDisposition, { Options as ContentDispositionOptions } from 'content-disposition'
 
 import { RequestInfo } from './requestInfo'
@@ -35,30 +36,19 @@ export type SharedResponseInfo = {
   cookies?: Cookies
 }
 
-export type JsonBody = {
-  type: 'json'
-  value: JsonType
-}
-
-export type TextBody = {
-  type: 'text'
-  value: string
-}
-
-export type HtmlBody = {
-  type: 'html'
-  value: string
-}
-
 export type EmptyBody = {
   type: 'empty'
   value: null
 }
 
-export type RedirectBody = {
-  type: 'redirect'
-  usePrefix: boolean
+export type StringBody = {
+  type: 'string'
   value: string
+}
+
+export type JsonBody = {
+  type: 'json'
+  value: JsonType
 }
 
 export type StreamBody = {
@@ -71,22 +61,25 @@ export type BufferBody = {
   value: Buffer
 }
 
-export type RawBody = {
-  type: 'raw'
+export type RedirectBody = {
+  type: 'redirect'
+  usePrefix: boolean
   value: string
 }
 
-export type FileBodyOptions =  string | {
-  flags?: string;
-  encoding?: BufferEncoding;
-  fd?: number;
-  mode?: number;
-  autoClose?: boolean;
-  emitClose?: boolean;
-  start?: number;
-  end?: number;
-  highWaterMark?: number;
-}
+export type FileBodyOptions =
+  | string
+  | {
+      flags?: string
+      encoding?: BufferEncoding
+      fd?: number
+      mode?: number
+      autoClose?: boolean
+      emitClose?: boolean
+      start?: number
+      end?: number
+      highWaterMark?: number
+    }
 
 export type FileBody = {
   type: 'file'
@@ -106,17 +99,7 @@ export type CustomBody = {
   handler: CustomBodyHandler
 }
 
-export type Body =
-  | JsonBody
-  | TextBody
-  | HtmlBody
-  | EmptyBody
-  | RedirectBody
-  | StreamBody
-  | BufferBody
-  | FileBody
-  | RawBody
-  | CustomBody
+export type Body = EmptyBody | StringBody | JsonBody | StreamBody | BufferBody | FileBody | CustomBody | RedirectBody
 
 export type BodyMap = {
   [V in Body as V['type']]: V
@@ -130,33 +113,6 @@ export type ResponseInfo = {
   vary?: string[]
 }
 
-export const json = (value: JsonType): ResponseInfo => {
-  return {
-    body: {
-      type: 'json',
-      value,
-    },
-  }
-}
-
-export const text = (value: string): ResponseInfo => {
-  return {
-    body: {
-      type: 'text',
-      value,
-    },
-  }
-}
-
-export const html = (value: string): ResponseInfo => {
-  return {
-    body: {
-      type: 'html',
-      value,
-    },
-  }
-}
-
 export const empty = (): ResponseInfo => {
   return {
     body: {
@@ -166,14 +122,15 @@ export const empty = (): ResponseInfo => {
   }
 }
 
-export const raw = (value: string): ResponseInfo => {
+export const string = (value: string): ResponseInfo => {
   return {
     body: {
-      type: 'raw',
-      value: value,
+      type: 'string',
+      value,
     },
   }
 }
+
 
 export type RedirectOptions = {
   usePrefix?: boolean
@@ -184,7 +141,7 @@ export const redirect = (url: string, options?: RedirectOptions): ResponseInfo =
     body: {
       type: 'redirect',
       value: url,
-      usePrefix: options?.usePrefix ?? true
+      usePrefix: options?.usePrefix ?? true,
     },
   }
 }
@@ -221,15 +178,12 @@ export const file = (filename: string, options?: FileBodyOptions): ResponseInfo 
     body: {
       type: 'file',
       value: filename,
-      options
+      options,
     },
   }
 }
 
-export const attachment = (
-  filename?: string,
-  options?: ContentDispositionOptions
-): ResponseInfo => {
+export const attachment = (filename?: string, options?: ContentDispositionOptions): ResponseInfo => {
   return headers({
     'Content-Disposition': contentDisposition(filename, options),
   })
@@ -254,22 +208,7 @@ export const header = (name: string, value: Value): ResponseInfo => {
   return headers({ [name]: value })
 }
 
-export const type = (type: string): ResponseInfo => {
-  let contentType = mime.contentType(type)
-
-  if (contentType === false) {
-    return headers({})
-  }
-
-  return headers({
-    'Content-Type': contentType,
-  })
-}
-
-export const cookies = (
-  config: { [key: string]: Value | null },
-  options?: CookieOptions
-): ResponseInfo => {
+export const cookies = (config: { [key: string]: Value | null }, options?: CookieOptions): ResponseInfo => {
   let cookies = {} as Cookies
 
   Object.entries(config).forEach(([name, value]) => {
@@ -284,11 +223,7 @@ export const cookies = (
   }
 }
 
-export const cookie = (
-  name: string,
-  value: Value | null,
-  options?: CookieOptions
-): ResponseInfo => {
+export const cookie = (name: string, value: Value | null, options?: CookieOptions): ResponseInfo => {
   return cookies({ [name]: value }, options)
 }
 
@@ -327,3 +262,41 @@ export const merge = (...responses: ResponseInfo[]) => {
 }
 
 
+export const type = (type: string): ResponseInfo => {
+  let contentType = mime.contentType(type)
+
+  if (contentType === false) {
+    return headers({})
+  }
+
+  return headers({
+    'Content-Type': contentType,
+  })
+}
+
+export const is = (info: ResponseInfo, ...types: string[]) => {
+  let contentType = info.headers?.['content-type'] ?? info.headers?.['Content-Type']
+  
+  if (!contentType) {
+    return false 
+  }
+
+  return typeis.is(contentType.toString(), types)
+}
+
+export const text = (value: string): ResponseInfo => {
+  return merge(type('text'), string(value))
+}
+
+export const html = (value: string): ResponseInfo => {
+  return merge(type('html'), string(value))
+}
+
+export const json = (value: JsonType): ResponseInfo => {
+  return merge(type('json'), {
+    body: {
+      type: 'json',
+      value,
+    },
+  })
+}

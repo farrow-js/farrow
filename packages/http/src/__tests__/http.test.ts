@@ -194,7 +194,7 @@ describe('Http', () => {
       await request(http.server()).get('/test').expect(200, content)
     })
 
-    it('support raw response', async () => {
+    it('support string response', async () => {
       let http = createHttp()
 
       http
@@ -202,10 +202,10 @@ describe('Http', () => {
           pathname: '/test',
         })
         .use(() => {
-          return Response.raw('test raw body')
+          return Response.text('test string body')
         })
 
-      await request(http.server()).get('/test').expect(200, 'test raw body')
+      await request(http.server()).get('/test').expect(200, 'test string body')
     })
 
     it('support custom response', async () => {
@@ -575,8 +575,8 @@ describe('Http', () => {
       let http = createHttp()
       let server = http.server()
 
-      http.capture('text', (textBody) => {
-        return Response.text(`capture: ${textBody.value}`)
+      http.capture('string', (stringBody) => {
+        return Response.text(`capture: ${stringBody.value}`)
       })
 
       http.capture('json', (jsonBody) => {

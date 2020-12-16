@@ -323,38 +323,18 @@ export const handleResponse = async (params: ResponseParams) => {
     res.end(body)
   }
 
-  let handleJson = (json: JsonType) => {
-    let content = JSON.stringify(json)
+  let handleString = (content: string) => {
     let length = Buffer.byteLength(content)
-
-    if (res.getHeader('Content-Type') === undefined) {
-      res.setHeader('Content-Type', 'application/json; charset=utf-8')
-    }
 
     res.setHeader('Content-Length', length)
     res.end(content)
   }
 
-  let handleText = (text: string) => {
-    let length = Buffer.byteLength(text)
-
-    if (res.getHeader('Content-Type') === undefined) {
-      res.setHeader('Content-Type', 'text/plain; charset=utf-8')
-    }
-
+  let handleJson = (json: JsonType) => {
+    let content = JSON.stringify(json)
+    let length = Buffer.byteLength(content)
     res.setHeader('Content-Length', length)
-    res.end(text)
-  }
-
-  let handleHtml = (html: string) => {
-    let length = Buffer.byteLength(html)
-
-    if (res.getHeader('Content-Type') === undefined) {
-      res.setHeader('Content-Type', 'text/html; charset=utf-8')
-    }
-
-    res.setHeader('Content-Length', length)
-    res.end(html)
+    res.end(content)
   }
 
   let handleRedirect = (body: RedirectBody) => {
@@ -381,9 +361,12 @@ export const handleResponse = async (params: ResponseParams) => {
     })
 
     if (accept.types('html')) {
-      handleHtml(`Redirecting to ${escapeHtml(url)}`)
+      handleHeaders({
+        'Content-Type': 'text/html; charset=utf-8',
+      })
+      handleString(`Redirecting to ${escapeHtml(url)}`)
     } else {
-      handleText(`Redirecting to ${url}`)
+      handleString(`Redirecting to ${url}`)
     }
   }
 
@@ -434,16 +417,12 @@ export const handleResponse = async (params: ResponseParams) => {
     return handleEmpty()
   }
 
+  if (body.type === 'string') {
+    return handleString(body.value)
+  }
+
   if (body.type === 'json') {
     return handleJson(body.value)
-  }
-
-  if (body.type === 'text') {
-    return handleText(body.value)
-  }
-
-  if (body.type === 'html') {
-    return handleHtml(body.value)
   }
 
   if (body.type === 'redirect') {
@@ -473,11 +452,6 @@ export const handleResponse = async (params: ResponseParams) => {
       })
     }
     return runWithContainer(handleResponse, container)
-  }
-
-  if (body.type === 'raw') {
-    res.end(body.value)
-    return
   }
 
   throw new Error(`Unsupported response body: ${JSON.stringify(body, null, 2)}`)

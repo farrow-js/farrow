@@ -70,16 +70,19 @@ type ResponseInfo = {
 type Response = {
   // response info
   info: ResponseInfo
+  // check response content type
+  // response.is('json') => 'json' | false
+  is: (...types: string[]) => string | false
   // merger all responses
   merge: (...responses: Response[]) => Response
+  // set string response body
+  string: (value: string) => Response
   // set json response body
   json: (value: JsonType) => Response
   // set html response body
   html: (value: string) => Response
   // set text response body
   text: (value: string) => Response
-  // set raw response body without content-type
-  raw: (value: string) => Response
   // redirect response
   redirect: (url: string, options?: { usePrefix?: boolean }) => Response
   // set stream response body

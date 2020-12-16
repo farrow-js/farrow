@@ -4,7 +4,7 @@ import { match as createMatch, Path as Pathname } from 'path-to-regexp'
 import { createPipeline, useContainer, MiddlewareInput, Pipeline, Middleware } from 'farrow-pipeline'
 
 import * as Schema from 'farrow-schema'
-import { Prettier } from 'farrow-schema'
+import {} from 'farrow-schema'
 
 import { Validator, createSchemaValidator } from 'farrow-schema/validator'
 
@@ -12,6 +12,7 @@ import { RequestInfo } from './requestInfo'
 import { BodyMap } from './responseInfo'
 import { route as createRoute } from './basenames'
 import { MaybeAsyncResponse, matchBodyType, Response } from './response'
+import { MarkReadOnlyDeep } from './types'
 
 export { Pathname }
 
@@ -38,7 +39,7 @@ export type TypeOfRouterRequestField<T> = T extends string
   ? Schema.TypeOfFieldDescriptor<T>
   : never
 
-export type TypeOfRequestSchema<T extends RouterRequestSchema> = Prettier<
+export type TypeOfRequestSchema<T extends RouterRequestSchema> = MarkReadOnlyDeep<
   {
     [key in keyof T]: TypeOfRouterRequestField<T[key]>
   }

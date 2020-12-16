@@ -1,14 +1,20 @@
-export type RequestHeaders = Record<string, any>
+import { MarkReadOnlyDeep } from './types'
 
-export type RequestCookies = Record<string, any>
+export type ReadOnlyRecord = {
+  readonly [key: string]: any
+}
 
-export type RequestQuery = Record<string, any>
+export type RequestHeaders = ReadOnlyRecord
+
+export type RequestCookies = ReadOnlyRecord
+
+export type RequestQuery = ReadOnlyRecord
 
 export type RequestInfo = {
-  pathname: string
-  method?: string
-  query?: RequestQuery
-  body?: any
-  headers?: RequestHeaders
-  cookies?: RequestCookies
+  readonly pathname: string
+  readonly method?: string
+  readonly query?: RequestQuery
+  readonly body?: any
+  readonly headers?: RequestHeaders
+  readonly cookies?: RequestCookies
 }

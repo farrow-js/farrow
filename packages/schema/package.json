@@ -1,6 +1,6 @@
 {
   "name": "farrow-schema",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A powerful and extensible schema builder",
   "main": "dist/index.js",
   "files": ["dist", "validator.d.ts", "validator.js", "transformer.js", "transformer.d.ts"],

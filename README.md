@@ -18,6 +18,8 @@
 - Provide React-Hooks-like mechanism which is useful for reusing code and integrating other parts of Server like database connection
 - Easy to learn and use if you were experienced in expressjs/koajs
 
+![farrow](./docs/assets/farrow.png)
+
 ## Environment Requirement
 
 - TypeScript 4.1

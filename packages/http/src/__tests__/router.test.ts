@@ -1,6 +1,6 @@
-import { createRouterPipeline as Router } from '../router'
+import { createRouterPipeline as Router, RouterUrlSchema } from '../router'
 import { Response } from '../response'
-import { Nullable, Strict, Union, Literal, JsonType } from 'farrow-schema'
+import { Nullable, Strict, Union, Literal, JsonType, Int, Float } from 'farrow-schema'
 import { Stream } from 'stream'
 
 describe('Router', () => {
@@ -1289,6 +1289,368 @@ describe('Router Url Pattern', () => {
       value: {
         type: 'one-or-more',
         value: ['abc', 'efg'],
+      },
+    })
+  })
+
+  it('support routing methods', async () => {
+    let router = Router()
+
+    router.get('/get0/<arg0:int>?<arg1:int>').use((request) => {
+      return Response.json({
+        type: 'get',
+        request,
+      })
+    })
+
+    router
+      .get('/get1/<arg0:int>?<arg1:int>', {
+        headers: {
+          a: Int,
+        },
+      })
+      .use((request) => {
+        return Response.json({
+          type: 'get',
+          request,
+        })
+      })
+
+    router
+      .post('/post/<arg0:int>?<arg1:int>', {
+        body: {
+          a: Int,
+          b: Float,
+        },
+      })
+      .use((request) => {
+        return Response.json({
+          type: 'post',
+          request,
+        })
+      })
+
+    router
+      .put('/put/<arg0:int>?<arg1:int>', {
+        body: {
+          a: Int,
+          b: Float,
+        },
+      })
+      .use((request) => {
+        return Response.json({
+          type: 'put',
+          request,
+        })
+      })
+
+    router
+      .delete('/delete/<arg0:int>?<arg1:int>', {
+        body: {
+          a: Int,
+          b: Float,
+        },
+      })
+      .use((request) => {
+        return Response.json({
+          type: 'delete',
+          request,
+        })
+      })
+
+    router
+      .patch('/patch/<arg0:int>?<arg1:int>', {
+        body: {
+          a: Int,
+          b: Float,
+        },
+      })
+      .use((request) => {
+        return Response.json({
+          type: 'patch',
+          request,
+        })
+      })
+
+    router
+      .head('/head/<arg0:int>?<arg1:int>', {
+        body: {
+          a: Int,
+          b: Float,
+        },
+      })
+      .use((request) => {
+        return Response.json({
+          type: 'head',
+          request,
+        })
+      })
+
+    router
+      .options('/options/<arg0:int>?<arg1:int>', {
+        body: {
+          a: Int,
+          b: Float,
+        },
+      })
+      .use((request) => {
+        return Response.json({
+          type: 'options',
+          request,
+        })
+      })
+
+    let result0 = await router.run({
+      pathname: '/get0/123',
+      method: 'get',
+      query: {
+        arg1: '456',
+      },
+    })
+
+    expect(result0.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'get',
+        request: {
+          method: 'get',
+          pathname: '/get0/123',
+          params: {
+            arg0: 123,
+          },
+          query: {
+            arg1: 456,
+          },
+        },
+      },
+    })
+
+    let result1 = await router.run({
+      pathname: '/get1/123',
+      method: 'get',
+      query: {
+        arg1: '456',
+      },
+      headers: {
+        a: '789',
+      },
+    })
+
+    expect(result1.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'get',
+        request: {
+          pathname: '/get1/123',
+          method: 'get',
+          params: {
+            arg0: 123,
+          },
+          query: {
+            arg1: 456,
+          },
+          headers: {
+            a: 789,
+          },
+        },
+      },
+    })
+
+    let result2 = await router.run({
+      pathname: '/post/123',
+      method: 'post',
+      query: {
+        arg1: '456',
+      },
+      body: {
+        a: 3,
+        b: 3.14,
+      },
+    })
+
+    expect(result2.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'post',
+        request: {
+          pathname: '/post/123',
+          method: 'post',
+          params: {
+            arg0: 123,
+          },
+          query: {
+            arg1: 456,
+          },
+          body: {
+            a: 3,
+            b: 3.14,
+          },
+        },
+      },
+    })
+
+    let result3 = await router.run({
+      pathname: '/put/123',
+      method: 'put',
+      query: {
+        arg1: '456',
+      },
+      body: {
+        a: 3,
+        b: 3.14,
+      },
+    })
+
+    expect(result3.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'put',
+        request: {
+          pathname: '/put/123',
+          method: 'put',
+          params: {
+            arg0: 123,
+          },
+          query: {
+            arg1: 456,
+          },
+          body: {
+            a: 3,
+            b: 3.14,
+          },
+        },
+      },
+    })
+
+    let result4 = await router.run({
+      pathname: '/patch/123',
+      method: 'patch',
+      query: {
+        arg1: '456',
+      },
+      body: {
+        a: 3,
+        b: 3.14,
+      },
+    })
+
+    expect(result4.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'patch',
+        request: {
+          pathname: '/patch/123',
+          method: 'patch',
+          params: {
+            arg0: 123,
+          },
+          query: {
+            arg1: 456,
+          },
+          body: {
+            a: 3,
+            b: 3.14,
+          },
+        },
+      },
+    })
+
+    let result5 = await router.run({
+      pathname: '/head/123',
+      method: 'head',
+      query: {
+        arg1: '456',
+      },
+      body: {
+        a: 3,
+        b: 3.14,
+      },
+    })
+
+    expect(result5.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'head',
+        request: {
+          pathname: '/head/123',
+          method: 'head',
+          params: {
+            arg0: 123,
+          },
+          query: {
+            arg1: 456,
+          },
+          body: {
+            a: 3,
+            b: 3.14,
+          },
+        },
+      },
+    })
+
+    let result6 = await router.run({
+      pathname: '/options/123',
+      method: 'options',
+      query: {
+        arg1: '456',
+      },
+      body: {
+        a: 3,
+        b: 3.14,
+      },
+    })
+
+    expect(result6.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'options',
+        request: {
+          pathname: '/options/123',
+          method: 'options',
+          params: {
+            arg0: 123,
+          },
+          query: {
+            arg1: 456,
+          },
+          body: {
+            a: 3,
+            b: 3.14,
+          },
+        },
+      },
+    })
+
+    let result7 = await router.run({
+      pathname: '/delete/123',
+      method: 'delete',
+      query: {
+        arg1: '456',
+      },
+      body: {
+        a: 3,
+        b: 3.14,
+      },
+    })
+
+    expect(result7.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'delete',
+        request: {
+          pathname: '/delete/123',
+          method: 'delete',
+          params: {
+            arg0: 123,
+          },
+          query: {
+            arg1: 456,
+          },
+          body: {
+            a: 3,
+            b: 3.14,
+          },
+        },
       },
     })
   })

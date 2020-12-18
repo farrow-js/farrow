@@ -65,10 +65,6 @@ export type TypeOfUrlSchema<T extends RouterUrlSchema> = MarkReadOnlyDeep<
   ParseUrl<T['url']> & TypeOfRouterRequestField<Omit<T, 'url'>>
 >
 
-type T0 = TypeOfUrlSchema<{
-  url: '/<arg:string>'
-}>
-
 const createRequestSchemaValidatorAndMatcher = <T extends RouterRequestSchema>(schema: T) => {
   let descriptors: Schema.FieldDescriptors = {
     pathname: Schema.String,
@@ -280,6 +276,29 @@ export type RouterPipeline = Pipeline<RequestInfo, MaybeAsyncResponse> & {
     schema: T,
     options?: MatchOptions,
   ): Pipeline<TypeOfUrlSchema<T>, MaybeAsyncResponse>
+} & RoutingMethods
+
+export type RoutingMethod = <U extends string, T extends Omit<RouterSharedSchema, 'method'>>(
+  path: U,
+  schema?: T,
+  options?: MatchOptions,
+) => Pipeline<
+  MarkReadOnlyDeep<
+    ParseUrl<U> & { readonly method: string } & (T extends Omit<RouterSharedSchema, 'method'>
+        ? TypeOfRouterRequestField<T>
+        : {})
+  >,
+  MaybeAsyncResponse
+>
+
+export type RoutingMethods = {
+  get: RoutingMethod
+  post: RoutingMethod
+  put: RoutingMethod
+  head: RoutingMethod
+  delete: RoutingMethod
+  patch: RoutingMethod
+  options: RoutingMethod
 }
 
 export type RouterPipelineOptions = {}
@@ -397,8 +416,36 @@ export const createRouterPipeline = (): RouterPipeline => {
     throw new Error(`Unsupported schema: {${Object.keys(schema)}}`)
   }
 
+  let createRoutingMethod = (method: string) => {
+    return ((<U extends string, T extends Omit<RouterUrlSchema<U>, 'url' | 'method'>>(
+      path: U,
+      schema?: T,
+      options?: MatchOptions,
+    ) => {
+      return match(
+        {
+          ...schema,
+          method: method,
+          url: path,
+        },
+        options,
+      )
+    }) as unknown) as RoutingMethod
+  }
+
+  let methods: RoutingMethods = {
+    get: createRoutingMethod('GET'),
+    post: createRoutingMethod('POST'),
+    put: createRoutingMethod('PUT'),
+    head: createRoutingMethod('HEAD'),
+    delete: createRoutingMethod('DELETE'),
+    patch: createRoutingMethod('PATCH'),
+    options: createRoutingMethod('OPTIONS'),
+  }
+
   return {
     ...pipeline,
+    ...methods,
     capture: capture,
     route: route,
     serve: serve,

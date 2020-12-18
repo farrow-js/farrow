@@ -1,4 +1,4 @@
-import { createRouterPipeline as Router, RouterUrlSchema } from '../router'
+import { Router, RouterUrlSchema } from '../router'
 import { Response } from '../response'
 import { Nullable, Strict, Union, Literal, JsonType, Int, Float } from 'farrow-schema'
 import { Stream } from 'stream'
@@ -1650,6 +1650,33 @@ describe('Router Url Pattern', () => {
             a: 3,
             b: 3.14,
           },
+        },
+      },
+    })
+  })
+
+  it('support literal string unions', async () => {
+    let router = Router()
+
+    router
+      .match({
+        url: '/some-service/<client:{mac}|{win}|{iphone}|{android}|{api}>/users/<id:number>',
+      })
+      .use((request) => {
+        return Response.json(request)
+      })
+
+    let result0 = await router.run({
+      pathname: '/some-service/mac/users/123',
+    })
+
+    expect(result0.info.body).toEqual({
+      type: 'json',
+      value: {
+        pathname: '/some-service/mac/users/123',
+        params: {
+          client: 'mac',
+          id: 123,
         },
       },
     })

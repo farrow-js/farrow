@@ -127,6 +127,8 @@ http.use((request) => {
 
 ### How to match specific request
 
+Click [Router-Url-Schema](./docs/http#router-url-schema) to read more
+
 ```typescript
 // http.match(schema).use(...middlewares)
 // farrow will validate request info and extract the data for middlewares
@@ -144,6 +146,14 @@ http
     // productId is a number
     console.log('productId', request.query.productId)
   })
+
+// or using routing-methods
+http.get('/get0/<arg0:int>?<arg1:int>').use((request) => {
+  return Response.json({
+    type: 'get',
+    request,
+  })
+})
 ```
 
 ### How to pass new request info for downstream middleware

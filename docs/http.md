@@ -193,6 +193,81 @@ router
   })
 ```
 
+## Router-Url-Schema
+
+Since farrow `v1.2.0`, a new feature `router-url-schema` is supported. it combines `{ pathname, params, query }` into `{ url }`, and use [Template literal types](https://devblogs.microsoft.com/typescript/announcing-typescript-4-1-beta/#template-literal-types) to extract the type info
+
+```typescript
+// the same schema as above but in a more compact form
+router
+  .match({
+    url: '/product/<id:number>?<a:number>&<b:string>&<c:boolean>',
+    method: 'POST',
+    body: {
+      a: Number,
+      b: String,
+      c: Boolean,
+    },
+    headers: {
+      a: Number,
+      b: String,
+      c: Boolean,
+    },
+    cookies: {
+      a: Number,
+      b: String,
+      c: Boolean,
+    },
+  })
+  .use(async (request) => {
+    console.log('request', request)
+  })
+```
+
+### Dynamic parameter
+
+A dynamic parameter has the form `<key:type>`.
+
+- if it was placed in `pathname`(before `?` in a url), it will regard as `params[key] = type`. the order is matter
+- if it was placed in `querystring`(after `?` in a url), it will regard as `query[key] = type`. the order is't matter
+
+Dynamic parameter support `modifier`(learn more from [here](https://github.com/pillarjs/path-to-regexp#modifiers)), has the form:
+
+- `<key?:type>` means optional, the corresponding type is `{ key?: type }`, the corresponding pattern is `/:key?`
+- `<key*:type>` means zero or more, the corresponding type is `{ key?: type[] }`, the corresponding pattern is `/:key*`
+- `<key+:type>` means one or more, the corresponding type is `{ key: type[] }`, the corresponding pattern is `/:key+`
+
+### Static parameter
+
+A static parameter can only be placed in `querystring`, it will regard as `literal string type`.
+
+For example: `/?<a:int>&b=2` has the type `{ pathname: string, query: { a: number, b: '2' } }`
+
+### Current supported types in `router-url-schema`
+
+The supported types in `<key:type>` are list below:
+
+- `string` -> ts `string`
+- `number` -> ts `number`
+- `boolean` -> ts `boolean`
+- `id` -> ts `string`, but `farrow-schema` will ensure it's not empty
+- `int` -> ts `number`, but `farrow-schema` will ensure it's integer
+- `float` -> ts `number`
+- `{*+}` -> use the string wrapped `{}` as `string literal type`. eg. `{abc}` is type `"abc"`, only `string literal type` is supported
+
+## Routing methods
+
+`router[get|post|put|patch|head|delte|options](url, schema, options)` is supported as shortcut of `router.match({ url, method: get|post|put|patch|head|delte|options }, options)`
+
+```typescript
+router.get('/get0/<arg0:int>?<arg1:int>').use((request) => {
+  return Response.json({
+    type: 'get',
+    request,
+  })
+})
+```
+
 ## useReq(): IncomingMessage
 
 ```typescript

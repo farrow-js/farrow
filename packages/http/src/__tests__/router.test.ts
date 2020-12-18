@@ -1,6 +1,6 @@
 import { createRouterPipeline as Router } from '../router'
 import { Response } from '../response'
-import { Nullable, Schema, Struct, Strict, Union, Literal } from 'farrow-schema'
+import { Nullable, Strict, Union, Literal, JsonType } from 'farrow-schema'
 import { Stream } from 'stream'
 
 describe('Router', () => {
@@ -401,5 +401,895 @@ describe('Router', () => {
 
     expect(contentTypes).toEqual(['json', 'json', 'text', 'html'])
     expect(bodyTypes).toEqual(['json', 'json', 'string', 'buffer', 'string', 'stream', 'string'])
+  })
+})
+
+describe('Router Url Pattern', () => {
+  it('support dynamic params in pathname', async () => {
+    let router = Router()
+
+    router
+      .match({
+        url: '/string/<arg:string>',
+      })
+      .use(async (request) => {
+        return Response.json({
+          type: 'string',
+          arg: request.params.arg,
+        })
+      })
+
+    router
+      .match({
+        url: '/boolean/<arg:boolean>',
+      })
+      .use(async (request) => {
+        return Response.json({
+          type: 'boolean',
+          arg: request.params.arg,
+        })
+      })
+
+    router
+      .match({
+        url: '/number/<arg:number>',
+      })
+      .use(async (request) => {
+        return Response.json({
+          type: 'number',
+          arg: request.params.arg,
+        })
+      })
+
+    router
+      .match({
+        url: '/int/<arg:int>',
+      })
+      .use(async (request) => {
+        return Response.json({
+          type: 'int',
+          arg: request.params.arg,
+        })
+      })
+
+    router
+      .match({
+        url: '/float/<arg:float>',
+      })
+      .use(async (request) => {
+        return Response.json({
+          type: 'float',
+          arg: request.params.arg,
+        })
+      })
+
+    router
+      .match({
+        url: '/id/<arg:id>',
+      })
+      .use(async (request) => {
+        return Response.json({
+          type: 'id',
+          arg: request.params.arg,
+        })
+      })
+
+    router
+      .match({
+        url: '/literal/<arg:{123}|{abc}>',
+      })
+      .use(async (request) => {
+        return Response.json({
+          type: 'literal',
+          arg: request.params.arg,
+        })
+      })
+
+    router
+      .match({
+        url: '/union/<arg:number|boolean|string>',
+      })
+      .use(async (request) => {
+        return Response.json({
+          type: 'union',
+          arg: request.params.arg,
+        })
+      })
+
+    expect(() => {
+      router.run({
+        pathname: '/abc',
+      })
+    }).toThrow()
+
+    let result0 = await router.run({
+      pathname: '/string/123',
+    })
+
+    expect(result0.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'string',
+        arg: '123',
+      },
+    })
+
+    let result1 = await router.run({
+      pathname: '/number/123.456',
+    })
+
+    expect(result1.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'number',
+        arg: 123.456,
+      },
+    })
+
+    let result2 = await router.run({
+      pathname: '/int/123.456',
+    })
+
+    expect(result2.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'int',
+        arg: 123,
+      },
+    })
+
+    let result3 = await router.run({
+      pathname: '/float/123.456',
+    })
+
+    expect(result3.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'float',
+        arg: 123.456,
+      },
+    })
+
+    let result4 = await router.run({
+      pathname: '/boolean/true',
+    })
+
+    expect(result4.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'boolean',
+        arg: true,
+      },
+    })
+
+    let result5 = await router.run({
+      pathname: '/boolean/false',
+    })
+
+    expect(result5.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'boolean',
+        arg: false,
+      },
+    })
+
+    let result6 = await router.run({
+      pathname: '/id/1234123',
+    })
+
+    expect(result6.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'id',
+        arg: '1234123',
+      },
+    })
+
+    let result7 = await router.run({
+      pathname: '/literal/123',
+    })
+
+    expect(result7.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'literal',
+        arg: '123',
+      },
+    })
+
+    let result8 = await router.run({
+      pathname: '/literal/abc',
+    })
+
+    expect(result8.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'literal',
+        arg: 'abc',
+      },
+    })
+
+    let result9 = await router.run({
+      pathname: '/union/abc',
+    })
+
+    expect(result9.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'union',
+        arg: 'abc',
+      },
+    })
+
+    let result10 = await router.run({
+      pathname: '/union/123',
+    })
+
+    expect(result10.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'union',
+        arg: 123,
+      },
+    })
+
+    let result11 = await router.run({
+      pathname: '/union/false',
+    })
+
+    expect(result11.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'union',
+        arg: false,
+      },
+    })
+  })
+
+  it('support dynamic params in querystring', async () => {
+    let router = Router()
+
+    router
+      .match({
+        url: '/string?<arg:string>',
+      })
+      .use(async (request) => {
+        return Response.json({
+          type: 'string',
+          arg: request.query.arg,
+        })
+      })
+
+    router
+      .match({
+        url: '/boolean?<arg:boolean>',
+      })
+      .use(async (request) => {
+        return Response.json({
+          type: 'boolean',
+          arg: request.query.arg,
+        })
+      })
+
+    router
+      .match({
+        url: '/number?<arg:number>',
+      })
+      .use(async (request) => {
+        return Response.json({
+          type: 'number',
+          arg: request.query.arg,
+        })
+      })
+
+    router
+      .match({
+        url: '/int?<arg:int>',
+      })
+      .use(async (request) => {
+        return Response.json({
+          type: 'int',
+          arg: request.query.arg,
+        })
+      })
+
+    router
+      .match({
+        url: '/float?<arg:float>',
+      })
+      .use(async (request) => {
+        return Response.json({
+          type: 'float',
+          arg: request.query.arg,
+        })
+      })
+
+    router
+      .match({
+        url: '/id?<arg:id>',
+      })
+      .use(async (request) => {
+        return Response.json({
+          type: 'id',
+          arg: request.query.arg,
+        })
+      })
+
+    router
+      .match({
+        url: '/literal?<arg:{123}|{abc}>',
+      })
+      .use(async (request) => {
+        return Response.json({
+          type: 'literal',
+          arg: request.query.arg,
+        })
+      })
+
+    router
+      .match({
+        url: '/union?<arg:number|boolean|string>',
+      })
+      .use(async (request) => {
+        return Response.json({
+          type: 'union',
+          arg: request.query.arg,
+        })
+      })
+
+    expect(() => {
+      router.run({
+        pathname: '/abc',
+      })
+    }).toThrow()
+
+    let result0 = await router.run({
+      pathname: '/string',
+      query: {
+        arg: '123',
+      },
+    })
+
+    expect(result0.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'string',
+        arg: '123',
+      },
+    })
+
+    let result1 = await router.run({
+      pathname: '/number',
+      query: {
+        arg: '123.456',
+      },
+    })
+
+    expect(result1.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'number',
+        arg: 123.456,
+      },
+    })
+
+    let result2 = await router.run({
+      pathname: '/int',
+      query: {
+        arg: '123.456',
+      },
+    })
+
+    expect(result2.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'int',
+        arg: 123,
+      },
+    })
+
+    let result3 = await router.run({
+      pathname: '/float',
+      query: {
+        arg: '123.456',
+      },
+    })
+
+    expect(result3.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'float',
+        arg: 123.456,
+      },
+    })
+
+    let result4 = await router.run({
+      pathname: '/boolean',
+      query: {
+        arg: 'true',
+      },
+    })
+
+    expect(result4.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'boolean',
+        arg: true,
+      },
+    })
+
+    let result5 = await router.run({
+      pathname: '/boolean',
+      query: {
+        arg: 'false',
+      },
+    })
+
+    expect(result5.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'boolean',
+        arg: false,
+      },
+    })
+
+    let result6 = await router.run({
+      pathname: '/id',
+      query: {
+        arg: '1234123',
+      },
+    })
+
+    expect(result6.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'id',
+        arg: '1234123',
+      },
+    })
+
+    let result7 = await router.run({
+      pathname: '/literal',
+      query: {
+        arg: '123',
+      },
+    })
+
+    expect(result7.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'literal',
+        arg: '123',
+      },
+    })
+
+    let result8 = await router.run({
+      pathname: '/literal',
+      query: {
+        arg: 'abc',
+      },
+    })
+
+    expect(result8.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'literal',
+        arg: 'abc',
+      },
+    })
+
+    let result9 = await router.run({
+      pathname: '/union',
+      query: {
+        arg: 'abc',
+      },
+    })
+
+    expect(result9.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'union',
+        arg: 'abc',
+      },
+    })
+
+    let result10 = await router.run({
+      pathname: '/union',
+      query: {
+        arg: '123',
+      },
+    })
+
+    expect(result10.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'union',
+        arg: 123,
+      },
+    })
+
+    let result11 = await router.run({
+      pathname: '/union',
+      query: {
+        arg: 'false',
+      },
+    })
+
+    expect(result11.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'union',
+        arg: false,
+      },
+    })
+  })
+
+  it('support static params in querystring', async () => {
+    let router = Router()
+
+    router
+      .match({
+        url: '/static?a=1&b=2',
+      })
+      .use((request) => {
+        return Response.json({
+          type: 'static',
+          query: request.query,
+        })
+      })
+
+    router
+      .match({
+        url: '/mix0?a=1&b=2&<c:int>',
+      })
+      .use((request) => {
+        return Response.json({
+          type: 'mix0',
+          query: request.query,
+        })
+      })
+
+    router
+      .match({
+        url: '/mix1?<a:int>&b=2&<c:int>',
+      })
+      .use((request) => {
+        return Response.json({
+          type: 'mix1',
+          query: request.query,
+        })
+      })
+
+    router
+      .match({
+        url: '/mix2?a=1&<b:id>&c=abc',
+      })
+      .use((request) => {
+        return Response.json({
+          type: 'mix2',
+          query: request.query,
+        })
+      })
+
+    expect(() => {
+      router.run({
+        pathname: '/static',
+        query: {
+          a: 'a',
+          b: 'b',
+        },
+      })
+    }).toThrow()
+
+    let result0 = await router.run({
+      pathname: '/static',
+      query: {
+        a: '1',
+        b: '2',
+      },
+    })
+
+    expect(result0.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'static',
+        query: {
+          a: '1',
+          b: '2',
+        },
+      },
+    })
+
+    let result1 = await router.run({
+      pathname: '/mix0',
+      query: {
+        a: '1',
+        b: '2',
+        c: '3.14159',
+      },
+    })
+
+    expect(result1.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'mix0',
+        query: {
+          a: '1',
+          b: '2',
+          c: 3,
+        },
+      },
+    })
+
+    let result2 = await router.run({
+      pathname: '/mix0',
+      query: {
+        a: '1',
+        b: '2',
+        c: 30000,
+      },
+    })
+
+    expect(result2.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'mix0',
+        query: {
+          a: '1',
+          b: '2',
+          c: 30000,
+        },
+      },
+    })
+
+    expect(() => {
+      router.run({
+        pathname: '/mix0',
+        query: {
+          a: '1',
+          b: '2',
+          c: 'abc',
+        },
+      })
+    }).toThrow()
+
+    let result3 = await router.run({
+      pathname: '/mix1',
+      query: {
+        a: '1',
+        b: '2',
+        c: 30000,
+      },
+    })
+
+    expect(result3.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'mix1',
+        query: {
+          a: 1,
+          b: '2',
+          c: 30000,
+        },
+      },
+    })
+
+    expect(() => {
+      router.run({
+        pathname: '/mix1',
+        query: {
+          a: '1',
+          b: '3',
+          c: 30000,
+        },
+      })
+    }).toThrow()
+
+    let result4 = await router.run({
+      pathname: '/mix2',
+      query: {
+        a: '1',
+        b: '2123123123',
+        c: 'abc',
+      },
+    })
+
+    expect(result4.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'mix2',
+        query: {
+          a: '1',
+          b: '2123123123',
+          c: 'abc',
+        },
+      },
+    })
+
+    expect(() => {
+      router.run({
+        pathname: '/mix1',
+        query: {
+          a: '2',
+          b: '3',
+          c: 'abc',
+        },
+      })
+    }).toThrow()
+  })
+
+  it('support using dynamic params in pathname and querystring at the same time', async () => {
+    let router = Router()
+
+    router
+      .match({
+        url: '/test0/<name:string>/<age:int>?static=abc&<dynamic:int>',
+      })
+      .use((request) => {
+        return Response.json({
+          type: 'test0',
+          ...request,
+        })
+      })
+
+    expect(() => {
+      router.run({
+        pathname: '/test0/farrow/20',
+        query: {
+          static: 'abc',
+        },
+      })
+    }).toThrow()
+
+    let result0 = await router.run({
+      pathname: '/test0/farrow/20',
+      query: {
+        static: 'abc',
+        dynamic: '20',
+      },
+    })
+
+    expect(result0.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'test0',
+        pathname: '/test0/farrow/20',
+        params: {
+          name: 'farrow',
+          age: 20,
+        },
+        query: {
+          static: 'abc',
+          dynamic: 20,
+        },
+      },
+    })
+  })
+
+  it('support modifier in dynamic params', async () => {
+    let router = Router()
+
+    router
+      .match({
+        url: '/optional/<name?:string>',
+      })
+      .use((request) => {
+        return Response.json({
+          type: 'optional',
+          value: request.params.name ?? 'default-value',
+        })
+      })
+
+    router
+      .match({
+        url: '/zero/or/more/<name*:string>',
+      })
+      .use((request) => {
+        return Response.json({
+          type: 'zero-or-more',
+          value: request.params.name as JsonType,
+        })
+      })
+
+    router
+      .match({
+        url: '/one/or/more/<name+:string>',
+      })
+      .use((request) => {
+        return Response.json({
+          type: 'one-or-more',
+          value: request.params.name as JsonType,
+        })
+      })
+
+    let result0 = await router.run({
+      pathname: '/optional',
+    })
+
+    expect(result0.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'optional',
+        value: 'default-value',
+      },
+    })
+
+    let result1 = await router.run({
+      pathname: '/optional/abc',
+    })
+
+    expect(result1.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'optional',
+        value: 'abc',
+      },
+    })
+
+    let result2 = await router.run({
+      pathname: '/zero/or/more',
+    })
+
+    expect(result2.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'zero-or-more',
+      },
+    })
+
+    let result3 = await router.run({
+      pathname: '/zero/or/more/abc',
+    })
+
+    expect(result3.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'zero-or-more',
+        value: ['abc'],
+      },
+    })
+
+    let result4 = await router.run({
+      pathname: '/zero/or/more/abc/efg',
+    })
+
+    expect(result4.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'zero-or-more',
+        value: ['abc', 'efg'],
+      },
+    })
+
+    expect(() => {
+      let result5 = router.run({
+        pathname: '/one/or/more',
+      })
+    }).toThrow()
+
+    let result6 = await router.run({
+      pathname: '/one/or/more/abc',
+    })
+
+    expect(result6.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'one-or-more',
+        value: ['abc'],
+      },
+    })
+
+    let result7 = await router.run({
+      pathname: '/one/or/more/abc/efg',
+    })
+
+    expect(result7.info.body).toEqual({
+      type: 'json',
+      value: {
+        type: 'one-or-more',
+        value: ['abc', 'efg'],
+      },
+    })
   })
 })

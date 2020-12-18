@@ -26,8 +26,8 @@ type ParseValue<T extends string> = ParseItem<ParseUnion<T>>
 
 type ParseModifier<Key extends string, Value> =
   Key extends `${infer K}?` ? { [key in K]?: Value } :
+  Key extends `${infer K}*` ? { [key in K]?: Value[] } :
   Key extends `${infer K}+` ? { [key in K]: Value[] } :
-  Key extends `${infer K}*` ? { [key in K]: Value[] } :
   { [key in Key]: Value }
 
 type ParseDynamic<T extends string> =
@@ -85,3 +85,5 @@ export type ParseUrl<T extends string> = CleanEmptyObject<{
 // type T7 = Prettier<ParseUrl<`/hello?<a:{a}|{b}|{c}|{123}>&<c:d>`>>
 
 // type T8 = Prettier<ParseUrl<`/hello/<a?:id>/<c?:float>`>>
+
+// type T9 = Prettier<ParseUrl<'/<arg:string>'>>

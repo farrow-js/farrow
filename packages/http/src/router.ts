@@ -35,8 +35,8 @@ export type RouterRequestSchema = {
   query?: RouterSchemaDescriptor
 } & RouterSharedSchema
 
-export type RouterUrlSchema = {
-  url: string
+export type RouterUrlSchema<T extends string = string> = {
+  url: T
 } & RouterSharedSchema
 
 export const isRouterRequestSchema = (input: any): input is RouterRequestSchema => {
@@ -64,6 +64,10 @@ export type TypeOfRequestSchema<T extends RouterRequestSchema> = MarkReadOnlyDee
 export type TypeOfUrlSchema<T extends RouterUrlSchema> = MarkReadOnlyDeep<
   ParseUrl<T['url']> & TypeOfRouterRequestField<Omit<T, 'url'>>
 >
+
+type T0 = TypeOfUrlSchema<{
+  url: '/<arg:string>'
+}>
 
 const createRequestSchemaValidatorAndMatcher = <T extends RouterRequestSchema>(schema: T) => {
   let descriptors: Schema.FieldDescriptors = {
@@ -107,15 +111,22 @@ const createRequestSchemaValidatorAndMatcher = <T extends RouterRequestSchema>(s
 }
 
 const splitUrlPattern = (url: string) => {
-  let list = url.split('?')
   let pathname = ''
   let querystring = ''
+  let isQuerystring = false
 
-  for (let item of list) {
-    if (!querystring && !item.startsWith(':')) {
-      pathname += item
-    } else {
+  for (let i = 0; i < url.length; i++) {
+    let item = url.charAt(i)
+
+    if (item === '?' && url.charAt(i + 1) !== ':') {
+      isQuerystring = true
+      continue
+    }
+
+    if (isQuerystring) {
       querystring += item
+    } else {
+      pathname += item
     }
   }
 
@@ -139,9 +150,14 @@ const createSchemaByString = (str: string): Schema.SchemaCtor => {
     return SchemaMap[str]
   }
 
+  // is union type
+  if (str.includes('|')) {
+    return Schema.Union(...str.split('|').map(createSchemaByString))
+  }
+
   // is literal string type
   if (str.startsWith('{') && str.endsWith('}')) {
-    let value = str.substr(1, str.length - 1)
+    let value = str.substring(1, str.length - 1)
     return Schema.Literal(value)
   }
 
@@ -155,16 +171,17 @@ const resolveUrlPattern = <T extends string>(input: T) => {
 
   let resolve = (source: string, descriptors: RouterSchemaDescriptor) => {
     return source.replace(/<([^>]*)>/g, (match) => {
-      let [key, value] = match.split(':')
+      let [key, value] = match.substring(1, match.length - 1).split(':')
+      let Type = createSchemaByString(value)
 
       if (key.endsWith('?')) {
         let name = key.substr(0, key.length - 1)
-        descriptors[name] = Schema.Nullable(createSchemaByString(value))
+        descriptors[name] = Schema.Nullable(Type)
       } else if (key.endsWith('+') || key.endsWith('*')) {
         let name = key.substr(0, key.length - 1)
-        descriptors[name] = Schema.List(createSchemaByString(value))
+        descriptors[name] = key.endsWith('*') ? Schema.Nullable(Schema.List(Type)) : Schema.List(Type)
       } else {
-        descriptors[key] = createSchemaByString(value)
+        descriptors[key] = Type
       }
 
       return `:${key}`
@@ -172,14 +189,26 @@ const resolveUrlPattern = <T extends string>(input: T) => {
   }
 
   let pathname = resolve(url.pathname, params)
-  let querystring = resolve(url.querystring, query)
 
-  for (let [key, item] of Object.entries(parseQuery(querystring))) {
+  let parsedQuery = parseQuery(url.querystring)
+
+  resolve(url.querystring, query)
+
+  for (let [key, item] of Object.entries(parsedQuery)) {
     let isDynamicKey = key.startsWith('<') && key.endsWith('>')
     if (!isDynamicKey) {
       query[key] = Schema.Literal(item + '')
     }
   }
+
+  // console.log('pathname', {
+  //   url: input,
+  //   pathname,
+  //   parsed: url,
+  //   query,
+  //   params,
+  //   parsedQuery
+  // })
 
   return {
     pathname,
@@ -247,7 +276,10 @@ export type RouterPipeline = Pipeline<RequestInfo, MaybeAsyncResponse> & {
     schema: T,
     options?: MatchOptions,
   ): Pipeline<TypeOfRequestSchema<T>, MaybeAsyncResponse>
-  match<T extends RouterUrlSchema>(schema: T, options?: MatchOptions): Pipeline<TypeOfUrlSchema<T>, MaybeAsyncResponse>
+  match<U extends string, T extends RouterUrlSchema<U>>(
+    schema: T,
+    options?: MatchOptions,
+  ): Pipeline<TypeOfUrlSchema<T>, MaybeAsyncResponse>
 }
 
 export type RouterPipelineOptions = {}

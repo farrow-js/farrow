@@ -127,7 +127,7 @@ http.use((request) => {
 
 ### How to match specific request
 
-Click [Router-Url-Schema](./docs/http#router-url-schema) to read more
+Click [Router-Url-Schema](./docs/http.md#router-url-schema) to read more
 
 ```typescript
 // http.match(schema).use(...middlewares)

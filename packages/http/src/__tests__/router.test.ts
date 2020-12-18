@@ -1296,12 +1296,23 @@ describe('Router Url Pattern', () => {
   it('support routing methods', async () => {
     let router = Router()
 
-    router.get('/get0/<arg0:int>?<arg1:int>').use((request) => {
-      return Response.json({
-        type: 'get',
-        request,
-      })
-    })
+    router.get('/get0/<arg0:int>?<arg1:int>').use(
+      (request: {
+        readonly pathname: string
+        readonly params: {
+          readonly arg0: number
+        }
+        readonly query: {
+          readonly arg1: number
+        }
+        readonly method: string
+      }) => {
+        return Response.json({
+          type: 'get',
+          request,
+        })
+      },
+    )
 
     router
       .get('/get1/<arg0:int>?<arg1:int>', {
@@ -1309,12 +1320,26 @@ describe('Router Url Pattern', () => {
           a: Int,
         },
       })
-      .use((request) => {
-        return Response.json({
-          type: 'get',
-          request,
-        })
-      })
+      .use(
+        (request: {
+          readonly pathname: string
+          readonly params: {
+            readonly arg0: number
+          }
+          readonly query: {
+            readonly arg1: number
+          }
+          readonly method: string
+          readonly headers: {
+            readonly a: number
+          }
+        }) => {
+          return Response.json({
+            type: 'get',
+            request,
+          })
+        },
+      )
 
     router
       .post('/post/<arg0:int>?<arg1:int>', {
@@ -1658,22 +1683,29 @@ describe('Router Url Pattern', () => {
   it('support literal string unions', async () => {
     let router = Router()
 
-    router
-      .match({
-        url: '/some-service/<client:{mac}|{win}|{iphone}|{android}|{api}>/users/<id:number>',
-      })
-      .use((request) => {
+    router.get('/some-service/<client:{mac}|{win}|{iphone}|{android}|{api}>/users/<id:number>').use(
+      (request: {
+        readonly pathname: string
+        readonly params: {
+          readonly client: 'mac' | 'win' | 'iphone' | 'android' | 'api'
+          readonly id: number
+        }
+        readonly method: string
+      }) => {
         return Response.json(request)
-      })
+      },
+    )
 
     let result0 = await router.run({
       pathname: '/some-service/mac/users/123',
+      method: 'GET',
     })
 
     expect(result0.info.body).toEqual({
       type: 'json',
       value: {
         pathname: '/some-service/mac/users/123',
+        method: 'GET',
         params: {
           client: 'mac',
           id: 123,

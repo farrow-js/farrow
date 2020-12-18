@@ -62,7 +62,10 @@ export type TypeOfRequestSchema<T extends RouterRequestSchema> = MarkReadOnlyDee
 >
 
 export type TypeOfUrlSchema<T extends RouterUrlSchema> = MarkReadOnlyDeep<
-  ParseUrl<T['url']> & TypeOfRouterRequestField<Omit<T, 'url'>>
+  ParseUrl<T['url']> &
+    {
+      [key in keyof Omit<T, 'url'>]: TypeOfRouterRequestField<Omit<T, 'url'>[key]>
+    }
 >
 
 const createRequestSchemaValidatorAndMatcher = <T extends RouterRequestSchema>(schema: T) => {
@@ -278,16 +281,12 @@ export type RouterPipeline = Pipeline<RequestInfo, MaybeAsyncResponse> & {
   ): Pipeline<TypeOfUrlSchema<T>, MaybeAsyncResponse>
 } & RoutingMethods
 
-export type RoutingMethod = <U extends string, T extends Omit<RouterSharedSchema, 'method'>>(
+export type RoutingMethod = <U extends string, T extends RouterSharedSchema>(
   path: U,
   schema?: T,
   options?: MatchOptions,
 ) => Pipeline<
-  MarkReadOnlyDeep<
-    ParseUrl<U> & { readonly method: string } & (T extends Omit<RouterSharedSchema, 'method'>
-        ? TypeOfRouterRequestField<T>
-        : {})
-  >,
+  MarkReadOnlyDeep<TypeOfUrlSchema<{ url: U; method: string } & (RouterSharedSchema extends T ? {} : T)>>,
   MaybeAsyncResponse
 >
 
@@ -417,7 +416,7 @@ export const createRouterPipeline = (): RouterPipeline => {
   }
 
   let createRoutingMethod = (method: string) => {
-    return ((<U extends string, T extends Omit<RouterUrlSchema<U>, 'url' | 'method'>>(
+    return ((<U extends string, T extends Omit<RouterSharedSchema, 'method'>>(
       path: U,
       schema?: T,
       options?: MatchOptions,

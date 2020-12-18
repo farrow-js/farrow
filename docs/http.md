@@ -153,7 +153,9 @@ type RouterRequestSchema = {
 
 type MatchOptions = {
   // if true, it will throw error when there are no middlewares handle the request, or it will calling next()
-  block: boolean
+  block?: boolean
+  // if given, it will be called when Router-Request-Schema was failed, if it returned Response in sync or async way, that would be the final response of middleware
+  onSchemaError?(error: ValidationError): Response | void | Promise<Response | void>
 }
 
 const router = Router()
@@ -257,7 +259,7 @@ The supported types in `<key:type>` are list below:
 
 ## Routing methods
 
-`router[get|post|put|patch|head|delte|options](url, schema, options)` is supported as shortcut of `router.match({ url, method: get|post|put|patch|head|delte|options }, options)`
+`router[get|post|put|patch|head|delte|options](url, schema?, options?)` is supported as shortcut of `router.match({ url, method: get|post|put|patch|head|delte|options }, options?)`
 
 ```typescript
 router.get('/get0/<arg0:int>?<arg1:int>').use((request) => {

@@ -679,6 +679,91 @@ describe('Http', () => {
       await request(server).delete('/test').expect(200, 'test')
       await request(server).put('/test').expect(200, 'test')
     })
+
+    it('should respond 400 if request schema was not matched', async () => {
+      let http = createHttp()
+      let server = http.server()
+
+      http.get('/<name:string>/<age:int>').use((request) => {
+        return Response.json({
+          name: request.params.name,
+          age: request.params.age,
+        })
+      })
+
+      await request(server).get('/farrow/20').expect(200, {
+        name: 'farrow',
+        age: 20,
+      })
+
+      await request(server).get('/farrow/abc').expect(400)
+    })
+
+    it('should handle schema-error if options.onSchemaError is used', async () => {
+      let http = createHttp()
+      let server = http.server()
+
+      http
+        .get(
+          '/catch0/<name:string>/<age:int>',
+          {},
+          {
+            onSchemaError: (error) => {
+              return Response.json({
+                error,
+              })
+            },
+          },
+        )
+        .use((request) => {
+          return Response.json({
+            name: request.params.name,
+            age: request.params.age,
+          })
+        })
+
+      let count = 0
+
+      http
+        .get(
+          '/catch1/<name:string>/<age:int>',
+          {},
+          {
+            onSchemaError: () => {
+              count = 1
+            },
+          },
+        )
+        .use((request) => {
+          return Response.json({
+            name: request.params.name,
+            age: request.params.age,
+          })
+        })
+
+      await request(server).get('/catch0/farrow/20').expect(200, {
+        name: 'farrow',
+        age: 20,
+      })
+
+      await request(server)
+        .get('/catch0/farrow/abc')
+        .expect(200, {
+          error: {
+            path: ['params', 'age'],
+            message: 'abc is not an integer',
+          },
+        })
+
+      await request(server).get('/catch1/farrow/20').expect(200, {
+        name: 'farrow',
+        age: 20,
+      })
+
+      await request(server).get('/catch1/farrow/abc').expect(400)
+
+      expect(count).toBe(1)
+    })
   })
 
   describe('Request', () => {

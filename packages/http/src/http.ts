@@ -210,7 +210,7 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
       let message = process.env.NODE_ENV !== 'production' ? error?.stack || error?.message : error?.message
 
       if (!res.headersSent) {
-        res.statusCode = 500
+        res.statusCode = error.statusCode ?? 500
         res.setHeader('Content-Type', 'text/plain')
         res.setHeader('Content-Length', Buffer.byteLength(message))
       }

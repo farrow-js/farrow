@@ -5,7 +5,7 @@ import { parse as parseQuery } from 'qs'
 import { createPipeline, useContainer, MiddlewareInput, Pipeline, Middleware } from 'farrow-pipeline'
 
 import * as Schema from 'farrow-schema'
-import {} from 'farrow-schema'
+import { ValidationError } from 'farrow-schema/validator'
 
 import { Validator, createSchemaValidator } from 'farrow-schema/validator'
 
@@ -14,6 +14,7 @@ import { BodyMap } from './responseInfo'
 import { route as createRoute } from './basenames'
 import { MaybeAsyncResponse, matchBodyType, Response } from './response'
 import { MarkReadOnlyDeep, ParseUrl } from './types'
+import { HttpError } from './HttpError'
 
 export { Pathname }
 
@@ -250,7 +251,8 @@ export type HttpMiddleware = Middleware<RequestInfo, MaybeAsyncResponse>
 export type HttpMiddlewareInput = MiddlewareInput<RequestInfo, MaybeAsyncResponse>
 
 export type MatchOptions = {
-  block: boolean
+  block?: boolean
+  onSchemaError?(error: ValidationError): Response | void | Promise<Response | void>
 }
 
 export type RouterSchema = RouterRequestSchema | RouterUrlSchema
@@ -342,7 +344,7 @@ export const createRouterPipeline = (): RouterPipeline => {
 
     let methods = getMethods(method)
 
-    pipeline.use((input, next) => {
+    pipeline.use(async (input, next) => {
       let container = useContainer()
 
       if (input.method && !methods.includes(input.method.toLowerCase())) {
@@ -363,13 +365,18 @@ export const createRouterPipeline = (): RouterPipeline => {
       })
 
       if (result.isErr) {
+        if (config.onSchemaError) {
+          let response = await config.onSchemaError(result.value)
+          if (response) return response
+        }
+
         let message = result.value.message
 
         if (result.value.path) {
           message = `path: ${JSON.stringify(result.value.path)}\n` + message
         }
 
-        throw new Error(message)
+        throw new HttpError(message, 400)
       }
 
       return matchedPipeline.run(result.value, {

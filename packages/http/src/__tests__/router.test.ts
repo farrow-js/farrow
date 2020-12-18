@@ -14,11 +14,11 @@ describe('Router', () => {
       return Response.json(request)
     })
 
-    expect(() => {
-      router.run({
+    expect(async () => {
+      await router.run({
         pathname: '/abc',
       })
-    }).toThrow()
+    }).rejects.toThrow()
 
     let result = await router.run({
       pathname: '/test',
@@ -72,11 +72,11 @@ describe('Router', () => {
       return Response.json(request)
     })
 
-    expect(() => {
-      router.run({
+    expect(async () => {
+      await router.run({
         pathname: '/detail/abc',
       })
-    }).toThrow()
+    }).rejects.toThrow()
 
     let request0 = {
       pathname: '/detail/123',
@@ -188,9 +188,9 @@ describe('Router', () => {
       query: {},
     }
 
-    expect(() => {
-      router.run(request2)
-    }).toThrow()
+    expect(async () => {
+      await router.run(request2)
+    }).rejects.toThrow()
   })
 
   it('can validate number | int | float | boolean strictly', async () => {
@@ -220,14 +220,14 @@ describe('Router', () => {
         return Response.json(request)
       })
 
-    expect(() => {
-      router0.run({
+    expect(async () => {
+      await router0.run({
         pathname: '/',
         query: {
           id: '123',
         },
       })
-    }).toThrow()
+    }).rejects.toThrow()
 
     let result1 = await router1.run({
       pathname: '/',
@@ -258,17 +258,17 @@ describe('Router', () => {
         return Response.json(request)
       })
 
-    expect(() => {
-      router.run({
+    expect(async () => {
+      await router.run({
         pathname: '/abc',
       })
-    }).toThrow()
+    }).rejects.toThrow()
 
-    expect(() => {
-      router.run({
+    expect(async () => {
+      await router.run({
         pathname: '/abc/test',
       })
-    }).toThrow()
+    }).rejects.toThrow()
 
     let result0 = await router.run({
       pathname: '/test/abc',
@@ -496,11 +496,11 @@ describe('Router Url Pattern', () => {
         })
       })
 
-    expect(() => {
-      router.run({
+    expect(async () => {
+      await router.run({
         pathname: '/abc',
       })
-    }).toThrow()
+    }).rejects.toThrow()
 
     let result0 = await router.run({
       pathname: '/string/123',
@@ -738,11 +738,11 @@ describe('Router Url Pattern', () => {
         })
       })
 
-    expect(() => {
-      router.run({
+    expect(async () => {
+      await router.run({
         pathname: '/abc',
       })
-    }).toThrow()
+    }).rejects.toThrow()
 
     let result0 = await router.run({
       pathname: '/string',
@@ -972,15 +972,15 @@ describe('Router Url Pattern', () => {
         })
       })
 
-    expect(() => {
-      router.run({
+    expect(async () => {
+      await router.run({
         pathname: '/static',
         query: {
           a: 'a',
           b: 'b',
         },
       })
-    }).toThrow()
+    }).rejects.toThrow()
 
     let result0 = await router.run({
       pathname: '/static',
@@ -1043,8 +1043,8 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    expect(() => {
-      router.run({
+    expect(async () => {
+      await router.run({
         pathname: '/mix0',
         query: {
           a: '1',
@@ -1052,7 +1052,7 @@ describe('Router Url Pattern', () => {
           c: 'abc',
         },
       })
-    }).toThrow()
+    }).rejects.toThrow()
 
     let result3 = await router.run({
       pathname: '/mix1',
@@ -1075,8 +1075,8 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    expect(() => {
-      router.run({
+    expect(async () => {
+      await router.run({
         pathname: '/mix1',
         query: {
           a: '1',
@@ -1084,7 +1084,7 @@ describe('Router Url Pattern', () => {
           c: 30000,
         },
       })
-    }).toThrow()
+    }).rejects.toThrow()
 
     let result4 = await router.run({
       pathname: '/mix2',
@@ -1107,8 +1107,8 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    expect(() => {
-      router.run({
+    expect(async () => {
+      await router.run({
         pathname: '/mix1',
         query: {
           a: '2',
@@ -1116,7 +1116,7 @@ describe('Router Url Pattern', () => {
           c: 'abc',
         },
       })
-    }).toThrow()
+    }).rejects.toThrow()
   })
 
   it('support using dynamic params in pathname and querystring at the same time', async () => {
@@ -1133,14 +1133,14 @@ describe('Router Url Pattern', () => {
         })
       })
 
-    expect(() => {
-      router.run({
+    expect(async () => {
+      await router.run({
         pathname: '/test0/farrow/20',
         query: {
           static: 'abc',
         },
       })
-    }).toThrow()
+    }).rejects.toThrow()
 
     let result0 = await router.run({
       pathname: '/test0/farrow/20',
@@ -1262,11 +1262,11 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    expect(() => {
-      let result5 = router.run({
+    expect(async () => {
+      let result5 = await router.run({
         pathname: '/one/or/more',
       })
-    }).toThrow()
+    }).rejects.toThrow()
 
     let result6 = await router.run({
       pathname: '/one/or/more/abc',

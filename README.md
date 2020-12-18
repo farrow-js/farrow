@@ -219,7 +219,7 @@ http.use(() => {
 
 ```typescript
 http.use(() => {
-  return Response.status(404, 'Not Fouind').html('some text')
+  return Response.status(404, 'Not Found').html('some text')
 })
 ```
 

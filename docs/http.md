@@ -255,7 +255,7 @@ The supported types in `<key:type>` are list below:
 - `id` -> ts `string`, but `farrow-schema` will ensure it's not empty
 - `int` -> ts `number`, but `farrow-schema` will ensure it's integer
 - `float` -> ts `number`
-- `{*+}` -> use the string wrapped `{}` as `string literal type`. eg. `{abc}` is type `"abc"`, only `string literal type` is supported
+- `{*+}` -> use the string wrapped by `{}` as `string literal type`. eg. `{abc}` is type `"abc"`, only `string literal type` is supported
 
 ## Routing methods
 

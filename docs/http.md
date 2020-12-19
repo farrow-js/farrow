@@ -147,7 +147,7 @@ type RouterRequestSchema = {
   body?: Schema.FieldDescriptor | Schema.FieldDescriptors
   // match the req headers
   headers?: RouterSchemaDescriptor
-  // match the rqe cookies
+  // match the req cookies
   cookies?: RouterSchemaDescriptor
 }
 

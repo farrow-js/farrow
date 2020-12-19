@@ -1,11 +1,16 @@
 import path from 'path'
-import { Http } from 'farrow-http'
+import { Http, Response } from 'farrow-http'
 import { router as api } from './api'
 import { router as pages } from './pages'
 import { Action2Api } from './middleware/Action2Page'
 
 const http = Http({
   basenames: ['/base'],
+})
+
+http.get('/greet/<name:string>?<age:int>&farrow=type-safe').use((request) => {
+  console.log(request.query.farrow)
+  return Response.text(`Hello ${request.params.name}, your age is ${request.query.age}`)
 })
 
 http.use(pages)

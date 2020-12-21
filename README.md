@@ -1,11 +1,29 @@
 # 𝓕𝓪𝓻𝓻𝓸𝔀
 
-[![npm version](https://img.shields.io/npm/v/farrow-http.svg?style=flat)](https://www.npmjs.com/package/farrow-http)
-[![Build Status](https://travis-ci.org/Lucifier129/farrow.svg?branch=master)](https://travis-ci.org/Lucifier129/farrow)
-[![Documentation](https://img.shields.io/badge/documentation-yes-brightgreen.svg)](https://github.com/Lucifier129/farrow#readme)
-[![Maintenance](https://img.shields.io/badge/Maintained%3F-yes-green.svg)](https://github.com/Lucifier129/farrow/graphs/commit-activity)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Lucifier129/farrow/blob/master/LICENSE)
-[![Twitter: guyingjie129](https://img.shields.io/twitter/follow/guyingjie129.svg?style=social)](https://twitter.com/guyingjie129)
+<p align="center">
+  <img height="400" src="./docs/assets/farrow-description.png" alt="Farrow Description">
+</p>
+
+<p align="center">
+  <a href="https://www.npmjs.com/package/farrow-http" rel="nofollow">
+    <img alt="npm version" src="https://img.shields.io/npm/v/farrow-http.svg?style=flat" style="max-width:100%;">
+  </a>
+  <a href="https://travis-ci.org/Lucifier129/farrow" rel="nofollow">
+    <img alt="Build Status" src="https://travis-ci.org/Lucifier129/farrow.svg?branch=master" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/Lucifier129/farrow#readme">
+    <img alt="Documentation" src="https://img.shields.io/badge/documentation-yes-brightgreen.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/Lucifier129/farrow/graphs/commit-activity">
+    <img alt="Maintenance" src="https://img.shields.io/badge/Maintained%3F-yes-green.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/Lucifier129/farrow/blob/master/LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-yellow.svg" style="max-width:100%;">
+  </a>
+  <a href="https://twitter.com/guyingjie129" rel="nofollow">
+    <img alt="Twitter: guyingjie129" src="https://img.shields.io/twitter/follow/guyingjie129.svg?style=social" style="max-width:100%;">
+  </a>
+</p>
 
 **Farrow** is a functional-style web framework for node.js written by TypeScript
 

@@ -140,6 +140,7 @@ Click [Router-Url-Schema](./docs/http.md#router-url-schema) to read more
 http
   .match({
     pathname: '/product',
+    // if method was not given, the default value wounld be `GET`.
     query: {
       productId: Number,
     },

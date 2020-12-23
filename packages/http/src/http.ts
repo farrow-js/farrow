@@ -303,7 +303,7 @@ export const handleResponse = async (params: ResponseParams) => {
       if (cookie.value !== null) {
         cookiesInstance.set(name, cookie.value + '', cookie.options)
       } else {
-        cookiesInstance.set(name, cookie.options)
+        cookiesInstance.set(name, '', cookie.options)
       }
     })
   }

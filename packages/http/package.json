@@ -17,7 +17,7 @@
     "@types/co-body": "^5.1.0",
     "@types/content-disposition": "^0.5.3",
     "@types/cookie": "^0.4.0",
-    "@types/cookies": "^0.7.4",
+    "@types/cookies": "^0.7.6",
     "@types/destroy": "^1.0.0",
     "@types/encodeurl": "^1.0.0",
     "@types/escape-html": "^1.0.0",

@@ -1,5 +1,5 @@
 import { isNumberConstructor, isStringConstructor, isBooleanConstructor } from './utils'
-import {  MarkReadOnlyDeep } from './types'
+import { MarkReadOnlyDeep } from './types'
 
 export type Prettier<T> = T extends object | any[]
   ? {
@@ -102,7 +102,7 @@ export const toSchemaCtors = <T extends SchemaCtorInputs>(Inputs: T): ToSchemaCt
       // @ts-ignore
       result[key] = toSchemaCtor(Inputs[key])
     }
-    
+
     return result
   }
 
@@ -124,10 +124,11 @@ export type TypeOf<T extends Schema | SchemaCtor> = T extends Schema
   : never
 
 type TypeOfObjectType<T extends ObjectType> = {
-  [key in keyof T as T[key] extends FieldDescriptor | FieldDescriptors ? key : never]:
-    T[key] extends FieldDescriptor ? TypeOfFieldDescriptor<T[key]> :
-    T[key] extends FieldDescriptors ? TypeOfFieldDescriptors<T[key]> :
-    never
+  [key in keyof T as T[key] extends FieldDescriptor | FieldDescriptors ? key : never]: T[key] extends FieldDescriptor
+    ? TypeOfFieldDescriptor<T[key]>
+    : T[key] extends FieldDescriptors
+    ? TypeOfFieldDescriptors<T[key]>
+    : never
 }
 
 export const kind = <T extends string>(name: T) => name
@@ -198,7 +199,9 @@ export const List = <T extends SchemaCtorInput>(Item: T) => {
 
 type TypeofUnion<T extends SchemaCtor[]> = TypeOfSchemaCtor<T[number]>
 
-export abstract class UnionType<T extends SchemaCtorInput[] = SchemaCtorInput[]> extends Schema<TypeofUnion<ToSchemaCtors<T>>> {
+export abstract class UnionType<T extends SchemaCtorInput[] = SchemaCtorInput[]> extends Schema<
+  TypeofUnion<ToSchemaCtors<T>>
+> {
   [Kind] = kind('Union')
   abstract Items: ToSchemaCtors<T>
 }
@@ -213,7 +216,9 @@ type UnionToIntersection<T> = (T extends any ? (x: T) => any : never) extends (x
 
 type TypeOfIntersect<T extends SchemaCtor[]> = UnionToIntersection<TypeOf<T[number]>>
 
-export abstract class IntersectType<T extends SchemaCtorInput[] = SchemaCtorInput[]> extends Schema<TypeOfIntersect<ToSchemaCtors<T>>> {
+export abstract class IntersectType<T extends SchemaCtorInput[] = SchemaCtorInput[]> extends Schema<
+  TypeOfIntersect<ToSchemaCtors<T>>
+> {
   [Kind] = kind('Intersect')
   abstract Items: ToSchemaCtors<T>
 }
@@ -254,7 +259,9 @@ type TypeOfRecord<T extends SchemaCtor> = {
   [key: string]: TypeOfSchemaCtor<T>
 }
 
-export abstract class RecordType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<TypeOfRecord<ToSchemaCtor<T>>> {
+export abstract class RecordType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<
+  TypeOfRecord<ToSchemaCtor<T>>
+> {
   [Kind] = kind('Record')
   abstract Item: ToSchemaCtor<T>
 }
@@ -272,6 +279,9 @@ export type JsonType =
   | null
   | undefined
   | JsonType[]
+  | {
+      toJSON(): string
+    }
   | {
       [key: string]: JsonType
     }
@@ -295,7 +305,9 @@ export const Strict = <T extends SchemaCtorInput>(Item: T) => {
   }
 }
 
-export abstract class NonStrictType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<TypeOf<ToSchemaCtor<T>>> {
+export abstract class NonStrictType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<
+  TypeOf<ToSchemaCtor<T>>
+> {
   [Kind] = kind('Strict')
   abstract Item: ToSchemaCtor<T>
 }
@@ -306,8 +318,9 @@ export const NonStrict = <T extends SchemaCtorInput>(Item: T) => {
   }
 }
 
-
-export abstract class ReadOnlyType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<Readonly<TypeOf<ToSchemaCtor<T>>>> {
+export abstract class ReadOnlyType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<
+  Readonly<TypeOf<ToSchemaCtor<T>>>
+> {
   [Kind] = kind('ReadOnly')
   abstract Item: ToSchemaCtor<T>
 }
@@ -318,7 +331,9 @@ export const ReadOnly = <T extends SchemaCtorInput>(Item: T) => {
   }
 }
 
-export abstract class ReadOnlyDeepType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<MarkReadOnlyDeep<TypeOf<ToSchemaCtor<T>>>> {
+export abstract class ReadOnlyDeepType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<
+  MarkReadOnlyDeep<TypeOf<ToSchemaCtor<T>>>
+> {
   [Kind] = kind('ReadOnly')
   abstract Item: ToSchemaCtor<T>
 }

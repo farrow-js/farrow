@@ -1,3 +1,4 @@
+import fs from 'fs'
 import path from 'path'
 import { match as createMatch, MatchFunction, Path as Pathname } from 'path-to-regexp'
 import { parse as parseQuery } from 'qs'
@@ -15,6 +16,7 @@ import { route as createRoute } from './basenames'
 import { MaybeAsyncResponse, matchBodyType, Response } from './response'
 import { MarkReadOnlyDeep, ParseUrl } from './types'
 import { HttpError } from './HttpError'
+import { fstat } from 'fs'
 
 export { Pathname }
 
@@ -318,9 +320,14 @@ export const createRouterPipeline = (): RouterPipeline => {
   }
 
   let serve: RouterPipeline['serve'] = (name, dirname) => {
-    route(name).use((request) => {
+    route(name).use((request, next) => {
       let filename = path.join(dirname, request.pathname)
-      return Response.file(filename)
+      let isExist = fs.existsSync(filename)
+      if (isExist) {
+        return Response.file(filename)
+      } else {
+        return next(request)
+      }
     })
   }
 

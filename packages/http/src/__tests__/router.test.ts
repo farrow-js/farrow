@@ -1713,4 +1713,27 @@ describe('Router Url Pattern', () => {
       },
     })
   })
+
+  it('serve static files', async () => {
+    let router = Router()
+
+    router.serve('/serve/static', './static')
+
+    router.use((request) => {
+      return Response.text('Cheer!')
+    })
+
+    let result0 = await router.run({
+      pathname: '/serve/static/foo.js',
+      method: 'GET',
+    })
+
+    let result1 = await router.run({
+      pathname: '/serve/static/cheer',
+      method: 'GET',
+    })
+
+    expect(result0.info.body).toEqual('module.exports = {}')
+    expect(result1.info.body).toEqual('Cheer!')
+  })
 })

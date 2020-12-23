@@ -319,9 +319,9 @@ export const createRouterPipeline = (): RouterPipeline => {
   }
 
   let serve: RouterPipeline['serve'] = (name, dirname) => {
-    route(name).use((request, next) => {
+    route(name).use(async (request, next) => {
       let filename = path.join(dirname, request.pathname)
-      let isExist = fs.existsSync(filename)
+      let isExist = await isFileExist(filename)
       if (isExist) {
         return Response.file(filename)
       } else {
@@ -477,4 +477,12 @@ const getMethods = (method: RouterRequestSchema['method']) => {
   }
 
   return methods
+}
+
+const isFileExist = (filename: string) => {
+  return new Promise<boolean>((resolve) => {
+    fs.access(filename, fs.constants.F_OK, (err) => {
+      resolve(!err)
+    })
+  })
 }

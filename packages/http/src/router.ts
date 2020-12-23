@@ -16,7 +16,6 @@ import { route as createRoute } from './basenames'
 import { MaybeAsyncResponse, matchBodyType, Response } from './response'
 import { MarkReadOnlyDeep, ParseUrl } from './types'
 import { HttpError } from './HttpError'
-import { fstat } from 'fs'
 
 export { Pathname }
 

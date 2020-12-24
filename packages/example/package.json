@@ -1,6 +1,6 @@
 {
   "name": "farrow-example",
-  "version": "1.3.0",
+  "version": "1.3.1",
   "private": true,
   "description": "Functional style web framework for node.js",
   "scripts": {
@@ -10,13 +10,13 @@
   "author": "Jade Gu",
   "license": "MIT",
   "dependencies": {
-    "ts-node": "^9.1.1",
-    "farrow-http": "^1.3.0",
+    "farrow-http": "^1.3.1",
     "farrow-pipeline": "^1.0.1",
-    "farrow-react": "^1.3.0",
-    "farrow-schema": "^1.1.0",
+    "farrow-react": "^1.3.1",
+    "farrow-schema": "^1.3.1",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
+    "ts-node": "^9.1.1",
     "tslib": "^2.0.3"
   }
 }

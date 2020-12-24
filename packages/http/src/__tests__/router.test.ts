@@ -1,5 +1,5 @@
 import path from 'path'
-import { Router, RouterUrlSchema } from '../router'
+import { Router } from '../router'
 import { Response } from '../response'
 import { Nullable, Strict, Union, Literal, JsonType, Int, Float } from 'farrow-schema'
 import { Stream } from 'stream'

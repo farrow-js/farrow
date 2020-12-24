@@ -1,8 +1,7 @@
-import { createServer, IncomingMessage, request, Server, ServerResponse } from 'http'
+import { createServer, IncomingMessage, Server, ServerResponse } from 'http'
 import fs from 'fs'
 import path from 'path'
 import { Stream } from 'stream'
-import { promisify } from 'util'
 
 import parseBody, { Options as BodyOptions } from 'co-body'
 import { parse as parseCookies, CookieParseOptions as CookieOptions } from 'cookie'
@@ -33,6 +32,8 @@ import { BasenamesContext, handleBasenames } from './basenames'
 import { Router, RouterPipeline } from './router'
 
 import { createLogger, LoggerEvent, LoggerOptions } from './logger'
+
+import { access } from './util'
 
 const RequestContext = createContext<IncomingMessage | null>(null)
 
@@ -303,7 +304,7 @@ export const handleResponse = async (params: ResponseParams) => {
       if (cookie.value !== null) {
         cookiesInstance.set(name, cookie.value + '', cookie.options)
       } else {
-        cookiesInstance.set(name, cookie.options)
+        cookiesInstance.set(name, '', cookie.options)
       }
     })
   }
@@ -311,16 +312,12 @@ export const handleResponse = async (params: ResponseParams) => {
   let handleEmpty = () => {
     let code = responseInfo.status?.code ?? 204
 
-    let body = statuses.message[code] ?? ''
-
     handleStatus({ code })
 
+    res.removeHeader('Content-Type')
     res.removeHeader('Transfer-Encoding')
 
-    res.setHeader('Content-Type', 'text/plain; charset=utf-8')
-    res.setHeader('Content-Length', Buffer.byteLength(body))
-
-    res.end(body)
+    res.end()
   }
 
   let handleString = (content: string) => {
@@ -476,5 +473,3 @@ const handleStream = (res: ServerResponse, stream: Stream) => {
     })
   })
 }
-
-const access = promisify(fs.access)

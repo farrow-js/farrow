@@ -28,6 +28,7 @@ const delay = (time: number) => {
 const createHttp = (options?: HttpPipelineOptions) => {
   return Http({
     logger: false,
+    // @ts-ignore
     ...options,
   })
 }
@@ -121,11 +122,7 @@ describe('Http', () => {
           return Response.empty()
         })
 
-      await request(http.server())
-        .get('/test')
-        .set('Accept', 'text/plain')
-        .expect('Content-Type', /text/)
-        .expect(204, '')
+      await request(http.server()).get('/test').expect(204)
     })
 
     it('support redirecting', async () => {
@@ -569,6 +566,23 @@ describe('Http', () => {
         .expect(200, await read('dist/index.js'))
 
       await request(server).get('/static/abc').expect(404)
+    })
+
+    it('should go through when the file does not exist in router.serve ', async () => {
+      let http = createHttp()
+      let server = http.server()
+      let dirname = path.join(__dirname, '../../fixtures/static')
+      let content = await fs.promises.readFile(path.join(dirname, 'foo.js'))
+
+      http.serve('/static', dirname)
+
+      http.use(() => {
+        return Response.text('Cheer!')
+      })
+
+      await request(server).get('/static/foo.js').expect(200, content.toString())
+
+      await request(server).get('/static/cheer').expect(200, 'Cheer!')
     })
 
     it('support capturing response by type', async () => {

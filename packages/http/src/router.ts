@@ -1,3 +1,4 @@
+import fs from 'fs'
 import path from 'path'
 import { match as createMatch, MatchFunction, Path as Pathname } from 'path-to-regexp'
 import { parse as parseQuery } from 'qs'
@@ -318,9 +319,14 @@ export const createRouterPipeline = (): RouterPipeline => {
   }
 
   let serve: RouterPipeline['serve'] = (name, dirname) => {
-    route(name).use((request) => {
+    route(name).use(async (request, next) => {
       let filename = path.join(dirname, request.pathname)
-      return Response.file(filename)
+      let isExist = await isFileExist(filename)
+      if (isExist) {
+        return Response.file(filename)
+      } else {
+        return next(request)
+      }
     })
   }
 
@@ -471,4 +477,12 @@ const getMethods = (method: RouterRequestSchema['method']) => {
   }
 
   return methods
+}
+
+const isFileExist = (filename: string) => {
+  return new Promise<boolean>((resolve) => {
+    fs.access(filename, fs.constants.F_OK, (err) => {
+      resolve(!err)
+    })
+  })
 }

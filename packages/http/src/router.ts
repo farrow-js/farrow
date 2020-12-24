@@ -16,6 +16,7 @@ import { route as createRoute } from './basenames'
 import { MaybeAsyncResponse, matchBodyType, Response } from './response'
 import { MarkReadOnlyDeep, ParseUrl } from './types'
 import { HttpError } from './HttpError'
+import { isFileExist } from './util'
 
 export { Pathname }
 
@@ -477,12 +478,4 @@ const getMethods = (method: RouterRequestSchema['method']) => {
   }
 
   return methods
-}
-
-const isFileExist = (filename: string) => {
-  return new Promise<boolean>((resolve) => {
-    fs.access(filename, fs.constants.F_OK, (err) => {
-      resolve(!err)
-    })
-  })
 }

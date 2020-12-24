@@ -25,7 +25,7 @@ http
     method: 'POST',
   })
   .use(() => {
-    return Response.status(401)
+    return Response.status(401).text('unauthorized')
   })
 
 http

@@ -571,14 +571,16 @@ describe('Http', () => {
     it('should go through when the file does not exist in router.serve ', async () => {
       let http = createHttp()
       let server = http.server()
+      let dirname = path.join(__dirname, '../../fixtures/static')
+      let content = await fs.promises.readFile(path.join(dirname, 'foo.js'))
 
-      http.serve('/static', path.join(__dirname, '../../fixtures/static'))
+      http.serve('/static', dirname)
 
       http.use(() => {
         return Response.text('Cheer!')
       })
 
-      await request(server).get('/static/foo.js').expect(200, 'module.exports = {}')
+      await request(server).get('/static/foo.js').expect(200, content.toString())
 
       await request(server).get('/static/cheer').expect(200, 'Cheer!')
     })

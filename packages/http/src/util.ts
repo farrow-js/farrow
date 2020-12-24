@@ -29,9 +29,10 @@ export const prettyTime = (start: number): string => {
 
 export const access = fs.promises.access
 
+export const stat = fs.promises.stat
+
 export const isFileExist = (filename: string) => {
-  return access(filename, fs.constants.F_OK | fs.constants.R_OK).then(
-    () => true,
-    () => false,
-  )
+  return stat(filename)
+    .then((stats) => stats.isFile())
+    .catch(() => false)
 }

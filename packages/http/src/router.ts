@@ -1,4 +1,3 @@
-import fs from 'fs'
 import path from 'path'
 import { match as createMatch, MatchFunction, Path as Pathname } from 'path-to-regexp'
 import { parse as parseQuery } from 'qs'
@@ -478,12 +477,4 @@ const getMethods = (method: RouterRequestSchema['method']) => {
   }
 
   return methods
-}
-
-const isFileExist = (filename: string) => {
-  return new Promise<boolean>((resolve) => {
-    fs.stat(filename, (err, stats) => {
-      resolve(!err && stats.isFile())
-    })
-  })
 }

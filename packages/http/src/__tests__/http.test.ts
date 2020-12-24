@@ -583,6 +583,8 @@ describe('Http', () => {
       await request(server).get('/static/foo.js').expect(200, content.toString())
 
       await request(server).get('/static/cheer').expect(200, 'Cheer!')
+
+      await request(server).get('/static').expect(200, 'Cheer!')
     })
 
     it('support capturing response by type', async () => {

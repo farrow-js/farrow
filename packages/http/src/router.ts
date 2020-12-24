@@ -479,3 +479,11 @@ const getMethods = (method: RouterRequestSchema['method']) => {
 
   return methods
 }
+
+const isFileExist = (filename: string) => {
+  return new Promise<boolean>((resolve) => {
+    fs.stat(filename, (err, stats) => {
+      resolve(!err && stats.isFile())
+    })
+  })
+}

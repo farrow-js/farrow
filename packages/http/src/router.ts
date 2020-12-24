@@ -481,8 +481,8 @@ const getMethods = (method: RouterRequestSchema['method']) => {
 
 const isFileExist = (filename: string) => {
   return new Promise<boolean>((resolve) => {
-    fs.access(filename, fs.constants.F_OK, (err) => {
-      resolve(!err)
+    fs.stat(filename, (err, stats) => {
+      resolve(!err && stats.isFile())
     })
   })
 }

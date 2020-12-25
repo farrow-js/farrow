@@ -29,7 +29,7 @@
 
 **Farrow** is a functional-style web framework for node.js written by TypeScript
 
-[API Documentation](./docs/index.md) | [Example](./packages/example)
+[Documentation](./docs/index.md) | [Example](./packages/example)
 
 ## Benefits
 
@@ -487,6 +487,6 @@ Give a ⭐️ if this project helped you!
 
 ## 📝 License
 
-Copyright © 2020 [Jade Gu](https://github.com/Lucifier129).
+Copyright © 2021 [Jade Gu](https://github.com/Lucifier129).
 
 This project is [MIT](https://github.com/Lucifier129/farrow/blob/master/LICENSE) licensed.

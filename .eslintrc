@@ -1,0 +1,27 @@
+{
+  "overrides": [
+    {
+      "files": ["*.ts", "*.tsx"],
+      "parser": "@typescript-eslint/parser",
+      "extends": ["prettier"],
+      "plugins": ["prefer-let", "@typescript-eslint", "prettier"],
+      "rules": {
+        "prefer-let/prefer-let": "error",
+        "prefer-const": "off"
+      }
+    },
+    {
+      "files": ["*.js"],
+      "env": { "node": true },
+      "parserOptions": {
+        "ecmaVersion": 2018
+      },
+      "extends": ["prettier"],
+      "plugins": ["prefer-let", "prettier"],
+      "rules": {
+        "prefer-let/prefer-let": "error",
+        "prefer-const": "off"
+      }
+    }
+  ]
+}

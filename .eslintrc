@@ -1,26 +1,26 @@
 {
+  "root": true,
+  "plugins": ["jest", "prefer-let", "prettier", "@typescript-eslint"],
+  "env": {
+    "node": true
+  },
+  "parserOptions": {
+    "ecmaVersion": 2018
+  },
+  "rules": {
+    "prefer-let/prefer-let": "error",
+    "prettier/prettier": "error"
+  },
   "overrides": [
     {
       "files": ["*.ts", "*.tsx"],
-      "parser": "@typescript-eslint/parser",
-      "extends": ["prettier"],
-      "plugins": ["prefer-let", "@typescript-eslint", "prettier"],
-      "rules": {
-        "prefer-let/prefer-let": "error",
-        "prefer-const": "off"
-      }
+      "parser": "@typescript-eslint/parser"
     },
     {
-      "files": ["*.js"],
-      "env": { "node": true },
-      "parserOptions": {
-        "ecmaVersion": 2018
-      },
-      "extends": ["prettier"],
-      "plugins": ["prefer-let", "prettier"],
+      "files": ["**/__tests__/**/*.js", "**/__tests__/**/*.ts"],
+      "extends": ["plugin:jest/recommended"],
       "rules": {
-        "prefer-let/prefer-let": "error",
-        "prefer-const": "off"
+        "jest/expect-expect": "off"
       }
     }
   ]

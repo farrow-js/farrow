@@ -40,25 +40,19 @@ http
 /* -------------------------------------------------------------------------- */
 
 describe('error response', function () {
-  it('500', function (done) {
-    supertest(app)
-      .post('/five-hundred')
-      .expect(500)
-      .expect('Access-Control-Allow-Origin', '*')
-      .expect(/nope/i)
-      .end(done)
+  it('500', async () => {
+    await supertest(app).post('/five-hundred').expect(500).expect('Access-Control-Allow-Origin', '*').expect(/nope/i)
   })
 
-  it('401', function (done) {
-    supertest(app)
+  it('401', async () => {
+    await supertest(app)
       .post('/four-oh-one')
       .expect(401)
       .expect('Access-Control-Allow-Origin', '*')
       .expect(/unauthorized/i)
-      .end(done)
   })
 
-  it('404', function (done) {
-    supertest(app).post('/four-oh-four').expect(404).expect('Access-Control-Allow-Origin', '*').end(done)
+  it('404', async () => {
+    supertest(app).post('/four-oh-four').expect(404).expect('Access-Control-Allow-Origin', '*')
   })
 })

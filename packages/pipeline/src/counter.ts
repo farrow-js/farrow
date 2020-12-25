@@ -1,10 +1,6 @@
 export type Next<I = unknown, O = unknown> = (input?: I) => O
 
-export type CounterCallback<I = unknown, O = unknown> = (
-  index: number,
-  input: I,
-  next: Next<I, O>
-) => O
+export type CounterCallback<I = unknown, O = unknown> = (index: number, input: I, next: Next<I, O>) => O
 
 export type Counter<I = unknown, O = unknown> = {
   start: (input: I) => O

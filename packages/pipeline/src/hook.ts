@@ -1,4 +1,3 @@
-
 type AnyFn = (...args: any) => any
 
 type Hooks = {

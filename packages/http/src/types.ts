@@ -2,41 +2,42 @@ import { Prettier } from 'farrow-schema'
 
 export type MarkReadOnlyDeep<T> = T extends object | any[]
   ? {
-    readonly [key in keyof T]: MarkReadOnlyDeep<T[key]>
-  }
+      readonly [key in keyof T]: MarkReadOnlyDeep<T[key]>
+    }
   : T
 
-type ParseUnion<T extends string> = T extends `${infer Left}|${infer Right}`
-  ? Left | ParseUnion<Right>
-  : T
+type ParseUnion<T extends string> = T extends `${infer Left}|${infer Right}` ? Left | ParseUnion<Right> : T
 
 type ValueTypeMap = {
-  string: string,
-  number: number,
-  boolean: boolean,
-  int: number,
-  float: number,
-  id: string,
+  string: string
+  number: number
+  boolean: boolean
+  int: number
+  float: number
+  id: string
 }
 
-type ParseItem<T extends string> = T extends keyof ValueTypeMap ? ValueTypeMap[T] :
-  T extends `{${infer Literal}}` ? Literal : never
+type ParseItem<T extends string> = T extends keyof ValueTypeMap
+  ? ValueTypeMap[T]
+  : T extends `{${infer Literal}}`
+  ? Literal
+  : never
 
 type ParseValue<T extends string> = ParseItem<ParseUnion<T>>
 
-type ParseModifier<Key extends string, Value> =
-  Key extends `${infer K}?` ? { [key in K]?: Value } :
-  Key extends `${infer K}*` ? { [key in K]?: Value[] } :
-  Key extends `${infer K}+` ? { [key in K]: Value[] } :
-  { [key in Key]: Value }
+type ParseModifier<Key extends string, Value> = Key extends `${infer K}?`
+  ? { [key in K]?: Value }
+  : Key extends `${infer K}*`
+  ? { [key in K]?: Value[] }
+  : Key extends `${infer K}+`
+  ? { [key in K]: Value[] }
+  : { [key in Key]: Value }
 
-type ParseDynamic<T extends string> =
-  T extends `${infer Left}<${infer Key}:${infer Value}>${infer Right}`
+type ParseDynamic<T extends string> = T extends `${infer Left}<${infer Key}:${infer Value}>${infer Right}`
   ? ParseModifier<Key, ParseValue<Value>> & ParseDynamic<Right>
   : {}
 
-type ParseStatic<T extends string> =
-  T extends `${infer Key}=${infer Value}&${infer Right}`
+type ParseStatic<T extends string> = T extends `${infer Key}=${infer Value}&${infer Right}`
   ? { [key in Key]: Value } & ParseStatic<Right>
   : T extends `${infer Left}&${infer Right}`
   ? ParseStatic<Right>
@@ -46,26 +47,28 @@ type ParseStatic<T extends string> =
 
 type ParseData<T extends string> = ParseDynamic<T> & ParseStatic<T>
 
-type IsNotEmptyObjectKey<T, Key> = T extends object ? keyof T extends never ? never : Key : Key
+type IsNotEmptyObjectKey<T, Key> = T extends object ? (keyof T extends never ? never : Key) : Key
 
-type CleanEmptyObject<T extends object> =
-  {
-    [key in keyof T as IsNotEmptyObjectKey<T[key], key>]: T[key]
-  }
+type CleanEmptyObject<T extends object> = {
+  [key in keyof T as IsNotEmptyObjectKey<T[key], key>]: T[key]
+}
 
-type ParsePathname<T extends string> =
-  T extends `${infer Left}?${infer Right}` ? Right extends `:${infer Rest}` ? `${Left}?:${ParsePathname<Rest>}`
-  : Left
+type ParsePathname<T extends string> = T extends `${infer Left}?${infer Right}`
+  ? Right extends `:${infer Rest}`
+    ? `${Left}?:${ParsePathname<Rest>}`
+    : Left
   : T
 
-type ParseQueryString<T extends string> =
-  T extends `${infer Left}?${infer Right}` ? Right extends `:${infer Rest}` ? ParseQueryString<Rest> : Right
+type ParseQueryString<T extends string> = T extends `${infer Left}?${infer Right}`
+  ? Right extends `:${infer Rest}`
+    ? ParseQueryString<Rest>
+    : Right
   : ''
 
 export type ParseUrl<T extends string> = CleanEmptyObject<{
-  pathname: string,
-  params: ParseData<ParsePathname<T>>,
-  query: ParseData<ParseQueryString<T>>,
+  pathname: string
+  params: ParseData<ParsePathname<T>>
+  query: ParseData<ParseQueryString<T>>
 }>
 
 // type T0 = Prettier<ParseUrl<`/hello/<name?:string>?<age:int>&test=1`>>

@@ -20,14 +20,7 @@
     "sourceMap": true,
     "esModuleInterop": true,
     "stripInternal": true,
-    "lib": ["dom", "ES5", "ES2015", "ES2016", "ES2017", "ES2018", "ES2019", "esnext"],
-    "baseUrl": "./packages",
-    "paths": {
-      "react": ["node_modules/@types/react"],
-      "graphql": ["node_modules/graphql"],
-      "cors": ["node_modules/@types/cors"],
-      "farrow-*": ["./*/src/index.ts"]
-    }
+    "lib": ["ESNext"]
   },
   "include": ["./packages/**/*"]
 }

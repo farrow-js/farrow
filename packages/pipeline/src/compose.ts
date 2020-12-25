@@ -9,7 +9,7 @@ export const compose = <T, U>(middlewares: KoaMiddleware<T, U>[]) => {
     throw new TypeError('Middleware stack must be an array!')
   }
 
-  for (const fn of middlewares) {
+  for (let fn of middlewares) {
     if (typeof fn !== 'function') {
       throw new TypeError('Middleware must be composed of functions!')
     }

@@ -1,6 +1,5 @@
 {
   "name": "farrow",
-  "version": "0.0.0",
   "license": "MIT",
   "description": "A type-friendly web framework",
   "author": "https://github.com/Lucifier129",
@@ -10,11 +9,10 @@
     "build:dist": "tsc -b ./tsconfig.build.json",
     "clean": "shx rm -rf ./packages/**/*.tsbuildinfo && shx rm -rf ./packages/**/dist",
     "clean:tests": "shx rm -rf ./packages/**/dist/**/__tests__",
-    "format": "run-p format:md format:json format:source format:yml",
-    "format:json": "prettier --parser json --write **/*.json",
-    "format:md": "prettier --parser markdown --write ./*.md ./{examples,packages}/**/*.md",
-    "format:source": "prettier --config ./package.json ./{examples,packages}/**/*.{ts,tsx,js} --write",
-    "format:yml": "prettier --parser yaml --write ./*.{yml,yaml}",
+    "lint": "eslint --report-unused-disable-directives ./packages",
+    "format": "run-p format:source format:other",
+    "format:other": "prettier ./**/*.{md,yml,json} --write",
+    "format:source": "prettier ./**/*.{ts,tsx,js} --write",
     "test": "jest --config ./jest.config.js",
     "test:coverage": "jest --config ./jest.config.js --collectCoverage --coverage",
     "bootstrap": "lerna bootstrap --hoist",
@@ -25,34 +23,22 @@
     "@types/jest": "^26.0.14",
     "@types/node": "^14.11.10",
     "codecov": "^3.8.0",
-    "husky": "^4.3.0",
+    "husky": "^4.3.6",
     "jest": "^26.6.0",
     "lerna": "^3.22.1",
-    "lint-staged": "^10.4.2",
+    "lint-staged": "^10.5.3",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.2.1",
     "shx": "^0.3.2",
     "ts-jest": "^26.4.1",
     "ts-node": "^9.1.1",
     "tslib": "^2.0.3",
-    "typescript": "^4.1.2"
-  },
-  "lint-staged": {
-    "*.@(js|ts|tsx)": ["prettier --write"],
-    "*.@(yml|yaml)": ["prettier --parser yaml --write"],
-    "*.md": ["prettier --parser markdown --write"],
-    "*.json": ["prettier --parser json --write"]
-  },
-  "prettier": {
-    "printWidth": 120,
-    "semi": false,
-    "trailingComma": "all",
-    "singleQuote": true,
-    "arrowParens": "always"
-  },
-  "husky": {
-    "hooks": {
-      "pre-commit": "lint-staged"
-    }
+    "typescript": "^4.1.2",
+    "@typescript-eslint/eslint-plugin": "^4.11.0",
+    "@typescript-eslint/parser": "^4.11.0",
+    "eslint": "^7.16.0",
+    "eslint-config-prettier": "^7.1.0",
+    "eslint-plugin-prefer-let": "^1.1.0",
+    "eslint-plugin-prettier": "^3.3.0"
   }
 }

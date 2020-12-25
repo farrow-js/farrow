@@ -6,7 +6,11 @@
   "scripts": {
     "start": "ts-node src"
   },
-  "keywords": ["Web Framework", "TypeScript", "Functional Programming"],
+  "keywords": [
+    "Web Framework",
+    "TypeScript",
+    "Functional Programming"
+  ],
   "author": "Jade Gu",
   "license": "MIT",
   "dependencies": {

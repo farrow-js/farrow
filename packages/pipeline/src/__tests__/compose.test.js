@@ -12,8 +12,8 @@ function isPromise(x) {
 
 describe('Koa Compose', function () {
   it('should work', async () => {
-    const arr = []
-    const stack = []
+    let arr = []
+    let stack = []
 
     stack.push(async (context, next) => {
       arr.push(1)
@@ -44,7 +44,7 @@ describe('Koa Compose', function () {
   })
 
   it('should be able to be called twice', () => {
-    var stack = []
+    let stack = []
 
     stack.push(async (context, next) => {
       context.arr.push(1)
@@ -70,10 +70,10 @@ describe('Koa Compose', function () {
       context.arr.push(4)
     })
 
-    const fn = compose(stack)
-    const ctx1 = { arr: [] }
-    const ctx2 = { arr: [] }
-    const out = [1, 2, 3, 4, 5, 6]
+    let fn = compose(stack)
+    let ctx1 = { arr: [] }
+    let ctx2 = { arr: [] }
+    let out = [1, 2, 3, 4, 5, 6]
 
     return fn(ctx1)
       .then(() => {
@@ -96,8 +96,8 @@ describe('Koa Compose', function () {
   })
 
   it('should create next functions that return a Promise', function () {
-    const stack = []
-    const arr = []
+    let stack = []
+    let arr = []
     for (let i = 0; i < 5; i++) {
       stack.push((context, next) => {
         arr.push(next())
@@ -126,8 +126,8 @@ describe('Koa Compose', function () {
   })
 
   it('should work when yielding at the end of the stack', async () => {
-    var stack = []
-    var called = false
+    let stack = []
+    let called = false
 
     stack.push(async (ctx, next) => {
       await next()
@@ -139,7 +139,7 @@ describe('Koa Compose', function () {
   })
 
   it('should reject on errors in middleware', () => {
-    var stack = []
+    let stack = []
 
     stack.push(() => {
       throw new Error()
@@ -155,7 +155,7 @@ describe('Koa Compose', function () {
   })
 
   it('should work when yielding at the end of the stack with yield*', () => {
-    var stack = []
+    let stack = []
 
     stack.push(async (ctx, next) => {
       await next
@@ -165,9 +165,9 @@ describe('Koa Compose', function () {
   })
 
   it('should keep the context', () => {
-    const ctx = {}
+    let ctx = {}
 
-    const stack = []
+    let stack = []
 
     stack.push(async (ctx2, next) => {
       await next()
@@ -188,8 +188,8 @@ describe('Koa Compose', function () {
   })
 
   it('should catch downstream errors', async () => {
-    const arr = []
-    const stack = []
+    let arr = []
+    let stack = []
 
     stack.push(async (ctx, next) => {
       arr.push(1)
@@ -223,7 +223,7 @@ describe('Koa Compose', function () {
   })
 
   it('should handle errors in wrapped non-async functions', () => {
-    const stack = []
+    let stack = []
 
     stack.push(function () {
       throw new Error()
@@ -240,7 +240,7 @@ describe('Koa Compose', function () {
 
   // https://github.com/koajs/compose/pull/27#issuecomment-143109739
   it('should compose w/ other compositions', () => {
-    var called = []
+    let called = []
 
     return compose([
       compose([
@@ -299,52 +299,52 @@ describe('Koa Compose', function () {
   })
 
   it('should return last return value', () => {
-    const stack = []
+    let stack = []
 
     stack.push(async (context, next) => {
-      var val = await next()
+      let val = await next()
       expect(val).toEqual(2)
       return 1
     })
 
     stack.push(async (context, next) => {
-      const val = await next()
+      let val = await next()
       expect(val).toEqual(0)
       return 2
     })
 
-    const next = () => 0
+    let next = () => 0
     return compose(stack)({}, next).then(function (val) {
       expect(val).toEqual(1)
     })
   })
 
   it('should not affect the original middleware array', () => {
-    const middleware = []
-    const fn1 = (ctx, next) => {
+    let middleware = []
+    let fn1 = (ctx, next) => {
       return next()
     }
     middleware.push(fn1)
 
-    for (const fn of middleware) {
+    for (let fn of middleware) {
       assert.equal(fn, fn1)
     }
 
     compose(middleware)
 
-    for (const fn of middleware) {
+    for (let fn of middleware) {
       assert.equal(fn, fn1)
     }
   })
 
   it('should not get stuck on the passed in next', () => {
-    const middleware = [
+    let middleware = [
       (ctx, next) => {
         ctx.middleware++
         return next()
       },
     ]
-    const ctx = {
+    let ctx = {
       middleware: 0,
       next: 0,
     }

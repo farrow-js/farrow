@@ -3,8 +3,20 @@
   "version": "1.3.4",
   "description": "React bindings for farrow-http",
   "main": "dist/index.js",
-  "files": ["dist", "Context.d.ts", "Context.js", "hooks.d.ts", "hooks.js", "Link.d.ts", "Link.js"],
-  "keywords": ["Web Framework", "TypeScript", "Functional Programming"],
+  "files": [
+    "dist",
+    "Context.d.ts",
+    "Context.js",
+    "hooks.d.ts",
+    "hooks.js",
+    "Link.d.ts",
+    "Link.js"
+  ],
+  "keywords": [
+    "Web Framework",
+    "TypeScript",
+    "Functional Programming"
+  ],
   "author": "Jade Gu",
   "license": "MIT",
   "repository": {

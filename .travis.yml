@@ -4,4 +4,4 @@ node_js:
 install:
   - npm install --global lerna && npm install && npm run bootstrap
 script:
-  - npm run build && npm run test
+  - npm run lint && npm run build && npm run test

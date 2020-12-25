@@ -13,8 +13,8 @@
     "format": "run-p format:source format:other",
     "format:other": "prettier ./**/*.{md,yml,json} --write",
     "format:source": "prettier ./**/*.{ts,tsx,js} --write",
-    "test": "jest --config ./jest.config.js",
-    "test:coverage": "jest --config ./jest.config.js --collectCoverage --coverage",
+    "test": "jest",
+    "test:coverage": "jest --collectCoverage --coverage",
     "bootstrap": "lerna bootstrap --hoist && npm run build",
     "release": "lerna publish",
     "prerelease": "npm run build && npm run test"
@@ -39,6 +39,8 @@
     "eslint": "^7.16.0",
     "eslint-config-prettier": "^7.1.0",
     "eslint-plugin-prefer-let": "^1.1.0",
-    "eslint-plugin-prettier": "^3.3.0"
+    "eslint-plugin-prettier": "^3.3.0",
+    "@types/supertest": "^2.0.10",
+    "eslint-plugin-jest": "^24.1.3"
   }
 }

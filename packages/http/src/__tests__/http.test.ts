@@ -567,7 +567,7 @@ describe('Http', () => {
       await request(server).get('/static/abc').expect(404)
     })
 
-    it('should go through when the file does not exist in router.serve ', async () => {
+    it('should go through when the file does not exist in router.serve', async () => {
       let http = createHttp()
       let server = http.server()
       let dirname = path.join(__dirname, '../../fixtures/static')

@@ -71,38 +71,36 @@ let complexServer = complexApp.server()
 
 describe('example app(s)', function () {
   describe('simple methods', function () {
-    it('GET works', function (done) {
-      supertest(simpleServer)
+    it('GET works', async () => {
+      await supertest(simpleServer)
         .get('/')
         .expect(200)
         .expect('Access-Control-Allow-Origin', '*')
         .expect('Hello World (Get)')
-        .end(done)
     })
-    it('HEAD works', function (done) {
-      supertest(simpleServer).head('/').expect(204).expect('Access-Control-Allow-Origin', '*').end(done)
+    it('HEAD works', async () => {
+      await supertest(simpleServer).head('/').expect(204).expect('Access-Control-Allow-Origin', '*')
     })
-    it('POST works', function (done) {
-      supertest(simpleServer)
+    it('POST works', async () => {
+      await supertest(simpleServer)
         .post('/')
         .expect(200)
         .expect('Access-Control-Allow-Origin', '*')
         .expect('Hello World (Post)')
-        .end(done)
     })
   })
 
   describe('complex methods', function () {
-    it('OPTIONS works', function (done) {
-      supertest(complexServer).options('/').expect(204).expect('Access-Control-Allow-Origin', '*').end(done)
+    it('OPTIONS works', async () => {
+      await supertest(complexServer).options('/').expect(204).expect('Access-Control-Allow-Origin', '*')
     })
-    it('DELETE works', function (done) {
-      supertest(complexServer)
+
+    it('DELETE works', async () => {
+      await supertest(complexServer)
         .del('/')
         .expect(200)
         .expect('Access-Control-Allow-Origin', '*')
         .expect('Hello World (Delete)')
-        .end(done)
     })
   })
 })

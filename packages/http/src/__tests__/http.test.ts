@@ -28,7 +28,6 @@ const delay = (time: number) => {
 const createHttp = (options?: HttpPipelineOptions) => {
   return Http({
     logger: false,
-    // @ts-ignore
     ...options,
   })
 }

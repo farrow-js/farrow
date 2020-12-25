@@ -15,7 +15,7 @@
     "format:source": "prettier ./**/*.{ts,tsx,js} --write",
     "test": "jest --config ./jest.config.js",
     "test:coverage": "jest --config ./jest.config.js --collectCoverage --coverage",
-    "bootstrap": "lerna bootstrap --hoist",
+    "bootstrap": "lerna bootstrap --hoist && npm run build",
     "release": "lerna publish",
     "prerelease": "npm run build && npm run test"
   },

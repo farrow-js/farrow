@@ -10,6 +10,10 @@
   "keywords": ["Web Framework", "TypeScript", "Functional Programming"],
   "author": "Jade Gu",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lucifier129/farrow.git"
+  },
   "dependencies": {
     "tslib": "^2.0.3"
   }

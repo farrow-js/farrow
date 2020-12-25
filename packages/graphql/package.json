@@ -11,6 +11,10 @@
   "keywords": ["Web Framework", "TypeScript", "Functional Programming"],
   "author": "Jade Gu",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lucifier129/farrow.git"
+  },
   "peerDependencies": {
     "farrow-schema": "^1.0.0",
     "graphql": "^15.4.0",

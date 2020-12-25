@@ -155,7 +155,7 @@ export const build = (config: SchemaConfig) => {
     return result
   }
 
-  const buildArgs = (args: ArgumentConfigMap): GraphQL.GraphQLFieldConfigArgumentMap => {
+  let buildArgs = (args: ArgumentConfigMap): GraphQL.GraphQLFieldConfigArgumentMap => {
     let result = {} as GraphQL.GraphQLFieldConfigArgumentMap
 
     for (let key in args) {
@@ -172,7 +172,7 @@ export const build = (config: SchemaConfig) => {
     return result
   }
 
-  const buildObject = (type: ObjectType): GraphQL.GraphQLObjectType => {
+  let buildObject = (type: ObjectType): GraphQL.GraphQLObjectType => {
     if (outputMap.hasOwnProperty(type.name)) {
       return outputMap[type.name] as GraphQL.GraphQLObjectType
     }
@@ -193,7 +193,7 @@ export const build = (config: SchemaConfig) => {
     return object
   }
 
-  const buildEnum = (type: EnumType): GraphQL.GraphQLEnumType => {
+  let buildEnum = (type: EnumType): GraphQL.GraphQLEnumType => {
     // enum type is both output type and input type
     if (inputMap.hasOwnProperty(type.name)) {
       return inputMap[type.name] as GraphQL.GraphQLEnumType
@@ -215,7 +215,7 @@ export const build = (config: SchemaConfig) => {
     return result
   }
 
-  const buildUnion = (type: UnionType): GraphQL.GraphQLUnionType => {
+  let buildUnion = (type: UnionType): GraphQL.GraphQLUnionType => {
     if (outputMap.hasOwnProperty(type.name)) {
       return outputMap[type.name] as GraphQL.GraphQLUnionType
     }

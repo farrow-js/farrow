@@ -23,7 +23,7 @@ export const prettyNumber = function (number: number | string, options?: PrettyN
 }
 
 export const prettyTime = (start: number): string => {
-  const delta = Date.now() - start
+  let delta = Date.now() - start
   return prettyNumber(delta < 10000 ? delta + 'ms' : Math.round(delta / 1000) + 's')
 }
 

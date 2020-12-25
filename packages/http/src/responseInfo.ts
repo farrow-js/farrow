@@ -131,7 +131,6 @@ export const string = (value: string): ResponseInfo => {
   }
 }
 
-
 export type RedirectOptions = {
   usePrefix?: boolean
 }
@@ -261,7 +260,6 @@ export const merge = (...responses: ResponseInfo[]) => {
   return result
 }
 
-
 export const type = (type: string): ResponseInfo => {
   let contentType = mime.contentType(type)
 
@@ -276,9 +274,9 @@ export const type = (type: string): ResponseInfo => {
 
 export const is = (info: ResponseInfo, ...types: string[]) => {
   let contentType = info.headers?.['content-type'] ?? info.headers?.['Content-Type']
-  
+
   if (!contentType) {
-    return false 
+    return false
   }
 
   return typeis.is(contentType.toString(), types)

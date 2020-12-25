@@ -4,11 +4,17 @@
   "description": "Code-first GraphQL(WIP)",
   "main": "dist/index.js",
   "private": true,
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "start": "ts-node src/weather.schema"
   },
-  "keywords": ["Web Framework", "TypeScript", "Functional Programming"],
+  "keywords": [
+    "Web Framework",
+    "TypeScript",
+    "Functional Programming"
+  ],
   "author": "Jade Gu",
   "license": "MIT",
   "repository": {

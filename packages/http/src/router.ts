@@ -49,7 +49,9 @@ export const isRouterUrlSchema = (input: any): input is RouterUrlSchema => {
   return !!(input && input.hasOwnProperty('url'))
 }
 
-export type TypeOfRouterRequestField<T> = T extends string
+export type TypeOfRouterRequestField<T> = T extends string | string[]
+  ? string
+  : T extends Pathname
   ? string
   : T extends Schema.FieldDescriptors
   ? Schema.TypeOf<Schema.StructType<T>>

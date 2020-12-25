@@ -15,6 +15,15 @@ http.get('/hello').use(() => {
     .html('<h1>Farrow</h1>')
 })
 
+http
+  .match({
+    url: '/note/<name:string>',
+    method: ['GET', 'POST'],
+  })
+  .use((req) => {
+    return Response.text('')
+  })
+
 http.serve('/static', path.join(__dirname, '../static'))
 
 http.listen(3000, () => {

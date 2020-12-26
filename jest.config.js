@@ -15,7 +15,7 @@ module.exports = {
   },
   collectCoverageFrom: ['packages/*/src/**/*.{ts,tsx}'],
   rootDir: __dirname,
-  testEnvironment: 'jsdom',
+  testEnvironment: 'node',
   moduleNameMapper: {},
   testPathIgnorePatterns: ['/node_modules/', '/examples/'],
 }

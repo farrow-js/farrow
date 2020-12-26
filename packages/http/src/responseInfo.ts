@@ -145,7 +145,7 @@ export const redirect = (url: string, options?: RedirectOptions): ResponseInfo =
   }
 }
 
-export const custom = (handler: CustomBodyHandler = () => {}): ResponseInfo => {
+export const custom = (handler: CustomBodyHandler = () => undefined): ResponseInfo => {
   return {
     body: {
       type: 'custom',

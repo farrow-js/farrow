@@ -17,16 +17,16 @@ export type TransformRules<Output, Context extends {}> = {
   [key: string]: TransformRule<Schema.Schema, Output, Context>
 }
 
-export type TransfromCache<T = any> = {
+export type TransformCache<T = any> = {
   [Cache]?: WeakMap<Schema.SchemaCtor, T>
 }
 
-const getCache = <T>(context: TransfromCache<T>): WeakMap<Schema.SchemaCtor, T> => {
+const getCache = <T>(context: TransformCache<T>): WeakMap<Schema.SchemaCtor, T> => {
   return (context[Cache] = context[Cache] ?? new WeakMap())
 }
 
 export const createTransformer = <Output, Context extends {}>(
-  context: TransformContext<Context, Output> & TransfromCache<Output>,
+  context: TransformContext<Context, Output> & TransformCache<Output>,
 ) => {
   let cache = getCache(context)
 

@@ -123,7 +123,7 @@ export const createPipeline = <I, O>(options?: PipelineOptions) => {
   let middleware: Pipeline<I, O>['middleware'] = (input, next) => {
     let container = useContainer()
     return run(input, {
-      container: container,
+      container,
       onLast: next,
     })
   }
@@ -145,7 +145,7 @@ export const usePipeline = <I, O>(pipeline: Pipeline<I, O>) => {
   let container = useContainer()
 
   let runPipeline = (input: I, options?: RunPipelineOptions<I, O>): O => {
-    return pipeline.run(input, { ...options, container: container })
+    return pipeline.run(input, { ...options, container })
   }
 
   return runPipeline

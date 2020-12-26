@@ -452,7 +452,7 @@ describe('Schema', () => {
 
     expect(assertOk(validateJson([1, 2, 3, 'false']))).toEqual([1, 2, 3, 'false'])
 
-    expect(() => assertOk(validateJson(() => {}))).toThrow()
+    expect(() => assertOk(validateJson(() => undefined))).toThrow()
   })
 
   it('supports record validation', () => {
@@ -729,9 +729,9 @@ describe('Schema', () => {
 
     type T0 = Prettier<TypeOf<typeof Struct0>>
 
-    type T1 = Prettier<TypeOf<typeof ReadOnlyStruct>>
+    // type T1 = Prettier<TypeOf<typeof ReadOnlyStruct>>
 
-    type T2 = Prettier<TypeOf<typeof ReadOnlyDeepStruct>>
+    // type T2 = Prettier<TypeOf<typeof ReadOnlyDeepStruct>>
 
     let data: T0 = {
       a: 1,

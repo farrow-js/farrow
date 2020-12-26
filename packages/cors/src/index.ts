@@ -29,9 +29,8 @@ export const cors = <T extends CorsRequest = CorsRequest>(
           }
         }
         return Response.status(204).string('')
-      } else {
-        return next(request)
       }
+      return next(request)
     } catch (error) {
       return Response.status(500).text(error.message)
     }

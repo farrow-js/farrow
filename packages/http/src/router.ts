@@ -42,11 +42,11 @@ export type RouterUrlSchema<T extends string = string> = {
 } & RouterSharedSchema
 
 export const isRouterRequestSchema = (input: any): input is RouterRequestSchema => {
-  return !!(input && input.hasOwnProperty('pathname'))
+  return has(input, 'pathname')
 }
 
 export const isRouterUrlSchema = (input: any): input is RouterUrlSchema => {
-  return !!(input && input.hasOwnProperty('url'))
+  return has(input, 'url')
 }
 
 export type TypeOfRouterRequestField<T> = T extends string | string[]
@@ -149,7 +149,7 @@ const SchemaMap = {
 }
 
 const createSchemaByString = (str: string): Schema.SchemaCtor => {
-  if (SchemaMap.hasOwnProperty(str)) {
+  if (has(SchemaMap, str)) {
     return SchemaMap[str]
   }
 
@@ -200,7 +200,7 @@ const resolveUrlPattern = <T extends string>(input: T) => {
   for (let [key, item] of Object.entries(parsedQuery)) {
     let isDynamicKey = key.startsWith('<') && key.endsWith('>')
     if (!isDynamicKey) {
-      query[key] = Schema.Literal(item + '')
+      query[key] = Schema.Literal(`${item}`)
     }
   }
 
@@ -291,7 +291,14 @@ export type RoutingMethod = <U extends string, T extends RouterSharedSchema>(
   schema?: T,
   options?: MatchOptions,
 ) => Pipeline<
-  MarkReadOnlyDeep<TypeOfUrlSchema<{ url: U; method: string } & (RouterSharedSchema extends T ? {} : T)>>,
+  MarkReadOnlyDeep<
+    TypeOfUrlSchema<
+      {
+        url: U
+        method: string
+      } & (RouterSharedSchema extends T ? {} : T)
+    >
+  >,
   MaybeAsyncResponse
 >
 
@@ -305,7 +312,7 @@ export type RoutingMethods = {
   options: RoutingMethod
 }
 
-export type RouterPipelineOptions = {}
+export type RouterPipelineOptions = string
 
 export const createRouterPipeline = (): RouterPipeline => {
   let pipeline = createPipeline<RequestInfo, MaybeAsyncResponse>()
@@ -326,9 +333,8 @@ export const createRouterPipeline = (): RouterPipeline => {
       let isExist = await isFileExist(filename)
       if (isExist) {
         return Response.file(filename)
-      } else {
-        return next(request)
       }
+      return next(request)
     })
   }
 
@@ -365,7 +371,7 @@ export const createRouterPipeline = (): RouterPipeline => {
         return next()
       }
 
-      let params = matches.params
+      let { params } = matches
 
       let result = validator({
         ...input,
@@ -378,17 +384,17 @@ export const createRouterPipeline = (): RouterPipeline => {
           if (response) return response
         }
 
-        let message = result.value.message
+        let { message } = result.value
 
         if (result.value.path) {
-          message = `path: ${JSON.stringify(result.value.path)}\n` + message
+          message = `path: ${JSON.stringify(result.value.path)}\n${message}`
         }
 
         throw new HttpError(message, 400)
       }
 
       return matchedPipeline.run(result.value, {
-        container: container,
+        container,
         onLast: () => {
           if (config.block) {
             throw new Error(`Unhandled request: ${input.pathname}`)
@@ -439,7 +445,7 @@ export const createRouterPipeline = (): RouterPipeline => {
       return match(
         {
           ...schema,
-          method: method,
+          method,
           url: path,
         },
         options,
@@ -460,10 +466,10 @@ export const createRouterPipeline = (): RouterPipeline => {
   return {
     ...pipeline,
     ...methods,
-    capture: capture,
-    route: route,
-    serve: serve,
-    match: match,
+    capture,
+    route,
+    serve,
+    match,
   }
 }
 
@@ -479,4 +485,8 @@ const getMethods = (method: RouterRequestSchema['method']) => {
   }
 
   return methods
+}
+
+const has = (target: unknown, key: string | number | symbol) => {
+  return Object.prototype.hasOwnProperty.call(target, key)
 }

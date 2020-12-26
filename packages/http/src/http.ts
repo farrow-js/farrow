@@ -118,7 +118,7 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
       throw new Error(`req.url is not existed`)
     }
 
-    let url = req.url
+    let { url } = req
 
     let [pathname = '/', search = ''] = url.split('?')
 
@@ -156,16 +156,16 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
     })
 
     let responser = await router.run(requestInfo, {
-      container: container,
+      container,
       onLast: () => Response.status(404).text('404 Not Found'),
     })
 
     await handleResponse({
       req,
       res,
-      requestInfo: requestInfo,
+      requestInfo,
       responseInfo: responser.info,
-      container: container,
+      container,
     })
   }
 
@@ -275,7 +275,7 @@ export type ResponseParams = {
   container: Container
 }
 
-export const handleResponse = async (params: ResponseParams) => {
+export const handleResponse = (params: ResponseParams) => {
   let { req, res, requestInfo, responseInfo, container } = params
   let basenames = container.read(BasenamesContext)
   let prefix = basenames.join('')
@@ -302,7 +302,7 @@ export const handleResponse = async (params: ResponseParams) => {
 
     Object.entries(cookies).forEach(([name, cookie]) => {
       if (cookie.value !== null) {
-        cookiesInstance.set(name, cookie.value + '', cookie.options)
+        cookiesInstance.set(name, `${cookie.value}`, cookie.options)
       } else {
         cookiesInstance.set(name, '', cookie.options)
       }
@@ -338,7 +338,7 @@ export const handleResponse = async (params: ResponseParams) => {
     let url = body.value
 
     if (url === 'back') {
-      let referrer = req.headers['referer'] + '' || '/'
+      let referrer = `${req.headers['referer']}` || '/'
       url = referrer
     }
 
@@ -439,10 +439,10 @@ export const handleResponse = async (params: ResponseParams) => {
   }
 
   if (body.type === 'custom') {
-    let handler = body.handler
+    let { handler } = body
     let handleResponse = () => {
       return handler({
-        req: req,
+        req,
         res,
         requestInfo,
         responseInfo: omitBody(responseInfo),

@@ -69,8 +69,8 @@ let complexServer = complexApp.server()
 
 /* -------------------------------------------------------------------------- */
 
-describe('example app(s)', function () {
-  describe('simple methods', function () {
+describe('example app(s)', () => {
+  describe('simple methods', () => {
     it('GET works', async () => {
       await supertest(simpleServer)
         .get('/')
@@ -90,7 +90,7 @@ describe('example app(s)', function () {
     })
   })
 
-  describe('complex methods', function () {
+  describe('complex methods', () => {
     it('OPTIONS works', async () => {
       await supertest(complexServer).options('/').expect(204).expect('Access-Control-Allow-Origin', '*')
     })

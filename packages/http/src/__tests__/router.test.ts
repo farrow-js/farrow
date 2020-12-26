@@ -10,7 +10,7 @@ describe('Router', () => {
       pathname: '/test',
     }
 
-    router.match(schema).use(async (request) => {
+    router.match(schema).use((request) => {
       return Response.json(request)
     })
 
@@ -68,7 +68,7 @@ describe('Router', () => {
       },
     }
 
-    router.match(schema).use(async (request) => {
+    router.match(schema).use((request) => {
       return Response.json(request)
     })
 
@@ -410,7 +410,7 @@ describe('Router Url Pattern', () => {
       .match({
         url: '/string/<arg:string>',
       })
-      .use(async (request) => {
+      .use((request) => {
         return Response.json({
           type: 'string',
           arg: request.params.arg,
@@ -421,7 +421,7 @@ describe('Router Url Pattern', () => {
       .match({
         url: '/boolean/<arg:boolean>',
       })
-      .use(async (request) => {
+      .use((request) => {
         return Response.json({
           type: 'boolean',
           arg: request.params.arg,
@@ -432,7 +432,7 @@ describe('Router Url Pattern', () => {
       .match({
         url: '/number/<arg:number>',
       })
-      .use(async (request) => {
+      .use((request) => {
         return Response.json({
           type: 'number',
           arg: request.params.arg,
@@ -443,7 +443,7 @@ describe('Router Url Pattern', () => {
       .match({
         url: '/int/<arg:int>',
       })
-      .use(async (request) => {
+      .use((request) => {
         return Response.json({
           type: 'int',
           arg: request.params.arg,
@@ -454,7 +454,7 @@ describe('Router Url Pattern', () => {
       .match({
         url: '/float/<arg:float>',
       })
-      .use(async (request) => {
+      .use((request) => {
         return Response.json({
           type: 'float',
           arg: request.params.arg,
@@ -465,7 +465,7 @@ describe('Router Url Pattern', () => {
       .match({
         url: '/id/<arg:id>',
       })
-      .use(async (request) => {
+      .use((request) => {
         return Response.json({
           type: 'id',
           arg: request.params.arg,
@@ -476,7 +476,7 @@ describe('Router Url Pattern', () => {
       .match({
         url: '/literal/<arg:{123}|{abc}>',
       })
-      .use(async (request) => {
+      .use((request) => {
         return Response.json({
           type: 'literal',
           arg: request.params.arg,
@@ -487,7 +487,7 @@ describe('Router Url Pattern', () => {
       .match({
         url: '/union/<arg:number|boolean|string>',
       })
-      .use(async (request) => {
+      .use((request) => {
         return Response.json({
           type: 'union',
           arg: request.params.arg,
@@ -652,7 +652,7 @@ describe('Router Url Pattern', () => {
       .match({
         url: '/string?<arg:string>',
       })
-      .use(async (request) => {
+      .use((request) => {
         return Response.json({
           type: 'string',
           arg: request.query.arg,
@@ -663,7 +663,7 @@ describe('Router Url Pattern', () => {
       .match({
         url: '/boolean?<arg:boolean>',
       })
-      .use(async (request) => {
+      .use((request) => {
         return Response.json({
           type: 'boolean',
           arg: request.query.arg,
@@ -674,7 +674,7 @@ describe('Router Url Pattern', () => {
       .match({
         url: '/number?<arg:number>',
       })
-      .use(async (request) => {
+      .use((request) => {
         return Response.json({
           type: 'number',
           arg: request.query.arg,
@@ -685,7 +685,7 @@ describe('Router Url Pattern', () => {
       .match({
         url: '/int?<arg:int>',
       })
-      .use(async (request) => {
+      .use((request) => {
         return Response.json({
           type: 'int',
           arg: request.query.arg,
@@ -696,7 +696,7 @@ describe('Router Url Pattern', () => {
       .match({
         url: '/float?<arg:float>',
       })
-      .use(async (request) => {
+      .use((request) => {
         return Response.json({
           type: 'float',
           arg: request.query.arg,
@@ -707,7 +707,7 @@ describe('Router Url Pattern', () => {
       .match({
         url: '/id?<arg:id>',
       })
-      .use(async (request) => {
+      .use((request) => {
         return Response.json({
           type: 'id',
           arg: request.query.arg,
@@ -718,7 +718,7 @@ describe('Router Url Pattern', () => {
       .match({
         url: '/literal?<arg:{123}|{abc}>',
       })
-      .use(async (request) => {
+      .use((request) => {
         return Response.json({
           type: 'literal',
           arg: request.query.arg,
@@ -729,7 +729,7 @@ describe('Router Url Pattern', () => {
       .match({
         url: '/union?<arg:number|boolean|string>',
       })
-      .use(async (request) => {
+      .use((request) => {
         return Response.json({
           type: 'union',
           arg: request.query.arg,

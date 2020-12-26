@@ -20,7 +20,7 @@ http
     url: '/note/<name:string>',
     method: ['GET', 'POST'],
   })
-  .use((req) => {
+  .use((_req) => {
     return Response.text('')
   })
 

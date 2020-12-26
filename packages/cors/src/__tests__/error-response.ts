@@ -39,7 +39,7 @@ http
 
 /* -------------------------------------------------------------------------- */
 
-describe('error response', function () {
+describe('error response', () => {
   it('500', async () => {
     await supertest(app).post('/five-hundred').expect(500).expect('Access-Control-Allow-Origin', '*').expect(/nope/i)
   })
@@ -53,6 +53,6 @@ describe('error response', function () {
   })
 
   it('404', async () => {
-    supertest(app).post('/four-oh-four').expect(404).expect('Access-Control-Allow-Origin', '*')
+    await supertest(app).post('/four-oh-four').expect(404).expect('Access-Control-Allow-Origin', '*')
   })
 })

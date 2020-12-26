@@ -19,7 +19,7 @@ router
     pathname: '/',
   })
   .use(NoCache())
-  .use(async () => {
+  .use(() => {
     let LayoutView = useLayoutView()
     return LayoutView.render(<Home todos={fakeData} />)
   })
@@ -29,7 +29,7 @@ router
     pathname: '/create',
   })
   .use(NoCache())
-  .use(async () => {
+  .use(() => {
     let LayoutView = useLayoutView()
     return LayoutView.render(<Create />)
   })
@@ -42,7 +42,7 @@ router
     },
   })
   .use(NoCache())
-  .use(async (request) => {
+  .use((request) => {
     let LayoutView = useLayoutView()
     let todo = fakeData.find((todo) => todo.id === request.params.todoId)
 

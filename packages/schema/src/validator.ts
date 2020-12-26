@@ -236,7 +236,7 @@ const LiteralValidatorRule: ValidatorRule<Schema.LiteralType> = {
     return schema instanceof Schema.LiteralType
   },
   transform: (schema, { strict }) => {
-    let value = schema.value
+    let { value } = schema
 
     return (input) => {
       if (input === value) {
@@ -465,7 +465,7 @@ const JsonValidatorRule: ValidatorRule<Schema.Json> = {
   test: (schema) => {
     return schema instanceof Schema.Json
   },
-  transform: (schema) => {
+  transform: (_schema) => {
     return validateJson
   },
 }
@@ -474,7 +474,7 @@ const AnyValidatorRule: ValidatorRule<Schema.Any> = {
   test: (schema) => {
     return schema instanceof Schema.Any
   },
-  transform: (schema) => {
+  transform: (_schema) => {
     return (input) => Ok(input)
   },
 }

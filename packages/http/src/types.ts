@@ -1,6 +1,4 @@
-import { Prettier } from 'farrow-schema'
-
-export type MarkReadOnlyDeep<T> = T extends object | any[]
+export type MarkReadOnlyDeep<T> = T extends {} | any[]
   ? {
       readonly [key in keyof T]: MarkReadOnlyDeep<T[key]>
     }
@@ -33,13 +31,13 @@ type ParseModifier<Key extends string, Value> = Key extends `${infer K}?`
   ? { [key in K]: Value[] }
   : { [key in Key]: Value }
 
-type ParseDynamic<T extends string> = T extends `${infer Left}<${infer Key}:${infer Value}>${infer Right}`
+type ParseDynamic<T extends string> = T extends `${infer _Left}<${infer Key}:${infer Value}>${infer Right}`
   ? ParseModifier<Key, ParseValue<Value>> & ParseDynamic<Right>
   : {}
 
 type ParseStatic<T extends string> = T extends `${infer Key}=${infer Value}&${infer Right}`
   ? { [key in Key]: Value } & ParseStatic<Right>
-  : T extends `${infer Left}&${infer Right}`
+  : T extends `${infer _Left}&${infer Right}`
   ? ParseStatic<Right>
   : T extends `${infer Key}=${infer Value}`
   ? { [key in Key]: Value }
@@ -59,7 +57,7 @@ type ParsePathname<T extends string> = T extends `${infer Left}?${infer Right}`
     : Left
   : T
 
-type ParseQueryString<T extends string> = T extends `${infer Left}?${infer Right}`
+type ParseQueryString<T extends string> = T extends `${infer _Left}?${infer Right}`
   ? Right extends `:${infer Rest}`
     ? ParseQueryString<Rest>
     : Right

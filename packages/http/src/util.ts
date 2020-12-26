@@ -17,19 +17,19 @@ export const prettyNumber = function (number: number | string, options?: PrettyN
   }
   let { delimiter, separator } = config
   let [first, ...rest] = number.toString().split('.')
-  let text = first.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, '$1' + delimiter)
+  let text = first.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, `$1${delimiter}`)
 
   return [text, ...rest].join(separator)
 }
 
 export const prettyTime = (start: number): string => {
   let delta = Date.now() - start
-  return prettyNumber(delta < 10000 ? delta + 'ms' : Math.round(delta / 1000) + 's')
+  return prettyNumber(delta < 10000 ? `${delta}ms` : `${Math.round(delta / 1000)}s`)
 }
 
-export const access = fs.promises.access
+export const { access } = fs.promises
 
-export const stat = fs.promises.stat
+export const { stat } = fs.promises
 
 export const isFileExist = (filename: string) => {
   return stat(filename)

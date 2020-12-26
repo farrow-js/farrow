@@ -91,7 +91,7 @@ export const toSchemaCtor = <T extends SchemaCtorInput>(Item: T) => {
 
 export const toSchemaCtors = <T extends SchemaCtorInputs>(Inputs: T): ToSchemaCtors<T> => {
   if (Array.isArray(Inputs)) {
-    // @ts-ignore
+    // @ts-ignore: TODO add desc
     return Inputs.map(toSchemaCtor)
   }
 
@@ -99,7 +99,7 @@ export const toSchemaCtors = <T extends SchemaCtorInputs>(Inputs: T): ToSchemaCt
     let result = {} as ToSchemaCtors<T>
 
     for (let key in Inputs) {
-      // @ts-ignore
+      // @ts-ignore: TODO add desc
       result[key] = toSchemaCtor(Inputs[key])
     }
 
@@ -182,7 +182,7 @@ export abstract class ObjectType extends Schema<unknown> {
   [Kind] = kind('Object')
 }
 
-type TypeOfList<T extends SchemaCtor> = Array<TypeOfSchemaCtor<T>>
+type TypeOfList<T extends SchemaCtor> = TypeOfSchemaCtor<T>[]
 
 export abstract class ListType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<
   TypeOfList<ToSchemaCtor<T>>

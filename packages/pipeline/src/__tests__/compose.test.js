@@ -10,7 +10,7 @@ function isPromise(x) {
   return x && typeof x.then === 'function'
 }
 
-describe('Koa Compose', function () {
+describe('Koa Compose', () => {
   it('should work', async () => {
     let arr = []
     let stack = []
@@ -95,7 +95,7 @@ describe('Koa Compose', function () {
     return expect(err).toBeInstanceOf(TypeError)
   })
 
-  it('should create next functions that return a Promise', function () {
+  it('should create next functions that return a Promise', () => {
     let stack = []
     let arr = []
     for (let i = 0; i < 5; i++) {
@@ -111,7 +111,7 @@ describe('Koa Compose', function () {
     }
   })
 
-  it('should work with 0 middleware', function () {
+  it('should work with 0 middleware', () => {
     return compose([])({})
   })
 
@@ -146,10 +146,10 @@ describe('Koa Compose', function () {
     })
 
     return compose(stack)({})
-      .then(function () {
+      .then(() => {
         throw new Error('promise was not rejected')
       })
-      .catch(function (e) {
+      .catch((e) => {
         expect(e).toBeInstanceOf(Error)
       })
   })
@@ -217,7 +217,7 @@ describe('Koa Compose', function () {
 
     return compose([])({}, async () => {
       called = true
-    }).then(function () {
+    }).then(() => {
       assert(called)
     })
   })
@@ -225,15 +225,15 @@ describe('Koa Compose', function () {
   it('should handle errors in wrapped non-async functions', () => {
     let stack = []
 
-    stack.push(function () {
+    stack.push(() => {
       throw new Error()
     })
 
     return compose(stack)({})
-      .then(function () {
+      .then(() => {
         throw new Error('promise was not rejected')
       })
-      .catch(function (e) {
+      .catch((e) => {
         expect(e).toBeInstanceOf(Error)
       })
   })
@@ -293,7 +293,7 @@ describe('Koa Compose', function () {
         val++
         return next()
       },
-    ])({}).then(function () {
+    ])({}).then(() => {
       expect(val).toEqual(3)
     })
   })
@@ -314,7 +314,7 @@ describe('Koa Compose', function () {
     })
 
     let next = () => 0
-    return compose(stack)({}, next).then(function (val) {
+    return compose(stack)({}, next).then((val) => {
       expect(val).toEqual(1)
     })
   })

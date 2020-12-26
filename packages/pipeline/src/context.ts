@@ -12,7 +12,7 @@ export type Context<T = any> = {
 }
 
 export const isContext = (input: any): input is Context => {
-  return !!input?.hasOwnProperty(ContextSymbol)
+  return Object.prototype.hasOwnProperty.call(input, ContextSymbol)
 }
 
 type AssertContext = (input: any) => asserts input is Context
@@ -42,7 +42,7 @@ export const createContext = <T>(value: T) => {
       id,
       [ContextSymbol]: value,
       create,
-      use: use,
+      use,
     }
     return Context
   }

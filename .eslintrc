@@ -1,26 +1,201 @@
 {
   "root": true,
-  "plugins": ["jest", "prefer-let", "prettier", "@typescript-eslint"],
   "env": {
-    "node": true
+    "node": true,
+    "es6": true
   },
   "parserOptions": {
-    "ecmaVersion": 2018
+    "ecmaVersion": 2018,
+    "ecmaFeatures": {
+      "jsx": true
+    }
   },
+  "plugins": ["jest", "prefer-let", "prettier", "@typescript-eslint"],
   "rules": {
+    "no-var": "error",
+    "for-direction": "error",
+    "getter-return": "error",
+    "no-async-promise-executor": "error",
+    "no-compare-neg-zero": "error",
+    "no-cond-assign": "error",
+    "no-constant-condition": "error",
+    "no-debugger": "error",
+    "no-dupe-keys": "error",
+    "no-duplicate-case": "error",
+    "no-empty": "error",
+    "no-empty-character-class": "error",
+    "no-ex-assign": "error",
+    "no-extra-boolean-cast": "error",
+    "no-func-assign": "error",
+    "no-inner-declarations": "error",
+    "no-invalid-regexp": "error",
+    "no-misleading-character-class": "error",
+    "no-obj-calls": "error",
+    "no-prototype-builtins": "error",
+    "no-regex-spaces": "error",
+    "no-sparse-arrays": "error",
+    "no-template-curly-in-string": "warn",
+    "no-unexpected-multiline": "error",
+    "no-unreachable": "error",
+    "no-unsafe-finally": "error",
+    "no-unsafe-negation": "error",
+    "require-atomic-updates": "warn",
+    "use-isnan": "error",
+    "valid-typeof": ["error", { "requireStringLiterals": true }],
+    "accessor-pairs": "error",
+    "array-callback-return": "error",
+    "class-methods-use-this": "error",
+    "curly": ["error", "multi-line"],
+    "default-case": "error",
+    "eqeqeq": "error",
+    "guard-for-in": "warn",
+    "no-caller": "error",
+    "no-case-declarations": "error",
+    "no-div-regex": "error",
+    "no-else-return": "error",
+    "no-empty-function": "warn",
+    "no-empty-pattern": "error",
+    "no-eq-null": "error",
+    "no-extend-native": "error",
+    "no-extra-bind": "error",
+    "no-fallthrough": "error",
+    "no-global-assign": "error",
+    "no-new": "error",
+    "no-new-func": "error",
+    "no-new-wrappers": "error",
+    "no-octal": "error",
+    "no-proto": "error",
+    "no-return-assign": "error",
+    "no-return-await": "error",
+    "no-self-assign": "error",
+    "no-self-compare": "error",
+    "no-sequences": "error",
+    "no-throw-literal": "error",
+    "no-unmodified-loop-condition": "error",
+    "no-useless-call": "error",
+    "no-useless-catch": "error",
+    "no-useless-concat": "error",
+    "no-useless-escape": "error",
+    "no-useless-return": "error",
+    "no-with": "error",
+    "prefer-promise-reject-errors": "error",
+    "radix": "error",
+    "require-await": "warn",
+    "wrap-iife": "error",
+    "yoda": "error",
+    "no-delete-var": "error",
+    "no-shadow-restricted-names": "error",
+    "no-undef": "error",
+    "no-unused-vars": [
+      "warn",
+      {
+        "argsIgnorePattern": "^_",
+        "varsIgnorePattern": "^_",
+        "ignoreRestSiblings": true
+      }
+    ],
+    "global-require": "error",
+    "handle-callback-err": "error",
+    "no-buffer-constructor": "error",
+    "no-path-concat": "error",
+    "constructor-super": "error",
+    "no-class-assign": "error",
+    "no-const-assign": "error",
+    "no-dupe-class-members": "error",
+    "no-new-symbol": "error",
+    "no-this-before-super": "error",
+    "no-useless-computed-key": "error",
+    "no-useless-constructor": "error",
+    "no-useless-rename": "error",
+    "object-shorthand": "error",
+    "prefer-arrow-callback": "error",
+    "prefer-destructuring": "error",
+    "prefer-rest-params": "error",
+    "prefer-spread": "error",
+    "prefer-template": "warn",
+    "require-yield": "error",
+    "symbol-description": "error",
     "prefer-let/prefer-let": "error",
     "prettier/prettier": "error"
   },
   "overrides": [
     {
       "files": ["*.ts", "*.tsx"],
-      "parser": "@typescript-eslint/parser"
+      "parser": "@typescript-eslint/parser",
+      "parserOptions": {
+        "project": "./tsconfig.json"
+      },
+      "rules": {
+        "no-undef": "off",
+        "no-unused-vars": "off",
+        "@typescript-eslint/no-unused-vars": [
+          "warn",
+          {
+            "argsIgnorePattern": "^_",
+            "varsIgnorePattern": "^_",
+            "ignoreRestSiblings": true
+          }
+        ],
+        "@typescript-eslint/array-type": "error",
+        "@typescript-eslint/await-thenable": "error",
+        "@typescript-eslint/adjacent-overload-signatures": "error",
+        "@typescript-eslint/ban-ts-comment": [
+          "error",
+          {
+            "ts-expect-error": true,
+            "ts-ignore": "allow-with-description"
+          }
+        ],
+        "@typescript-eslint/ban-types": [
+          "error",
+          {
+            "extendDefaults": false,
+            "types": {
+              "String": {
+                "message": "Use string instead",
+                "fixWith": "string"
+              },
+              "Boolean": {
+                "message": "Use boolean instead",
+                "fixWith": "boolean"
+              },
+              "Number": {
+                "message": "Use number instead",
+                "fixWith": "number"
+              },
+              "Symbol": {
+                "message": "Use symbol instead",
+                "fixWith": "symbol"
+              },
+              "Function": {
+                "message": "\nThe `Function` type accepts any function-like value.\n\nIt provides no type safety when calling the function, which can be a common source of bugs.\n\nIt also accepts things like class declarations, which will throw at runtime as they will not be called with `new`.\n\nIf you are expecting the function to accept certain arguments, you should explicitly define the function shape.",
+                "fixWith": "(...args: unknown[]) => unknown"
+              },
+              "Object": {
+                "message": "\nThe `Object` type actually means \"any non-nullish value\", so it is marginally better than `unknown`.\n\n- If you want a type meaning \"any object\", you probably want `Record<string, unknown>` instead.\n\n- If you want a type meaning \"any value\", you probably want `unknown` instead.\n",
+                "fixWith": "Record<string, unknown>"
+              }
+            }
+          }
+        ],
+        "@typescript-eslint/no-floating-promises": "error"
+      }
     },
     {
-      "files": ["**/__tests__/**/*.js", "**/__tests__/**/*.ts"],
+      "files": ["**/__tests__/**/*.js", "**/__tests__/**/*.ts", "**/__tests__/**/*.tsx"],
+      "env": {
+        "jest": true
+      },
       "extends": ["plugin:jest/recommended"],
       "rules": {
-        "jest/expect-expect": "off"
+        "jest/expect-expect": "off",
+        "@typescript-eslint/ban-ts-comment": [
+          "error",
+          {
+            "ts-expect-error": "allow-with-description",
+            "ts-ignore": true
+          }
+        ]
       }
     }
   ]

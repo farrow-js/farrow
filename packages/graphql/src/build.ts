@@ -73,11 +73,11 @@ export const build = (config: SchemaConfig) => {
 
     if (type instanceof ScalarType) {
       // scalr type is both output type and input type
-      if (inputMap.hasOwnProperty(type.name)) {
+      if (has(inputMap, type.name)) {
         return inputMap[type.name] as GraphQL.GraphQLScalarType
       }
 
-      if (outputMap.hasOwnProperty(type.name)) {
+      if (has(outputMap, type.name)) {
         return outputMap[type.name] as GraphQL.GraphQLScalarType
       }
 
@@ -99,7 +99,7 @@ export const build = (config: SchemaConfig) => {
   }
 
   let buildInterface = (type: InterfaceType): GraphQL.GraphQLInterfaceType => {
-    if (outputMap.hasOwnProperty(type.name)) {
+    if (has(outputMap, type.name)) {
       return outputMap[type.name] as GraphQL.GraphQLInterfaceType
     }
 
@@ -173,7 +173,7 @@ export const build = (config: SchemaConfig) => {
   }
 
   let buildObject = (type: ObjectType): GraphQL.GraphQLObjectType => {
-    if (outputMap.hasOwnProperty(type.name)) {
+    if (has(outputMap, type.name)) {
       return outputMap[type.name] as GraphQL.GraphQLObjectType
     }
 
@@ -195,11 +195,11 @@ export const build = (config: SchemaConfig) => {
 
   let buildEnum = (type: EnumType): GraphQL.GraphQLEnumType => {
     // enum type is both output type and input type
-    if (inputMap.hasOwnProperty(type.name)) {
+    if (has(inputMap, type.name)) {
       return inputMap[type.name] as GraphQL.GraphQLEnumType
     }
 
-    if (outputMap.hasOwnProperty(type.name)) {
+    if (has(outputMap, type.name)) {
       return outputMap[type.name] as GraphQL.GraphQLEnumType
     }
 
@@ -216,7 +216,7 @@ export const build = (config: SchemaConfig) => {
   }
 
   let buildUnion = (type: UnionType): GraphQL.GraphQLUnionType => {
-    if (outputMap.hasOwnProperty(type.name)) {
+    if (has(outputMap, type.name)) {
       return outputMap[type.name] as GraphQL.GraphQLUnionType
     }
 
@@ -284,7 +284,7 @@ export const build = (config: SchemaConfig) => {
   }
 
   let buildInput = (type: InputType): GraphQL.GraphQLInputType => {
-    if (inputMap.hasOwnProperty(type.name)) {
+    if (has(inputMap, type.name)) {
       return inputMap[type.name]
     }
 
@@ -308,7 +308,7 @@ export const build = (config: SchemaConfig) => {
   }
 
   let buildOutput = (type: OutputType): GraphQL.GraphQLOutputType => {
-    if (outputMap.hasOwnProperty(type.name)) {
+    if (has(outputMap, type.name)) {
       return outputMap[type.name]
     }
 
@@ -342,8 +342,7 @@ export const build = (config: SchemaConfig) => {
     buildOutput(new config.Mutation())
   }
 
-  let Query = outputMap['Query']
-  let Mutation = outputMap['Mutation']
+  let { Query, Mutation } = outputMap
 
   if (!Query) {
     throw new Error(`config.Query is not Query Type`)
@@ -359,4 +358,8 @@ export const build = (config: SchemaConfig) => {
   })
 
   return Schema
+}
+
+const has = (target: unknown, key: string | symbol | number) => {
+  return Object.prototype.hasOwnProperty.call(target, key)
 }

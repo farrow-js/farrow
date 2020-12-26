@@ -212,7 +212,7 @@ describe('Http', () => {
           pathname: '/test',
         })
         .use(() => {
-          return Response.custom(({ req, res, requestInfo, responseInfo }) => {
+          return Response.custom(({ res, requestInfo, responseInfo }) => {
             res.end(
               JSON.stringify({
                 requestInfo: {
@@ -645,9 +645,9 @@ describe('Http', () => {
 
       let server = http.server()
 
-      http.use(async () => {
+      http.use(() => {
         let ctx = TestContext.use()
-        let value = ctx.value
+        let { value } = ctx
         ctx.value += 1
         return Response.text(value.toString())
       })
@@ -852,9 +852,8 @@ describe('Http', () => {
               new: true,
             },
           })
-        } else {
-          return next()
         }
+        return next()
       })
 
       http

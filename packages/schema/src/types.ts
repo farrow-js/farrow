@@ -28,7 +28,7 @@ export type MarkReadOnlyDeep<T> = T extends Basic | ((...args: any[]) => unknown
   ? ReadOnlyMapDeep<KeyType, ValueType>
   : T extends ReadonlySet<infer ItemType>
   ? ReadOnlySetDeep<ItemType>
-  : T extends object
+  : T extends {}
   ? ReadOnlyObjectDeep<T>
   : unknown
 

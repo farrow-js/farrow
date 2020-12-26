@@ -71,7 +71,7 @@ const findBasename = (basenames: string[], pathname: string) => {
     let newPathname = pathname.replace(basename, '')
 
     if (!newPathname.startsWith('/')) {
-      newPathname = '/' + newPathname
+      newPathname = `/${newPathname}`
     }
 
     return {

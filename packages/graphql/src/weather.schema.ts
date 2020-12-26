@@ -315,7 +315,7 @@ type T6 = TypeOf<Unit>
 type T8 = Prettier<TypeOf<City>>
 
 const Schema = build({
-  Query: Query,
+  Query,
 })
 
 const test = async () => {
@@ -323,4 +323,4 @@ const test = async () => {
   await fs.promises.writeFile(filename, printSchema(Schema))
 }
 
-test()
+test().catch(console.error)

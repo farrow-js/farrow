@@ -59,9 +59,9 @@ export const useReactView = (options?: ReactViewOptions) => {
 
     if (config.useStream) {
       return renderToNodeStream(view)
-    } else {
-      return renderToString(view)
     }
+
+    return renderToString(view)
   }
 
   return {

@@ -2,7 +2,15 @@ import path from 'path'
 import { match as createMatch, MatchFunction, Path as Pathname } from 'path-to-regexp'
 import { parse as parseQuery } from 'qs'
 
-import { createPipeline, useContainer, MiddlewareInput, Pipeline, Middleware } from 'farrow-pipeline'
+import {
+  createPipeline,
+  useContainer,
+  MiddlewareInput,
+  Pipeline,
+  Middleware,
+  AsyncPipeline,
+  createAsyncPipeline,
+} from 'farrow-pipeline'
 
 import * as Schema from 'farrow-schema'
 import { ValidationError } from 'farrow-schema/validator'
@@ -204,15 +212,6 @@ const resolveUrlPattern = <T extends string>(input: T) => {
     }
   }
 
-  // console.log('pathname', {
-  //   url: input,
-  //   pathname,
-  //   parsed: url,
-  //   query,
-  //   params,
-  //   parsedQuery
-  // })
-
   return {
     pathname,
     params,
@@ -272,7 +271,7 @@ export type MatchedPipeline<T extends RouterSchema> = T extends RouterRequestSch
   ? Pipeline<TypeOfUrlSchema<T>, MaybeAsyncResponse>
   : never
 
-export type RouterPipeline = Pipeline<RequestInfo, MaybeAsyncResponse> & {
+export type RouterPipeline = AsyncPipeline<RequestInfo, Response> & {
   capture: <T extends keyof BodyMap>(type: T, f: (body: BodyMap[T]) => MaybeAsyncResponse) => void
   route: (name: string) => Pipeline<RequestInfo, MaybeAsyncResponse>
   serve: (name: string, dirname: string) => void
@@ -315,7 +314,7 @@ export type RoutingMethods = {
 export type RouterPipelineOptions = string
 
 export const createRouterPipeline = (): RouterPipeline => {
-  let pipeline = createPipeline<RequestInfo, MaybeAsyncResponse>()
+  let pipeline = createAsyncPipeline<RequestInfo, Response>()
 
   let capture: RouterPipeline['capture'] = (type, f) => {
     pipeline.use(matchBodyType(type, f))

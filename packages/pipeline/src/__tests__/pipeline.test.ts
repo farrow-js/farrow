@@ -1,4 +1,5 @@
 import { createContext, createContainer, createPipeline, usePipeline, useContainer } from '../'
+import { createAsyncPipeline } from '../pipeline'
 
 describe('createContext', () => {
   it('basic usage', () => {
@@ -488,5 +489,46 @@ describe('createPipeline', () => {
     expect(result0).toEqual(1)
     expect(result1).toEqual(3)
     expect(steps).toEqual([1, 2])
+  })
+
+  it('support async pipeline', async () => {
+    let pipeline = createAsyncPipeline<number, number>()
+
+    pipeline.use((input, next) => {
+      return next(input + 1)
+    })
+
+    let i = 0
+
+    pipeline.useLazy(() => {
+      let count = ++i
+      return (input, next) => {
+        return next(input + count)
+      }
+    })
+
+    pipeline.useLazy(async () => {
+      // eslint-disable-next-line @typescript-eslint/await-thenable
+      let count = await ++i
+      return (input, next) => {
+        return next(input + count)
+      }
+    })
+
+    pipeline.use((input) => {
+      return input
+    })
+
+    expect(i).toBe(0)
+
+    let result0 = await pipeline.run(0)
+
+    expect(result0).toBe(4)
+    expect(i).toBe(2)
+
+    let result1 = await pipeline.run(-4)
+
+    expect(result1).toBe(0)
+    expect(i).toBe(2)
   })
 })

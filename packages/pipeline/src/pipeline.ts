@@ -150,3 +150,46 @@ export const usePipeline = <I, O>(pipeline: Pipeline<I, O>) => {
 
   return runPipeline
 }
+
+export type MaybeAsync<T> = T | Promise<T>
+
+export type ThunkMiddlewareInput<I, O> = () => MaybeAsync<MiddlewareInput<I, MaybeAsync<O>>>
+
+export type AsyncPipeline<I = unknown, O = unknown> = Pipeline<I, MaybeAsync<O>> & {
+  useLazy: (thunk: ThunkMiddlewareInput<I, O>) => AsyncPipeline<I, O>
+}
+
+export const createAsyncPipeline = <I, O>(options?: PipelineOptions) => {
+  let pipeline = createPipeline<I, MaybeAsync<O>>(options)
+
+  let useLazy: AsyncPipeline<I, O>['useLazy'] = (thunk) => {
+    let middleware: Middleware<I, MaybeAsync<O>> | null = null
+    let promise: Promise<void> | null = null
+
+    pipeline.use((input, next) => {
+      if (middleware) return next(input)
+
+      if (!promise) {
+        promise = Promise.resolve(thunk()).then((result) => {
+          middleware = getMiddleware(result)
+        })
+      }
+
+      return promise.then(() => next(input))
+    })
+
+    pipeline.use((input, next) => {
+      if (!middleware) throw new Error(`pipeline.useLazy failed to load middleware`)
+      return middleware(input, next)
+    })
+
+    return asyncPipeline
+  }
+
+  let asyncPipeline: AsyncPipeline<I, O> = {
+    ...pipeline,
+    useLazy,
+  }
+
+  return asyncPipeline
+}

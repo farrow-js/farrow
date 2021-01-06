@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import path from 'path'
 import { Http, Response } from 'farrow-http'
 
@@ -23,6 +24,45 @@ http
   .use((_req) => {
     return Response.text('')
   })
+
+http
+  .match({
+    pathname: '/product',
+    // if method was not given, the default value wounld be `GET`.
+    query: {
+      productId: Number,
+    },
+  })
+  .use((request) => {
+    // productId is a number
+
+    console.log('productId', request.query.productId)
+
+    return Response.json({
+      productId: request.query.productId,
+    })
+  })
+
+
+
+
+
+
+
+
+
+
+
+  
+http.get('/product?<productId:number>').use((request) => {
+  // productId is a number
+
+  console.log('productId', request.query.productId)
+
+  return Response.json({
+    productId: request.query.productId,
+  })
+})
 
 http.serve('/static', path.join(__dirname, '../static'))
 

@@ -1,5 +1,6 @@
 {
   "root": true,
+  "extends": ["plugin:react/recommended"],
   "env": {
     "node": true,
     "es6": true
@@ -12,6 +13,7 @@
   },
   "plugins": ["jest", "prefer-let", "prettier", "@typescript-eslint"],
   "rules": {
+    "react/prop-types": "off",
     "no-var": "error",
     "for-direction": "error",
     "getter-return": "error",

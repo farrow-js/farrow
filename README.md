@@ -468,6 +468,13 @@ http
   })
 ```
 
+## Development
+
+```shell
+# git clone and run command below to bootstrap
+npm run bootstrap
+```
+
 ## Author
 
 👤 **Jade Gu**

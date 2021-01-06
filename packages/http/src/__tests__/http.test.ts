@@ -18,6 +18,7 @@ import {
   usePrefix,
   useBasenames,
 } from '../'
+import { file } from '../responseInfo'
 
 const delay = (time: number) => {
   return new Promise((resolve) => {
@@ -1003,6 +1004,28 @@ describe('Http', () => {
         prefix: '/router2',
         pathname: '/',
       })
+    })
+
+    it('support setting custom content-type for Response.file', async () => {
+      let http = createHttp()
+      let server = http.server()
+      let filename = path.join(__dirname, '../../fixtures/static/foo.js')
+      let content = await fs.promises.readFile(filename)
+
+      http.get('/raw').use(async () => {
+        return Response.file(filename)
+      })
+
+      http.get('/text').use(async () => {
+        return Response.type('text').file(filename)
+      })
+
+      await request(server)
+        .get('/raw')
+        .expect('Content-Type', /javascript/)
+        .expect(200, content.toString())
+
+      await request(server).get('/text').expect('Content-Type', /text/).expect(200, content.toString())
     })
   })
 })

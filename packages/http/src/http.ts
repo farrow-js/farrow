@@ -384,11 +384,14 @@ export const handleResponse = (params: ResponseParams) => {
     }
 
     let stream = fs.createReadStream(filename, options)
-    let ext = path.extname(filename)
-    let contentType = mime.contentType(ext)
 
-    if (contentType) {
-      res.setHeader('Content-Type', contentType)
+    if (!res.getHeader('Content-Type')) {
+      let ext = path.extname(filename)
+      let contentType = mime.contentType(ext)
+
+      if (contentType) {
+        res.setHeader('Content-Type', contentType)
+      }
     }
 
     return handleStream(res, stream)

@@ -1,4 +1,4 @@
-const { createServerBundler } = require('farrow-dev')
+const { createServerBundler } = require('farrow')
 const pkg = require('./package.json')
 
 const bundler = createServerBundler({

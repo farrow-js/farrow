@@ -76,36 +76,47 @@ export const createBundler = (options: BundlerOptions) => {
 }
 
 export type ServerBundlerOptions = {
+  // filename of entry
   entry?: string
+  // folder of source code
   src?: string
+  // folder of output code
   dist?: string
-  watch?: boolean
+  // args for node.js
+  // eg. ['--inspect-brk'] for debugging
   nodeArgs?: string[]
-} & Omit<BuildOptions, 'entryPoints' | 'outdir' | 'outbase'>
+  // env for node.js
+  // eg. { NODE_ENV: 'production' }
+  // NODE_ENV = production in `farrow start`
+  // NODE_ENV = development in `farrow dev`
+  env?: NodeJS.ProcessEnv
+  // other options for esbuild
+  esbuild?: Omit<BuildOptions, 'entryPoints' | 'outdir' | 'outbase'>
+}
 
 export const createServerBundler = (options: ServerBundlerOptions = {}) => {
-  let isProduction = process.env.NODE_ENV === 'production'
   let config = {
     entry: 'index.ts',
     src: 'src',
     dist: 'dist',
-    watch: !isProduction,
-    sourcemap: true,
     nodeArgs: [],
     ...options,
+    esbuild: {
+      sourcemap: true,
+      ...options.esbuild,
+    },
   }
-  let esbuildOptions = omit(config, ['entry', 'src', 'dist', 'watch', 'nodeArgs'])
   let srcEntry = join(config.src, config.entry)
   let distEntry = join(config.dist, config.entry).replace(/\.(tsx?)$/, '.js')
   let bundler = createBundler({
     build: {
-      ...esbuildOptions,
+      ...config.esbuild,
       platform: 'node',
       bundle: true,
       entryPoints: [srcEntry],
       outbase: config.src,
       outdir: config.dist,
-      plugins: [...(config.plugins ?? []), createResolveDirnamePlugin(config.dist)],
+      plugins: [...(config.esbuild.plugins ?? []), createResolveDirnamePlugin(config.dist)],
     },
   })
 
@@ -116,6 +127,10 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
     childProcess = execa('node', [...config.nodeArgs, distEntry], {
       stdout: 'inherit',
       stderr: 'inherit',
+      env: {
+        NODE_ENV: process.env.NODE_ENV,
+        ...config.env,
+      },
     })
     return childProcess
   }
@@ -240,16 +255,4 @@ const createResolveDirnamePlugin = (dist: string): Plugin => {
       )
     },
   }
-}
-
-const omit = <T extends object, K extends keyof T>(obj: T, keys: K[]): Omit<T, K> => {
-  let result = {} as Omit<T, K>
-
-  for (let key in obj) {
-    if (!keys.includes((key as unknown) as K)) {
-      result[key as any] = obj[key]
-    }
-  }
-
-  return result
 }

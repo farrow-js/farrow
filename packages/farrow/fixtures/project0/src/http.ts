@@ -11,3 +11,15 @@ http.get('/user/<id:int>').use((request) => {
     },
   })
 })
+
+http.get('/env/<key:string>').use((request) => {
+  return Response.json({
+    [request.params.key]: process.env[request.params.key],
+  })
+})
+
+http.get('/env').use(() => {
+  return Response.json({
+    env: process.env,
+  })
+})

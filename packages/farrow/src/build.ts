@@ -6,6 +6,9 @@ export default async function build(options: GetConfigOptions) {
 
   let serverBundler = createServerBundler({
     minify: true,
+    env: {
+      NODE_ENV: 'production',
+    },
     ...config.server,
   })
 

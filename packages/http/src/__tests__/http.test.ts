@@ -1027,5 +1027,57 @@ describe('Http', () => {
 
       await request(server).get('/text').expect('Content-Type', /text/).expect(200, content.toString())
     })
+
+    it('support remove cookies or headers', async () => {
+      let http = createHttp()
+      let server = http.server()
+
+      http
+        .get(
+          '/test',
+          {},
+          {
+            block: false,
+          },
+        )
+        .use(async (request, next) => {
+          let response = await next(request)
+
+          return response
+            .cookies({
+              a: '',
+              b: '',
+            })
+            .headers({
+              c: '',
+              d: '',
+            })
+        })
+
+      http.get('/test').use(() => {
+        return Response.cookies({
+          a: '1',
+          b: '2',
+          c: '3',
+          d: '4',
+        })
+          .headers({
+            a: '1',
+            b: '2',
+            c: '3',
+            d: '4',
+          })
+          .text('OK')
+      })
+
+      await request(server)
+        .get('/test')
+        .expect((res) => {
+          expect(res.headers['set-cookie'].length).toEqual(4)
+          expect(res.headers['a']).toBe('1')
+          expect(res.headers['b']).toBe('2')
+        })
+        .expect(200, 'OK')
+    })
   })
 })

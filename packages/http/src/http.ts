@@ -292,7 +292,9 @@ export const handleResponse = (params: ResponseParams) => {
   // handle response headers
   let handleHeaders = (headers: Headers) => {
     Object.entries(headers).forEach(([name, value]) => {
-      res.setHeader(name, value)
+      if (value) {
+        res.setHeader(name, value)
+      }
     })
   }
 

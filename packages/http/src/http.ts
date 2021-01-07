@@ -177,7 +177,10 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
 
       let contentLength = 0
 
+      let hasLogOut = false
       let logOutput = (event: LoggerEvent) => {
+        if (hasLogOut) return
+        hasLogOut = true
         logger?.logOutput(method, url, res.statusCode, startTime, contentLength || getContentLength(res), event)
       }
 

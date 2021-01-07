@@ -48,6 +48,7 @@
 ## Usage
 
 - [How to install](#how-to-install)
+- [How to setup a development environment](#how-to-setup-a-development-environment)
 - [How to setup a server](#how-to-setup-a-server)
 - [How to serve static assets](#how-to-serve-static-assets)
 - [How to respond text or json or html or file](#how-to-respond-text-or-json-or-html-or-file)
@@ -68,11 +69,35 @@
 
 ```shell
 # via npm
-npm install --save farrow-pipeline farrow-schema farrow-http
+npm install --save farrow farrow-pipeline farrow-schema farrow-http
 
 # via yarn
-yarn add farrow-pipeline farrow-schema farrow-http
+yarn add farrow farrow-pipeline farrow-schema farrow-http
 ```
+
+### How to setup a development environment
+
+add `scripts` to your `package.json`
+
+```json
+{
+  "scripts": {
+    "dev": "farrow dev",
+    "build": "farrow build",
+    "start": "farrow start"
+  }
+}
+```
+
+and then:
+
+- `npm run dev` for developing
+- `npm run build` for bundling the source code
+- `npm run start` for runing the output code of bundler
+
+`farrow` assumes that your source code is in `src` folder, and the output code is in `dist` folder.
+
+You can use `farrow.config.js` to change the default configuration, see the [documentation](./docs/farrow.md) for more detail.
 
 ### How to setup a server
 

@@ -42,12 +42,15 @@ const { createFarrowConfig } = require('farrow')
 const pkg = require('./package.json')
 
 module.exports = createFarrowConfig({
-  // options for server project
   server: {
-    entry: 'index.ts',
+    entry: 'index.js',
     src: 'src',
     dist: 'dist',
-    external: [...Object.keys(pkg.dependencies)],
+    // uncomment next-line to debug
+    // nodeArgs: ['--inspect-brk'],
+    esbuild: {
+      external: [...Object.keys(pkg.dependencies)],
+    },
   },
 })
 ```

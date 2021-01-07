@@ -3,6 +3,8 @@ const pkg = require('./package.json')
 
 module.exports = createFarrowConfig({
   server: {
-    external: [...Object.keys(pkg.dependencies)],
+    esbuild: {
+      external: [...Object.keys(pkg.dependencies)],
+    },
   },
 })

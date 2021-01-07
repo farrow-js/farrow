@@ -28,3 +28,5 @@ http.route('/flight').use(flight)
 http.listen(3002, () => {
   console.log(`server started at http://localhost:3002`)
 })
+
+console.log('NODE_ENV', process.env.NODE_ENV)

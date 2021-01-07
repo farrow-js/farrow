@@ -4,7 +4,9 @@
   "private": true,
   "description": "Functional style web framework for node.js",
   "scripts": {
-    "start": "ts-node src"
+    "dev": "farrow dev",
+    "build": "farrow build",
+    "start": "farrow start"
   },
   "keywords": [
     "Web Framework",

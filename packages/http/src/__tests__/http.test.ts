@@ -265,12 +265,17 @@ describe('Http', () => {
       })
     })
 
-    it('should respond 500 when there are no middlewares handling request', async () => {
+    it('should respond 500 in block mode when there are no middlewares handling request', async () => {
       let http = createHttp()
 
-      http.match({
-        pathname: '/test',
-      })
+      http.match(
+        {
+          pathname: '/test',
+        },
+        {
+          block: true,
+        },
+      )
 
       await request(http.server()).get('/test').expect(500)
     })

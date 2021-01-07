@@ -351,7 +351,7 @@ export const createRouterPipeline = (): RouterPipeline => {
     matcher: MatchFunction<object>
   }) => {
     let config = {
-      block: true,
+      block: false,
       ...options,
     }
 

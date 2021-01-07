@@ -1,44 +1,48 @@
 #!/usr/bin/env node
 
-let querystring = require('query-string')
-// eslint-disable-next-line prefer-destructuring
-let command = process.argv[2]
-let [script, params = ''] = command.split('?')
-let query = querystring.parse(params)
-params = Object.keys(query).map((key) => (query[key] ? `--${key}=${query[key]}` : `--${key}`))
-let Farrow = require('../dist')
-let result
+// based on https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/bin/react-scripts.js
 
-switch (script) {
-  case 'start':
-    return Farrow.start()
-  case 'build':
-    return Farrow.build()
-  default:
-    console.log(`Unknown script "${script}".`)
-    break
-}
+'use strict'
 
-if (result) {
-  switch (result.signal) {
-    case 'SIGKILL':
+// Makes the script crash on unhandled rejections instead of silently
+// ignoring them. In the future, promise rejections that are not handled will
+// terminate the Node.js process with a non-zero exit code.
+process.on('unhandledRejection', (err) => {
+  throw err
+})
+
+const spawn = require('cross-spawn')
+const args = process.argv.slice(2)
+
+const scripts = ['dev', 'build', 'start']
+
+const scriptIndex = args.findIndex((arg) => scripts.includes(arg))
+const script = scriptIndex === -1 ? args[0] : args[scriptIndex]
+const nodeArgs = scriptIndex > 0 ? args.slice(0, scriptIndex) : []
+
+if (scripts.includes(script)) {
+  let result = spawn.sync(
+    process.execPath,
+    nodeArgs.concat(require.resolve(`../scripts/${script}`)).concat(args.slice(scriptIndex + 1)),
+    { stdio: 'inherit' },
+  )
+  if (result.signal) {
+    if (result.signal === 'SIGKILL') {
       console.log(
         'The build failed because the process exited too early. ' +
           'This probably means the system ran out of memory or someone called ' +
           '`kill -9` on the process.',
       )
-      process.exit(1)
-      break
-    case 'SIGTERM':
+    } else if (result.signal === 'SIGTERM') {
       console.log(
         'The build failed because the process exited too early. ' +
           'Someone might have called `kill` or `killall`, or the system could ' +
           'be shutting down.',
       )
-      process.exit(1)
-      break
-    default: {
-      throw new Error(`Unknown signal: ${result.signal}`)
     }
+    process.exit(1)
   }
+  process.exit(result.status)
+} else {
+  console.log(`Unknown script "${script}". Allow scripts: ${scripts.join(', ')}`)
 }

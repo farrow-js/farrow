@@ -1,0 +1,8 @@
+{
+  "name": "project0",
+  "scripts": {
+    "dev": "node ../../bin/scripts dev",
+    "build": "node ../../bin/scripts build",
+    "start": "node ../../bin/scripts start"
+  }
+}

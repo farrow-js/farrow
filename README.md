@@ -478,7 +478,7 @@ const UserProvider = (): HttpMiddleware => {
 
 const http = Http()
 
-http.use(UserProvider)
+http.use(UserProvider())
 
 http
   .match({

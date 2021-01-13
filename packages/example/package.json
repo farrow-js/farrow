@@ -1,6 +1,6 @@
 {
   "name": "farrow-example",
-  "version": "1.4.2",
+  "version": "1.4.3",
   "private": true,
   "description": "Functional style web framework for node.js",
   "scripts": {
@@ -19,7 +19,7 @@
     "ts-node": "^9.1.1"
   },
   "dependencies": {
-    "farrow": "^1.4.1",
+    "farrow": "^1.4.3",
     "farrow-http": "^1.4.0",
     "farrow-pipeline": "^1.4.0",
     "farrow-react": "^1.4.0",

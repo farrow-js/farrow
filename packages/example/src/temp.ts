@@ -43,17 +43,6 @@ http
     })
   })
 
-
-
-
-
-
-
-
-
-
-
-  
 http.get('/product?<productId:number>').use((request) => {
   // productId is a number
 

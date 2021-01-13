@@ -1,4 +1,3 @@
-/* eslint-disable prettier/prettier */
 import path from 'path'
 import { Http, Response } from 'farrow-http'
 

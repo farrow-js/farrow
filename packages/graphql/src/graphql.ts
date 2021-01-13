@@ -1,5 +1,55 @@
 import type { ValueNode } from 'graphql'
 
+// graphql field resolver can be thunk or async thunk
+export type Thunk<T> = T extends (...args: any) => any ? T : T | (() => T) | (() => Promise<T>)
+
+export type Maybe<T> = T | null | undefined
+
+export type ResolvedValue<T> = Thunk<Maybe<T>>
+
+export type MaybePromise<T> = T extends Promise<any> ? T : T | Promise<T>
+
+export type ResolverType<T> = T extends TypeCtor
+  ? ResolverType<InstanceType<T>>
+  : T extends UnionType
+  ? ResolverType<T['types'][number]>
+  : T extends ObjectType
+  ? {
+      [key in keyof TypeOf<T>]: ResolvedValue<TypeOf<T>[key]>
+    }
+  : T
+
+const typenameMap = new WeakMap<new () => ObjectType | UnionType, string>()
+
+const getTypename = <T extends ObjectType | UnionType>(GraphQLType: new () => T): string => {
+  let typename = typenameMap.get(GraphQLType)
+  if (!typename) {
+    typename = new GraphQLType().name
+    typenameMap.set(GraphQLType, typename)
+  }
+  return typename
+}
+
+export const resolve = <T extends ObjectType | UnionType, V extends Omit<ResolverType<T>, '__typename'>>(
+  GraphQLType: new () => T,
+  value: V,
+): { __typename: T['name'] } & V => {
+  return {
+    ...value,
+    __typename: getTypename(GraphQLType),
+  }
+}
+
+type Constructable = new (...args: any[]) => ObjectType
+
+export const Resolver = <T extends Constructable>(Type: T) => {
+  abstract class Resolver extends Type {
+    static Type = Type
+    abstract resolver: Omit<ResolverType<T>, '__typename'>
+  }
+  return Resolver
+}
+
 const Phantom = Symbol('phantom')
 
 type Phantom = typeof Phantom
@@ -128,6 +178,10 @@ export abstract class InterfaceType extends Type {
 }
 
 export abstract class ObjectType extends Type {
+  static resolve<T extends ObjectType, V extends Omit<ResolverType<T>, '__typename'>>(this: new () => T, value: V) {
+    return resolve(this, value)
+  }
+
   __object = true
 
   interfaces?: (new () => InterfaceType)[]
@@ -182,6 +236,9 @@ export abstract class EnumType extends Type {
 }
 
 export abstract class UnionType extends Type {
+  static resolve<T extends UnionType, V extends Omit<ResolverType<T>, '__typename'>>(this: new () => T, value: V) {
+    return resolve(this, value)
+  }
   __union = true
   abstract types: (new () => ObjectType)[]
   resolveTypes?(value: any): new () => ObjectType

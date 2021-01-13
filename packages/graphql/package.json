@@ -23,13 +23,13 @@
   },
   "peerDependencies": {
     "farrow-schema": "^1.0.0",
-    "graphql": "^15.4.0",
-    "reflect-metadata": "^0.1.13"
+    "farrow-pipeline": "^1.0.0",
+    "graphql": "^15.4.0"
   },
   "devDependencies": {
     "farrow-schema": "^1.4.0",
-    "graphql": "^15.4.0",
-    "reflect-metadata": "^0.1.13"
+    "farrow-pipeline": "^1.0.0",
+    "graphql": "^15.4.0"
   },
   "dependencies": {
     "tslib": "^2.0.3"

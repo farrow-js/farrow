@@ -50,7 +50,7 @@
     "curly": ["error", "multi-line"],
     "default-case": "error",
     "eqeqeq": "error",
-    "guard-for-in": "warn",
+    "guard-for-in": "off",
     "no-caller": "error",
     "no-case-declarations": "error",
     "no-div-regex": "error",

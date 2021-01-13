@@ -21,13 +21,16 @@ import {
   Type,
   typename,
   Prettier,
+  TypeCtor,
+  ResolverType,
+  Resolver,
 } from './graphql'
 
 import { printSchema } from 'graphql'
 
 import { build } from './build'
 
-class Point2D extends InputObjectType {
+class Point2D extends ObjectType {
   name = typename('Point2D')
 
   fields = {
@@ -39,6 +42,67 @@ class Point2D extends InputObjectType {
     },
   }
 }
+
+class Point2DResolver extends Resolver(Point2D) {
+  constructor(public x: number, public y: number) {
+    super()
+  }
+
+  resolver = {
+    x: this.x,
+    y: this.y,
+  }
+}
+
+const resolvePoint2D = (x: number, y: number) => {
+  return Point2D.resolve({
+    x,
+    y,
+  })
+}
+
+let point0 = new Point2DResolver(0, 0)
+let point1 = resolvePoint2D(0, 0)
+
+class Point3D extends ObjectType {
+  name = typename('Point3D')
+
+  fields = {
+    x: {
+      type: Float,
+    },
+    y: {
+      type: Float,
+    },
+    z: {
+      type: Float,
+    },
+  }
+}
+
+const resolvePoint3D = (x: number, y: number, z: number) => {
+  return Point3D.resolve({
+    x: () => x,
+    y,
+    z,
+  })
+}
+
+class Point extends UnionType {
+  name = typename('Point')
+  types = [Point2D, Point3D]
+}
+
+const resolvePoint = (x: number, y: number, z?: number): ResolverType<Point> => {
+  if (typeof z !== 'number') {
+    return resolvePoint2D(x, y)
+  }
+  return resolvePoint3D(x, y, z)
+}
+
+const p0 = resolvePoint(0, 0, 0)
+
+type P0 = Prettier<typeof p0>
 
 type T0 = Prettier<TypeOf<Point2D>>
 
@@ -313,6 +377,10 @@ type T5 = TypeOf<Language>
 type T6 = TypeOf<Unit>
 
 type T8 = Prettier<TypeOf<City>>
+
+type T10 = ResolverType<Query>
+
+type T11 = Prettier<T10>
 
 const Schema = build({
   Query,

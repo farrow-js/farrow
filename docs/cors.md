@@ -206,7 +206,10 @@ You can also enable pre-flight across-the-board like so:
 // include before other routes
 http
   .match({
-    pathname: '*',
+    // we can not simple use wildcard here
+    // because Path-To-RegExp breaks compatibility
+    // https://github.com/pillarjs/path-to-regexp#compatibility-with-express--4x
+    pathname: '(.*)',
     method: 'OPTIONS',
   })
   .use(cors())

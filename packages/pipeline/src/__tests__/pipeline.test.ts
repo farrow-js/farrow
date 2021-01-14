@@ -1,5 +1,12 @@
 import { createContext, createContainer, createPipeline, usePipeline, useContainer } from '../'
 import { createAsyncPipeline } from '../pipeline'
+import * as asyncHooksImpl from '../asyncHooksImpl/node'
+
+const delay = (duration: number = 1) => {
+  return new Promise<boolean>((resolve) => {
+    setTimeout(() => resolve(true), duration)
+  })
+}
 
 describe('createContext', () => {
   it('basic usage', () => {
@@ -530,5 +537,64 @@ describe('createPipeline', () => {
 
     expect(result1).toBe(0)
     expect(i).toBe(2)
+  })
+
+  it('support async hooks', async () => {
+    let pipeline = createAsyncPipeline<number, number>()
+
+    let Count = createContext({
+      count: 10,
+    })
+
+    let incre = async () => {
+      await delay()
+      Count.set({
+        count: Count.assert().count + 1,
+      })
+    }
+
+    let list = [] as { count: number }[]
+
+    pipeline.use(async (input, next) => {
+      let before = Count.get()
+      let result = await next(input)
+
+      await incre()
+
+      let after = Count.get()
+
+      list.push(before, after)
+
+      return result
+    })
+
+    pipeline.use(async (input) => {
+      await delay()
+      await incre()
+
+      return input + Count.get().count
+    })
+
+    let container = createContainer({
+      count: Count,
+    })
+
+    asyncHooksImpl.enable()
+
+    let result0 = await pipeline.run(10, {
+      container,
+    })
+
+    asyncHooksImpl.disable()
+
+    expect(result0).toEqual(21)
+    expect(list).toEqual([
+      {
+        count: 10,
+      },
+      {
+        count: 12,
+      },
+    ])
   })
 })

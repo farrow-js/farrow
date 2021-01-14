@@ -5,10 +5,18 @@ const ContextSymbol = Symbol('Context')
 export type Context<T = any> = {
   id: symbol
   [ContextSymbol]: T
+  // create a new context equipped a new value
   create: (value: T) => Context<T>
+  // get context ref { value } for accessing context in current container of pipeline
   use: () => {
     value: T
   }
+  // get context value
+  get: () => T
+  // set context value
+  set: (value: T) => void
+  // assert context value is not null or undefined and return context value
+  assert: () => Exclude<T, undefined | null>
 }
 
 export const isContext = (input: any): input is Context => {
@@ -38,11 +46,29 @@ export const createContext = <T>(value: T) => {
         },
       })
     }
+    let get = () => {
+      let container = useContainer()
+      return container.read(Context)
+    }
+    let set = (v: T) => {
+      let container = useContainer()
+      container.write(Context, v)
+    }
+    let assert = () => {
+      let value = get()
+      if (value === null || value === undefined) {
+        throw new Error(`Expected value is not null or undefined, but got: ${value}`)
+      }
+      return value as Exclude<T, null | undefined>
+    }
     let Context: Context<T> = {
       id,
       [ContextSymbol]: value,
       create,
       use,
+      get,
+      set,
+      assert,
     }
     return Context
   }

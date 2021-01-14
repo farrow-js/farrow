@@ -1,21 +1,14 @@
-type AnyFn = (...args: any) => any
+import { Hooks, AnyFn, asyncHooks } from './asyncHooksInterface'
 
-type Hooks = {
-  [key: string]: AnyFn
-}
-
-type DefaultHooks<HS extends Hooks> = {
-  [key in keyof HS]: (...args: Parameters<HS[key]>) => never
-}
-
-export const createHooks = <HS extends Hooks>(defaultHooks: DefaultHooks<HS>) => {
-  let currentHooks: Hooks = {}
+export const createHooks = <HS extends Hooks>(defaultHooks: HS) => {
+  let currentHooks = {} as HS
 
   let hooks = {} as HS
 
   for (let key in defaultHooks) {
     let f = ((...args) => {
-      let handler = currentHooks[key]
+      let hooks = currentHooks === defaultHooks ? asyncHooks?.get() ?? defaultHooks : currentHooks
+      let handler = hooks[key]
       // tslint:disable-next-line: strict-type-predicates
       if (typeof handler !== 'function') {
         handler = defaultHooks[key]
@@ -29,6 +22,7 @@ export const createHooks = <HS extends Hooks>(defaultHooks: DefaultHooks<HS>) =>
   let run = <F extends AnyFn>(f: F, implementations: HS): ReturnType<F> => {
     try {
       currentHooks = implementations || defaultHooks
+      asyncHooks?.set(currentHooks)
       return f()
     } finally {
       currentHooks = defaultHooks

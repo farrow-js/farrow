@@ -18,7 +18,6 @@ import {
   usePrefix,
   useBasenames,
 } from '../'
-import { file } from '../responseInfo'
 
 const delay = (time: number) => {
   return new Promise((resolve) => {
@@ -660,6 +659,35 @@ describe('Http', () => {
 
       await request(server).get('/').expect(200, '10')
       await request(server).get('/any').expect(200, '10')
+    })
+
+    it('support async hooks', async () => {
+      let TestContext = createContext(0)
+
+      let http = createHttp({
+        contexts: () => {
+          return {
+            test: TestContext.create(10),
+          }
+        },
+      })
+
+      let server = http.server()
+
+      http.use(async (request, next) => {
+        await delay(1)
+        let response = await next(request)
+        expect(TestContext.get()).toBe(11)
+        return response
+      })
+
+      http.use(() => {
+        TestContext.set(TestContext.get() + 1)
+        return Response.text(`${TestContext.get()}`)
+      })
+
+      await request(server).get('/').expect(200, '11')
+      await request(server).get('/any').expect(200, '11')
     })
 
     it('should only handle GET method by default', async () => {

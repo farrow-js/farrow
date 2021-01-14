@@ -52,7 +52,7 @@ let result = pipeline.run(0) // [0, 1, 2, 3]
 
 create a injectable context
 
-createContext is like `React.createContext`, we can use it injecting anything we want, and access via `Context.use()` in any middleware or custom-hooks function body.
+createContext is like `React.createContext`, we can use it injecting anything we want, and access `Context` in any middleware or custom-hooks function.
 
 ```typescript
 type Context<T = any> = {

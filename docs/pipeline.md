@@ -60,10 +60,16 @@ type Context<T = any> = {
   [ContextSymbol]: T
   // create a new context equipped a new value
   create: (value: T) => Context<T>
-  // farrow-hooks for accessing context in current container of pipeline
+  // get context ref { value } for accessing context in current container of pipeline
   use: () => {
     value: T
   }
+  // get context value
+  get: () => T
+  // set context value
+  set: (value: T) => void
+  // assert context value is not null or undefined and return context value
+  assert: () => Exclude<T, undefined | null>
 }
 
 const Context0 = createContext(0)
@@ -75,13 +81,17 @@ const pipeline = createPipeline<number, number>({
   },
 })
 
-pipeline.use((input) => {
-  let context0 = Context0.use()
-  return context0.value + input
+pipeline.use((input, next()) => {
+  return next(input) + Context0.get()
 })
 
-let result0 = pipeline.run(10) // return 20
-let result1 = pipeline.run(20) // return 30
+pipeline.use((input) => {
+  Context0.set(Context0.get() + 1)
+  return input
+})
+
+let result0 = pipeline.run(10) // return 21
+let result1 = pipeline.run(20) // return 31
 ```
 
 ## createContainer(contexts?: ContextStorage): Container

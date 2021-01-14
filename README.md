@@ -420,7 +420,7 @@ http.use(() => {
 
 ### How to write a farrow hooks
 
-**Note**: farrow-hooks shared similar rules or limitations with react-hooks, all farrow-hooks have to place before the first `await` in the function body.
+[Click here to learn more.](./docs/pipeline.md#createcontextdefaultvalue-t-context)
 
 ```tsx
 import { createContext } from 'farrow-pipeline'
@@ -437,25 +437,12 @@ interface User {
 // define a farrow context via interface
 const UserContext = createContext<User | null>(null)
 
-// define a custom farrow hooks
-const useUser = (): User => {
-  // every farrow context provide a built-in hooks, Context.use()
-  let ctx = UserContext.use()
-
-  if (ctx.value === null) {
-    throw new Error(`user not found`)
-  }
-
-  return ctx.value
-}
-
 // define a provider middleware
 const UserProvider = (): HttpMiddleware => {
   return async (request, next) => {
-    let userCtx = UserContext.use()
     // assume defining somewhere
-    let session = SessionContext.use().value
-    let db = DbContext.use().value
+    let session = SessionContext.get()
+    let db = DbContext.get()
 
     if (!request?.cookies?.token) {
       return next()
@@ -469,8 +456,7 @@ const UserProvider = (): HttpMiddleware => {
       },
     })
 
-    // write user context
-    userCtx.value = user
+    UserContext.set(user)
 
     return next()
   }
@@ -486,8 +472,8 @@ http
   })
   .use(async (request, next) => {
     let ReactView = useReactView()
-    // read user from hooks
-    let user = useUser()
+    // assert context value is not null or undefined and return context value
+    let user = UserContext.assert()
 
     return ReactView.render(<div>{JSON.stringify(user)}</div>)
   })

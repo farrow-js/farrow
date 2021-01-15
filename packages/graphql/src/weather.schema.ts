@@ -22,9 +22,7 @@ import {
   typename,
   Prettier,
   TypeCtor,
-  ResolverType,
   DataType,
-  PrettierDataType,
 } from './graphql'
 
 import { printSchema } from 'graphql'
@@ -77,13 +75,6 @@ class Circle extends ObjectType {
       description: 'radius of circle',
     },
   }
-}
-
-const createCircle = (origin: PrettierDataType<Point2D>, radius: PrettierDataType<Float>) => {
-  return Circle.create({
-    origin: () => Point3D.create({ ...origin, z: 0 }),
-    radius,
-  })
 }
 
 type T0 = Prettier<TypeOf<Point2D>>
@@ -359,10 +350,6 @@ type T5 = TypeOf<Language>
 type T6 = TypeOf<Unit>
 
 type T8 = Prettier<TypeOf<City>>
-
-type T10 = ResolverType<Query>
-
-type T11 = Prettier<T10>
 
 const Schema = build({
   Query,

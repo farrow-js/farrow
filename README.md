@@ -454,8 +454,11 @@ http
 ## Development
 
 ```shell
-# git clone and run command below to bootstrap
-npm run bootstrap
+# git clone and run command below to initilize project
+npm run init
+
+# test
+npm run test
 ```
 
 ## Author

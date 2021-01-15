@@ -327,62 +327,34 @@ http.route('/user').use(user)
 http.listen(3000)
 
 // handle product router
-product
-  .match({
-    // this will match /product/:id
-    pathname: '/:id',
-    params: {
-      id: Number,
-    },
+// this will match /product/:id
+product.get('/<id:int>').use(async (request) => {
+  return Response.json({
+    productId: request.params.id,
   })
-  .use(async (request) => {
-    return Response.json({
-      productId: request.params.id,
-    })
-  })
+})
 
-product
-  .match({
-    // this will match /product/info
-    pathname: '/info',
-    params: {
-      id: Number,
-    },
+// this will match /product/info
+product.get('/info').use(async (request) => {
+  return Response.json({
+    productInfo: {},
   })
-  .use(async (request) => {
-    return Response.json({
-      productInfo: {},
-    })
-  })
+})
 
 // handle user router
-user
-  .match({
-    // this will match /user/:id
-    pathname: '/:id',
-    params: {
-      id: Number,
-    },
+// this will match /user/:id
+user.get('/<id:int>').use(async (request) => {
+  return Response.json({
+    userId: request.params.id,
   })
-  .use(async (request) => {
-    return Response.json({
-      userId: request.params.id,
-    })
-  })
+})
 
-user
-  .match({
-    // this will match /user/info
-    pathname: '/info',
-    params: {
-      id: Number,
-    },
+// this will match /user/info
+user.get('/info').use(async (request) => {
+  return Response.json({
+    userInfo: {},
   })
-  .use(async (request) => {
-    return Response.json({
-      userInfo: {},
-    })
-  })
+})
 ```
 
 ### How to add view-engine

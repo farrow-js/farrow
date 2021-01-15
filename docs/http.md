@@ -304,9 +304,10 @@ http.use((request0) => {
 const http = Http({
   basename: ['/base0'],
 })
-http.route('/base1', () => {
+http.route('/base1').use(() => {
   // basenames will be ['/base0', '/base1'] if user accessed /base0/base1
-  let basenames = useBasenames()
+  let basenames = useBasenames().value
+  return Response.json({ basenames })
 })
 ```
 
@@ -317,8 +318,9 @@ const http = Http({
   basename: ['/base0'],
 })
 
-http.route('/base1', () => {
+http.route('/base1').use(() => {
   // prefix will be '/base0/base1' if user accessed /base0/base1
   let prefix = usePrefix()
+  return Response.json({ prefix })
 })
 ```

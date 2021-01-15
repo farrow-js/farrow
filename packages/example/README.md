@@ -1,6 +1,6 @@
 # farrow-example
 
-An **todo-list** example for farrow-http
+A **todo-list** example for farrow-http.
 
 ```shell
 # for developing

@@ -302,7 +302,7 @@ http.use((request0) => {
 
 ```typescript
 const http = Http({
-  basename: ['/base0'],
+  basenames: ['/base0'],
 })
 http.route('/base1').use(() => {
   // basenames will be ['/base0', '/base1'] if user accessed /base0/base1
@@ -315,7 +315,7 @@ http.route('/base1').use(() => {
 
 ```typescript
 const http = Http({
-  basename: ['/base0'],
+  basenames: ['/base0'],
 })
 
 http.route('/base1').use(() => {

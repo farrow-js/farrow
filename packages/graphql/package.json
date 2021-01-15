@@ -8,7 +8,7 @@
     "dist"
   ],
   "scripts": {
-    "start": "ts-node src/weather.schema"
+    "start": "ts-node src/exec"
   },
   "keywords": [
     "Web Framework",

@@ -1,27 +1,8 @@
 import type { ValueNode } from 'graphql'
 
-// graphql field resolver can be thunk or async thunk
-export type Thunk<T> = T extends (...args: any) => any ? T : T | (() => T) | (() => Promise<T>)
+const typenameMap = new WeakMap<TypeCtor, string>()
 
-export type Maybe<T> = T | null | undefined
-
-export type ResolvedValue<T> = Thunk<Maybe<T>>
-
-export type MaybePromise<T> = T extends Promise<any> ? T : T | Promise<T>
-
-export type ResolverType<T> = T extends TypeCtor
-  ? ResolverType<InstanceType<T>>
-  : T extends UnionType
-  ? ResolverType<T['types'][number]>
-  : T extends ObjectType
-  ? {
-      [key in keyof TypeOf<T>]: ResolvedValue<TypeOf<T>[key]>
-    }
-  : T
-
-const typenameMap = new WeakMap<new () => ObjectType | UnionType, string>()
-
-const getTypename = <T extends ObjectType | UnionType>(GraphQLType: new () => T): string => {
+export const getTypename = <T extends Type>(GraphQLType: new () => T): T['name'] => {
   let typename = typenameMap.get(GraphQLType)
   if (!typename) {
     typename = new GraphQLType().name
@@ -30,24 +11,14 @@ const getTypename = <T extends ObjectType | UnionType>(GraphQLType: new () => T)
   return typename
 }
 
-export const resolve = <T extends ObjectType | UnionType, V extends Omit<ResolverType<T>, '__typename'>>(
+export const resolve = <T extends ObjectType | UnionType, V extends Omit<ResolverTypeOf<T>, '__typename'>>(
   GraphQLType: new () => T,
   value: V,
-): { __typename: T['name'] } & V => {
+) => {
   return {
     ...value,
     __typename: getTypename(GraphQLType),
-  }
-}
-
-type Constructable = new (...args: any[]) => ObjectType
-
-export const Resolver = <T extends Constructable>(Type: T) => {
-  abstract class Resolver extends Type {
-    static Type = Type
-    abstract resolver: Omit<ResolverType<T>, '__typename'>
-  }
-  return Resolver
+  } as { __typename: T['name'] } & V
 }
 
 const Phantom = Symbol('phantom')
@@ -72,6 +43,7 @@ export type Prettier<T> = T extends Promise<infer U>
     }
   : T
 
+// TypeOf
 export type TypeOf<T> = T extends TypeCtor
   ? TypeOf<InstanceType<T>>
   : T extends ObjectType
@@ -88,9 +60,15 @@ export type TypeOf<T> = T extends TypeCtor
   ? U
   : never
 
+export type DataObjectType<T> = {
+  [key in keyof T as key extends '__typename' ? never : T[key] extends (...args: any) => any ? never : key]: T[key]
+}
+
+export type DataType<T> = TypeOf<T> extends { __typename?: string } ? DataObjectType<TypeOf<T>> : TypeOf<T>
+
 export type TypeOfObject<T extends ObjectType> = T['interfaces'] extends any[]
-  ? { __typename: T['name'] } & TypeOfFields<T['fields']> & TypeOfInterfaces<T['interfaces']>
-  : { __typename: T['name'] } & TypeOfFields<T['fields']>
+  ? { __typename?: T['name'] } & TypeOfFields<T['fields']> & TypeOfInterfaces<T['interfaces']>
+  : { __typename?: T['name'] } & TypeOfFields<T['fields']>
 
 type TypeOfFields<T extends FieldConfigs> = {
   [key in keyof T]: T[key] extends FieldConfig ? TypeOfField<T[key]> : T[key] extends TypeCtor ? TypeOf<T[key]> : never
@@ -136,6 +114,81 @@ type TypeOfEnumValue<T extends EnumValueConfig> = T['value']
 
 type TypeOfUnion<T extends UnionType> = TypeOf<T['types'][number]>
 
+// ResolverTypeOf
+
+type Optional<T> = T | null | undefined
+
+// graphql field resolver can be thunk or async thunk
+type ResolvedValue<T> = Optional<T> | (() => Optional<T>) | (() => Promise<Optional<T>>)
+
+export type ResolverTypeOf<T> = T extends TypeCtor
+  ? ResolverTypeOf<InstanceType<T>>
+  : T extends ObjectType
+  ? ResolverTypeOfObject<T>
+  : T extends InputObjectType
+  ? ResolverTypeOfInputObject<T>
+  : T extends EnumType
+  ? ResolverTypeOfEnum<T>
+  : T extends UnionType
+  ? ResolverTypeOfUnion<T>
+  : T extends InterfaceType
+  ? ResolverTypeOfFields<T['fields']>
+  : T extends Type<infer U>
+  ? U
+  : never
+
+export type ResolverTypeOfObject<T extends ObjectType> = T['interfaces'] extends any[]
+  ? { __typename?: T['name'] } & ResolverTypeOfFields<T['fields']> & ResolverTypeOfInterfaces<T['interfaces']>
+  : { __typename?: T['name'] } & ResolverTypeOfFields<T['fields']>
+
+type ResolverTypeOfFields<T extends FieldConfigs> = {
+  [key in keyof T]: T[key] extends FieldConfig
+    ? ResolverTypeOfField<T[key]>
+    : T[key] extends TypeCtor
+    ? ResolverTypeOf<T[key]>
+    : never
+}
+
+type ResolverTypeOfField<T extends FieldConfig> = T extends FunctionFieldConfig
+  ? ResolverTypeOfFunctionField<T>
+  : T extends ValueFieldConfig
+  ? ResolverTypeOfValueField<T>
+  : never
+
+type ResolverTypeOfValueField<T extends ValueFieldConfig> = ResolvedValue<ResolverTypeOf<T['type']>>
+
+type ResolverTypeOfFunctionField<T extends FunctionFieldConfig> = Optional<
+  (args: ResolverTypeOfArgumentConfigMap<T['args']>) => ResolverTypeOf<T['type']>
+>
+
+type ResolverTypeOfArgumentConfigMap<T extends ArgumentConfigMap> = {
+  [key in keyof T]: ResolverTypeOf<T[key]['type']>
+}
+
+export type ResolverTypeOfInterface<T extends InterfaceType> = ResolverTypeOfFields<T['fields']>
+
+export type ResolverTypeOfInterfaces<T extends (new () => InterfaceType)[]> = UnionToIntersection<
+  ResolverTypeOfInterface<InstanceType<T[number]>>
+>
+
+type ResolverTypeOfInputObject<T extends InputObjectType> = ResolverTypeOfInputFields<T['fields']>
+
+type ResolverTypeOfInputFields<T extends InputFieldConfigs> = {
+  [key in keyof T]: T[key] extends InputFieldConfig
+    ? ResolverTypeOf<T[key]['type']>
+    : T[key] extends TypeCtor
+    ? ResolverTypeOf<T[key]>
+    : never
+}
+
+type ResolverTypeOfEnum<T extends EnumType> = ResolverTypeOfEnumValue<T['values'][keyof T['values']]>
+
+type ResolverTypeOfEnumValue<T extends EnumValueConfig> = T['value']
+
+type ResolverTypeOfUnion<T extends UnionType> = ResolverTypeOf<T['types'][number]>
+
+// class type
+
 export abstract class InternalScalarType<T = unknown> extends Type<T> {
   __scalar = true
 }
@@ -178,7 +231,7 @@ export abstract class InterfaceType extends Type {
 }
 
 export abstract class ObjectType extends Type {
-  static resolve<T extends ObjectType, V extends Omit<ResolverType<T>, '__typename'>>(this: new () => T, value: V) {
+  static create<T extends ObjectType, V extends Omit<ResolverTypeOf<T>, '__typename'>>(this: new () => T, value: V) {
     return resolve(this, value)
   }
 
@@ -236,7 +289,7 @@ export abstract class EnumType extends Type {
 }
 
 export abstract class UnionType extends Type {
-  static resolve<T extends UnionType, V extends Omit<ResolverType<T>, '__typename'>>(this: new () => T, value: V) {
+  static create<T extends UnionType, V extends Omit<ResolverTypeOf<T>, '__typename'>>(this: new () => T, value: V) {
     return resolve(this, value)
   }
   __union = true
@@ -289,4 +342,8 @@ export type InputFieldConfig<T extends InputType = any> = Describable & {
 
 export type InputFieldConfigs = {
   [key: string]: (new () => InputType) | InputFieldConfig
+}
+
+export const Fields = <T extends FieldConfigs>(fields: T): T => {
+  return fields
 }

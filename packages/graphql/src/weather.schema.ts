@@ -23,7 +23,8 @@ import {
   Prettier,
   TypeCtor,
   ResolverType,
-  Resolver,
+  DataType,
+  PrettierDataType,
 } from './graphql'
 
 import { printSchema } from 'graphql'
@@ -43,27 +44,6 @@ class Point2D extends ObjectType {
   }
 }
 
-class Point2DResolver extends Resolver(Point2D) {
-  constructor(public x: number, public y: number) {
-    super()
-  }
-
-  resolver = {
-    x: this.x,
-    y: this.y,
-  }
-}
-
-const resolvePoint2D = (x: number, y: number) => {
-  return Point2D.resolve({
-    x,
-    y,
-  })
-}
-
-let point0 = new Point2DResolver(0, 0)
-let point1 = resolvePoint2D(0, 0)
-
 class Point3D extends ObjectType {
   name = typename('Point3D')
 
@@ -80,29 +60,31 @@ class Point3D extends ObjectType {
   }
 }
 
-const resolvePoint3D = (x: number, y: number, z: number) => {
-  return Point3D.resolve({
-    x: () => x,
-    y,
-    z,
-  })
-}
-
 class Point extends UnionType {
   name = typename('Point')
   types = [Point2D, Point3D]
 }
 
-const resolvePoint = (x: number, y: number, z?: number): ResolverType<Point> => {
-  if (typeof z !== 'number') {
-    return resolvePoint2D(x, y)
+class Circle extends ObjectType {
+  name = typename('Circle')
+  fields = {
+    origin: {
+      type: Point,
+      description: 'origin of circle',
+    },
+    radius: {
+      type: Float,
+      description: 'radius of circle',
+    },
   }
-  return resolvePoint3D(x, y, z)
 }
 
-const p0 = resolvePoint(0, 0, 0)
-
-type P0 = Prettier<typeof p0>
+const createCircle = (origin: PrettierDataType<Point2D>, radius: PrettierDataType<Float>) => {
+  return Circle.create({
+    origin: () => Point3D.create({ ...origin, z: 0 }),
+    radius,
+  })
+}
 
 type T0 = Prettier<TypeOf<Point2D>>
 

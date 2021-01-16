@@ -83,7 +83,7 @@ class Circle extends ObjectType {
   name = typename('Circle')
   fields = {
     origin: {
-      type: Point,
+      type: Nullable(Point),
       description: 'origin of circle',
     },
     radius: {
@@ -98,6 +98,7 @@ Point3D.create({ x: 0, y: 0, z: 0 })
 const createCircle = (origin: Prettier<DataType<Point>>, radius: Prettier<DataType<Float>>) => {
   return Circle.create({
     origin: () => {
+      // return Point2D.create({ x: null, y: 0 })
       if (origin.x < 0) return null
       if ('z' in origin) return Point3D.create(origin)
       return Point2D.create(origin)

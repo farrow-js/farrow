@@ -22,11 +22,12 @@
     "url": "git+https://github.com/Lucifier129/farrow.git"
   },
   "peerDependencies": {
-    "farrow-pipeline": "^1.0.0",
-    "farrow-schema": "^1.0.0",
+    "farrow-pipeline": "^1.5.0",
+    "farrow-schema": "^1.4.0",
     "graphql": "^15.4.0"
   },
   "devDependencies": {
+    "ts-node": "^9.1.1",
     "farrow-pipeline": "^1.5.0",
     "farrow-schema": "^1.4.0",
     "graphql": "^15.4.0"

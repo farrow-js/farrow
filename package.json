@@ -16,7 +16,7 @@
     "test": "jest",
     "test:coverage": "jest --collectCoverage --coverage",
     "bootstrap": "lerna bootstrap --hoist",
-    "init": "npm install && npm run bootstrap",
+    "init": "npm install && npm run bootstrap && npm run build",
     "release": "lerna publish",
     "prerelease": "npm run build && npm run test"
   },

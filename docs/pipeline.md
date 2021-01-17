@@ -75,13 +75,13 @@ type Context<T = any> = {
 const Context0 = createContext(0)
 
 const pipeline = createPipeline<number, number>({
-  context: {
+  contexts: {
     // inject Context0 equipped 10 into pipeline
     context0: Context0.create(10),
   },
 })
 
-pipeline.use((input, next()) => {
+pipeline.use((input, next) => {
   return next(input) + Context0.get()
 })
 
@@ -111,7 +111,7 @@ type Container = {
 }
 
 const Context0 = createContext(0)
-const context1 = createContext([])
+const Context1 = createContext<number[]>([])
 
 const container = createContainer({
   context0: Context0.create(10),
@@ -126,6 +126,8 @@ container.write(Context1, [11])
 
 container.read(Context0) // 1
 container.read(Context1) // [11]
+
+const pipeline = createPipeline<number, number>()
 
 pipeline.run(10, {
   // use container to replace pipeline's internal container

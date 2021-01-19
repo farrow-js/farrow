@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "../http/tsconfig.json"
+    },
+    {
+      "path": "../cors/tsconfig.json"
+    }
+  ],
+  "include": ["src"]
+}

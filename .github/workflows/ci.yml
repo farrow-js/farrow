@@ -1,12 +1,12 @@
 name: CI
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push or pull request events but only for the master branch
   push:
-    branches: [ master ]
+    branches: [master]
   pull_request:
-    branches: [ master ]
+    branches: [master]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -18,7 +18,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-       os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-latest, macos-latest, windows-latest]
 
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
@@ -26,12 +26,12 @@ jobs:
         uses: actions/setup-node@v1.4.4
         with:
           node-version: 14.0.0
-        
+
       - name: Check out
         uses: actions/checkout@v2
-      
+
       - name: Init
         run: npm install -g lerna && npm install && npm run bootstrap
-      
-      - name: Lint & Build & Test
-        run: npm run lint && npm run build && npm run test
+
+      - name: Format & Lint & Build & Test
+        run: npm run format && npm run lint && npm run build && npm run test

@@ -28,7 +28,7 @@ jobs:
           node-version: 14.0.0
       
       - name: Debug
-        run: pwd && ls -a
+        run: ls
       
       - name: Init
         run: npm install -g lerna npm install && npm run bootstrap

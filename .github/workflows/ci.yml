@@ -26,12 +26,12 @@ jobs:
         uses: actions/setup-node@v1.4.4
         with:
           node-version: 14.0.0
-      
-      - name: Debug
-        run: ls
+        
+      - name: Check out
+        uses: actions/checkout@v2
       
       - name: Init
-        run: npm install -g lerna npm install && npm run bootstrap
+        run: npm install -g lerna && npm install && npm run bootstrap
       
       - name: Lint & Build & Test
         run: npm run lint && npm run build && npm run test

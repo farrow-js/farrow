@@ -27,8 +27,11 @@ jobs:
         with:
           node-version: 14.0.0
       
+      - name: Debug
+        run: cwd && ls -a
+      
       - name: Init
-        run: npm install && npm run bootstrap
+        run: npm install -g lerna npm install && npm run bootstrap
       
       - name: Lint & Build & Test
         run: npm run lint && npm run build && npm run test

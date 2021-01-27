@@ -5,7 +5,8 @@
   "main": "dist/index.js",
   "private": true,
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "scripts": {
     "start": "ts-node src/exec"

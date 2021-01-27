@@ -12,7 +12,8 @@
   "files": [
     "dist",
     "scripts",
-    "bin"
+    "bin",
+    "src"
   ],
   "keywords": [
     "Web Framework",

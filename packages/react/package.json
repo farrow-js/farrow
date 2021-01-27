@@ -4,6 +4,7 @@
   "description": "React bindings for farrow-http",
   "main": "dist/index.js",
   "files": [
+    "src",
     "dist",
     "Context.d.ts",
     "Context.js",

@@ -4,6 +4,7 @@
   "description": "A powerful and extensible schema builder",
   "main": "dist/index.js",
   "files": [
+    "src",
     "dist",
     "validator.d.ts",
     "validator.js",

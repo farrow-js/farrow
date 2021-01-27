@@ -4,7 +4,8 @@
   "description": "A Type-Friendly Web Framework",
   "main": "dist/index.js",
   "files": [
-    "dist"
+    "dist",
+    "src"
   ],
   "keywords": [
     "Web Framework",

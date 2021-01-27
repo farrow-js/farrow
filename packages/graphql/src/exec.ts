@@ -68,11 +68,8 @@ class Point2D extends ObjectType {
 }
 
 const queryPoint = Point2D.select({
-  __typename: 'Point2D',
-  fields: {
-    x: true,
-    y: true,
-  },
+  x: true,
+  y: true,
 } as const)
 
 type QueryPoint2D = QuerySelections<Point2D>

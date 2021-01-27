@@ -1,6 +1,6 @@
 {
   "name": "farrow",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "description": "Useful modules for developing Farrow App",
   "main": "dist/index.js",
   "bin": {
@@ -29,10 +29,10 @@
   "devDependencies": {
     "@types/node-fetch": "^1.6.9",
     "@types/supertest": "^2.0.10",
-    "farrow-http": "^1.5.0",
-    "farrow-pipeline": "^1.5.0",
-    "farrow-react": "^1.5.0",
-    "farrow-schema": "^1.4.0",
+    "farrow-http": "^1.5.3",
+    "farrow-pipeline": "^1.5.3",
+    "farrow-react": "^1.5.3",
+    "farrow-schema": "^1.5.3",
     "node-fetch": "^2.6.1",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",

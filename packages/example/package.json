@@ -1,6 +1,6 @@
 {
   "name": "farrow-example",
-  "version": "1.5.2",
+  "version": "1.5.3",
   "private": true,
   "description": "Functional style web framework for node.js",
   "scripts": {
@@ -19,11 +19,11 @@
     "ts-node": "^9.1.1"
   },
   "dependencies": {
-    "farrow": "^1.5.2",
-    "farrow-http": "^1.5.0",
-    "farrow-pipeline": "^1.5.0",
-    "farrow-react": "^1.5.0",
-    "farrow-schema": "^1.4.0",
+    "farrow": "^1.5.3",
+    "farrow-http": "^1.5.3",
+    "farrow-pipeline": "^1.5.3",
+    "farrow-react": "^1.5.3",
+    "farrow-schema": "^1.5.3",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "tslib": "^2.0.3"

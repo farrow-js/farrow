@@ -10,6 +10,15 @@ import {
   typename,
   TypeOf,
   UnionType,
+  SelectTypeOf,
+  QuerySelections,
+  QueryObjectField,
+  QueryUnionField,
+  QueryFieldValue,
+  NullableType,
+  select,
+  SelectObjectTypeOf,
+  InterfaceType,
 } from './graphql'
 import { SchemaConfig, build } from './build'
 
@@ -58,6 +67,18 @@ class Point2D extends ObjectType {
   }
 }
 
+const queryPoint = Point2D.select({
+  __typename: 'Point2D',
+  fields: {
+    x: true,
+    y: true,
+  },
+} as const)
+
+type QueryPoint2D = QuerySelections<Point2D>
+
+type T9 = SelectObjectTypeOf<Point2D, typeof queryPoint>
+
 class Point3D extends ObjectType {
   name = typename('Point3D')
 
@@ -93,6 +114,23 @@ class Circle extends ObjectType {
   }
 }
 
+const isTrue = true as boolean
+
+const queryCircle = Circle.select({
+  origin: {
+    field: 'origin',
+    selections: Point2D.select({
+      width: {
+        field: 'x',
+      },
+    } as const),
+  },
+} as const)
+
+type T00 = SelectObjectTypeOf<Circle, typeof queryCircle>
+
+type T01 = Prettier<QuerySelections<Circle>>
+
 Point3D.create({ x: 0, y: 0, z: 0 })
 
 const createCircle = (origin: Prettier<DataType<Point>>, radius: Prettier<DataType<Float>>) => {
@@ -127,6 +165,47 @@ class Query extends ObjectType {
     },
   })
 }
+
+const query0 = Query.select({
+  circle0: {
+    field: 'getCircle',
+    args: {
+      x: 10.0,
+      y: 0.0,
+    },
+    selected: true,
+    selections: {
+      radius: {
+        field: 'radius',
+        selected: true,
+      },
+      origin: {
+        field: 'origin',
+        selected: true,
+        selections: {
+          width: {
+            field: 'x',
+            selected: true,
+          },
+          height: {
+            field: 'y',
+            selected: true,
+          },
+        },
+      },
+    },
+  },
+} as const)
+
+type Query0 = SelectObjectTypeOf<Query, typeof query0>
+
+type T6 = InstanceType<Circle['fields']['origin']['type']>
+
+type T5 = QueryFieldValue<T6, 'Field'> & { nullable: true }
+
+type T4 = Prettier<QueryObjectField<Circle, 'test'>>
+
+type T3 = Prettier<QuerySelections<Query>>
 
 type T0 = ResolverTypeOf<Query>
 

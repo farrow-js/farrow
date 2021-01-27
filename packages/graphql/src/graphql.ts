@@ -1,4 +1,5 @@
 import type { ValueNode } from 'graphql'
+import { Interface } from 'readline'
 
 const typenameMap = new WeakMap<TypeCtor, string>()
 
@@ -43,6 +44,13 @@ export type Prettier<T> = T extends Promise<infer U>
     }
   : T
 
+type SplitNullable<T> = {
+  [key in keyof T as null extends T[key] ? never : key]: T[key]
+} &
+  {
+    [key in keyof T as null extends T[key] ? key : never]?: T[key]
+  }
+
 // TypeOf
 export type TypeOf<T> = T extends TypeCtor
   ? TypeOf<InstanceType<T>>
@@ -86,9 +94,11 @@ type TypeOfFunctionField<T extends FunctionFieldConfig> = (
   args: TypeOfArgumentConfigMap<T['args']>,
 ) => TypeOf<T['type']>
 
-type TypeOfArgumentConfigMap<T extends ArgumentConfigMap> = {
-  [key in keyof T]: TypeOf<T[key]['type']>
-}
+type TypeOfArgumentConfigMap<T extends ArgumentConfigMap> = SplitNullable<
+  {
+    [key in keyof T]: TypeOf<T[key]['type']>
+  }
+>
 
 export type TypeOfInterface<T extends InterfaceType> = TypeOfFields<T['fields']>
 
@@ -100,13 +110,15 @@ export type TypeOfInterfaces<T extends (new () => InterfaceType)[]> = UnionToInt
 
 type TypeOfInputObject<T extends InputObjectType> = TypeOfInputFields<T['fields']>
 
-type TypeOfInputFields<T extends InputFieldConfigs> = {
-  [key in keyof T]: T[key] extends InputFieldConfig
-    ? TypeOf<T[key]['type']>
-    : T[key] extends TypeCtor
-    ? TypeOf<T[key]>
-    : never
-}
+type TypeOfInputFields<T extends InputFieldConfigs> = SplitNullable<
+  {
+    [key in keyof T]: T[key] extends InputFieldConfig
+      ? TypeOf<T[key]['type']>
+      : T[key] extends TypeCtor
+      ? TypeOf<T[key]>
+      : never
+  }
+>
 
 type TypeOfEnum<T extends EnumType> = TypeOfEnumValue<T['values'][keyof T['values']]>
 
@@ -115,7 +127,6 @@ type TypeOfEnumValue<T extends EnumValueConfig> = T['value']
 type TypeOfUnion<T extends UnionType> = TypeOf<T['types'][number]>
 
 // ResolverTypeOf
-
 type Optional<T> = T | null | undefined
 
 // graphql field resolver can be thunk or async thunk
@@ -158,7 +169,7 @@ type ResolverTypeOfField<T extends FieldConfig> = T extends FunctionFieldConfig
 type ResolverTypeOfValueField<T extends ValueFieldConfig> = ResolvedValue<ResolverTypeOf<T['type']>>
 
 type ResolverTypeOfFunctionField<T extends FunctionFieldConfig> = Optional<
-  (args: ResolverTypeOfArgumentConfigMap<T['args']>) => ResolverTypeOf<T['type']>
+  (args: ResolverTypeOfArgumentConfigMap<T['args']>) => Optional<ResolverTypeOf<T['type']>>
 >
 
 type ResolverTypeOfArgumentConfigMap<T extends ArgumentConfigMap> = {
@@ -187,9 +198,116 @@ type ResolverTypeOfEnumValue<T extends EnumValueConfig> = T['value']
 
 type ResolverTypeOfUnion<T extends UnionType> = ResolverTypeOf<T['types'][number]>
 
+// QueryTypeOf
+export type QueryLeafField<Field extends string> =
+  | boolean
+  | {
+      field: Field
+    }
+
+export type QueryObjectField<T extends ObjectType, Field extends string> = T extends ObjectType
+  ? {
+      field: Field
+      selections: QuerySelections<T>
+    }
+  : never
+
+export type QueryUnionField<T extends UnionType, Field extends string> = T extends UnionType
+  ? QueryObjectField<InstanceType<T['types'][number]>, Field>
+  : never
+
+export type QueryFields<T extends FieldConfigs> = T extends FieldConfigs
+  ? {
+      [key in Exclude<keyof T, number | symbol>]: QueryField<T[key], key>
+    }[Exclude<keyof T, number | symbol>]
+  : never
+
+export type QuerySelections<T extends ObjectType> = T['interfaces'] extends (new () => InterfaceType)[]
+  ? {
+      __typename?: T['name']
+      fields?: {
+        [key: string]: QueryFields<T['fields']> | QueryFields<InstanceType<T['interfaces'][number]>['fields']>
+      }
+    }
+  : {
+      __typename?: T['name']
+      fields?: {
+        [key: string]: QueryFields<T['fields']>
+      }
+    }
+
+export type FieldType<T> = InstanceType<T extends TypeCtor ? T : T extends FieldConfig ? T['type'] : never>
+
+export type QueryField<T extends FieldConfigs[string], Field extends string> = T extends FunctionFieldConfig
+  ? {
+      args: TypeOfArgumentConfigMap<T['args']>
+    } & QueryFieldValue<FieldType<T>, Field>
+  : QueryFieldValue<FieldType<T>, Field>
+
+export type QueryFieldValue<T extends Type, Field extends string> = T extends NullableType<infer U>
+  ? QueryFieldValue<InstanceType<U>, Field>
+  : T extends ListType<infer U>
+  ? QueryFieldValue<InstanceType<U>, Field>
+  : T extends InternalScalarType | EnumType
+  ? QueryLeafField<Field>
+  : T extends ObjectType
+  ? QueryObjectField<T, Field>
+  : T extends UnionType
+  ? QueryUnionField<T, Field>
+  : never
+// Select type
+
+export type SelectTypeOf<Provider, Consumer> = Provider extends NullableType<infer V>
+  ? SelectTypeOf<InstanceType<V>, Consumer> | null
+  : Provider extends ListType<infer V>
+  ? SelectTypeOf<InstanceType<V>, Consumer>[]
+  : Provider extends UnionType
+  ? SelectTypeOf<InstanceType<UnionType['types'][number]>, Consumer>
+  : Provider extends ObjectType
+  ? Consumer extends { selections: QuerySelections<Provider> }
+    ? Consumer['selections']['__typename'] extends string
+      ? {
+          __typename: Consumer['selections']['__typename']
+        } & {
+          [key in keyof Consumer['selections']['fields']]: Consumer['selections']['fields'][key] extends true
+            ? key extends keyof Provider['fields']
+              ? SelectTypeOf<FieldType<Provider['fields'][key]>, Consumer['selections']['fields'][key]>
+              : never
+            : Consumer['selections']['fields'][key] extends { field: infer Field }
+            ? Field extends keyof Provider['fields']
+              ? SelectTypeOf<FieldType<Provider['fields'][Field]>, Consumer['selections']['fields'][key]>
+              : never
+            : never
+        }
+      : {
+          [key in keyof Consumer['selections']['fields']]: Consumer['selections']['fields'][key] extends true
+            ? key extends keyof Provider['fields']
+              ? SelectTypeOf<FieldType<Provider['fields'][key]>, Consumer['selections']['fields'][key]>
+              : never
+            : Consumer['selections']['fields'][key] extends { field: infer Field }
+            ? Field extends keyof Provider['fields']
+              ? SelectTypeOf<FieldType<Provider['fields'][Field]>, Consumer['selections']['fields'][key]>
+              : never
+            : never
+        }
+    : never
+  : Provider extends InternalScalarType | EnumType
+  ? Consumer extends true | { field: string }
+    ? [TypeOf<Provider>, Provider, Consumer]
+    : never
+  : never
+
+export type SelectObjectTypeOf<Provider extends ObjectType, Consumer extends { [key: string]: any }> = SelectTypeOf<
+  Provider,
+  { selections: Consumer }
+>
+
 // class type
 
 export abstract class InternalScalarType<T = unknown> extends Type<T> {
+  static select<T extends boolean>(selected: T) {
+    return selected
+  }
   __scalar = true
 }
 
@@ -230,9 +348,26 @@ export abstract class InterfaceType extends Type {
   abstract fields: FieldConfigs
 }
 
+export const select = <T extends ObjectType, Q extends QuerySelections<T>>(Type: new () => T, query: Q) => {
+  return {
+    Type,
+    query,
+  }
+}
+
 export abstract class ObjectType extends Type {
   static create<T extends ObjectType, V extends Omit<ResolverTypeOf<T>, '__typename'>>(this: new () => T, value: V) {
     return resolve(this, value)
+  }
+
+  static select<T extends ObjectType, FS extends QuerySelections<T>['fields']>(
+    this: new () => T,
+    fields: FS,
+  ): { __typename: T['name']; fields: FS } {
+    return {
+      __typename: getTypename(this),
+      fields,
+    }
   }
 
   __object = true

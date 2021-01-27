@@ -56,7 +56,10 @@ const createAsyncHooks = <T>() => {
 }
 
 export const enable = () => {
-  asyncHooksInterface.impl(createAsyncHooks<asyncHooksInterface.Hooks>())
+  let hooks = createAsyncHooks<asyncHooksInterface.Hooks>()
+  disable()
+  asyncHooksInterface.impl(hooks)
+  hooks.enable()
 }
 
 export const disable = () => {

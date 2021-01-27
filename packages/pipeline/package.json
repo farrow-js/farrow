@@ -4,6 +4,7 @@
   "description": "Type-Friendly middleware library",
   "main": "dist/index.js",
   "files": [
+    "src",
     "dist",
     "asyncHooks.node.js",
     "asyncHooks.node.d.ts"

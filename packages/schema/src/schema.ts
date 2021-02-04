@@ -1,7 +1,11 @@
 import { isNumberConstructor, isStringConstructor, isBooleanConstructor } from './utils'
 import { MarkReadOnlyDeep } from './types'
 
-export type Prettier<T> = T extends object | any[]
+export type Prettier<T> = T extends Promise<infer U>
+  ? Promise<Prettier<U>>
+  : T extends (...args: infer Args) => infer Return
+  ? (...args: Prettier<Args>) => Prettier<Return>
+  : T extends object | any[]
   ? {
       [key in keyof T]: Prettier<T[key]>
     }
@@ -9,17 +13,13 @@ export type Prettier<T> = T extends object | any[]
 
 export type Primitives = NumberConstructor | StringConstructor | BooleanConstructor
 
-export const Kind = Symbol('kind')
+export const Phantom = Symbol('phantom')
 
-export type Kind = typeof Kind
-
-const Phantom = Symbol('phantom')
-
-type Phantom = typeof Phantom
+export type Phantom = typeof Phantom
 
 export abstract class Schema<T = unknown> {
-  abstract [Kind]: string
-  [Phantom]: T | Phantom = Phantom
+  abstract readonly __kind: string
+  readonly __phantom: T | Phantom = Phantom
 }
 
 export type SchemaCtor = Primitives | (new () => Schema)
@@ -36,7 +36,13 @@ export const Type = Symbol('type')
 
 export type Type = typeof Type
 
-export type FieldDescriptor = SchemaCtor | { [Type]: SchemaCtor }
+export type FieldDescriptor =
+  | SchemaCtor
+  | {
+      [Type]: SchemaCtor
+      description?: string
+      deprecated?: string
+    }
 
 export const isFieldDescriptor = (input: any): input is FieldDescriptor => {
   return isSchemaCtor(input?.[Type] ?? input)
@@ -91,7 +97,7 @@ export const toSchemaCtor = <T extends SchemaCtorInput>(Item: T) => {
 
 export const toSchemaCtors = <T extends SchemaCtorInputs>(Inputs: T): ToSchemaCtors<T> => {
   if (Array.isArray(Inputs)) {
-    // @ts-ignore: TODO add desc
+    // @ts-ignore: ignore
     return Inputs.map(toSchemaCtor)
   }
 
@@ -99,7 +105,7 @@ export const toSchemaCtors = <T extends SchemaCtorInputs>(Inputs: T): ToSchemaCt
     let result = {} as ToSchemaCtors<T>
 
     for (let key in Inputs) {
-      // @ts-ignore: TODO add desc
+      // @ts-ignore: ignore
       result[key] = toSchemaCtor(Inputs[key])
     }
 
@@ -142,33 +148,33 @@ export abstract class ScalarType<T = unknown> extends Schema<T> {
 }
 
 export class Number extends ScalarType<number> {
-  [Kind] = kind('Number')
+  __kind = kind('Number')
 }
 
 export class String extends ScalarType<string> {
-  [Kind] = kind('String')
+  __kind = kind('String')
 }
 
 export class Boolean extends ScalarType<boolean> {
-  [Kind] = kind('Boolean')
+  __kind = kind('Boolean')
 }
 
 export class Int extends ScalarType<number> {
-  [Kind] = kind('Int')
+  __kind = kind('Int')
 }
 
 export class Float extends ScalarType<number> {
-  [Kind] = kind('Float')
+  __kind = kind('Float')
 }
 
 export class ID extends ScalarType<string> {
-  [Kind] = kind('ID')
+  __kind = kind('ID')
 }
 
 type TypeOfStruct<T extends FieldDescriptors> = TypeOfFieldDescriptors<T>
 
 export abstract class StructType<T extends FieldDescriptors = FieldDescriptors> extends Schema<TypeOfStruct<T>> {
-  [Kind] = kind('Struct')
+  __kind = kind('Struct')
   abstract descriptors: T
 }
 
@@ -179,7 +185,7 @@ export const Struct = <T extends FieldDescriptors>(descriptors: T) => {
 }
 
 export abstract class ObjectType extends Schema<unknown> {
-  [Kind] = kind('Object')
+  __kind = kind('Object')
 }
 
 type TypeOfList<T extends SchemaCtor> = TypeOfSchemaCtor<T>[]
@@ -187,7 +193,7 @@ type TypeOfList<T extends SchemaCtor> = TypeOfSchemaCtor<T>[]
 export abstract class ListType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<
   TypeOfList<ToSchemaCtor<T>>
 > {
-  [Kind] = kind('List')
+  __kind = kind('List')
   abstract Item: ToSchemaCtor<T>
 }
 
@@ -202,7 +208,7 @@ type TypeofUnion<T extends SchemaCtor[]> = TypeOfSchemaCtor<T[number]>
 export abstract class UnionType<T extends SchemaCtorInput[] = SchemaCtorInput[]> extends Schema<
   TypeofUnion<ToSchemaCtors<T>>
 > {
-  [Kind] = kind('Union')
+  __kind = kind('Union')
   abstract Items: ToSchemaCtors<T>
 }
 
@@ -219,7 +225,7 @@ type TypeOfIntersect<T extends SchemaCtor[]> = UnionToIntersection<TypeOf<T[numb
 export abstract class IntersectType<T extends SchemaCtorInput[] = SchemaCtorInput[]> extends Schema<
   TypeOfIntersect<ToSchemaCtors<T>>
 > {
-  [Kind] = kind('Intersect')
+  __kind = kind('Intersect')
   abstract Items: ToSchemaCtors<T>
 }
 
@@ -232,7 +238,7 @@ export const Intersect = <T extends SchemaCtorInput[]>(...Items: T) => {
 export abstract class NullableType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<
   TypeOf<ToSchemaCtor<T>> | null | undefined
 > {
-  [Kind] = kind('Nullable')
+  __kind = kind('Nullable')
   abstract Item: ToSchemaCtor<T>
 }
 
@@ -245,7 +251,7 @@ export function Nullable<T extends SchemaCtorInput>(Item: T) {
 export type Literals = number | string | boolean | null
 
 export abstract class LiteralType<T extends Literals = Literals> extends Schema<T> {
-  [Kind] = kind('Literal')
+  __kind = kind('Literal')
   abstract value: T
 }
 
@@ -262,7 +268,7 @@ type TypeOfRecord<T extends SchemaCtor> = {
 export abstract class RecordType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<
   TypeOfRecord<ToSchemaCtor<T>>
 > {
-  [Kind] = kind('Record')
+  __kind = kind('Record')
   abstract Item: ToSchemaCtor<T>
 }
 
@@ -287,15 +293,15 @@ export type JsonType =
     }
 
 export class Json extends Schema<JsonType> {
-  [Kind] = kind('Json')
+  __kind = kind('Json')
 }
 
 export class Any extends Schema<any> {
-  [Kind] = kind('Any')
+  __kind = kind('Any')
 }
 
 export abstract class StrictType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<TypeOf<ToSchemaCtor<T>>> {
-  [Kind] = kind('Strict')
+  __kind = kind('Strict')
   abstract Item: ToSchemaCtor<T>
 }
 
@@ -308,7 +314,7 @@ export const Strict = <T extends SchemaCtorInput>(Item: T) => {
 export abstract class NonStrictType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<
   TypeOf<ToSchemaCtor<T>>
 > {
-  [Kind] = kind('Strict')
+  __kind = kind('Strict')
   abstract Item: ToSchemaCtor<T>
 }
 
@@ -321,7 +327,7 @@ export const NonStrict = <T extends SchemaCtorInput>(Item: T) => {
 export abstract class ReadOnlyType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<
   Readonly<TypeOf<ToSchemaCtor<T>>>
 > {
-  [Kind] = kind('ReadOnly')
+  __kind = kind('ReadOnly')
   abstract Item: ToSchemaCtor<T>
 }
 
@@ -334,7 +340,7 @@ export const ReadOnly = <T extends SchemaCtorInput>(Item: T) => {
 export abstract class ReadOnlyDeepType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<
   MarkReadOnlyDeep<TypeOf<ToSchemaCtor<T>>>
 > {
-  [Kind] = kind('ReadOnly')
+  __kind = kind('ReadOnly')
   abstract Item: ToSchemaCtor<T>
 }
 

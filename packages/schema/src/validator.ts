@@ -20,6 +20,7 @@ export type Validator<T = any> = (input: unknown) => ValidationResult<T>
 
 export type ValidatorContext = {
   strict?: boolean
+  validatorCache: WeakMap<Schema.SchemaCtor, Validator>
 }
 
 export type ValidatorRule<S extends Schema.Schema, Context extends ValidatorContext = ValidatorContext> = TransformRule<
@@ -32,17 +33,25 @@ export const createValidator = <S extends Schema.SchemaCtor, Context extends Val
   SchemaCtor: S,
   context: TransformContext<Context, Validator>,
 ): Validator<Schema.TypeOf<S>> => {
+  if (context.validatorCache.has(SchemaCtor)) {
+    return context.validatorCache.get(SchemaCtor)!
+  }
+
   let transformer = createTransformer(context)
 
-  let validator: Validator<Schema.TypeOf<S>> | undefined
+  let validate: Validator<Schema.TypeOf<S>> | undefined
 
-  return (input) => {
-    if (validator) {
-      return validator(input)
+  let validator: Validator<Schema.TypeOf<S>> = (input) => {
+    if (validate) {
+      return validate(input)
     }
-    validator = transformer(SchemaCtor)
-    return validator(input)
+    validate = transformer(SchemaCtor)
+    return validate(input)
   }
+
+  context.validatorCache.set(SchemaCtor, validator)
+
+  return validator
 }
 
 export const createSchemaValidator = <S extends Schema.SchemaCtor, Context extends ValidatorContext = ValidatorContext>(
@@ -51,6 +60,7 @@ export const createSchemaValidator = <S extends Schema.SchemaCtor, Context exten
 ) => {
   return createValidator(SchemaCtor, {
     ...context,
+    validatorCache: new WeakMap(),
     rules: {
       ...defaultValidatorRules,
       ...context?.rules,

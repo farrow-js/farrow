@@ -5,7 +5,7 @@ const Cache = Symbol('transformer-cache')
 type Cache = typeof Cache
 
 export type TransformContext<Context extends {}, Output = any> = Context & {
-  rules: TransformRules<Output, Context>
+  rules?: TransformRules<Output, Context>
 }
 
 export type TransformRule<T extends Schema.Schema, Output, Context extends {}> = {
@@ -30,7 +30,7 @@ export const createTransformer = <Output, Context extends {}>(
 ) => {
   let cache = getCache(context)
 
-  let values = Object.values(context.rules)
+  let values = Object.values(context.rules ?? {})
 
   let transformer = <SC extends Schema.SchemaCtor>(SchemaCtor: SC): Output => {
     let Ctor: new () => Schema.Schema

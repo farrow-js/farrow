@@ -129,7 +129,7 @@ export type TypeOf<T extends Schema | SchemaCtor> = T extends Schema
   ? TypeOfSchemaCtor<T>
   : never
 
-type TypeOfObjectType<T extends ObjectType> = {
+export type TypeOfObjectType<T extends ObjectType> = {
   [key in keyof T as T[key] extends FieldDescriptor | FieldDescriptors ? key : never]: T[key] extends FieldDescriptor
     ? TypeOfFieldDescriptor<T[key]>
     : T[key] extends FieldDescriptors
@@ -171,7 +171,7 @@ export class ID extends ScalarType<string> {
   __kind = kind('ID')
 }
 
-type TypeOfStruct<T extends FieldDescriptors> = TypeOfFieldDescriptors<T>
+export type TypeOfStruct<T extends FieldDescriptors> = TypeOfFieldDescriptors<T>
 
 export abstract class StructType<T extends FieldDescriptors = FieldDescriptors> extends Schema<TypeOfStruct<T>> {
   __kind = kind('Struct')
@@ -188,7 +188,7 @@ export abstract class ObjectType extends Schema<unknown> {
   __kind = kind('Object')
 }
 
-type TypeOfList<T extends SchemaCtor> = TypeOfSchemaCtor<T>[]
+export type TypeOfList<T extends SchemaCtor> = TypeOfSchemaCtor<T>[]
 
 export abstract class ListType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<
   TypeOfList<ToSchemaCtor<T>>
@@ -203,7 +203,7 @@ export const List = <T extends SchemaCtorInput>(Item: T) => {
   }
 }
 
-type TypeofUnion<T extends SchemaCtor[]> = TypeOfSchemaCtor<T[number]>
+export type TypeofUnion<T extends SchemaCtor[]> = TypeOfSchemaCtor<T[number]>
 
 export abstract class UnionType<T extends SchemaCtorInput[] = SchemaCtorInput[]> extends Schema<
   TypeofUnion<ToSchemaCtors<T>>
@@ -218,9 +218,9 @@ export const Union = <T extends SchemaCtorInput[]>(...Items: T) => {
   }
 }
 
-type UnionToIntersection<T> = (T extends any ? (x: T) => any : never) extends (x: infer R) => any ? R : never
+export type UnionToIntersection<T> = (T extends any ? (x: T) => any : never) extends (x: infer R) => any ? R : never
 
-type TypeOfIntersect<T extends SchemaCtor[]> = UnionToIntersection<TypeOf<T[number]>>
+export type TypeOfIntersect<T extends SchemaCtor[]> = UnionToIntersection<TypeOf<T[number]>>
 
 export abstract class IntersectType<T extends SchemaCtorInput[] = SchemaCtorInput[]> extends Schema<
   TypeOfIntersect<ToSchemaCtors<T>>
@@ -261,7 +261,7 @@ export const Literal = <T extends Literals>(value: T) => {
   }
 }
 
-type TypeOfRecord<T extends SchemaCtor> = {
+export type TypeOfRecord<T extends SchemaCtor> = {
   [key: string]: TypeOfSchemaCtor<T>
 }
 
@@ -298,6 +298,10 @@ export class Json extends Schema<JsonType> {
 
 export class Any extends Schema<any> {
   __kind = kind('Any')
+}
+
+export class Unknown extends Schema<unknown> {
+  __kind = kind('Unknown')
 }
 
 export abstract class StrictType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<TypeOf<ToSchemaCtor<T>>> {

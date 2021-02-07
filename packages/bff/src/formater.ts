@@ -1,0 +1,542 @@
+import * as Schema from 'farrow-schema'
+import { createTransformer, TransformRule, TransformContext } from 'farrow-schema/transformer'
+
+export type FormatField = {
+  typeId: number
+  description?: string
+  deprecated?: string
+}
+
+export type FormatFields = {
+  [key: string]: FormatField
+}
+
+export type FormatPrimitives =
+  | FormatNumberType
+  | FormatIntType
+  | FormatFloatType
+  | FormatStringType
+  | FormatIDType
+  | FormatBooleanType
+  | FormatJSONType
+  | FormatAnyType
+  | FormatUnknownType
+  | FormatRecordType
+
+export const PrimitiveTypes = ['Number', 'Int', 'Float', 'String', 'ID', 'Boolean', 'JSON', 'Any', 'Unknown']
+
+export const isPrimitive = (input: FormatType): input is FormatPrimitives => {
+  return PrimitiveTypes.includes(input?.type ?? '')
+}
+
+export type FormatObjectType = {
+  type: 'Object'
+  name: string
+  fields: FormatFields
+}
+
+export type FormatStructType = {
+  type: 'Struct'
+  fields: FormatFields
+}
+
+export type FormatNumberType = {
+  type: 'Number'
+}
+
+export type FormatIntType = {
+  type: 'Int'
+}
+
+export type FormatFloatType = {
+  type: 'Float'
+}
+
+export type FormatStringType = {
+  type: 'String'
+}
+
+export type FormatIDType = {
+  type: 'ID'
+}
+
+export type FormatBooleanType = {
+  type: 'Boolean'
+}
+
+export type FormatJSONType = {
+  type: 'JSON'
+}
+
+export type FormatAnyType = {
+  type: 'Any'
+}
+
+export type FormatUnknownType = {
+  type: 'Unknown'
+}
+
+export type FormatLiteralType = {
+  type: 'Literal'
+  value: string | number | boolean | null
+}
+
+export type FormatRecordType = {
+  type: 'Record'
+  valueTypeId: number
+}
+
+export type FormatListType = {
+  type: 'List'
+  itemTypeId: number
+}
+
+export type FormatNullableType = {
+  type: 'Nullable'
+  itemTypeId: number
+}
+
+export type FormatUnionType = {
+  type: 'Union'
+  itemTypeIds: number[]
+}
+
+export type FormatIntersectType = {
+  type: 'Intersect'
+  itemTypeIds: number[]
+}
+
+export type FormatType =
+  | FormatObjectType
+  | FormatUnionType
+  | FormatStringType
+  | FormatStructType
+  | FormatUnknownType
+  | FormatAnyType
+  | FormatBooleanType
+  | FormatFloatType
+  | FormatIDType
+  | FormatRecordType
+  | FormatListType
+  | FormatLiteralType
+  | FormatNullableType
+  | FormatIntType
+  | FormatJSONType
+  | FormatNumberType
+  | FormatIntersectType
+
+export type FormatTypes = {
+  [key: string]: FormatType
+}
+
+export type FormaterContext = {
+  addType: (type: FormatType) => number
+  writerCache: WeakMap<Schema.SchemaCtor, FormaterWriter>
+}
+
+export type FormaterWriter = () => number
+
+export type FormaterRule<S extends Schema.Schema, Context extends FormaterContext = FormaterContext> = TransformRule<
+  S,
+  FormaterWriter,
+  Context
+>
+
+export const createFormater = <S extends Schema.SchemaCtor, Context extends FormaterContext = FormaterContext>(
+  SchemaCtor: S,
+  context: TransformContext<Context, FormaterWriter>,
+): FormaterWriter => {
+  if (context.writerCache.has(SchemaCtor)) {
+    return context.writerCache.get(SchemaCtor)!
+  }
+
+  let transformer = createTransformer(context)
+  let typeId: number | undefined
+
+  let writer = () => {
+    if (typeof typeId === 'number') {
+      return typeId
+    }
+    let writer = transformer(SchemaCtor)
+    return (typeId = writer())
+  }
+
+  context.writerCache.set(SchemaCtor, writer)
+
+  return writer
+}
+
+export const createSchemaFormater = <S extends Schema.SchemaCtor, Context extends FormaterContext = FormaterContext>(
+  SchemaCtor: S,
+  context?: TransformContext<Context, FormaterWriter>,
+) => {
+  let types: FormatTypes = {}
+  let uid = 0
+
+  let addType = (type: FormatType): number => {
+    let id = uid++
+    types[`${id}`] = type
+    return id
+  }
+
+  context = {
+    writerCache: new WeakMap(),
+    addType,
+    ...context,
+  } as TransformContext<Context, FormaterWriter>
+
+  let format = createFormater(SchemaCtor, {
+    ...context,
+    rules: {
+      ...defaultFormaterRules,
+      ...context?.rules,
+    },
+  })
+
+  let typeId = format()
+
+  return {
+    typeId,
+    types,
+  }
+}
+
+const StrictFormaterRule: FormaterRule<Schema.StrictType> = {
+  test: (schema) => {
+    return schema instanceof Schema.StrictType
+  },
+  transform: (schema, context) => {
+    return createFormater(schema.Item, context)
+  },
+}
+
+const NonStrictFormaterRule: FormaterRule<Schema.NonStrictType> = {
+  test: (schema) => {
+    return schema instanceof Schema.NonStrictType
+  },
+  transform: (schema, context) => {
+    return createFormater(schema.Item, context)
+  },
+}
+
+const ReadOnlyFormaterRule: FormaterRule<Schema.ReadOnlyType> = {
+  test: (schema) => {
+    return schema instanceof Schema.ReadOnlyType
+  },
+  transform: (schema, context) => {
+    return createFormater(schema.Item, context)
+  },
+}
+
+const ReadOnlyDeepFormaterRule: FormaterRule<Schema.ReadOnlyDeepType> = {
+  test: (schema) => {
+    return schema instanceof Schema.ReadOnlyDeepType
+  },
+  transform: (schema, context) => {
+    return createFormater(schema.Item, context)
+  },
+}
+
+const StringFormaterRule: FormaterRule<Schema.String> = {
+  test: (schema) => {
+    return schema instanceof Schema.String
+  },
+  transform: (_, context) => {
+    return () => {
+      return context.addType({
+        type: 'String',
+      })
+    }
+  },
+}
+
+const IntFormaterRule: FormaterRule<Schema.Int> = {
+  test: (schema) => {
+    return schema instanceof Schema.Int
+  },
+  transform: (_, context) => {
+    return () => {
+      return context.addType({
+        type: 'Int',
+      })
+    }
+  },
+}
+
+const FloatFormaterRule: FormaterRule<Schema.Float> = {
+  test: (schema) => {
+    return schema instanceof Schema.Float
+  },
+  transform: (_, context) => {
+    return () => {
+      return context.addType({
+        type: 'Float',
+      })
+    }
+  },
+}
+
+const NumberFormaterRule: FormaterRule<Schema.Number> = {
+  test: (schema) => {
+    return schema instanceof Schema.Number
+  },
+  transform: (_, context) => {
+    return () => {
+      return context.addType({
+        type: 'Number',
+      })
+    }
+  },
+}
+
+const IDFormaterRule: FormaterRule<Schema.ID> = {
+  test: (schema) => {
+    return schema instanceof Schema.ID
+  },
+  transform: (_, context) => {
+    return () => {
+      return context.addType({
+        type: 'ID',
+      })
+    }
+  },
+}
+
+const BooleanFormaterRule: FormaterRule<Schema.Boolean> = {
+  test: (schema) => {
+    return schema instanceof Schema.Boolean
+  },
+  transform: (_, context) => {
+    return () => {
+      return context.addType({
+        type: 'Boolean',
+      })
+    }
+  },
+}
+
+const LiteralFormaterRule: FormaterRule<Schema.LiteralType> = {
+  test: (schema) => {
+    return schema instanceof Schema.LiteralType
+  },
+  transform: (schema, context) => {
+    return () => {
+      return context.addType({
+        type: 'Literal',
+        value: schema.value,
+      })
+    }
+  },
+}
+
+const ListFormaterRule: FormaterRule<Schema.ListType> = {
+  test: (schema) => {
+    return schema instanceof Schema.ListType
+  },
+  transform: (schema, context) => {
+    let formatItem = createFormater(schema.Item, context)
+
+    return () => {
+      return context.addType({
+        type: 'List',
+        itemTypeId: formatItem(),
+      })
+    }
+  },
+}
+
+type FieldsFormaters = {
+  [key: string]: {
+    writer: FormaterWriter
+    SchemaCtor: Schema.SchemaCtor
+    description?: string
+    deprecated?: string
+  }
+}
+
+const createFieldsFormaters = <T extends Schema.FieldDescriptors>(
+  descriptors: T,
+  context: TransformContext<any>,
+): FieldsFormaters => {
+  let fieldsFormaters = {} as FieldsFormaters
+
+  for (let [key, field] of Object.entries(descriptors)) {
+    if (!Schema.isFieldDescriptor(field)) {
+      if (Schema.isFieldDescriptors(field)) {
+        let SchemaCtor = Schema.Struct(field)
+        fieldsFormaters[key] = {
+          writer: createFormater(SchemaCtor, context),
+          SchemaCtor,
+        }
+      }
+      continue
+    }
+
+    if (typeof field === 'function') {
+      fieldsFormaters[key] = {
+        writer: createFormater(field, context),
+        SchemaCtor: field,
+      }
+    } else {
+      fieldsFormaters[key] = {
+        writer: createFormater(field[Schema.Type], context),
+        SchemaCtor: field[Schema.Type],
+        description: field.description,
+        deprecated: field.deprecated,
+      }
+    }
+  }
+
+  return fieldsFormaters
+}
+
+const ObjectFormaterRule: FormaterRule<Schema.ObjectType | Schema.StructType> = {
+  test: (schema) => {
+    return schema instanceof Schema.ObjectType || schema instanceof Schema.StructType
+  },
+  transform: (schema, context) => {
+    let descriptors = (schema instanceof Schema.StructType ? schema.descriptors : schema) as Schema.FieldDescriptors
+    let fieldsFormaters = createFieldsFormaters(descriptors, context)
+
+    return () => {
+      let fields = {} as FormatFields
+      let getFields = () => {
+        for (let key in fieldsFormaters) {
+          let fieldFormater = fieldsFormaters[key]
+          fields[key] = {
+            typeId: fieldFormater.writer(),
+            description: fieldFormater.description,
+            deprecated: fieldFormater.deprecated,
+          }
+        }
+        return fields
+      }
+      let hasCalled = false
+      let result: FormatObjectType = {
+        type: 'Object',
+        name: schema.constructor.name === 'Struct' ? '' : schema.constructor.name,
+        get fields() {
+          if (hasCalled) return fields
+          hasCalled = true
+          return getFields()
+        },
+      }
+
+      return context.addType(result)
+    }
+  },
+}
+
+const RecordFormaterRule: FormaterRule<Schema.RecordType> = {
+  test: (schema) => {
+    return schema instanceof Schema.RecordType
+  },
+  transform: (schema, context) => {
+    let formatItem = createFormater(schema.Item, context)
+
+    return () => {
+      return context.addType({
+        type: 'Record',
+        valueTypeId: formatItem(),
+      })
+    }
+  },
+}
+
+const NullableFormaterRule: FormaterRule<Schema.NullableType> = {
+  test: (schema) => {
+    return schema instanceof Schema.NullableType
+  },
+  transform: (schema, context) => {
+    let formatItem = createFormater(schema.Item, context)
+
+    return () => {
+      return context.addType({
+        type: 'Nullable',
+        itemTypeId: formatItem(),
+      })
+    }
+  },
+}
+
+const UnionFormaterRule: FormaterRule<Schema.UnionType> = {
+  test: (schema) => {
+    return schema instanceof Schema.UnionType
+  },
+  transform: (schema, context) => {
+    let itemsFormaters = (schema.Items as Schema.SchemaCtor[]).map((Item) => createFormater(Item, context))
+
+    return () => {
+      return context.addType({
+        type: 'Union',
+        itemTypeIds: itemsFormaters.map((format) => format()),
+      })
+    }
+  },
+}
+
+const IntersectFormaterRule: FormaterRule<Schema.IntersectType> = {
+  test: (schema) => {
+    return schema instanceof Schema.IntersectType
+  },
+  transform: (schema, context) => {
+    let itemsFormaters = schema.Items.map((Item) => createFormater(Item, context))
+
+    return () => {
+      return context.addType({
+        type: 'Intersect',
+        itemTypeIds: itemsFormaters.map((format) => format()),
+      })
+    }
+  },
+}
+
+const JsonFormaterRule: FormaterRule<Schema.Json> = {
+  test: (schema) => {
+    return schema instanceof Schema.Json
+  },
+  transform: (_schema, context) => {
+    return () => {
+      return context.addType({
+        type: 'JSON',
+      })
+    }
+  },
+}
+
+const AnyFormaterRule: FormaterRule<Schema.Any> = {
+  test: (schema) => {
+    return schema instanceof Schema.Any
+  },
+  transform: (_schema, context) => {
+    return () => {
+      return context.addType({
+        type: 'Any',
+      })
+    }
+  },
+}
+
+export const defaultFormaterRules = {
+  String: StringFormaterRule,
+  Boolean: BooleanFormaterRule,
+  Number: NumberFormaterRule,
+  Int: IntFormaterRule,
+  Float: FloatFormaterRule,
+  ID: IDFormaterRule,
+  List: ListFormaterRule,
+  Object: ObjectFormaterRule,
+  Union: UnionFormaterRule,
+  Intersect: IntersectFormaterRule,
+  Nullable: NullableFormaterRule,
+  Json: JsonFormaterRule,
+  Any: AnyFormaterRule,
+  Literal: LiteralFormaterRule,
+  Record: RecordFormaterRule,
+  Strict: StrictFormaterRule,
+  NonStrict: NonStrictFormaterRule,
+  ReadOnly: ReadOnlyFormaterRule,
+  ReadOnlyDeep: ReadOnlyDeepFormaterRule,
+}
+
+export type DefaultFormaterRules = typeof defaultFormaterRules

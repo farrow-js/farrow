@@ -1,4 +1,3 @@
-import prettier from 'prettier'
 import { FormatType, FormatTypes, getTypeName, isInlineType } from './formater'
 import { FormatEntries, FormatResult, FormatApi } from './toJSON'
 
@@ -144,7 +143,7 @@ export const codegen = (formatResult: FormatResult): string => {
     })
   }
 
-  let handleApi = (api: FormatApi): string => {
+  let handleApiType = (api: FormatApi): string => {
     let inputType = getFieldType(api.input.typeId, formatResult.types)
     let outputType = getFieldType(api.output.typeId, formatResult.types)
     let result = `(input: ${inputType}) => Promise<${outputType}>`
@@ -152,13 +151,13 @@ export const codegen = (formatResult: FormatResult): string => {
     return result
   }
 
-  let handleEntries = (entries: FormatEntries): string => {
+  let handleEntriesType = (entries: FormatEntries): string => {
     let fields = Object.entries(entries.entries).map(([key, field]) => {
       if (field.type === 'Api') {
-        let result = `${key}: ${handleApi(field)}`
+        let result = `${key}: ${handleApiType(field)}`
         return attachComment(result, field)
       }
-      return `${key}: ${handleEntries(field)}`
+      return `${key}: ${handleEntriesType(field)}`
     })
     return `
     {
@@ -167,14 +166,36 @@ export const codegen = (formatResult: FormatResult): string => {
     `
   }
 
+  let handleApiImpl = (api: FormatApi, path: string[]): string => {
+    let inputType = getFieldType(api.input.typeId, formatResult.types)
+    let outputType = getFieldType(api.output.typeId, formatResult.types)
+    let result = `
+    (input: ${inputType}) => {
+      return options.fetcher({ path: ${JSON.stringify(path)}, input }) as Promise<${outputType}>
+    }
+    `
+    return result
+  }
+
+  let handleEntriesImpl = (entries: FormatEntries, path: string[] = []): string => {
+    let fields = Object.entries(entries.entries).map(([key, field]) => {
+      if (field.type === 'Api') {
+        let result = `${key}: ${handleApiImpl(field, [...path, key])}`
+        return attachComment(result, field)
+      }
+      return `${key}: ${handleEntriesImpl(field, [...path, key])}`
+    })
+    return `{ ${fields.join(',\n')} }`
+  }
+
   let definitions = handleTypes(formatResult.types)
 
-  let entries = handleEntries(formatResult.entries)
+  let entriesType = handleEntriesType(formatResult.entries)
 
-  let hasJsonType = Object.values(formatResult.types).some((item) => item.type === 'JSON')
+  let entriesImpl = handleEntriesImpl(formatResult.entries)
 
-  let sourceOfJsonType = `
-  type JsonType =
+  let source = `
+  export type JsonType =
     | number
     | string
     | boolean
@@ -187,20 +208,19 @@ export const codegen = (formatResult: FormatResult): string => {
     | {
         [key: string]: JsonType
       }
-  `
-
-  let source = `
-    ${hasJsonType ? sourceOfJsonType : ''}
 
     ${definitions.join('\n\n')}
 
-    export type __API__ = ${entries}
-  `
+    export type __Api__ = ${entriesType}
 
-  source = prettier.format(source, {
-    semi: false,
-    parser: 'typescript',
-  })
+    export type CreateApiOptions = {
+      fetcher: (input: JsonType) => Promise<JsonType>
+    }
+
+    export const createApiClient = (options: CreateApiOptions) => {
+      return ${entriesImpl}
+    }
+  `
 
   return source
 }

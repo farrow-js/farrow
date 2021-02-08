@@ -1,3 +1,17 @@
+export type JsonType =
+  | number
+  | string
+  | boolean
+  | null
+  | undefined
+  | JsonType[]
+  | {
+      toJSON(): string
+    }
+  | {
+      [key: string]: JsonType
+    }
+
 export type AddTodoInputType = {
   /**
    * @remarks Todo Content
@@ -40,7 +54,7 @@ export type Nest = {
   next: Nest | null | undefined
 }
 
-export type __API__ = {
+export type __Api__ = {
   todo: {
     /**
      * @remarks add todo
@@ -56,5 +70,36 @@ export type __API__ = {
      * @remarks getNest
      */
     getNest: (input: Type4) => Promise<Nest | null | undefined>
+  }
+}
+
+export type CreateApiOptions = {
+  fetcher: (input: JsonType) => Promise<JsonType>
+}
+
+export const createApiClient = (options: CreateApiOptions) => {
+  return {
+    todo: {
+      /**
+       * @remarks add todo
+       */
+      addTodo: (input: AddTodoInputType) => {
+        return options.fetcher({ path: ['todo', 'addTodo'], input }) as Promise<TodoType[]>
+      },
+      /**
+       * @remarks remove todo
+       */
+      removeTodo: (input: RemoveTodoInputType) => {
+        return options.fetcher({ path: ['todo', 'removeTodo'], input }) as Promise<TodoType[]>
+      },
+    },
+    recurse: {
+      /**
+       * @remarks getNest
+       */
+      getNest: (input: Type4) => {
+        return options.fetcher({ path: ['recurse', 'getNest'], input }) as Promise<Nest | null | undefined>
+      },
+    },
   }
 }

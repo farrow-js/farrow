@@ -1,9 +1,10 @@
 import { Type, ID, String, List, TypeOf, ObjectType, Nullable, Prettier } from 'farrow-schema'
-import { Api, ApiEntries } from './api'
+import { Api } from './api'
 import { toJSON } from './toJSON'
 
 import fs from 'fs/promises'
 import { codegen } from './codegen'
+import { format } from './prettier'
 
 export class TodoType extends ObjectType {
   id = {
@@ -131,7 +132,7 @@ console.log('json', JSON.stringify(json, null, 2))
 
 const testCodegen = async () => {
   let code = codegen(json)
-  await fs.writeFile(`${__dirname}/test.schema.ts`, code)
+  await fs.writeFile(`${__dirname}/test.schema.ts`, format(code))
 }
 
 testCodegen().catch((error) => console.log('error', error))

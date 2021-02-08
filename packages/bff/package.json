@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "tslib": "^2.0.3",
-    "prettier": "^2.2.1"
+    "prettier": "^2.2.1",
+    "cosmiconfig": "^7.0.0"
   }
 }

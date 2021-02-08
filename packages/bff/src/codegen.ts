@@ -1,8 +1,8 @@
 import prettier from 'prettier'
-import { FormatField, FormatType, FormatTypes, isPrimitive } from './formater'
+import { FormatType, FormatTypes, getTypeName, isInlineType } from './formater'
 import { FormatEntries, FormatResult, FormatApi } from './toJSON'
 
-const attachInfoIfNeeded = (result: string, options: { description?: string; deprecated?: string }) => {
+const attachComment = (result: string, options: { description?: string; deprecated?: string }) => {
   if (!options.deprecated && !options.description) {
     return result
   }
@@ -17,117 +17,119 @@ const attachInfoIfNeeded = (result: string, options: { description?: string; dep
   return comment + result
 }
 
+const getTypeNameById = (typeId: number | string): string => {
+  return `Type${typeId}`
+}
+
+const getFieldType = (typeId: number, types: FormatTypes): string => {
+  let fieldType = types[typeId]
+
+  let typeName = getTypeName(fieldType)
+
+  if (typeName) {
+    return typeName
+  }
+
+  if (!isInlineType(fieldType)) {
+    return getTypeNameById(typeId)
+  }
+
+  if (fieldType.type === 'Any') {
+    return 'any'
+  }
+
+  if (fieldType.type === 'JSON') {
+    return 'JsonType'
+  }
+
+  if (fieldType.type === 'String') {
+    return 'string'
+  }
+
+  if (fieldType.type === 'Boolean') {
+    return 'boolean'
+  }
+
+  if (fieldType.type === 'Float') {
+    return 'number'
+  }
+
+  if (fieldType.type === 'ID') {
+    return 'string'
+  }
+
+  if (fieldType.type === 'Int') {
+    return 'number'
+  }
+
+  if (fieldType.type === 'Number') {
+    return 'number'
+  }
+
+  if (fieldType.type === 'Record') {
+    return `Record<string, ${getFieldType(typeId, types)}>`
+  }
+
+  if (fieldType.type === 'Unknown') {
+    return 'unknown'
+  }
+
+  if (fieldType.type === 'Literal') {
+    let literal = typeof fieldType.value === 'string' ? `"${fieldType.value}"` : fieldType.value
+    return `${literal}`
+  }
+
+  if (fieldType.type === 'Nullable') {
+    return `${getFieldType(fieldType.itemTypeId, types)} | null | undefined`
+  }
+
+  if (fieldType.type === 'List') {
+    return `${getFieldType(fieldType.itemTypeId, types)}[]`
+  }
+
+  if (fieldType.type === 'Union') {
+    return fieldType.itemTypeIds.map((typeId) => getFieldType(typeId, types)).join(' | ')
+  }
+
+  if (fieldType.type === 'Intersect') {
+    return fieldType.itemTypeIds.map((typeId) => getFieldType(typeId, types)).join(' & ')
+  }
+
+  throw new Error(`Unsupported field: ${JSON.stringify(fieldType, null, 2)}`)
+}
+
 export const codegen = (formatResult: FormatResult): string => {
   let exportSet = new Set<string>()
 
-  let getType = (typeId: number | string): string => {
-    return `Type${typeId}`
-  }
-
-  let getFieldType = (field: FormatField) => {
-    let fieldType = formatResult.types[field.typeId]
-
-    if (!isPrimitive(fieldType)) {
-      return getType(field.typeId)
-    }
-
-    if (fieldType.type === 'Any') {
-      return 'any'
-    }
-
-    if (fieldType.type === 'JSON') {
-      return 'JsonType'
-    }
-
-    if (fieldType.type === 'String') {
-      return 'string'
-    }
-
-    if (fieldType.type === 'Boolean') {
-      return 'boolean'
-    }
-
-    if (fieldType.type === 'Float') {
-      return 'number'
-    }
-
-    if (fieldType.type === 'ID') {
-      return 'string'
-    }
-
-    if (fieldType.type === 'Int') {
-      return 'number'
-    }
-
-    if (fieldType.type === 'Number') {
-      return 'number'
-    }
-
-    if (fieldType.type === 'Record') {
-      return `Record<string, ${getType(field.typeId)}>`
-    }
-
-    if (fieldType.type === 'Unknown') {
-      return 'unknown'
-    }
-
-    throw new Error(`Unsupported field: ${JSON.stringify(fieldType, null, 2)}`)
-  }
-
   let handleType = (typeId: string, formatType: FormatType) => {
-    if (isPrimitive(formatType)) {
+    if (isInlineType(formatType)) {
       return ''
-    }
-
-    if (formatType.type === 'Nullable') {
-      return `type ${getType(typeId)} = ${getType(formatType.itemTypeId)} | null | undefined`
-    }
-
-    if (formatType.type === 'List') {
-      return `type ${getType(typeId)} = ${getType(formatType.itemTypeId)}[]`
-    }
-
-    if (formatType.type === 'Union') {
-      return `
-       type ${getType(typeId)} = ${formatType.itemTypeIds.map(getType).join(' | ')}
-      `
-    }
-
-    if (formatType.type === 'Intersect') {
-      return `
-       type ${getType(typeId)} = ${formatType.itemTypeIds.map(getType).join(' & ')}
-      `
-    }
-
-    if (formatType.type === 'Literal') {
-      let literal = typeof formatType.value === 'string' ? `"${formatType.value}"` : formatType.value
-      return `type ${getType(typeId)} = ${literal}`
     }
 
     if (formatType.type === 'Object' || formatType.type === 'Struct') {
       let fileds = Object.entries(formatType.fields).map(([key, field]) => {
-        let result = `${key}: ${getFieldType(field)}`
+        let result = `${key}: ${getFieldType(field.typeId, formatResult.types)}`
 
-        return attachInfoIfNeeded(result, field)
+        return attachComment(result, field)
       })
 
-      if (formatType.type === 'Object' && formatType.name) {
-        if (exportSet.has(formatType.name)) {
-          throw new Error(`Duplicate Object Type name: ${formatType.name}`)
+      let typeName = getTypeName(formatType)
+
+      if (typeName) {
+        if (exportSet.has(typeName)) {
+          throw new Error(`Duplicate Object Type name: ${typeName}`)
         }
 
-        exportSet.add(formatType.name)
+        exportSet.add(typeName)
 
         return `
-        export type ${formatType.name} = {
+        export type ${typeName} = {
           ${fileds.join(',  \n')}
         }
-
-        type ${getType(typeId)} = ${formatType.name}
         `
       }
 
-      return `type ${getType(typeId)} = {
+      return `type ${getTypeNameById(typeId)} = {
         ${fileds.join(',  \n')}
       }
       `
@@ -143,8 +145,8 @@ export const codegen = (formatResult: FormatResult): string => {
   }
 
   let handleApi = (api: FormatApi): string => {
-    let inputType = getType(api.input.typeId)
-    let outputType = getType(api.output.typeId)
+    let inputType = getFieldType(api.input.typeId, formatResult.types)
+    let outputType = getFieldType(api.output.typeId, formatResult.types)
     let result = `(input: ${inputType}) => Promise<${outputType}>`
 
     return result
@@ -154,7 +156,7 @@ export const codegen = (formatResult: FormatResult): string => {
     let fields = Object.entries(entries.entries).map(([key, field]) => {
       if (field.type === 'Api') {
         let result = `${key}: ${handleApi(field)}`
-        return attachInfoIfNeeded(result, field)
+        return attachComment(result, field)
       }
       return `${key}: ${handleEntries(field)}`
     })
@@ -188,24 +190,11 @@ export const codegen = (formatResult: FormatResult): string => {
   `
 
   let source = `
-
-  type Prettier<T> = T extends Promise<infer U>
-    ? Promise<Prettier<U>>
-    : T extends (...args: infer Args) => infer Return
-    ? (...args: Prettier<Args>) => Prettier<Return>
-    : T extends object | any[]
-    ? {
-        [key in keyof T]: Prettier<T[key]>
-      }
-    : T
-
     ${hasJsonType ? sourceOfJsonType : ''}
 
     ${definitions.join('\n\n')}
 
-    export type __OriginalAPI__ = ${entries}
-
-    export type __API__ = Prettier<__OriginalAPI__>
+    export type __API__ = ${entries}
   `
 
   source = prettier.format(source, {

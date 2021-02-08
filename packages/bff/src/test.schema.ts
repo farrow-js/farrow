@@ -1,21 +1,9 @@
-type Prettier<T> = T extends Promise<infer U>
-  ? Promise<Prettier<U>>
-  : T extends (...args: infer Args) => infer Return
-  ? (...args: Prettier<Args>) => Prettier<Return>
-  : T extends object | any[]
-  ? {
-      [key in keyof T]: Prettier<T[key]>
-    }
-  : T
-
 export type AddTodoInputType = {
   /**
    * @remarks Todo Content
    */
   content: string
 }
-
-type Type0 = AddTodoInputType
 
 export type TodoType = {
   /**
@@ -32,18 +20,12 @@ export type TodoType = {
   completed: boolean
 }
 
-type Type1 = TodoType
-
-type Type2 = Type1[]
-
 export type RemoveTodoInputType = {
   /**
    * @remarks Todo id to remove
    */
   id: string
 }
-
-type Type3 = RemoveTodoInputType
 
 type Type4 = {}
 
@@ -55,32 +37,24 @@ export type Nest = {
   /**
    * @remarks next of Nest
    */
-  next: Type11
+  next: Nest | null | undefined
 }
 
-type Type5 = Nest
-
-type Type6 = Type5 | null | undefined
-
-type Type11 = Type5 | null | undefined
-
-export type __OriginalAPI__ = {
+export type __API__ = {
   todo: {
     /**
      * @remarks add todo
      */
-    addTodo: (input: Type0) => Promise<Type2>
+    addTodo: (input: AddTodoInputType) => Promise<TodoType[]>
     /**
      * @remarks remove todo
      */
-    removeTodo: (input: Type3) => Promise<Type2>
+    removeTodo: (input: RemoveTodoInputType) => Promise<TodoType[]>
   }
   recurse: {
     /**
      * @remarks getNest
      */
-    getNest: (input: Type4) => Promise<Type6>
+    getNest: (input: Type4) => Promise<Nest | null | undefined>
   }
 }
-
-export type __API__ = Prettier<__OriginalAPI__>

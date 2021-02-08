@@ -11,7 +11,7 @@ export type FormatFields = {
   [key: string]: FormatField
 }
 
-export type FormatPrimitives =
+export type FormatInlineTypes =
   | FormatNumberType
   | FormatIntType
   | FormatFloatType
@@ -22,11 +22,38 @@ export type FormatPrimitives =
   | FormatAnyType
   | FormatUnknownType
   | FormatRecordType
+  | FormatLiteralType
+  | FormatNullableType
+  | FormatUnionType
+  | FormatIntersectType
+  | FormatListType
 
-export const PrimitiveTypes = ['Number', 'Int', 'Float', 'String', 'ID', 'Boolean', 'JSON', 'Any', 'Unknown']
+export const InlineTypes = [
+  'Number',
+  'Int',
+  'Float',
+  'String',
+  'ID',
+  'Boolean',
+  'JSON',
+  'Any',
+  'Unknown',
+  'Literal',
+  'Nullable',
+  'List',
+  'Union',
+  'Intersect',
+]
 
-export const isPrimitive = (input: FormatType): input is FormatPrimitives => {
-  return PrimitiveTypes.includes(input?.type ?? '')
+export const isInlineType = (input: FormatType): input is FormatInlineTypes => {
+  return InlineTypes.includes(input?.type ?? '')
+}
+
+export const getTypeName = (input: FormatType): string | null => {
+  if (input.type === 'Object' && input.name) {
+    return input.name
+  }
+  return null
 }
 
 export type FormatObjectType = {

@@ -32,6 +32,7 @@
     "farrow-pipeline": "^1.5.3"
   },
   "dependencies": {
-    "tslib": "^2.0.3"
+    "tslib": "^2.0.3",
+    "prettier": "^2.2.1"
   }
 }

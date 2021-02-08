@@ -1,16 +1,20 @@
+import prettier from 'prettier'
 import { FormatField, FormatType, FormatTypes, isPrimitive } from './formater'
 import { FormatEntries, FormatResult, FormatApi } from './toJSON'
 
 const attachInfoIfNeeded = (result: string, options: { description?: string; deprecated?: string }) => {
-  if (options.deprecated) {
-    result = `// @depcreated ${options.deprecated}\n${result}`
+  if (!options.deprecated && !options.description) {
+    return result
   }
 
-  if (options.description) {
-    result = `// @remarks ${options.description}\n${result}`
-  }
+  let list = [
+    options.description ? `* @remarks ${options.description}` : '',
+    options.deprecated ? `* @depcreated ${options.deprecated}` : '',
+  ].filter(Boolean)
 
-  return result
+  let comment = `/**\n${list.join('\n')}\n*/\n`
+
+  return comment + result
 }
 
 export const codegen = (formatResult: FormatResult): string => {
@@ -118,6 +122,7 @@ export const codegen = (formatResult: FormatResult): string => {
         export type ${formatType.name} = {
           ${fileds.join(',  \n')}
         }
+
         type ${getType(typeId)} = ${formatType.name}
         `
       }
@@ -196,12 +201,17 @@ export const codegen = (formatResult: FormatResult): string => {
 
     ${hasJsonType ? sourceOfJsonType : ''}
 
-    ${definitions.join('\n')}
+    ${definitions.join('\n\n')}
 
     export type __OriginalAPI__ = ${entries}
 
     export type __API__ = Prettier<__OriginalAPI__>
   `
+
+  source = prettier.format(source, {
+    semi: false,
+    parser: 'typescript',
+  })
 
   return source
 }

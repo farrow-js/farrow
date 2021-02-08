@@ -1,5 +1,4 @@
 import { Type, Prettier, TypeOf, ToSchemaCtor, SchemaCtorInput } from 'farrow-schema'
-import { Schema } from 'inspector'
 
 export type MaybeReturnPromise<T extends (...args: any) => any> = T extends (...args: infer Args) => infer Return
   ? T | ((...args: Args) => Promise<Return>)

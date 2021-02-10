@@ -74,7 +74,7 @@ export type __Api__ = {
 }
 
 export type CreateApiOptions = {
-  fetcher: (input: JsonType) => Promise<JsonType>
+  fetcher: (input: { path: string[]; input: JsonType }) => Promise<JsonType>
 }
 
 export const createApiClient = (options: CreateApiOptions) => {

@@ -20,7 +20,7 @@ export type Validator<T = any> = (input: unknown) => ValidationResult<T>
 
 export type ValidatorContext = {
   strict?: boolean
-  validatorCache: WeakMap<Schema.SchemaCtor, Validator>
+  validatorCache?: WeakMap<Schema.SchemaCtor, Validator>
 }
 
 export type ValidatorRule<S extends Schema.Schema, Context extends ValidatorContext = ValidatorContext> = TransformRule<
@@ -33,8 +33,8 @@ export const createValidator = <S extends Schema.SchemaCtor, Context extends Val
   SchemaCtor: S,
   context: TransformContext<Context, Validator>,
 ): Validator<Schema.TypeOf<S>> => {
-  if (context.validatorCache.has(SchemaCtor)) {
-    return context.validatorCache.get(SchemaCtor)!
+  if (context.validatorCache?.has(SchemaCtor)) {
+    return context.validatorCache?.get(SchemaCtor)!
   }
 
   let transformer = createTransformer(context)
@@ -49,7 +49,7 @@ export const createValidator = <S extends Schema.SchemaCtor, Context extends Val
     return validate(input)
   }
 
-  context.validatorCache.set(SchemaCtor, validator)
+  context.validatorCache?.set(SchemaCtor, validator)
 
   return validator
 }

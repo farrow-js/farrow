@@ -7,16 +7,16 @@
   },
   "references": [
     {
-      "path": "../http/tsconfig.json"
-    },
-    {
-      "path": "../pipeline/tsconfig.json"
+      "path": "../schema/tsconfig.json"
     },
     {
       "path": "../api/tsconfig.json"
     },
     {
-      "path": "../schema/tsconfig.json"
+      "path": "../http/tsconfig.json"
+    },
+    {
+      "path": "../pipeline/tsconfig.json"
     }
   ],
   "include": ["src"]

@@ -1,14 +1,22 @@
 import { FormatType, FormatTypes, getTypeName, isInlineType } from './formater'
 import { FormatEntries, FormatResult, FormatApi } from './toJSON'
 
+const transformComment = (text: string) => {
+  return text
+    .split('\n')
+    .map((item) => item.trim())
+    .filter(Boolean)
+    .join('\n*\n*')
+}
+
 const attachComment = (result: string, options: { description?: string; deprecated?: string }) => {
   if (!options.deprecated && !options.description) {
     return result
   }
 
   let list = [
-    options.description ? `* @remarks ${options.description}` : '',
-    options.deprecated ? `* @depcreated ${options.deprecated}` : '',
+    options.description ? `* @remarks ${transformComment(options.description)}` : '',
+    options.deprecated ? `* @depcreated ${transformComment(options.deprecated)}` : '',
   ].filter(Boolean)
 
   let comment = `/**\n${list.join('\n')}\n*/\n`
@@ -214,7 +222,10 @@ export const codegen = (formatResult: FormatResult): string => {
     export type __Api__ = ${entriesType}
 
     export type CreateApiOptions = {
-      fetcher: (input: JsonType) => Promise<JsonType>
+      /**
+       * a fetcher for api-client
+       */
+      fetcher: (input: { path: string[], input: JsonType }) => Promise<JsonType>
     }
 
     export const createApiClient = (options: CreateApiOptions) => {

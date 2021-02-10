@@ -1,39 +1,12 @@
 import path from 'path'
-import chokidar from 'chokidar'
 import execa, { ExecaChildProcess } from 'execa'
 import { Plugin, startService, BuildOptions } from 'esbuild'
 import slash from 'slash'
 import fs from 'fs/promises'
 
-const join = (...args: Parameters<typeof path.join>): ReturnType<typeof path.join> => {
-  return slash(path.join(...args))
-}
-const watchFiles = (
-  paths: string | readonly string[],
-  options?: chokidar.WatchOptions,
-): Promise<chokidar.FSWatcher> => {
-  return new Promise((resolve, reject) => {
-    let watcher = chokidar
-      .watch(paths, options)
-      .on('ready', () => {
-        resolve(watcher)
-      })
-      .on('error', (error) => {
-        reject(error)
-      })
-  })
-}
-function memo<T>(f: () => T): typeof f
-function memo<T>(f: () => Promise<T>): typeof f
-function memo(f: () => any): any {
-  let result: any = null
-
-  return () => {
-    if (result) return result
-    result = f()
-    return result
-  }
-}
+import { watchFiles } from '../util/watchFiles'
+import { join } from '../util/join'
+import { memo } from '../util/memo'
 
 export type BundlerOptions = {
   build: BuildOptions
@@ -43,6 +16,7 @@ export const createBundler = (options: BundlerOptions) => {
   let getService = memo(() => {
     return startService()
   })
+
   let getBuilder = memo(async () => {
     let service = await getService()
     let result = await service.build({
@@ -76,21 +50,33 @@ export const createBundler = (options: BundlerOptions) => {
 }
 
 export type ServerBundlerOptions = {
-  // filename of entry
+  /**
+   * filename of entry
+   */
   entry?: string
-  // folder of source code
+  /**
+   * folder of source code
+   */
   src?: string
-  // folder of output code
+  /**
+   * folder of output code
+   */
   dist?: string
-  // args for node.js
-  // eg. ['--inspect-brk'] for debugging
+  /**
+   * - args for node.js
+   * - eg. ['--inspect-brk'] for debugging
+   */
   nodeArgs?: string[]
-  // env for node.js
-  // eg. { NODE_ENV: 'production' }
-  // NODE_ENV = production in `farrow start`
-  // NODE_ENV = development in `farrow dev`
+  /**
+   * - env for node.js
+   * - eg. { NODE_ENV: 'production' }
+   * - NODE_ENV = production in `farrow start`
+   * - NODE_ENV = development in `farrow dev`
+   */
   env?: NodeJS.ProcessEnv
-  // other options for esbuild
+  /**
+   * other options for esbuild
+   */
   esbuild?: Omit<BuildOptions, 'entryPoints' | 'outdir' | 'outbase'>
 }
 
@@ -103,6 +89,7 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
     ...options,
     esbuild: {
       sourcemap: true,
+      keepNames: true,
       ...options.esbuild,
     },
   }
@@ -234,6 +221,7 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
     dispose,
   }
 }
+
 const createResolveDirnamePlugin = (dist: string): Plugin => {
   return {
     name: 'farrow.resolve.dirname',

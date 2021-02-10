@@ -1,0 +1,40 @@
+{
+  "name": "farrow-api-server",
+  "version": "1.5.3",
+  "description": "A type-friendly BFF framework",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": "ts-node src/example"
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "keywords": [
+    "Web Framework",
+    "TypeScript",
+    "Functional Programming"
+  ],
+  "author": "Jade Gu",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lucifier129/farrow.git"
+  },
+  "peerDependencies": {
+    "farrow-pipeline": "^1.5.3",
+    "farrow-schema": "^1.5.3",
+    "farrow-api": "^1.5.3",
+    "farrow-http": "^1.5.3"
+  },
+  "devDependencies": {
+    "@types/lodash.get": "^4.4.6",
+    "farrow-schema": "^1.5.3",
+    "farrow-api": "^1.5.3",
+    "farrow-http": "^1.5.3"
+  },
+  "dependencies": {
+    "tslib": "^2.0.3",
+    "lodash.get": "^4.4.2"
+  }
+}

@@ -24,6 +24,8 @@
     "farrow-pipeline": "^1.5.3",
     "farrow-react": "^1.5.3",
     "farrow-schema": "^1.5.3",
+    "farrow-api": "^1.5.3",
+    "farrow-api-server": "^1.5.3",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "tslib": "^2.0.3"

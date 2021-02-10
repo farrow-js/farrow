@@ -424,32 +424,30 @@ const ObjectFormaterRule: FormaterRule<Schema.ObjectType | Schema.StructType> = 
   transform: (schema, context) => {
     let descriptors = (schema instanceof Schema.StructType ? schema.descriptors : schema) as Schema.FieldDescriptors
     let fieldsFormaters = createFieldsFormaters(descriptors, context)
+    let fields = {} as FormatFields
+    let hasGet = false
+    let getFields = () => {
+      if (hasGet) return fields
+      hasGet = true
+      for (let key in fieldsFormaters) {
+        let fieldFormater = fieldsFormaters[key]
+        fields[key] = {
+          typeId: fieldFormater.writer(),
+          description: fieldFormater.description,
+          deprecated: fieldFormater.deprecated,
+        }
+      }
+      return fields
+    }
 
     return () => {
-      let fields = {} as FormatFields
-      let getFields = () => {
-        for (let key in fieldsFormaters) {
-          let fieldFormater = fieldsFormaters[key]
-          fields[key] = {
-            typeId: fieldFormater.writer(),
-            description: fieldFormater.description,
-            deprecated: fieldFormater.deprecated,
-          }
-        }
-        return fields
-      }
-      let hasCalled = false
-      let result: FormatObjectType = {
+      return context.addType({
         type: 'Object',
         name: schema.constructor.name === 'Struct' ? '' : schema.constructor.name,
         get fields() {
-          if (hasCalled) return fields
-          hasCalled = true
           return getFields()
         },
-      }
-
-      return context.addType(result)
+      })
     }
   },
 }

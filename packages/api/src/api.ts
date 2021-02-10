@@ -45,7 +45,7 @@ export type ApiType<T extends ApiDefinition = ApiDefinition> = TypeOfApiDefiniti
 }
 
 export const isApi = <T extends ApiDefinition = ApiDefinition>(input: any): input is ApiType<T> => {
-  return !!(input?.type === 'Impl')
+  return typeof input === 'function' && input?.type === 'Api'
 }
 
 export function createApi<T extends ApiDefinition>(api: T, fn: TypeOfApiDefinition<T>): ApiType<T> {

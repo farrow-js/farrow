@@ -67,6 +67,9 @@ export type __Api__ = {
 }
 
 export type CreateApiOptions = {
+  /**
+   * a fetcher for api-client
+   */
   fetcher: (input: { path: string[]; input: JsonType }) => Promise<JsonType>
 }
 
@@ -75,14 +78,11 @@ export const createApiClient = (options: CreateApiOptions) => {
     /**
      * @remarks add todo
      */
-    addTodo: (input: AddTodoInput) => {
-      return options.fetcher({ path: ['addTodo'], input }) as Promise<AddTodoOutput>
-    },
+    addTodo: (input: AddTodoInput) => options.fetcher({ path: ['addTodo'], input }) as Promise<AddTodoOutput>,
     /**
      * @remarks remove todo
      */
-    removeTodo: (input: RemoveTodoInput) => {
-      return options.fetcher({ path: ['removeTodo'], input }) as Promise<RemoveTodoOuput>
-    },
+    removeTodo: (input: RemoveTodoInput) =>
+      options.fetcher({ path: ['removeTodo'], input }) as Promise<RemoveTodoOuput>,
   }
 }

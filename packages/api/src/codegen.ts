@@ -124,7 +124,7 @@ export const codegen = (formatResult: FormatResult): string => {
 
       if (typeName) {
         if (exportSet.has(typeName)) {
-          throw new Error(`Duplicate Object Type name: ${typeName}`)
+          throw new Error(`Duplicate Object type name: ${typeName}`)
         }
 
         exportSet.add(typeName)
@@ -178,9 +178,7 @@ export const codegen = (formatResult: FormatResult): string => {
     let inputType = getFieldType(api.input.typeId, formatResult.types)
     let outputType = getFieldType(api.output.typeId, formatResult.types)
     let result = `
-    (input: ${inputType}) => {
-      return options.fetcher({ path: ${JSON.stringify(path)}, input }) as Promise<${outputType}>
-    }
+    (input: ${inputType}) => options.fetcher({ path: ${JSON.stringify(path)}, input }) as Promise<${outputType}>
     `
     return result
   }

@@ -211,7 +211,7 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
     try {
       return await handleRequest(req, res)
     } catch (error) {
-      let message = process.env.NODE_ENV !== 'production' ? error?.stack || error?.message : error?.message
+      let message = (process.env.NODE_ENV !== 'production' ? error?.stack || error?.message : error?.message) ?? ''
 
       if (!res.headersSent) {
         res.statusCode = error.statusCode ?? 500

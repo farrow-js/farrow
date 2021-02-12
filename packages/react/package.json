@@ -39,6 +39,6 @@
   },
   "dependencies": {
     "multistream": "^4.0.0",
-    "tslib": "^2.0.3"
+    "tslib": "^2.1.0"
   }
 }

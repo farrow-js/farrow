@@ -34,6 +34,6 @@
     "ts-node": "^9.1.1"
   },
   "dependencies": {
-    "tslib": "^2.0.3"
+    "tslib": "^2.1.0"
   }
 }

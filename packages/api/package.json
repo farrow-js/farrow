@@ -28,7 +28,7 @@
     "farrow-schema": "^1.5.3"
   },
   "dependencies": {
-    "tslib": "^2.0.3",
+    "tslib": "^2.1.0",
     "prettier": "^2.2.1",
     "cosmiconfig": "^7.0.0"
   }

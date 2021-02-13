@@ -1,5 +1,5 @@
-import { HttpMiddleware, Router, Response, HttpError, RouterPipeline } from 'farrow-http'
-import { List, SchemaCtor, SchemaCtorInput, Struct, toSchemaCtor, Ok, Result, Any } from 'farrow-schema'
+import { Router, Response, RouterPipeline } from 'farrow-http'
+import { List, SchemaCtor, SchemaCtorInput, Struct, toSchemaCtor, Any } from 'farrow-schema'
 import { ApiDefinition, ApiEntries, getContentType, isApi } from 'farrow-api'
 import { toJSON } from 'farrow-api/dist/toJSON'
 import { createSchemaValidator, ValidationError, Validator } from 'farrow-schema/validator'
@@ -62,17 +62,19 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
     let bodyResult = validateBody(request.body)
 
     if (bodyResult.isErr) {
+      let message = getErrorMessage(bodyResult.value)
       return Response.json({
-        error: {
-          message: getErrorMessage(bodyResult.value),
-        },
+        error: { message },
       })
     }
 
     let api = get(entries, bodyResult.value.path)
 
     if (!isApi(api)) {
-      throw new HttpError(`The target API is not found with the path: [${bodyResult.value.path.join(', ')}]`)
+      let message = `The target API was not found with the path: [${bodyResult.value.path.join(', ')}]`
+      return Response.json({
+        error: { message },
+      })
     }
 
     let definition = api.definition as ApiDefinition<SchemaCtorInput>
@@ -80,39 +82,51 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
     let InputSchema = toSchemaCtor(getContentType(definition.input))
     let validateApiInput = getValidator(InputSchema)
 
+    /**
+     * validate input
+     */
     let inputResult = validateApiInput(bodyResult.value.input)
 
     if (inputResult.isErr) {
+      let message = getErrorMessage(inputResult.value)
       return Response.json({
-        error: {
-          message: getErrorMessage(inputResult.value),
-        },
+        error: { message },
       })
     }
 
-    let output = await api(inputResult.value)
+    try {
+      let output = await api(inputResult.value)
 
-    let OutputSchema = toSchemaCtor(getContentType(definition.output))
-    let validateApiOutput = getValidator(OutputSchema)
+      let OutputSchema = toSchemaCtor(getContentType(definition.output))
+      let validateApiOutput = getValidator(OutputSchema)
 
-    let outputResult = validateApiOutput(output)
+      /**
+       * validate output
+       */
+      let outputResult = validateApiOutput(output)
 
-    if (outputResult.isErr) {
+      if (outputResult.isErr) {
+        let message = getErrorMessage(outputResult.value)
+        return Response.json({
+          error: { message },
+        })
+      }
+
+      /**
+       * response output
+       */
       return Response.json({
-        error: {
-          message: getErrorMessage(outputResult.value),
-        },
+        output: outputResult.value,
+      })
+    } catch (error) {
+      let message = (process.env.NODE_ENV !== 'production' ? error?.stack || error?.message : error?.message) ?? ''
+      return Response.json({
+        error: { message },
       })
     }
-
-    return Response.json({
-      output: outputResult.value,
-    })
   })
 
-  return {
-    ...router,
-  }
+  return router
 }
 
 export const ApiService = createApiService

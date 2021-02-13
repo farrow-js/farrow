@@ -9,15 +9,12 @@ const transformComment = (text: string) => {
     .join('\n*\n*')
 }
 
-const attachComment = (result: string, options: { description?: string; deprecated?: string }) => {
-  if (!options.deprecated && !options.description) {
-    return result
-  }
-
-  let list = [
-    options.description ? `* @remarks ${transformComment(options.description)}` : '',
-    options.deprecated ? `* @depcreated ${transformComment(options.deprecated)}` : '',
-  ].filter(Boolean)
+const attachComment = (result: string, options: { [key: string]: string | undefined }) => {
+  let list = Object.entries(options)
+    .map(([key, value]) => {
+      return value ? `* @${key} ${transformComment(value)}` : ''
+    })
+    .filter(Boolean)
 
   let comment = `/**\n${list.join('\n')}\n*/\n`
 
@@ -117,7 +114,10 @@ export const codegen = (formatResult: FormatResult): string => {
       let fileds = Object.entries(formatType.fields).map(([key, field]) => {
         let result = `${key}: ${getFieldType(field.typeId, formatResult.types)}`
 
-        return attachComment(result, field)
+        return attachComment(result, {
+          remarks: field.description,
+          depcreated: field.deprecated,
+        })
       })
 
       let typeName = getTypeName(formatType)
@@ -130,6 +130,9 @@ export const codegen = (formatResult: FormatResult): string => {
         exportSet.add(typeName)
 
         return `
+        /**
+         * {@label ${typeName}} 
+         */
         export type ${typeName} = {
           ${fileds.join(',  \n')}
         }
@@ -151,54 +154,35 @@ export const codegen = (formatResult: FormatResult): string => {
     })
   }
 
-  let handleApiType = (api: FormatApi): string => {
+  let handleApi = (api: FormatApi, path: string[]) => {
     let inputType = getFieldType(api.input.typeId, formatResult.types)
     let outputType = getFieldType(api.output.typeId, formatResult.types)
-    let result = `(input: ${inputType}) => Promise<${outputType}>`
-
-    return result
-  }
-
-  let handleEntriesType = (entries: FormatEntries): string => {
-    let fields = Object.entries(entries.entries).map(([key, field]) => {
-      if (field.type === 'Api') {
-        let result = `${key}: ${handleApiType(field)}`
-        return attachComment(result, field)
-      }
-      return `${key}: ${handleEntriesType(field)}`
-    })
-    return `
-    {
-      ${fields.join(',\n')}
-    }
-    `
-  }
-
-  let handleApiImpl = (api: FormatApi, path: string[]): string => {
-    let inputType = getFieldType(api.input.typeId, formatResult.types)
-    let outputType = getFieldType(api.output.typeId, formatResult.types)
-    let result = `
+    let sourceText = `
     (input: ${inputType}) => options.fetcher({ path: ${JSON.stringify(path)}, input }) as Promise<${outputType}>
     `
-    return result
+    return { inputType, outputType, sourceText }
   }
 
-  let handleEntriesImpl = (entries: FormatEntries, path: string[] = []): string => {
+  let handleEntries = (entries: FormatEntries, path: string[] = []): string => {
     let fields = Object.entries(entries.entries).map(([key, field]) => {
       if (field.type === 'Api') {
-        let result = `${key}: ${handleApiImpl(field, [...path, key])}`
-        return attachComment(result, field)
+        let { sourceText, inputType, outputType } = handleApi(field, [...path, key])
+        let result = `${key}: ${sourceText}`
+        return attachComment(result, {
+          remarks: field.description,
+          depcreated: field.deprecated,
+          [`param input -`]: inputType,
+          returns: outputType,
+        })
       }
-      return `${key}: ${handleEntriesImpl(field, [...path, key])}`
+      return `${key}: ${handleEntries(field, [...path, key])}`
     })
     return `{ ${fields.join(',\n')} }`
   }
 
   let definitions = handleTypes(formatResult.types)
 
-  let entriesType = handleEntriesType(formatResult.entries)
-
-  let entriesImpl = handleEntriesImpl(formatResult.entries)
+  let entries = handleEntries(formatResult.entries)
 
   let source = `
   export type JsonType =
@@ -217,17 +201,15 @@ export const codegen = (formatResult: FormatResult): string => {
 
     ${definitions.join('\n\n')}
 
-    export type __Api__ = ${entriesType}
-
-    export type CreateApiOptions = {
+    export type CreateApiClientOptions = {
       /**
        * a fetcher for api-client
        */
       fetcher: (input: { path: string[], input: JsonType }) => Promise<JsonType>
     }
 
-    export const createApiClient = (options: CreateApiOptions) => {
-      return ${entriesImpl}
+    export const createApiClient = (options: CreateApiClientOptions) => {
+      return ${entries}
     }
   `
 

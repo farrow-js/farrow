@@ -12,6 +12,9 @@ export type JsonType =
       [key: string]: JsonType
     }
 
+/**
+ * {@label AddTodoInput}
+ */
 export type AddTodoInput = {
   /**
    * @remarks a content of todo for creating
@@ -19,6 +22,9 @@ export type AddTodoInput = {
   content: string
 }
 
+/**
+ * {@label AddTodoOutput}
+ */
 export type AddTodoOutput = {
   /**
    * @remarks Todo list
@@ -26,6 +32,9 @@ export type AddTodoOutput = {
   todos: Todo[]
 }
 
+/**
+ * {@label RemoveTodoInput}
+ */
 export type RemoveTodoInput = {
   /**
    * @remarks Todo id for removing
@@ -33,6 +42,9 @@ export type RemoveTodoInput = {
   id: number
 }
 
+/**
+ * {@label RemoveTodoOuput}
+ */
 export type RemoveTodoOuput = {
   /**
    * @remarks Remain todo list
@@ -40,6 +52,9 @@ export type RemoveTodoOuput = {
   todos: Todo[]
 }
 
+/**
+ * {@label Todo}
+ */
 export type Todo = {
   /**
    * @remarks Todo id
@@ -55,32 +70,25 @@ export type Todo = {
   completed: boolean
 }
 
-export type __Api__ = {
-  /**
-   * @remarks add todo
-   */
-  addTodo: (input: AddTodoInput) => Promise<AddTodoOutput>
-  /**
-   * @remarks remove todo
-   */
-  removeTodo: (input: RemoveTodoInput) => Promise<RemoveTodoOuput>
-}
-
-export type CreateApiOptions = {
+export type CreateApiClientOptions = {
   /**
    * a fetcher for api-client
    */
   fetcher: (input: { path: string[]; input: JsonType }) => Promise<JsonType>
 }
 
-export const createApiClient = (options: CreateApiOptions) => {
+export const createApiClient = (options: CreateApiClientOptions) => {
   return {
     /**
      * @remarks add todo
+     * @param input - AddTodoInput
+     * @returns AddTodoOutput
      */
     addTodo: (input: AddTodoInput) => options.fetcher({ path: ['addTodo'], input }) as Promise<AddTodoOutput>,
     /**
      * @remarks remove todo
+     * @param input - RemoveTodoInput
+     * @returns RemoveTodoOuput
      */
     removeTodo: (input: RemoveTodoInput) =>
       options.fetcher({ path: ['removeTodo'], input }) as Promise<RemoveTodoOuput>,

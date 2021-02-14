@@ -3,6 +3,7 @@ import { createTransformer, TransformRule, TransformContext } from 'farrow-schem
 
 export type FormatField = {
   typeId: number
+  $ref?: string
   description?: string
   deprecated?: string
 }
@@ -111,26 +112,29 @@ export type FormatLiteralType = {
 export type FormatRecordType = {
   type: 'Record'
   valueTypeId: number
+  $ref?: string
 }
 
 export type FormatListType = {
   type: 'List'
   itemTypeId: number
+  $ref?: string
 }
 
 export type FormatNullableType = {
   type: 'Nullable'
   itemTypeId: number
+  $ref?: string
 }
 
 export type FormatUnionType = {
   type: 'Union'
-  itemTypeIds: number[]
+  itemTypes: { typeId: number; $ref?: string }[]
 }
 
 export type FormatIntersectType = {
   type: 'Intersect'
-  itemTypeIds: number[]
+  itemTypes: { typeId: number; $ref?: string }[]
 }
 
 export type FormatType =
@@ -364,9 +368,11 @@ const ListFormaterRule: FormaterRule<Schema.ListType> = {
     let formatItem = createFormater(schema.Item, context)
 
     return () => {
+      let typeId = formatItem()
       return context.addType({
         type: 'List',
-        itemTypeId: formatItem(),
+        itemTypeId: typeId,
+        $ref: `#/types/${typeId}`,
       })
     }
   },
@@ -431,8 +437,10 @@ const ObjectFormaterRule: FormaterRule<Schema.ObjectType | Schema.StructType> = 
       hasGet = true
       for (let key in fieldsFormaters) {
         let fieldFormater = fieldsFormaters[key]
+        let typeId = fieldFormater.writer()
         fields[key] = {
-          typeId: fieldFormater.writer(),
+          typeId,
+          $ref: `#/types/${typeId}`,
           description: fieldFormater.description,
           deprecated: fieldFormater.deprecated,
         }
@@ -460,9 +468,11 @@ const RecordFormaterRule: FormaterRule<Schema.RecordType> = {
     let formatItem = createFormater(schema.Item, context)
 
     return () => {
+      let typeId = formatItem()
       return context.addType({
         type: 'Record',
-        valueTypeId: formatItem(),
+        valueTypeId: typeId,
+        $ref: `#/types/${typeId}`,
       })
     }
   },
@@ -476,9 +486,11 @@ const NullableFormaterRule: FormaterRule<Schema.NullableType> = {
     let formatItem = createFormater(schema.Item, context)
 
     return () => {
+      let typeId = formatItem()
       return context.addType({
         type: 'Nullable',
-        itemTypeId: formatItem(),
+        itemTypeId: typeId,
+        $ref: `#/types/${typeId}`,
       })
     }
   },
@@ -494,7 +506,13 @@ const UnionFormaterRule: FormaterRule<Schema.UnionType> = {
     return () => {
       return context.addType({
         type: 'Union',
-        itemTypeIds: itemsFormaters.map((format) => format()),
+        itemTypes: itemsFormaters.map((format) => {
+          let typeId = format()
+          return {
+            typeId,
+            $ref: `#/types/${typeId}`,
+          }
+        }),
       })
     }
   },
@@ -510,7 +528,13 @@ const IntersectFormaterRule: FormaterRule<Schema.IntersectType> = {
     return () => {
       return context.addType({
         type: 'Intersect',
-        itemTypeIds: itemsFormaters.map((format) => format()),
+        itemTypes: itemsFormaters.map((format) => {
+          let typeId = format()
+          return {
+            typeId,
+            $ref: `#/types/${typeId}`,
+          }
+        }),
       })
     }
   },

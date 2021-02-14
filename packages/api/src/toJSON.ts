@@ -12,12 +12,15 @@ export type FormatApi = {
 
 export type FormatEntries = {
   type: 'Entries'
+  description?: string
+  deprecated?: string
   entries: {
     [key: string]: FormatApi | FormatEntries
   }
 }
 
 export type FormatResult = {
+  protocol: 'Farrow-API'
   types: FormatTypes
   entries: FormatEntries
 }
@@ -53,6 +56,7 @@ export const toJSON = (apiEntries: ApiEntries): FormatResult => {
 
     return {
       typeId: formatResult.typeId,
+      $ref: `#/types/${formatResult.typeId}`,
       description: getTypeDescription(typable),
       deprecated: getTypeDeprecated(typable),
     }
@@ -73,6 +77,8 @@ export const toJSON = (apiEntries: ApiEntries): FormatResult => {
   let formatApiEntries = (apiEntries: ApiEntries): FormatEntries => {
     let entries: FormatEntries['entries'] = {}
     let formatEntries: FormatEntries = {
+      description: apiEntries.description,
+      deprecated: apiEntries.deprecated,
       type: 'Entries',
       entries,
     }
@@ -90,6 +96,7 @@ export const toJSON = (apiEntries: ApiEntries): FormatResult => {
   }
 
   let formatResult: FormatResult = {
+    protocol: 'Farrow-API',
     types,
     entries: formatApiEntries(apiEntries),
   }

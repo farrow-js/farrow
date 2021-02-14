@@ -12,9 +12,11 @@ const transformComment = (text: string) => {
 const attachComment = (result: string, options: { [key: string]: string | undefined }) => {
   let list = Object.entries(options)
     .map(([key, value]) => {
-      return value ? `* @${key} ${transformComment(value)}` : ''
+      return value ? `* @${key} ${transformComment(value.trim())}` : ''
     })
     .filter(Boolean)
+
+  if (list.length === 0) return result
 
   let comment = `/**\n${list.join('\n')}\n*/\n`
 
@@ -88,15 +90,15 @@ const getFieldType = (typeId: number, types: FormatTypes): string => {
   }
 
   if (fieldType.type === 'List') {
-    return `${getFieldType(fieldType.itemTypeId, types)}[]`
+    return `Array<${getFieldType(fieldType.itemTypeId, types)}>`
   }
 
   if (fieldType.type === 'Union') {
-    return fieldType.itemTypeIds.map((typeId) => getFieldType(typeId, types)).join(' | ')
+    return fieldType.itemTypes.map((itemType) => getFieldType(itemType.typeId, types)).join(' | ')
   }
 
   if (fieldType.type === 'Intersect') {
-    return fieldType.itemTypeIds.map((typeId) => getFieldType(typeId, types)).join(' & ')
+    return fieldType.itemTypes.map((itemType) => getFieldType(itemType.typeId, types)).join(' & ')
   }
 
   throw new Error(`Unsupported field: ${JSON.stringify(fieldType, null, 2)}`)

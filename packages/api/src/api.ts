@@ -58,5 +58,8 @@ export function createApi<T extends ApiDefinition>(api: T, fn: TypeOfApiDefiniti
 export const Api = createApi
 
 export type ApiEntries = {
+  description?: string
+  deprecated?: string
+} & {
   [key: string]: ApiType | ApiEntries
 }

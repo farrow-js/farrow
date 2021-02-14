@@ -1,7 +1,7 @@
 import { Router, Response, RouterPipeline } from 'farrow-http'
 import { List, SchemaCtor, SchemaCtorInput, Struct, toSchemaCtor, Any } from 'farrow-schema'
 import { ApiDefinition, ApiEntries, getContentType, isApi } from 'farrow-api'
-import { toJSON } from 'farrow-api/dist/toJSON'
+import { FormatResult, toJSON } from 'farrow-api/dist/toJSON'
 import { createSchemaValidator, ValidationError, Validator } from 'farrow-schema/validator'
 import get from 'lodash.get'
 
@@ -44,6 +44,8 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
     return validator
   }
 
+  let formatResult: FormatResult | undefined
+
   router.use(async (request, next) => {
     if (request.method?.toLowerCase() !== 'post') {
       return next()
@@ -53,7 +55,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
      * capture introspection request
      */
     if (request.body?.input?.__introspection__ === true) {
-      let output = toJSON(entries)
+      let output = (formatResult = formatResult ?? toJSON(entries))
       return Response.json({
         output,
       })

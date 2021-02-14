@@ -15,6 +15,10 @@ module.exports = createFarrowConfig({
         src: 'http://localhost:3002/service/todo',
         dist: `${__dirname}/client/todo.ts`,
       },
+      {
+        src: 'http://localhost:3002/service/pet-store',
+        dist: `${__dirname}/client/pet-store.ts`,
+      },
     ],
   },
 })

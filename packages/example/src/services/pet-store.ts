@@ -1,4 +1,4 @@
-import { Int, List, Literal, ObjectType, Struct, Type, TypeOf, Union } from 'farrow-schema'
+import { Int, List, Literal, ObjectType, Record, Struct, Type, TypeOf, Union } from 'farrow-schema'
 import { Api, ApiEntries } from 'farrow-api'
 import { ApiService } from 'farrow-api-server'
 
@@ -26,6 +26,30 @@ export class InvalidPetStatus extends ObjectType {
 
 export class InvalidPetTagValue extends ObjectType {
   type = Literal('InvalidPetTagValue')
+}
+
+export class InvalidOrder extends ObjectType {
+  type = Literal('InvalidOrder')
+}
+
+export class OrderNotFound extends ObjectType {
+  type = Literal('OrderNotFound')
+}
+
+export class InvalidUserSupplied extends ObjectType {
+  type = Literal('InvalidUserSupplied')
+}
+
+export class UserNotFound extends ObjectType {
+  type = Literal('UserNotFound')
+}
+
+export class InvalidUsernameSupplied extends ObjectType {
+  type = Literal('InvalidUsernameSupplied')
+}
+
+export class InvalidPasswordSupplied extends ObjectType {
+  type = Literal('InvalidPasswordSupplied')
 }
 
 /**
@@ -216,12 +240,334 @@ export const getPetById = Api(
   },
 )
 
+export class DeletePetInput extends ObjectType {
+  petId = {
+    description: `ID of pet to delete`,
+    [Type]: Int,
+  }
+}
+
+export class DeletePetOutput extends ObjectType {
+  petId = {
+    description: `ID of pet which was deleted`,
+    [Type]: Int,
+  }
+}
+
+export const deletePet = Api(
+  {
+    description: 'Deletes a pet',
+    input: DeletePetInput,
+    output: Union(InvalidIDSupplied, PetNotFound, DeletePetOutput),
+  },
+  (input) => {
+    throw new Error('No Implementation')
+  },
+)
+
+export class PlaceOrderInput extends ObjectType {
+  body = {
+    description: 'order placed for purchasing the pet',
+    [Type]: Order,
+  }
+}
+
+export class PlaceOrderOutput extends ObjectType {
+  order = {
+    [Type]: Order,
+  }
+}
+
+export const placeOrder = Api(
+  {
+    description: 'Place an order for a pet',
+    input: PlaceOrderInput,
+    output: Union(InvalidOrder, PlaceOrderOutput),
+  },
+  (input) => {
+    throw new Error('No Implementation')
+  },
+)
+
+export class GetOrderByIdInput extends ObjectType {
+  orderId = {
+    description: 'ID of pet that needs to be fetched',
+    [Type]: Int,
+  }
+}
+
+export class GetOrderByIdOutput extends ObjectType {
+  type = Literal('GetOrderByIdOutput')
+  order = {
+    [Type]: Order,
+  }
+}
+
+export const getOrderById = Api(
+  {
+    description: `
+  Find purchase order by ID
+  For valid response try integer IDs with value >= 1 and <= 10. Other values will generated exceptions
+  `,
+    input: GetOrderByIdInput,
+    output: Union(InvalidIDSupplied, OrderNotFound, GetOrderByIdOutput),
+  },
+  (input) => {
+    throw new Error('No Implementation')
+  },
+)
+
+export class DeleteOrderInput extends ObjectType {
+  orderId = {
+    description: 'ID of the order that needs to be deleted',
+    [Type]: Int,
+  }
+}
+
+export class DeleteOrderOutput extends ObjectType {
+  type = Literal('DeleteOrderOutput')
+  orderId = {
+    description: 'ID of the order that was deleted',
+    [Type]: Int,
+  }
+}
+
+export const deleteOrder = Api(
+  {
+    description: `
+  Delete purchase order by ID
+  For valid response try integer IDs with positive integer value. Negative or non-integer values will generate API errors
+  `,
+    input: DeleteOrderInput,
+    output: Union(InvalidIDSupplied, OrderNotFound, DeleteOrderOutput),
+  },
+  (input) => {
+    throw new Error('No Implementation')
+  },
+)
+
+export class GetInventoryOutput extends ObjectType {
+  inventory = {
+    description: '',
+    [Type]: Record(Int),
+  }
+}
+
+export const getInventory = Api(
+  {
+    description: `
+  Returns pet inventories by status
+  Returns a map of status codes to quantities
+  `,
+    input: {},
+    output: GetInventoryOutput,
+  },
+  (input) => {
+    throw new Error('No Implementation')
+  },
+)
+
+export class CreateUsersWithArrayInput extends ObjectType {
+  body = {
+    description: 'List of user object',
+    [Type]: List(User),
+  }
+}
+
+export class CreateUsersWithArrayOutput extends ObjectType {
+  users = {
+    [Type]: List(User),
+  }
+}
+
+export const createUsersWithArray = Api(
+  {
+    description: `Creates list of users with given input array`,
+    input: CreateUsersWithArrayInput,
+    output: CreateUsersWithArrayOutput,
+  },
+  (input) => {
+    throw new Error('No Implementation')
+  },
+)
+
+export class GetUserByNameInput extends ObjectType {
+  username = {
+    description: 'The name that needs to be fetched. Use user1 for testing.',
+    [Type]: String,
+  }
+}
+
+export class GetUserByNameOutput extends ObjectType {
+  type = Literal('GetUserByNameOutput')
+  user = User
+}
+
+export const getUserByName = Api(
+  {
+    description: 'Get user by user name',
+    input: GetUserByNameInput,
+    output: Union(InvalidUserSupplied, UserNotFound, GetUserByNameOutput),
+  },
+  (input) => {
+    throw new Error('No Implementation')
+  },
+)
+
+export class UpdateUserInput extends ObjectType {
+  username = {
+    description: 'name that need to be updated',
+    [Type]: String,
+  }
+  body = {
+    description: 'Updated user object',
+    [Type]: User,
+  }
+}
+
+export class UpdateUserOutput extends ObjectType {
+  type = Literal('UpdateUserOutput')
+  user = User
+}
+
+export const updateUser = Api(
+  {
+    description: `
+    Updated user
+    This can only be done by the logged in user.
+  `,
+    input: UpdateUserInput,
+    output: Union(InvalidUserSupplied, UserNotFound, UpdateUserOutput),
+  },
+  (input) => {
+    throw new Error('No Implementation')
+  },
+)
+
+export class DeleteUserInput extends ObjectType {
+  username = {
+    description: 'The name that needs to be deleted',
+    [Type]: String,
+  }
+}
+
+export class DeleteUserOutput extends ObjectType {
+  type = Literal('DeleteUserOutput')
+  username = {
+    description: 'The name that needs to be deleted',
+    [Type]: String,
+  }
+}
+
+export const deleteUser = Api(
+  {
+    description: `
+    Delete user
+    This can only be done by the logged in user.
+  `,
+    input: DeleteUserInput,
+    output: DeleteUserOutput,
+  },
+  (input) => {
+    throw new Error('No Implementation')
+  },
+)
+
+export class LoginUserInput extends ObjectType {
+  username = {
+    description: 'The user name for login',
+    [Type]: String,
+  }
+  password = {
+    description: 'The password for login in clear text',
+    [Type]: String,
+  }
+}
+
+export class LoginUserOutput extends ObjectType {
+  user = {
+    description: 'login user',
+    [Type]: User,
+  }
+}
+
+export const loginUser = Api(
+  {
+    description: `
+    Logs user into the system
+  `,
+    input: LoginUserInput,
+    output: Union(InvalidUsernameSupplied, InvalidPasswordSupplied, LoginUserOutput),
+  },
+  (input) => {
+    throw new Error('No Implementation')
+  },
+)
+
+export const logoutUser = Api(
+  {
+    description: 'Logs out current logged in user session',
+    input: {},
+    output: {
+      username: String,
+    },
+  },
+  (input) => {
+    throw new Error('No Implementation')
+  },
+)
+
+export class CreateUserInput extends ObjectType {
+  body = {
+    description: 'Created user object',
+    [Type]: User,
+  }
+}
+
+export class CreateUserOutput extends ObjectType {
+  type = Literal('CreateUserOutput')
+
+  user = User
+}
+
+export const createUser = Api(
+  {
+    description: `
+    Create user
+    This can only be done by the logged in user.
+  `,
+    input: CreateUserInput,
+    output: CreateUserOutput,
+  },
+  (input) => {
+    throw new Error('No Implementation')
+  },
+)
+
 export const entries = {
-  addPet,
-  updatePet,
-  findPetByStatus,
-  findPetsByTags,
-  getPetById,
+  pet: {
+    addPet,
+    updatePet,
+    deletePet,
+    findPetByStatus,
+    findPetsByTags,
+    getPetById,
+  },
+  store: {
+    placeOrder,
+    getOrderById,
+    deleteOrder,
+    getInventory,
+  },
+  user: {
+    createUsersWithArray,
+    getUserByName,
+    updateUser,
+    deleteUser,
+    loginUser,
+    logoutUser,
+    createUser,
+  },
 }
 
 export const service = ApiService({

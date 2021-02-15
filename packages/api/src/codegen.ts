@@ -73,7 +73,7 @@ const getFieldType = (typeId: number, types: FormatTypes): string => {
   }
 
   if (fieldType.type === 'Record') {
-    return `Record<string, ${getFieldType(typeId, types)}>`
+    return `Record<string, ${getFieldType(fieldType.valueTypeId, types)}>`
   }
 
   if (fieldType.type === 'Unknown') {

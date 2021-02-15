@@ -44,6 +44,7 @@ export const InlineTypes = [
   'List',
   'Union',
   'Intersect',
+  'Record',
 ]
 
 export const isInlineType = (input: FormatType): input is FormatInlineTypes => {

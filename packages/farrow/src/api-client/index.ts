@@ -3,7 +3,7 @@ import { ensureDir } from 'fs-extra'
 import { dirname } from 'path'
 import fetch from 'node-fetch'
 import { FormatResult } from 'farrow-api/dist/toJSON'
-import { codegen } from 'farrow-api/dist/codegen'
+import { codegen, CodegenOptions } from 'farrow-api/dist/codegen'
 import { format } from 'farrow-api/dist/prettier'
 
 const writeFile = async (filename: string, content: string) => {
@@ -17,6 +17,7 @@ const writeFile = async (filename: string, content: string) => {
 export type ApiClientOptions = {
   src: string
   dist: string
+  codegen: CodegenOptions
   pollingInterval?: number
   transform?: (source: string) => string
   format?: (source: string) => string
@@ -68,7 +69,7 @@ export const createApiClient = (options: ApiClientOptions) => {
       return
     }
 
-    let source = codegen(result.output)
+    let source = codegen(result.output, config.codegen)
 
     if (config.transform) {
       source = config.transform(source)
@@ -113,14 +114,14 @@ export type CreateApiClientsOptions = {
 }
 
 export const createApiClients = (options: CreateApiClientsOptions) => {
-  let syncers = options.services.map(createApiClient)
+  let clients = options.services.map(createApiClient)
 
   let start = () => {
-    syncers.map((syncer) => syncer.start())
+    clients.map((syncer) => syncer.start())
   }
 
   let stop = () => {
-    syncers.map((syncer) => syncer.stop())
+    clients.map((syncer) => syncer.stop())
   }
 
   return {

@@ -80,6 +80,12 @@ export type ServerBundlerOptions = {
   esbuild?: Omit<BuildOptions, 'entryPoints' | 'outdir' | 'outbase'>
 }
 
+export type StartOptions = {
+  build?: boolean
+  watch?: boolean
+  run?: boolean
+}
+
 export const createServerBundler = (options: ServerBundlerOptions = {}) => {
   let config = {
     entry: 'index.ts',
@@ -110,7 +116,7 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
   let childProcess: ExecaChildProcess | null
 
   let run = () => {
-    stop()
+    cancel()
     childProcess = execa('node', [...config.nodeArgs, distEntry], {
       stdout: 'inherit',
       stderr: 'inherit',
@@ -119,10 +125,13 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
         ...config.env,
       },
     })
-    return childProcess
+    childProcess.catch((error) => {
+      if (error.isCanceled) return
+      throw error
+    })
   }
 
-  let stop = () => {
+  let cancel = () => {
     if (childProcess) {
       childProcess.cancel()
       childProcess = null
@@ -141,11 +150,8 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
     watcher.on('all', async () => {
       try {
         await build()
-        await run()
+        run()
       } catch (error) {
-        if (error?.stack.includes('Command was canceled')) {
-          return
-        }
         console.log('watcher:', error.stack)
       }
     })
@@ -164,61 +170,72 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
     console.log(`finish build in ${(Date.now() - start).toFixed(2)}ms`)
   }
 
-  type StartOptions = {
-    build?: boolean
-    watch?: boolean
-    run?: boolean
-  }
-
   let isStarted = false
 
   let start = async (startOptions?: StartOptions) => {
-    if (isStarted) return
+    if (isStarted) {
+      await stop()
+    }
+
     isStarted = true
 
     let startConfig = {
       ...startOptions,
     }
 
-    try {
-      if (startConfig.build) {
-        await build()
-      }
+    if (startConfig.build) {
+      await build()
+    }
 
-      if (startConfig.watch) {
-        await watch()
-      }
+    if (startConfig.watch) {
+      await watch()
+    }
 
-      if (startConfig.run) {
-        await run()
-      }
-    } catch (error) {
-      if (error?.stack.includes('Command was canceled')) {
-        return
-      }
-      throw error
+    if (startConfig.run) {
+      run()
     }
 
     if (!startConfig.run && !startConfig.watch) {
-      await dispose()
+      await stop()
     }
   }
 
-  let dispose = async () => {
-    stop()
+  let stop = async () => {
+    cancel()
     await bundler.dispose()
     if (hasWatcher) {
       let watcher = await getWatcher()
       await watcher.close()
     }
+    isStarted = false
   }
 
   return {
     start,
-    watch,
-    build,
-    run,
-    dispose,
+    stop,
+  }
+}
+
+export type ServerBundlersOptions = {
+  bundlers: ServerBundlerOptions[]
+}
+
+export const createServerBundlers = (options: ServerBundlersOptions) => {
+  let bundlers = options.bundlers.map(createServerBundler)
+
+  let start = async (startOptions?: StartOptions) => {
+    let promises = bundlers.map((bundler) => bundler.start(startOptions))
+    await Promise.all(promises)
+  }
+
+  let stop = async () => {
+    let promises = bundlers.map((bundler) => bundler.stop())
+    await Promise.all(promises)
+  }
+
+  return {
+    start,
+    stop,
   }
 }
 

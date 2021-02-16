@@ -104,7 +104,16 @@ const getFieldType = (typeId: number, types: FormatTypes): string => {
   throw new Error(`Unsupported field: ${JSON.stringify(fieldType, null, 2)}`)
 }
 
-export const codegen = (formatResult: FormatResult): string => {
+export type CodegenOptions = {
+  emitApiClient?: boolean
+}
+
+export const codegen = (formatResult: FormatResult, options?: CodegenOptions): string => {
+  let config = {
+    emitApiClient: true,
+    ...options,
+  }
+
   let exportSet = new Set<string>()
 
   let handleType = (typeId: string, formatType: FormatType) => {
@@ -184,8 +193,6 @@ export const codegen = (formatResult: FormatResult): string => {
 
   let definitions = handleTypes(formatResult.types)
 
-  let entries = handleEntries(formatResult.entries)
-
   let source = `
   export type JsonType =
     | number
@@ -203,6 +210,11 @@ export const codegen = (formatResult: FormatResult): string => {
 
     ${definitions.join('\n\n')}
 
+  `
+
+  if (config.emitApiClient) {
+    let entries = handleEntries(formatResult.entries)
+    source += `
     export type CreateApiClientOptions = {
       /**
        * a fetcher for api-client
@@ -213,7 +225,8 @@ export const codegen = (formatResult: FormatResult): string => {
     export const createApiClient = (options: CreateApiClientOptions) => {
       return ${entries}
     }
-  `
+    `
+  }
 
   return source
 }

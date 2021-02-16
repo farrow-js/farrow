@@ -1,12 +1,12 @@
 import { cosmiconfig } from 'cosmiconfig'
 import { ServerBundlerOptions } from './bundler/server'
-import { CreateApiClientsOptions } from './api-client'
+import { ApiClientOptions } from './api-client'
 
 export const explorer = cosmiconfig('farrow')
 
 export type Config = {
-  server?: ServerBundlerOptions | false
-  api?: CreateApiClientsOptions | false
+  server?: ServerBundlerOptions | ServerBundlerOptions[] | false
+  api?: ApiClientOptions | ApiClientOptions[] | false
 }
 
 export type GetConfigOptions = {

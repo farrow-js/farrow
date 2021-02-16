@@ -1,5 +1,5 @@
-import * as Schema from 'farrow-schema'
-import { createTransformer, TransformRule, TransformContext } from 'farrow-schema/transformer'
+import * as Schema from './schema'
+import { createTransformer, TransformRule, TransformContext } from './transformer'
 
 export type FormatField = {
   typeId: number

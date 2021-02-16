@@ -1,5 +1,5 @@
 import { toSchemaCtor, SchemaCtorInput } from 'farrow-schema'
-import { FormatTypes, createSchemaFormater, FormatField, FormatType, FormatObjectType } from './formater'
+import { FormatTypes, createSchemaFormater, FormatField, FormatType, FormatObjectType } from 'farrow-schema/formater'
 import { ApiType, ApiEntries, getContentType, getTypeDescription, getTypeDeprecated, Typable } from './api'
 
 export type FormatApi = {

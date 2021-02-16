@@ -1,4 +1,4 @@
-import { FormatType, FormatTypes, getTypeName, isInlineType } from './formater'
+import { FormatType, FormatTypes, getTypeName, isInlineType } from 'farrow-schema/formater'
 import { FormatEntries, FormatResult, FormatApi } from './toJSON'
 
 const transformComment = (text: string) => {

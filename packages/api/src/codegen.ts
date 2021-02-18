@@ -188,6 +188,7 @@ export const codegen = (formatResult: FormatResult, options?: CodegenOptions): s
       }
       return `${key}: ${handleEntries(field, [...path, key])}`
     })
+
     return `{ ${fields.join(',\n')} }`
   }
 

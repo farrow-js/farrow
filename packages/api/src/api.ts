@@ -4,7 +4,7 @@ export type MaybeReturnPromise<T extends (...args: any) => any> = T extends (...
   ? T | ((...args: Args) => Promise<Return>)
   : never
 
-export type Typable<T = unknown> =
+export type Typeable<T = unknown> =
   | T
   | {
       [Type]: T
@@ -12,31 +12,31 @@ export type Typable<T = unknown> =
       deprecated?: string
     }
 
-export const getContentType = <T extends Typable>(typable: T): TypeOfTypable<T> => {
-  return typable[Type] ?? typable
+export const getContentType = <T extends Typeable>(typeable: T): TypeOfTypeable<T> => {
+  return typeable[Type] ?? typeable
 }
 
-export const getTypeDescription = (typable: Typable<any>): string | undefined => {
-  return (typable as any)?.description
+export const getTypeDescription = (typeable: Typeable<any>): string | undefined => {
+  return (typeable as any)?.description
 }
 
-export const getTypeDeprecated = (typable: Typable<any>): string | undefined => {
-  return (typable as any)?.depcreated
+export const getTypeDeprecated = (typeable: Typeable<any>): string | undefined => {
+  return (typeable as any)?.depcreated
 }
 
-type TypeOfTypable<T extends Typable> = T extends Typable<infer U> ? U : never
+type TypeOfTypeable<T extends Typeable> = T extends Typeable<infer U> ? U : never
 
 export type ApiDefinition<T extends SchemaCtorInput = any> = {
-  input: Typable<T>
-  output: Typable<T>
+  input: Typeable<T>
+  output: Typeable<T>
   description?: string
   deprecated?: string
 }
 
-type RawTypeOfTypable<T extends Typable<SchemaCtorInput>> = Prettier<TypeOf<ToSchemaCtor<TypeOfTypable<T>>>>
+type RawTypeOfTypeable<T extends Typeable<SchemaCtorInput>> = Prettier<TypeOf<ToSchemaCtor<TypeOfTypeable<T>>>>
 
 export type TypeOfApiDefinition<T extends ApiDefinition> = MaybeReturnPromise<
-  (input: Prettier<RawTypeOfTypable<T['input']>>) => RawTypeOfTypable<T['output']>
+  (input: Prettier<RawTypeOfTypeable<T['input']>>) => RawTypeOfTypeable<T['output']>
 >
 
 export type ApiType<T extends ApiDefinition = ApiDefinition> = TypeOfApiDefinition<T> & {
@@ -58,8 +58,5 @@ export function createApi<T extends ApiDefinition>(api: T, fn: TypeOfApiDefiniti
 export const Api = createApi
 
 export type ApiEntries = {
-  description?: string
-  deprecated?: string
-} & {
   [key: string]: ApiType | ApiEntries
 }

@@ -1,6 +1,6 @@
 import { toSchemaCtor, SchemaCtorInput } from 'farrow-schema'
 import { FormatTypes, formatSchema, FormatField, FormatType } from 'farrow-schema/formater'
-import { ApiType, ApiEntries, getContentType, getTypeDescription, getTypeDeprecated, Typable } from './api'
+import { ApiType, ApiEntries, getContentType, getTypeDescription, getTypeDeprecated, Typeable } from './api'
 
 export type FormatApi = {
   type: 'Api'
@@ -12,8 +12,6 @@ export type FormatApi = {
 
 export type FormatEntries = {
   type: 'Entries'
-  description?: string
-  deprecated?: string
   entries: {
     [key: string]: FormatApi | FormatEntries
   }
@@ -45,23 +43,23 @@ export const toJSON = (apiEntries: ApiEntries): FormatResult => {
     writerCache: new WeakMap(),
   }
 
-  let formatTypable = (typable: Typable<SchemaCtorInput>): FormatField => {
-    let SchemaCtor = toSchemaCtor(getContentType(typable))
+  let formatTypeable = (typeable: Typeable<SchemaCtorInput>): FormatField => {
+    let SchemaCtor = toSchemaCtor(getContentType(typeable))
     let formatResult = formatSchema(SchemaCtor, context)
 
     return {
       typeId: formatResult.typeId,
       $ref: `#/types/${formatResult.typeId}`,
-      description: getTypeDescription(typable),
-      deprecated: getTypeDeprecated(typable),
+      description: getTypeDescription(typeable),
+      deprecated: getTypeDeprecated(typeable),
     }
   }
 
   let formatApiType = (apiType: ApiType): FormatApi => {
     let formatEntry: FormatApi = {
       type: 'Api' as const,
-      input: formatTypable(apiType.definition.input),
-      output: formatTypable(apiType.definition.output),
+      input: formatTypeable(apiType.definition.input),
+      output: formatTypeable(apiType.definition.output),
       description: apiType.definition.description,
       deprecated: apiType.definition.deprecated,
     }
@@ -72,8 +70,6 @@ export const toJSON = (apiEntries: ApiEntries): FormatResult => {
   let formatApiEntries = (apiEntries: ApiEntries): FormatEntries => {
     let entries: FormatEntries['entries'] = {}
     let formatEntries: FormatEntries = {
-      description: apiEntries.description,
-      deprecated: apiEntries.deprecated,
       type: 'Entries',
       entries,
     }

@@ -29,6 +29,7 @@
   },
   "devDependencies": {
     "@types/lodash.get": "^4.4.6",
+    "farrow-pipeline": "^1.5.3",
     "farrow-schema": "^1.5.3",
     "farrow-api": "^1.5.3",
     "farrow-http": "^1.5.3"

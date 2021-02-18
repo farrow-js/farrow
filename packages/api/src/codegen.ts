@@ -44,7 +44,7 @@ const getFieldType = (typeId: number, types: FormatTypes): string => {
     return 'any'
   }
 
-  if (fieldType.type === 'JSON') {
+  if (fieldType.type === 'Json') {
     return 'JsonType'
   }
 

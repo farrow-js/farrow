@@ -1,5 +1,5 @@
 import { toSchemaCtor, SchemaCtorInput } from 'farrow-schema'
-import { FormatTypes, createSchemaFormater, FormatField, FormatType, FormatObjectType } from 'farrow-schema/formater'
+import { FormatTypes, formatSchema, FormatField, FormatType } from 'farrow-schema/formater'
 import { ApiType, ApiEntries, getContentType, getTypeDescription, getTypeDeprecated, Typable } from './api'
 
 export type FormatApi = {
@@ -34,14 +34,9 @@ export const toJSON = (apiEntries: ApiEntries): FormatResult => {
 
   let uid = 0
 
-  let objectTypeList = [] as FormatObjectType[]
-
   let addType = (type: FormatType): number => {
     let id = uid++
     types[`${id}`] = type
-    if (type.type === 'Object') {
-      objectTypeList.push(type)
-    }
     return id
   }
 
@@ -52,7 +47,7 @@ export const toJSON = (apiEntries: ApiEntries): FormatResult => {
 
   let formatTypable = (typable: Typable<SchemaCtorInput>): FormatField => {
     let SchemaCtor = toSchemaCtor(getContentType(typable))
-    let formatResult = createSchemaFormater(SchemaCtor, context)
+    let formatResult = formatSchema(SchemaCtor, context)
 
     return {
       typeId: formatResult.typeId,
@@ -99,12 +94,6 @@ export const toJSON = (apiEntries: ApiEntries): FormatResult => {
     protocol: 'Farrow-API',
     types,
     entries: formatApiEntries(apiEntries),
-  }
-
-  // trigger all lazy fields to expand formatResult.types
-  while (objectTypeList.length) {
-    let objectType = objectTypeList.shift()
-    objectType?.fields
   }
 
   return formatResult

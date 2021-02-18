@@ -21,7 +21,7 @@ export const getTypeDescription = (typeable: Typeable<any>): string | undefined 
 }
 
 export const getTypeDeprecated = (typeable: Typeable<any>): string | undefined => {
-  return (typeable as any)?.depcreated
+  return (typeable as any)?.deprecated
 }
 
 type TypeOfTypeable<T extends Typeable> = T extends Typeable<infer U> ? U : never

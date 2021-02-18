@@ -3,7 +3,7 @@ import { createTransformer, TransformRule, TransformContext } from './transforme
 
 export type FormatField = {
   typeId: number
-  $ref?: string
+  $ref: string
   description?: string
   deprecated?: string
 }
@@ -19,7 +19,7 @@ export type FormatInlineTypes =
   | FormatStringType
   | FormatIDType
   | FormatBooleanType
-  | FormatJSONType
+  | FormatJsonType
   | FormatAnyType
   | FormatUnknownType
   | FormatRecordType
@@ -93,8 +93,8 @@ export type FormatBooleanType = {
   type: 'Boolean'
 }
 
-export type FormatJSONType = {
-  type: 'JSON'
+export type FormatJsonType = {
+  type: 'Json'
 }
 
 export type FormatAnyType = {
@@ -113,29 +113,29 @@ export type FormatLiteralType = {
 export type FormatRecordType = {
   type: 'Record'
   valueTypeId: number
-  $ref?: string
+  $ref: string
 }
 
 export type FormatListType = {
   type: 'List'
   itemTypeId: number
-  $ref?: string
+  $ref: string
 }
 
 export type FormatNullableType = {
   type: 'Nullable'
   itemTypeId: number
-  $ref?: string
+  $ref: string
 }
 
 export type FormatUnionType = {
   type: 'Union'
-  itemTypes: { typeId: number; $ref?: string }[]
+  itemTypes: { typeId: number; $ref: string }[]
 }
 
 export type FormatIntersectType = {
   type: 'Intersect'
-  itemTypes: { typeId: number; $ref?: string }[]
+  itemTypes: { typeId: number; $ref: string }[]
 }
 
 export type FormatType =
@@ -153,7 +153,7 @@ export type FormatType =
   | FormatLiteralType
   | FormatNullableType
   | FormatIntType
-  | FormatJSONType
+  | FormatJsonType
   | FormatNumberType
   | FormatIntersectType
 
@@ -198,34 +198,50 @@ export const createFormater = <S extends Schema.SchemaCtor, Context extends Form
   return writer
 }
 
-export const createSchemaFormater = <S extends Schema.SchemaCtor, Context extends FormaterContext = FormaterContext>(
+export const formatSchema = <S extends Schema.SchemaCtor, Context extends FormaterContext = FormaterContext>(
   SchemaCtor: S,
-  context?: TransformContext<Context, FormaterWriter>,
+  context?: TransformContext<Partial<Context>, FormaterWriter>,
 ) => {
   let types: FormatTypes = {}
   let uid = 0
 
+  let lazyTypeList = [] as (FormatStructType | FormatObjectType)[]
+
   let addType = (type: FormatType): number => {
+    if (type.type === 'Object' || type.type === 'Struct') {
+      lazyTypeList.push(type)
+    }
+
+    if (context?.addType) {
+      return context.addType(type)
+    }
+
     let id = uid++
     types[`${id}`] = type
     return id
   }
 
-  context = {
+  let finalContext = {
     writerCache: new WeakMap(),
-    addType,
     ...context,
+    addType,
   } as TransformContext<Context, FormaterWriter>
 
   let format = createFormater(SchemaCtor, {
-    ...context,
+    ...finalContext,
     rules: {
       ...defaultFormaterRules,
-      ...context?.rules,
+      ...finalContext?.rules,
     },
   })
 
   let typeId = format()
+
+  // trigger all lazy fields to expand formatResult.types
+  while (lazyTypeList.length) {
+    let objectType = lazyTypeList.shift()
+    objectType?.fields
+  }
 
   return {
     typeId,
@@ -448,11 +464,21 @@ const ObjectFormaterRule: FormaterRule<Schema.ObjectType | Schema.StructType> = 
       }
       return fields
     }
+    let isStruct = schema.constructor.name === 'Struct'
 
     return () => {
+      if (isStruct) {
+        return context.addType({
+          type: 'Struct',
+          get fields() {
+            return getFields()
+          },
+        })
+      }
+
       return context.addType({
         type: 'Object',
-        name: schema.constructor.name === 'Struct' ? '' : schema.constructor.name,
+        name: schema.constructor.name,
         get fields() {
           return getFields()
         },
@@ -548,7 +574,7 @@ const JsonFormaterRule: FormaterRule<Schema.Json> = {
   transform: (_schema, context) => {
     return () => {
       return context.addType({
-        type: 'JSON',
+        type: 'Json',
       })
     }
   },
@@ -562,6 +588,19 @@ const AnyFormaterRule: FormaterRule<Schema.Any> = {
     return () => {
       return context.addType({
         type: 'Any',
+      })
+    }
+  },
+}
+
+const UnknownFormaterRule: FormaterRule<Schema.Unknown> = {
+  test: (schema) => {
+    return schema instanceof Schema.Unknown
+  },
+  transform: (_schema, context) => {
+    return () => {
+      return context.addType({
+        type: 'Unknown',
       })
     }
   },
@@ -587,6 +626,7 @@ export const defaultFormaterRules = {
   NonStrict: NonStrictFormaterRule,
   ReadOnly: ReadOnlyFormaterRule,
   ReadOnlyDeep: ReadOnlyDeepFormaterRule,
+  Unknown: UnknownFormaterRule,
 }
 
 export type DefaultFormaterRules = typeof defaultFormaterRules

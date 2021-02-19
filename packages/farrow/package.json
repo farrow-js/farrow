@@ -32,6 +32,8 @@
     "@types/fs-extra": "^9.0.6",
     "farrow-http": "^1.5.3",
     "farrow-pipeline": "^1.5.3",
+    "farrow-api": "^1.5.3",
+    "farrow-api-server": "^1.5.3",
     "supertest": "^6.0.1"
   },
   "dependencies": {

@@ -17,8 +17,9 @@ const writeFile = async (filename: string, content: string) => {
 export type ApiClientOptions = {
   src: string
   dist: string
-  codegen: CodegenOptions
+  codegen?: CodegenOptions
   pollingInterval?: number
+  logger?: false | ((options: ApiClientOptions) => void)
   transform?: (source: string) => string
   format?: (source: string) => string
 }
@@ -62,7 +63,7 @@ export const createApiClient = (options: ApiClientOptions) => {
     }
   }
 
-  let syncServer = async () => {
+  let sync = async () => {
     let result = await getIntrospection()
 
     if (!result) {
@@ -81,7 +82,14 @@ export const createApiClient = (options: ApiClientOptions) => {
       source = format(source)
     }
 
-    console.log(`synced`, config)
+    if (typeof config.logger === 'function') {
+      config.logger(options)
+    } else if (config.logger !== false) {
+      console.log(`synced`, {
+        src: config.src,
+        dist: config.dist,
+      })
+    }
 
     await writeFile(config.dist, source)
   }
@@ -90,7 +98,7 @@ export const createApiClient = (options: ApiClientOptions) => {
     stop()
     tid = setInterval(async () => {
       try {
-        await syncServer()
+        await sync()
       } catch (error) {
         console.log(error.stack)
       }
@@ -104,6 +112,7 @@ export const createApiClient = (options: ApiClientOptions) => {
   }
 
   return {
+    sync,
     start,
     stop,
   }
@@ -116,8 +125,13 @@ export type CreateApiClientsOptions = {
 export const createApiClients = (options: CreateApiClientsOptions) => {
   let clients = options.services.map(createApiClient)
 
+  let sync = async () => {
+    let promises = clients.map((client) => client.sync())
+    await Promise.all(promises)
+  }
+
   let start = () => {
-    clients.map((syncer) => syncer.start())
+    clients.map((client) => client.start())
   }
 
   let stop = () => {
@@ -125,6 +139,7 @@ export const createApiClients = (options: CreateApiClientsOptions) => {
   }
 
   return {
+    sync,
     start,
     stop,
   }

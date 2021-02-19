@@ -1,4 +1,5 @@
 import { Http, Response } from 'farrow-http'
+import { service } from './api'
 
 export const http = Http({
   logger: false,
@@ -23,3 +24,5 @@ http.get('/env').use(() => {
     env: process.env,
   })
 })
+
+http.route('/api').use(service)

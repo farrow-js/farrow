@@ -26,9 +26,15 @@ const getErrorMessage = (error: ValidationError) => {
 
 export type CreateApiServiceOptions = {
   entries: ApiEntries
+  errorStack?: boolean
 }
 
 export const createApiService = (options: CreateApiServiceOptions): ApiServiceType => {
+  let isNotProduction = process.env.NODE_ENV !== 'production'
+  let config = {
+    errorStack: isNotProduction,
+    ...options,
+  }
   let { entries } = options
 
   let router = Router()
@@ -121,7 +127,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
         output: outputResult.value,
       })
     } catch (error) {
-      let message = (process.env.NODE_ENV !== 'production' ? error?.stack || error?.message : error?.message) ?? ''
+      let message = (config.errorStack ? error?.stack || error?.message : error?.message) ?? ''
       return Response.json({
         error: { message },
       })

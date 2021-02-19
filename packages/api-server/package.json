@@ -29,10 +29,12 @@
   },
   "devDependencies": {
     "@types/lodash.get": "^4.4.6",
+    "@types/supertest": "^2.0.10",
     "farrow-pipeline": "^1.5.3",
     "farrow-schema": "^1.5.3",
     "farrow-api": "^1.5.3",
-    "farrow-http": "^1.5.3"
+    "farrow-http": "^1.5.3",
+    "supertest": "^6.0.1"
   },
   "dependencies": {
     "tslib": "^2.1.0",

@@ -3,39 +3,84 @@ import { Api } from '../api'
 import { toJSON } from '../toJSON'
 import { codegen } from '../codegen'
 import { format } from '../prettier'
-import { ObjectType } from 'farrow-schema'
+import {
+  Any,
+  Float,
+  ID,
+  Int,
+  Intersect,
+  Json,
+  List,
+  Literal,
+  Nullable,
+  ObjectType,
+  Record,
+  Struct,
+  Type,
+  Union,
+  Unknown,
+} from 'farrow-schema'
 
-class Count extends ObjectType {
-  count = Number
+class Collection extends ObjectType {
+  number = Number
+  int = Int
+  float = Float
+  string = String
+  boolean = Boolean
+  id = ID
+  nest = Nullable(Collection)
+  list = List(Collection)
+  struct = Struct({
+    a: Int,
+  })
+  union = Union(Int, String, Boolean)
+  intersect = Intersect(
+    {
+      a: Int,
+    },
+    {
+      b: Float,
+    },
+    {
+      c: Number,
+    },
+  )
+  any = Any
+  unknown = Unknown
+  json = Json
+  literal = Union(Literal(1), Literal('1'), Literal(false), Literal(null))
+  record = Record(Collection)
+
+  describable = {
+    description: 'test description',
+    deprecated: 'test deprecated',
+    [Type]: Int,
+  }
 }
 
-let incre = Api(
+let methodA = Api(
   {
-    input: Count,
-    output: Count,
+    input: Collection,
+    output: Collection,
   },
-  (input) => {
-    return {
-      count: input.count + 1,
-    }
+  () => {
+    throw new Error('No Implementation')
   },
 )
 
-let decre = Api(
+let methodB = Api(
   {
-    input: Count,
-    output: Count,
+    input: Collection,
+    output: Collection,
   },
-  (input) => {
-    return {
-      count: input.count - 1,
-    }
+  () => {
+    throw new Error('No Implementation')
   },
 )
 
 let entries = {
-  incre,
-  decre,
+  methodA,
+  methodB,
 }
 
 describe('codegen', () => {

@@ -46,7 +46,7 @@ export const InlineTypes = [
   'String',
   'ID',
   'Boolean',
-  'JSON',
+  'Json',
   'Any',
   'Unknown',
   'Literal',
@@ -144,8 +144,13 @@ const getFieldType = (typeId: number, types: FormatTypes): string => {
     return `Record<string, ${getFieldType(fieldType.valueTypeId, types)}>`
   }
 
+  /**
+   * unknown type for provider/server will be unknown
+   * but unknown type for consumer/client should be any type
+   * because consumers can pass any value to the server, and the server should detect what type it is.
+   */
   if (fieldType.type === 'Unknown') {
-    return 'unknown'
+    return 'any'
   }
 
   if (fieldType.type === 'Literal') {

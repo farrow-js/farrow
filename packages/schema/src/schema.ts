@@ -344,7 +344,7 @@ export const ReadOnly = <T extends SchemaCtorInput>(Item: T) => {
 export abstract class ReadOnlyDeepType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<
   MarkReadOnlyDeep<TypeOf<ToSchemaCtor<T>>>
 > {
-  __kind = kind('ReadOnly')
+  __kind = kind('ReadOnlyDeep')
   abstract Item: ToSchemaCtor<T>
 }
 

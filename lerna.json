@@ -1,4 +1,4 @@
 {
-  "packages": ["packages/*"],
+  "packages": ["packages/*", "examples/*"],
   "version": "1.5.3"
 }

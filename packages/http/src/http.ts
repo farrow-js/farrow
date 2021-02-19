@@ -93,6 +93,7 @@ export type HttpPipelineOptions = {
     basename: string
   }) => ContextStorage | Promise<ContextStorage>
   logger?: boolean | LoggerOptions
+  errorStack?: boolean
 }
 
 export type HttpPipeline = RouterPipeline & {
@@ -102,8 +103,10 @@ export type HttpPipeline = RouterPipeline & {
 }
 
 export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline => {
+  let isNotProduction = process.env.NODE_ENV !== 'production'
   let config: HttpPipelineOptions = {
-    logger: process.env.NODE_ENV !== 'production',
+    logger: isNotProduction,
+    errorStack: isNotProduction,
     ...options,
   }
 
@@ -211,7 +214,7 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
     try {
       return await handleRequest(req, res)
     } catch (error) {
-      let message = (process.env.NODE_ENV !== 'production' ? error?.stack || error?.message : error?.message) ?? ''
+      let message = (config.errorStack ? error?.stack || error?.message : error?.message) ?? ''
 
       if (!res.headersSent) {
         res.statusCode = error.statusCode ?? 500

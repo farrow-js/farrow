@@ -1,12 +1,80 @@
-import { FormatType, FormatTypes, getTypeName, isInlineType } from 'farrow-schema/formater'
+import {
+  FormatAnyType,
+  FormatBooleanType,
+  FormatFields,
+  FormatFloatType,
+  FormatIDType,
+  FormatIntersectType,
+  FormatIntType,
+  FormatJsonType,
+  FormatListType,
+  FormatLiteralType,
+  FormatNullableType,
+  FormatNumberType,
+  FormatRecordType,
+  FormatStringType,
+  FormatStructType,
+  FormatType,
+  FormatTypes,
+  FormatUnionType,
+  FormatUnknownType,
+} from 'farrow-schema/formater'
 import { FormatEntries, FormatResult, FormatApi } from './toJSON'
+
+export type FormatInlineTypes =
+  | FormatNumberType
+  | FormatIntType
+  | FormatFloatType
+  | FormatStringType
+  | FormatIDType
+  | FormatBooleanType
+  | FormatJsonType
+  | FormatAnyType
+  | FormatUnknownType
+  | FormatRecordType
+  | FormatLiteralType
+  | FormatNullableType
+  | FormatUnionType
+  | FormatIntersectType
+  | FormatListType
+  | FormatStructType
+
+export const InlineTypes = [
+  'Number',
+  'Int',
+  'Float',
+  'String',
+  'ID',
+  'Boolean',
+  'JSON',
+  'Any',
+  'Unknown',
+  'Literal',
+  'Nullable',
+  'List',
+  'Union',
+  'Intersect',
+  'Record',
+  'Struct',
+]
+
+export const isInlineType = (input: FormatType): input is FormatInlineTypes => {
+  return InlineTypes.includes(input?.type ?? '')
+}
+
+const getTypeName = (input: FormatType): string | null => {
+  if (input.type === 'Object' && input.name) {
+    return input.name
+  }
+  return null
+}
 
 const transformComment = (text: string) => {
   return text
     .split('\n')
     .map((item) => item.trim())
     .filter(Boolean)
-    .join('\n*\n*')
+    .join('\n*\n* ')
 }
 
 const attachComment = (result: string, options: { [key: string]: string | undefined }) => {
@@ -90,7 +158,7 @@ const getFieldType = (typeId: number, types: FormatTypes): string => {
   }
 
   if (fieldType.type === 'List') {
-    return `Array<${getFieldType(fieldType.itemTypeId, types)}>`
+    return `(${getFieldType(fieldType.itemTypeId, types)})[]`
   }
 
   if (fieldType.type === 'Union') {
@@ -101,7 +169,24 @@ const getFieldType = (typeId: number, types: FormatTypes): string => {
     return fieldType.itemTypes.map((itemType) => getFieldType(itemType.typeId, types)).join(' & ')
   }
 
+  if (fieldType.type === 'Struct') {
+    return `{
+      ${getFieldsType(fieldType.fields, types).join(',\n')}
+    }`
+  }
+
   throw new Error(`Unsupported field: ${JSON.stringify(fieldType, null, 2)}`)
+}
+
+const getFieldsType = (fields: FormatFields, types: FormatTypes): string[] => {
+  return Object.entries(fields).map(([key, field]) => {
+    let result = `${key}: ${getFieldType(field.typeId, types)}`
+
+    return attachComment(result, {
+      remarks: field.description,
+      deprecated: field.deprecated,
+    })
+  })
 }
 
 export type CodegenOptions = {
@@ -116,42 +201,27 @@ export const codegen = (formatResult: FormatResult, options?: CodegenOptions): s
 
   let exportSet = new Set<string>()
 
-  let handleType = (typeId: string, formatType: FormatType) => {
+  let handleType = (formatType: FormatType): string => {
     if (isInlineType(formatType)) {
       return ''
     }
 
-    if (formatType.type === 'Object' || formatType.type === 'Struct') {
-      let fileds = Object.entries(formatType.fields).map(([key, field]) => {
-        let result = `${key}: ${getFieldType(field.typeId, formatResult.types)}`
+    if (formatType.type === 'Object') {
+      let typeName = formatType.name
+      let fields = getFieldsType(formatType.fields, formatResult.types)
 
-        return attachComment(result, {
-          remarks: field.description,
-          depcreated: field.deprecated,
-        })
-      })
-
-      let typeName = getTypeName(formatType)
-
-      if (typeName) {
-        if (exportSet.has(typeName)) {
-          throw new Error(`Duplicate Object type name: ${typeName}`)
-        }
-
-        exportSet.add(typeName)
-
-        return `
-        /**
-         * {@label ${typeName}} 
-         */
-        export type ${typeName} = {
-          ${fileds.join(',  \n')}
-        }
-        `
+      if (exportSet.has(typeName)) {
+        throw new Error(`Duplicate Object type name: ${typeName}`)
       }
 
-      return `type ${getTypeNameById(typeId)} = {
-        ${fileds.join(',  \n')}
+      exportSet.add(typeName)
+
+      return `
+      /**
+       * {@label ${typeName}} 
+       */
+      export type ${typeName} = {
+        ${fields.join(',  \n')}
       }
       `
     }
@@ -160,30 +230,27 @@ export const codegen = (formatResult: FormatResult, options?: CodegenOptions): s
   }
 
   let handleTypes = (formatTypes: FormatTypes) => {
-    return Object.entries(formatTypes).map(([typeId, formatType]) => {
-      return handleType(typeId, formatType)
-    })
+    return Object.values(formatTypes).map((formatType) => handleType(formatType))
   }
 
   let handleApi = (api: FormatApi, path: string[]) => {
     let inputType = getFieldType(api.input.typeId, formatResult.types)
     let outputType = getFieldType(api.output.typeId, formatResult.types)
-    let sourceText = `
-    (input: ${inputType}) => options.fetcher({ path: ${JSON.stringify(path)}, input }) as Promise<${outputType}>
+    return `
+      (input: ${inputType}) => options.fetcher({ path: ${JSON.stringify(path)}, input }) as Promise<${outputType}>
     `
-    return { inputType, outputType, sourceText }
   }
 
   let handleEntries = (entries: FormatEntries, path: string[] = []): string => {
     let fields = Object.entries(entries.entries).map(([key, field]) => {
       if (field.type === 'Api') {
-        let { sourceText, inputType, outputType } = handleApi(field, [...path, key])
+        let sourceText = handleApi(field, [...path, key])
         let result = `${key}: ${sourceText}`
         return attachComment(result, {
           remarks: field.description,
-          depcreated: field.deprecated,
-          [`param input -`]: inputType,
-          returns: outputType,
+          deprecated: field.deprecated,
+          [`param input -`]: field.input.description,
+          returns: field.output.description,
         })
       }
       return `${key}: ${handleEntries(field, [...path, key])}`

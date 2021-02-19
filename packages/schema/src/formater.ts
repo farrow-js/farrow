@@ -12,52 +12,6 @@ export type FormatFields = {
   [key: string]: FormatField
 }
 
-export type FormatInlineTypes =
-  | FormatNumberType
-  | FormatIntType
-  | FormatFloatType
-  | FormatStringType
-  | FormatIDType
-  | FormatBooleanType
-  | FormatJsonType
-  | FormatAnyType
-  | FormatUnknownType
-  | FormatRecordType
-  | FormatLiteralType
-  | FormatNullableType
-  | FormatUnionType
-  | FormatIntersectType
-  | FormatListType
-
-export const InlineTypes = [
-  'Number',
-  'Int',
-  'Float',
-  'String',
-  'ID',
-  'Boolean',
-  'JSON',
-  'Any',
-  'Unknown',
-  'Literal',
-  'Nullable',
-  'List',
-  'Union',
-  'Intersect',
-  'Record',
-]
-
-export const isInlineType = (input: FormatType): input is FormatInlineTypes => {
-  return InlineTypes.includes(input?.type ?? '')
-}
-
-export const getTypeName = (input: FormatType): string | null => {
-  if (input.type === 'Object' && input.name) {
-    return input.name
-  }
-  return null
-}
-
 export type FormatObjectType = {
   type: 'Object'
   name: string

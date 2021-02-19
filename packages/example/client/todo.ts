@@ -33,6 +33,24 @@ export type AddTodoOutput = {
 }
 
 /**
+ * {@label Todo}
+ */
+export type Todo = {
+  /**
+   * @remarks Todo id
+   */
+  id: number
+  /**
+   * @remarks Todo content
+   */
+  content: string
+  /**
+   * @remarks Todo status
+   */
+  completed: boolean
+}
+
+/**
  * {@label RemoveTodoInput}
  */
 export type RemoveTodoInput = {
@@ -52,24 +70,6 @@ export type RemoveTodoOuput = {
   todos: Todo[]
 }
 
-/**
- * {@label Todo}
- */
-export type Todo = {
-  /**
-   * @remarks Todo id
-   */
-  id: number
-  /**
-   * @remarks Todo content
-   */
-  content: string
-  /**
-   * @remarks Todo status
-   */
-  completed: boolean
-}
-
 export type CreateApiClientOptions = {
   /**
    * a fetcher for api-client
@@ -81,14 +81,10 @@ export const createApiClient = (options: CreateApiClientOptions) => {
   return {
     /**
      * @remarks add todo
-     * @param input - AddTodoInput
-     * @returns AddTodoOutput
      */
     addTodo: (input: AddTodoInput) => options.fetcher({ path: ['addTodo'], input }) as Promise<AddTodoOutput>,
     /**
      * @remarks remove todo
-     * @param input - RemoveTodoInput
-     * @returns RemoveTodoOuput
      */
     removeTodo: (input: RemoveTodoInput) =>
       options.fetcher({ path: ['removeTodo'], input }) as Promise<RemoveTodoOuput>,

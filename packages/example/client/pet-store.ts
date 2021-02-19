@@ -23,6 +23,37 @@ export type AddPetInput = {
 }
 
 /**
+ * {@label Pet}
+ */
+export type Pet = {
+  id: number
+  category: Category
+  name: string
+  photoUrls: string[]
+  tags: Tag[]
+  /**
+   * @remarks pet status in the store
+   */
+  status: 'available' | 'pending' | 'Sold'
+}
+
+/**
+ * {@label Category}
+ */
+export type Category = {
+  id: number
+  name: string
+}
+
+/**
+ * {@label Tag}
+ */
+export type Tag = {
+  id: number
+  name: string
+}
+
+/**
  * {@label InvalidInput}
  */
 export type InvalidInput = {
@@ -156,6 +187,21 @@ export type PlaceOrderInput = {
 }
 
 /**
+ * {@label Order}
+ */
+export type Order = {
+  id: number
+  petId: number
+  quantity: number
+  shipDate: number
+  /**
+   * @remarks Order Status
+   */
+  status: 'placed' | 'approved' | 'delivered'
+  complete: boolean
+}
+
+/**
  * {@label InvalidOrder}
  */
 export type InvalidOrder = {
@@ -215,8 +261,6 @@ export type DeleteOrderOutput = {
   orderId: number
 }
 
-type Type33 = {}
-
 /**
  * {@label GetInventoryOutput}
  */
@@ -232,6 +276,23 @@ export type CreateUsersWithArrayInput = {
    * @remarks List of user object
    */
   body: User[]
+}
+
+/**
+ * {@label User}
+ */
+export type User = {
+  id: number
+  userName: string
+  firstName: string
+  lastName: string
+  email: string
+  password: string
+  phone: string
+  /**
+   * @remarks User Status
+   */
+  userStatus: number
 }
 
 /**
@@ -354,12 +415,6 @@ export type LoginUserOutput = {
   user: User
 }
 
-type Type52 = {}
-
-type Type53 = {
-  username: string
-}
-
 /**
  * {@label CreateUserInput}
  */
@@ -378,69 +433,6 @@ export type CreateUserOutput = {
   user: User
 }
 
-/**
- * {@label Pet}
- */
-export type Pet = {
-  id: number
-  category: Category
-  name: string
-  photoUrls: string[]
-  tags: Tag[]
-  /**
-   * @remarks pet status in the store
-   */
-  status: 'available' | 'pending' | 'Sold'
-}
-
-/**
- * {@label Order}
- */
-export type Order = {
-  id: number
-  petId: number
-  quantity: number
-  shipDate: number
-  /**
-   * @remarks Order Status
-   */
-  status: 'placed' | 'approved' | 'delivered'
-  complete: boolean
-}
-
-/**
- * {@label User}
- */
-export type User = {
-  id: number
-  userName: string
-  firstName: string
-  lastName: string
-  email: string
-  password: string
-  phone: string
-  /**
-   * @remarks User Status
-   */
-  userStatus: number
-}
-
-/**
- * {@label Category}
- */
-export type Category = {
-  id: number
-  name: string
-}
-
-/**
- * {@label Tag}
- */
-export type Tag = {
-  id: number
-  name: string
-}
-
 export type CreateApiClientOptions = {
   /**
    * a fetcher for api-client
@@ -453,15 +445,11 @@ export const createApiClient = (options: CreateApiClientOptions) => {
     pet: {
       /**
        * @remarks Add a new pet to the store
-       * @param input - AddPetInput
-       * @returns InvalidInput | AddPetOutput
        */
       addPet: (input: AddPetInput) =>
         options.fetcher({ path: ['pet', 'addPet'], input }) as Promise<InvalidInput | AddPetOutput>,
       /**
        * @remarks Update an existing pet
-       * @param input - UpdatePetInput
-       * @returns InvalidIDSupplied | PetNotFound | ValidationException | UpdatePetOutput
        */
       updatePet: (input: UpdatePetInput) =>
         options.fetcher({ path: ['pet', 'updatePet'], input }) as Promise<
@@ -469,8 +457,6 @@ export const createApiClient = (options: CreateApiClientOptions) => {
         >,
       /**
        * @remarks Deletes a pet
-       * @param input - DeletePetInput
-       * @returns InvalidIDSupplied | PetNotFound | DeletePetOutput
        */
       deletePet: (input: DeletePetInput) =>
         options.fetcher({ path: ['pet', 'deletePet'], input }) as Promise<
@@ -479,9 +465,7 @@ export const createApiClient = (options: CreateApiClientOptions) => {
       /**
        * @remarks Finds Pets by status
        *
-       *Multiple status values can be provided with comma separated strings
-       * @param input - FindPetByStatusInput
-       * @returns InvalidPetStatus | FindPetByStatusOutput
+       * Multiple status values can be provided with comma separated strings
        */
       findPetByStatus: (input: FindPetByStatusInput) =>
         options.fetcher({ path: ['pet', 'findPetByStatus'], input }) as Promise<
@@ -490,9 +474,7 @@ export const createApiClient = (options: CreateApiClientOptions) => {
       /**
        * @remarks Finds Pets by tags
        *
-       *Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
-       * @param input - FindPetByStatusInput
-       * @returns InvalidPetTagValue | FindPetByStatusOutput
+       * Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
        */
       findPetsByTags: (input: FindPetByStatusInput) =>
         options.fetcher({ path: ['pet', 'findPetsByTags'], input }) as Promise<
@@ -501,9 +483,7 @@ export const createApiClient = (options: CreateApiClientOptions) => {
       /**
        * @remarks Find pet by ID
        *
-       *Returns a single pet
-       * @param input - GetPetByIdInput
-       * @returns InvalidIDSupplied | PetNotFound | GetPetByIdOutput
+       * Returns a single pet
        */
       getPetById: (input: GetPetByIdInput) =>
         options.fetcher({ path: ['pet', 'getPetById'], input }) as Promise<
@@ -513,17 +493,13 @@ export const createApiClient = (options: CreateApiClientOptions) => {
     store: {
       /**
        * @remarks Place an order for a pet
-       * @param input - PlaceOrderInput
-       * @returns InvalidOrder | PlaceOrderOutput
        */
       placeOrder: (input: PlaceOrderInput) =>
         options.fetcher({ path: ['store', 'placeOrder'], input }) as Promise<InvalidOrder | PlaceOrderOutput>,
       /**
        * @remarks Find purchase order by ID
        *
-       *For valid response try integer IDs with value >= 1 and <= 10. Other values will generated exceptions
-       * @param input - GetOrderByIdInput
-       * @returns InvalidIDSupplied | OrderNotFound | GetOrderByIdOutput
+       * For valid response try integer IDs with value >= 1 and <= 10. Other values will generated exceptions
        */
       getOrderById: (input: GetOrderByIdInput) =>
         options.fetcher({ path: ['store', 'getOrderById'], input }) as Promise<
@@ -532,9 +508,7 @@ export const createApiClient = (options: CreateApiClientOptions) => {
       /**
        * @remarks Delete purchase order by ID
        *
-       *For valid response try integer IDs with positive integer value. Negative or non-integer values will generate API errors
-       * @param input - DeleteOrderInput
-       * @returns InvalidIDSupplied | OrderNotFound | DeleteOrderOutput
+       * For valid response try integer IDs with positive integer value. Negative or non-integer values will generate API errors
        */
       deleteOrder: (input: DeleteOrderInput) =>
         options.fetcher({ path: ['store', 'deleteOrder'], input }) as Promise<
@@ -543,25 +517,19 @@ export const createApiClient = (options: CreateApiClientOptions) => {
       /**
        * @remarks Returns pet inventories by status
        *
-       *Returns a map of status codes to quantities
-       * @param input - Type33
-       * @returns GetInventoryOutput
+       * Returns a map of status codes to quantities
        */
-      getInventory: (input: Type33) =>
+      getInventory: (input: {}) =>
         options.fetcher({ path: ['store', 'getInventory'], input }) as Promise<GetInventoryOutput>,
     },
     user: {
       /**
        * @remarks Creates list of users with given input array
-       * @param input - CreateUsersWithArrayInput
-       * @returns CreateUsersWithArrayOutput
        */
       createUsersWithArray: (input: CreateUsersWithArrayInput) =>
         options.fetcher({ path: ['user', 'createUsersWithArray'], input }) as Promise<CreateUsersWithArrayOutput>,
       /**
        * @remarks Get user by user name
-       * @param input - GetUserByNameInput
-       * @returns InvalidUserSupplied | UserNotFound | GetUserByNameOutput
        */
       getUserByName: (input: GetUserByNameInput) =>
         options.fetcher({ path: ['user', 'getUserByName'], input }) as Promise<
@@ -570,9 +538,7 @@ export const createApiClient = (options: CreateApiClientOptions) => {
       /**
        * @remarks Updated user
        *
-       *This can only be done by the logged in user.
-       * @param input - UpdateUserInput
-       * @returns InvalidUserSupplied | UserNotFound | UpdateUserOutput
+       * This can only be done by the logged in user.
        */
       updateUser: (input: UpdateUserInput) =>
         options.fetcher({ path: ['user', 'updateUser'], input }) as Promise<
@@ -581,16 +547,12 @@ export const createApiClient = (options: CreateApiClientOptions) => {
       /**
        * @remarks Delete user
        *
-       *This can only be done by the logged in user.
-       * @param input - DeleteUserInput
-       * @returns DeleteUserOutput
+       * This can only be done by the logged in user.
        */
       deleteUser: (input: DeleteUserInput) =>
         options.fetcher({ path: ['user', 'deleteUser'], input }) as Promise<DeleteUserOutput>,
       /**
        * @remarks Logs user into the system
-       * @param input - LoginUserInput
-       * @returns InvalidUsernameSupplied | InvalidPasswordSupplied | LoginUserOutput
        */
       loginUser: (input: LoginUserInput) =>
         options.fetcher({ path: ['user', 'loginUser'], input }) as Promise<
@@ -598,16 +560,17 @@ export const createApiClient = (options: CreateApiClientOptions) => {
         >,
       /**
        * @remarks Logs out current logged in user session
-       * @param input - Type52
-       * @returns Type53
        */
-      logoutUser: (input: Type52) => options.fetcher({ path: ['user', 'logoutUser'], input }) as Promise<Type53>,
+      logoutUser: (input: {}) =>
+        options.fetcher({ path: ['user', 'logoutUser'], input }) as Promise<{
+          username: string
+        }>,
       /**
        * @remarks Create user
        *
-       *This can only be done by the logged in user.
-       * @param input - CreateUserInput
-       * @returns CreateUserOutput
+       * This can only be done by the logged in user.
+       * @param input - user input
+       * @returns user output
        */
       createUser: (input: CreateUserInput) =>
         options.fetcher({ path: ['user', 'createUser'], input }) as Promise<CreateUserOutput>,

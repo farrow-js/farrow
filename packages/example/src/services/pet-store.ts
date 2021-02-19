@@ -130,7 +130,7 @@ export const addPet = Api(
     input: AddPetInput,
     output: Union(InvalidInput, AddPetOutput),
   },
-  (input) => {
+  (_input) => {
     throw new Error('No Implementation')
   },
 )
@@ -153,7 +153,7 @@ export const updatePet = Api(
     input: UpdatePetInput,
     output: Union(InvalidIDSupplied, PetNotFound, ValidationException, UpdatePetOutput),
   },
-  (input) => {
+  (_input) => {
     throw new Error('No Implementation')
   },
 )
@@ -179,7 +179,7 @@ export const findPetByStatus = Api(
     input: FindPetByStatusInput,
     output: Union(InvalidPetStatus, FindPetByStatusOutput),
   },
-  (input) => {
+  (_input) => {
     throw new Error('No Implementation')
   },
 )
@@ -210,7 +210,7 @@ export const findPetsByTags = Api(
     input: FindPetByStatusInput,
     output: Union(InvalidPetTagValue, FindPetByStatusOutput),
   },
-  (input) => {
+  (_input) => {
     throw new Error('No Implementation')
   },
 )
@@ -235,7 +235,7 @@ export const getPetById = Api(
     input: GetPetByIdInput,
     output: Union(InvalidIDSupplied, PetNotFound, GetPetByIdOutput),
   },
-  (input) => {
+  (_input) => {
     throw new Error('No Implementation')
   },
 )
@@ -260,7 +260,7 @@ export const deletePet = Api(
     input: DeletePetInput,
     output: Union(InvalidIDSupplied, PetNotFound, DeletePetOutput),
   },
-  (input) => {
+  (_input) => {
     throw new Error('No Implementation')
   },
 )
@@ -284,7 +284,7 @@ export const placeOrder = Api(
     input: PlaceOrderInput,
     output: Union(InvalidOrder, PlaceOrderOutput),
   },
-  (input) => {
+  (_input) => {
     throw new Error('No Implementation')
   },
 )
@@ -312,7 +312,7 @@ export const getOrderById = Api(
     input: GetOrderByIdInput,
     output: Union(InvalidIDSupplied, OrderNotFound, GetOrderByIdOutput),
   },
-  (input) => {
+  (_input) => {
     throw new Error('No Implementation')
   },
 )
@@ -341,7 +341,7 @@ export const deleteOrder = Api(
     input: DeleteOrderInput,
     output: Union(InvalidIDSupplied, OrderNotFound, DeleteOrderOutput),
   },
-  (input) => {
+  (_input) => {
     throw new Error('No Implementation')
   },
 )
@@ -362,7 +362,7 @@ export const getInventory = Api(
     input: {},
     output: GetInventoryOutput,
   },
-  (input) => {
+  (_input) => {
     throw new Error('No Implementation')
   },
 )
@@ -386,7 +386,7 @@ export const createUsersWithArray = Api(
     input: CreateUsersWithArrayInput,
     output: CreateUsersWithArrayOutput,
   },
-  (input) => {
+  (_input) => {
     throw new Error('No Implementation')
   },
 )
@@ -409,7 +409,7 @@ export const getUserByName = Api(
     input: GetUserByNameInput,
     output: Union(InvalidUserSupplied, UserNotFound, GetUserByNameOutput),
   },
-  (input) => {
+  (_input) => {
     throw new Error('No Implementation')
   },
 )
@@ -439,7 +439,7 @@ export const updateUser = Api(
     input: UpdateUserInput,
     output: Union(InvalidUserSupplied, UserNotFound, UpdateUserOutput),
   },
-  (input) => {
+  (_input) => {
     throw new Error('No Implementation')
   },
 )
@@ -468,7 +468,7 @@ export const deleteUser = Api(
     input: DeleteUserInput,
     output: DeleteUserOutput,
   },
-  (input) => {
+  (_input) => {
     throw new Error('No Implementation')
   },
 )
@@ -499,7 +499,7 @@ export const loginUser = Api(
     input: LoginUserInput,
     output: Union(InvalidUsernameSupplied, InvalidPasswordSupplied, LoginUserOutput),
   },
-  (input) => {
+  (_input) => {
     throw new Error('No Implementation')
   },
 )
@@ -512,7 +512,7 @@ export const logoutUser = Api(
       username: String,
     },
   },
-  (input) => {
+  (_input) => {
     throw new Error('No Implementation')
   },
 )
@@ -536,10 +536,16 @@ export const createUser = Api(
     Create user
     This can only be done by the logged in user.
   `,
-    input: CreateUserInput,
-    output: CreateUserOutput,
+    input: {
+      description: 'user input',
+      [Type]: CreateUserInput,
+    },
+    output: {
+      description: 'user output',
+      [Type]: CreateUserOutput,
+    },
   },
-  (input) => {
+  (_input) => {
     throw new Error('No Implementation')
   },
 )

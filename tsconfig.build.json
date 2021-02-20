@@ -13,5 +13,6 @@
     { "path": "./packages/api/tsconfig.json" },
     { "path": "./packages/api-server/tsconfig.json" },
     { "path": "./packages/farrow/tsconfig.json" }
-  ]
+  ],
+  "exclude": ["./examples/*"]
 }

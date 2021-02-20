@@ -1,28 +1,17 @@
-import { Int, Type } from 'farrow-schema'
-import { Api, isApi, getContentType, getTypeDescription, getTypeDeprecated } from '../api'
+import { Api } from '../api'
 import { toJSON } from '../toJSON'
 
 describe('toJSON', () => {
   it('work correctly', () => {
-    let incre = Api(
-      {
-        input: Number,
-        output: Number,
-      },
-      (input) => {
-        return input + 1
-      },
-    )
+    let incre = Api({
+      input: Number,
+      output: Number,
+    })
 
-    let decre = Api(
-      {
-        input: Number,
-        output: Number,
-      },
-      (input) => {
-        return input - 1
-      },
-    )
+    let decre = Api({
+      input: Number,
+      output: Number,
+    })
 
     let entries = {
       incre,

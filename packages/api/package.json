@@ -22,9 +22,11 @@
     "url": "git+https://github.com/Lucifier129/farrow.git"
   },
   "peerDependencies": {
+    "farrow-pipeline": "^1.5.3",
     "farrow-schema": "^1.5.3"
   },
   "devDependencies": {
+    "farrow-pipeline": "^1.5.3",
     "farrow-schema": "^1.5.3"
   },
   "dependencies": {

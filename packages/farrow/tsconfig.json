@@ -16,6 +16,9 @@
       "path": "../api/tsconfig.json"
     },
     {
+      "path": "../api-server/tsconfig.json"
+    },
+    {
       "path": "../schema/tsconfig.json"
     }
   ],

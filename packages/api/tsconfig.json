@@ -8,6 +8,9 @@
   "references": [
     {
       "path": "../schema/tsconfig.json"
+    },
+    {
+      "path": "../pipeline/tsconfig.json"
     }
   ],
   "include": ["src"]

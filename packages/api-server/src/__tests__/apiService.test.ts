@@ -44,7 +44,7 @@ const setCount = Api(
   },
   (input) => {
     count = input.newCount
-    return getCount()
+    return getCount({})
   },
 )
 

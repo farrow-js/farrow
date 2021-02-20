@@ -332,8 +332,14 @@ export const createRouterPipeline = (): RouterPipeline => {
   }
 
   let serve: RouterPipeline['serve'] = (name, dirname) => {
+    let getFilename = (filename: string): string => {
+      if (filename.endsWith('/')) {
+        return `${filename}index.html`
+      }
+      return filename
+    }
     route(name).use(async (request, next) => {
-      let filename = path.join(dirname, request.pathname)
+      let filename = path.join(dirname, getFilename(request.pathname))
       let isExist = await isFileExist(filename)
       if (isExist) {
         return Response.file(filename)

@@ -8,7 +8,7 @@ module.exports = createFarrowConfig({
       src: './server',
       dist: './dist/server',
       esbuild: {
-        external: [...Object.keys(pkg.dependencies)],
+        external: [...Object.keys(pkg.dependencies), ...Object.keys(pkg.devDependencies)],
       },
     },
   ],

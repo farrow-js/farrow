@@ -43,10 +43,11 @@
     "cosmiconfig": "^7.0.0",
     "cross-spawn": "^7.0.3",
     "node-fetch": "^2.6.1",
-    "esbuild": "0.8.33",
+    "esbuild": "^0.8.50",
     "fs-extra": "^9.1.0",
     "execa": "^5.0.0",
     "slash": "^3.0.0",
+    "read-pkg-up": "^7.0.1",
     "tslib": "^2.1.0",
     "yargs": "^15.3.1"
   }

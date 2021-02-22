@@ -3,24 +3,57 @@ import execa, { ExecaChildProcess } from 'execa'
 import { Plugin, startService, BuildOptions } from 'esbuild'
 import slash from 'slash'
 import fs from 'fs/promises'
+import readPkgUp from 'read-pkg-up'
 
 import { watchFiles } from '../util/watchFiles'
 import { join } from '../util/join'
 import { memo } from '../util/memo'
 
 export type BundlerOptions = {
+  /**
+   * auto add closest package.json dependenties to esbuild external or not
+   */
+  autoAddExternal?: boolean
   build: BuildOptions
 }
 
+const mergeList = <T>(...args: (undefined | T[])[]): T[] => {
+  let list = args.filter(Boolean) as T[][]
+  return ([] as T[]).concat(...list)
+}
+
+const safeGetKeys = (input: object | undefined): string[] => {
+  if (!input) return []
+  return Object.keys(input)
+}
+
 export const createBundler = (options: BundlerOptions) => {
+  let config = {
+    autoAddExternal: true,
+    ...options,
+  }
+
   let getService = memo(() => {
     return startService()
   })
 
   let getBuilder = memo(async () => {
     let service = await getService()
+    let pkgResult = await readPkgUp({
+      cwd: config.build.entryPoints?.[0],
+    })
+    let external = config.autoAddExternal
+      ? mergeList(
+          config.build.external,
+          safeGetKeys(pkgResult?.packageJson?.devDependencies),
+          safeGetKeys(pkgResult?.packageJson?.dependencies),
+          safeGetKeys(pkgResult?.packageJson?.peerDependencies),
+        )
+      : config.build.external
+
     let result = await service.build({
-      ...options.build,
+      ...config.build,
+      external,
       incremental: true,
     })
     return result.rebuild
@@ -78,6 +111,10 @@ export type ServerBundlerOptions = {
    * other options for esbuild
    */
   esbuild?: Omit<BuildOptions, 'entryPoints' | 'outdir' | 'outbase'>
+  /**
+   * auto add closest package.json dependenties to esbuild external or not
+   */
+  autoAddExternal?: boolean
 }
 
 export type StartOptions = {
@@ -92,6 +129,7 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
     src: 'src',
     dist: 'dist',
     nodeArgs: [],
+    autoAddExternal: true,
     ...options,
     esbuild: {
       sourcemap: true,
@@ -102,6 +140,7 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
   let srcEntry = join(config.src, config.entry)
   let distEntry = join(config.dist, config.entry).replace(/\.(tsx?)$/, '.js')
   let bundler = createBundler({
+    autoAddExternal: config.autoAddExternal,
     build: {
       ...config.esbuild,
       platform: 'node',
@@ -177,6 +216,7 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
       await stop()
     }
 
+    // eslint-disable-next-line require-atomic-updates
     isStarted = true
 
     let startConfig = {

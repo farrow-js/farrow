@@ -2,26 +2,20 @@
   "name": "test-react-vite",
   "version": "0.0.0",
   "scripts": {
-    "dev": "concurrently 'npm:farrow:dev' 'npm:vite:dev'",
-    "build": "concurrently 'npm:farrow:build' 'npm:vite:build'",
-    "start": "npm run farrow:start",
-    "farrow:dev": "farrow dev",
-    "farrow:build": "farrow build",
-    "farrow:start": "farrow start",
     "vite:dev": "vite",
-    "vite:build": "tsc && vite build",
-    "vite:serve": "vite preview"
+    "dev": "farrow dev",
+    "build": "tsc && vite build && farrow build",
+    "start": "farrow start",
+    "serve": "vite preview"
   },
   "dependencies": {
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
-    "farrow": "^1.5.3",
     "farrow-http": "^1.5.3",
     "farrow-pipeline": "^1.5.3",
     "farrow-schema": "^1.5.3",
     "farrow-api": "^1.5.3",
-    "farrow-api-server": "^1.5.3",
-    "farrow-cors": "^1.5.3"
+    "farrow-api-server": "^1.5.3"
   },
   "devDependencies": {
     "@types/react": "^17.0.0",
@@ -30,6 +24,7 @@
     "typescript": "^4.1.2",
     "vite": "^2.0.1",
     "farrow": "^1.5.3",
+    "farrow-vite": "^1.5.3",
     "concurrently": "^6.0.0"
   }
 }

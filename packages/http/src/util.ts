@@ -31,8 +31,8 @@ export const { access } = fs.promises
 
 export const { stat } = fs.promises
 
-export const isFileExist = (filename: string) => {
+export const getStats = (filename: string) => {
   return stat(filename)
-    .then((stats) => stats.isFile())
-    .catch(() => false)
+    .then((stats) => stats)
+    .catch(() => undefined)
 }

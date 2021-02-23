@@ -15,12 +15,35 @@ const writeFile = async (filename: string, content: string) => {
 }
 
 export type ApiClientOptions = {
+  /**
+   * http address of farrow-api
+   */
   src: string
+  /**
+   * file address of codegen target
+   */
   dist: string
+  /**
+   * codegen options
+   */
   codegen?: CodegenOptions
+  /**
+   * the interval of polling
+   * default value is 3000ms
+   */
   pollingInterval?: number
+  /**
+   * logger options for polling
+   */
   logger?: false | ((options: ApiClientOptions) => void)
+  /**
+   * transform source code received from server
+   * it's useful when need to attach custom code snippet
+   */
   transform?: (source: string) => string
+  /**
+   * format source code via codegen
+   */
   format?: (source: string) => string
 }
 

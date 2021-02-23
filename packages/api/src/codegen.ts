@@ -195,6 +195,10 @@ const getFieldsType = (fields: FormatFields, types: FormatTypes): string[] => {
 }
 
 export type CodegenOptions = {
+  /**
+   * emit createApiClient or not
+   * if set to false, just types will be codegened
+   */
   emitApiClient?: boolean
 }
 

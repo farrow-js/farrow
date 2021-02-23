@@ -34,7 +34,7 @@ and then:
 
 `farrow.config.js` is used to configure the behaviour of `farrow`
 
-Example
+### Example
 
 ```javascript
 // farrow.config.js
@@ -52,12 +52,24 @@ module.exports = createFarrowConfig({
       external: [...Object.keys(pkg.dependencies)],
     },
   },
+  // for connecting farrow-api-server
+  // api: [
+  //   {
+  //     src: 'http://localhost:3002/api/todo',
+  //     dist: `${__dirname}/src/api/todo/createApiClient.ts`,
+  //   },
+  // ],
 })
 ```
 
-Type
+### Type
 
 ```typescript
+export type Config = {
+  server?: ServerBundlerOptions | ServerBundlerOptions[] | false
+  api?: ApiClientOptions | ApiClientOptions[] | false
+}
+
 export type ServerBundlerOptions = {
   // filename of entry
   entry?: string
@@ -75,5 +87,46 @@ export type ServerBundlerOptions = {
   env?: NodeJS.ProcessEnv
   // other options for esbuild
   esbuild?: Omit<BuildOptions, 'entryPoints' | 'outdir' | 'outbase'>
+}
+
+export type ApiClientOptions = {
+  /**
+   * http address of farrow-api
+   */
+  src: string
+  /**
+   * file address of codegen target
+   */
+  dist: string
+  /**
+   * codegen options
+   */
+  codegen?: CodegenOptions
+  /**
+   * the interval of polling
+   * default value is 3000ms
+   */
+  pollingInterval?: number
+  /**
+   * logger options for polling
+   */
+  logger?: false | ((options: ApiClientOptions) => void)
+  /**
+   * transform source code received from server
+   * it's useful when need to attach custom code snippet
+   */
+  transform?: (source: string) => string
+  /**
+   * format source code via codegen
+   */
+  format?: (source: string) => string
+}
+
+export type CodegenOptions = {
+  /**
+   * emit createApiClient or not
+   * if set to false, just types will be codegened
+   */
+  emitApiClient?: boolean
 }
 ```

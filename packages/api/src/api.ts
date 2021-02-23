@@ -24,9 +24,21 @@ export const getTypeDeprecated = (typeable: Typeable<any>): string | undefined =
 }
 
 export type ApiDefinition<Input extends SchemaCtorInput = any, Output extends SchemaCtorInput = any> = {
+  /**
+   * input schema of api
+   */
   input: Typeable<Input>
+  /**
+   * output schema of api
+   */
   output: Typeable<Output>
+  /**
+   * description of api
+   */
   description?: string
+  /**
+   * depcreated info of api if needed
+   */
   deprecated?: string
 }
 

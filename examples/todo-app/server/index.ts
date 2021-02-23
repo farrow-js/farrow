@@ -2,11 +2,11 @@ import path from 'path'
 import { Http } from 'farrow-http'
 import { vite } from 'farrow-vite'
 
-import { service as TodoService } from './api/todo'
+import { services } from './api'
 
 let http = Http()
 
-http.route('/api/todo').use(TodoService)
+http.use(services)
 
 if (process.env.NODE_ENV === 'development') {
   http.use(vite())

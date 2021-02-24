@@ -342,12 +342,22 @@ export const createRouterPipeline = (): RouterPipeline => {
       let filename = path.join(dirname, request.pathname)
       let stats = await getStats(filename)
 
+      /**
+       * handle file
+       */
       if (stats?.isFile()) {
         return Response.file(filename)
       }
 
-      if (stats?.isDirectory) {
-        return Response.file(getIndexHtmlPath(filename))
+      /**
+       * handle {dirname}/index.html
+       */
+      if (stats?.isDirectory()) {
+        let indexHtmlPath = getIndexHtmlPath(filename)
+        let indexHtmlStats = await getStats(indexHtmlPath)
+        if (indexHtmlStats?.isFile()) {
+          return Response.file(getIndexHtmlPath(filename))
+        }
       }
 
       return next(request)

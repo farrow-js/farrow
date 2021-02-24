@@ -1,0 +1,29 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "composite": true,
+    "noEmit": true
+  },
+  "references": [
+    {
+      "path": "../../packages/pipeline/tsconfig.json"
+    },
+    {
+      "path": "../../packages/schema/tsconfig.json"
+    },
+    {
+      "path": "../../packages/http/tsconfig.json"
+    },
+    {
+      "path": "../../packages/react/tsconfig.json"
+    },
+    {
+      "path": "../../packages/api/tsconfig.json"
+    },
+    {
+      "path": "../../packages/api-server/tsconfig.json"
+    }
+  ],
+  "include": ["src"]
+}

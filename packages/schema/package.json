@@ -9,7 +9,9 @@
     "validator.d.ts",
     "validator.js",
     "transformer.js",
-    "transformer.d.ts"
+    "transformer.d.ts",
+    "formater.d.ts",
+    "formater.js"
   ],
   "scripts": {
     "start": ""
@@ -26,6 +28,6 @@
     "url": "git+https://github.com/Lucifier129/farrow.git"
   },
   "dependencies": {
-    "tslib": "^2.0.3"
+    "tslib": "^2.1.0"
   }
 }

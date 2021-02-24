@@ -10,6 +10,10 @@
     { "path": "./packages/react/tsconfig.json" },
     { "path": "./packages/cors/tsconfig.json" },
     { "path": "./packages/graphql/tsconfig.json" },
-    { "path": "./packages/farrow/tsconfig.json" }
-  ]
+    { "path": "./packages/api/tsconfig.json" },
+    { "path": "./packages/api-server/tsconfig.json" },
+    { "path": "./packages/farrow/tsconfig.json" },
+    { "path": "./packages/vite/tsconfig.json" }
+  ],
+  "exclude": ["./examples/*"]
 }

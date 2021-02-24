@@ -25,7 +25,7 @@ import { route as createRoute } from './basenames'
 import { MaybeAsyncResponse, matchBodyType, Response } from './response'
 import { MarkReadOnlyDeep, ParseUrl } from './types'
 import { HttpError } from './HttpError'
-import { isFileExist } from './util'
+import { getStats } from './util'
 
 // enable async hooks
 asyncHooksNode.enable()
@@ -332,12 +332,24 @@ export const createRouterPipeline = (): RouterPipeline => {
   }
 
   let serve: RouterPipeline['serve'] = (name, dirname) => {
+    let getIndexHtmlPath = (filename: string): string => {
+      if (filename.endsWith('/')) {
+        return `${filename}index.html`
+      }
+      return `${filename}/index.html`
+    }
     route(name).use(async (request, next) => {
       let filename = path.join(dirname, request.pathname)
-      let isExist = await isFileExist(filename)
-      if (isExist) {
+      let stats = await getStats(filename)
+
+      if (stats?.isFile()) {
         return Response.file(filename)
       }
+
+      if (stats?.isDirectory) {
+        return Response.file(getIndexHtmlPath(filename))
+      }
+
       return next(request)
     })
   }

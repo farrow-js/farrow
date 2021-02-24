@@ -9,7 +9,7 @@ let assertOk = <T>(result: ValidationResult<T>): T => {
   throw new Error(result.value.message)
 }
 
-describe('Schema', () => {
+describe('Validator', () => {
   it('supports number validation', () => {
     let validate = createSchemaValidator(Schema.Number)
 

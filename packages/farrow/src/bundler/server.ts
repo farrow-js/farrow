@@ -1,52 +1,59 @@
 import path from 'path'
-import chokidar from 'chokidar'
 import execa, { ExecaChildProcess } from 'execa'
 import { Plugin, startService, BuildOptions } from 'esbuild'
 import slash from 'slash'
 import fs from 'fs/promises'
+import readPkgUp from 'read-pkg-up'
 
-const join = (...args: Parameters<typeof path.join>): ReturnType<typeof path.join> => {
-  return slash(path.join(...args))
-}
-const watchFiles = (
-  paths: string | readonly string[],
-  options?: chokidar.WatchOptions,
-): Promise<chokidar.FSWatcher> => {
-  return new Promise((resolve, reject) => {
-    let watcher = chokidar
-      .watch(paths, options)
-      .on('ready', () => {
-        resolve(watcher)
-      })
-      .on('error', (error) => {
-        reject(error)
-      })
-  })
-}
-function memo<T>(f: () => T): typeof f
-function memo<T>(f: () => Promise<T>): typeof f
-function memo(f: () => any): any {
-  let result: any = null
-
-  return () => {
-    if (result) return result
-    result = f()
-    return result
-  }
-}
+import { watchFiles } from '../util/watchFiles'
+import { join } from '../util/join'
+import { memo } from '../util/memo'
 
 export type BundlerOptions = {
+  /**
+   * auto add closest package.json dependenties to esbuild external or not
+   */
+  autoAddExternal?: boolean
   build: BuildOptions
 }
 
+const mergeList = <T>(...args: (undefined | T[])[]): T[] => {
+  let list = args.filter(Boolean) as T[][]
+  return ([] as T[]).concat(...list)
+}
+
+const safeGetKeys = (input: object | undefined): string[] => {
+  if (!input) return []
+  return Object.keys(input)
+}
+
 export const createBundler = (options: BundlerOptions) => {
+  let config = {
+    autoAddExternal: true,
+    ...options,
+  }
+
   let getService = memo(() => {
     return startService()
   })
+
   let getBuilder = memo(async () => {
     let service = await getService()
+    let pkgResult = await readPkgUp({
+      cwd: config.build.entryPoints?.[0],
+    })
+    let external = config.autoAddExternal
+      ? mergeList(
+          config.build.external,
+          safeGetKeys(pkgResult?.packageJson?.devDependencies),
+          safeGetKeys(pkgResult?.packageJson?.dependencies),
+          safeGetKeys(pkgResult?.packageJson?.peerDependencies),
+        )
+      : config.build.external
+
     let result = await service.build({
-      ...options.build,
+      ...config.build,
+      external,
       incremental: true,
     })
     return result.rebuild
@@ -76,22 +83,44 @@ export const createBundler = (options: BundlerOptions) => {
 }
 
 export type ServerBundlerOptions = {
-  // filename of entry
+  /**
+   * filename of entry
+   */
   entry?: string
-  // folder of source code
+  /**
+   * folder of source code
+   */
   src?: string
-  // folder of output code
+  /**
+   * folder of output code
+   */
   dist?: string
-  // args for node.js
-  // eg. ['--inspect-brk'] for debugging
+  /**
+   * - args for node.js
+   * - eg. ['--inspect-brk'] for debugging
+   */
   nodeArgs?: string[]
-  // env for node.js
-  // eg. { NODE_ENV: 'production' }
-  // NODE_ENV = production in `farrow start`
-  // NODE_ENV = development in `farrow dev`
+  /**
+   * - env for node.js
+   * - eg. { NODE_ENV: 'production' }
+   * - NODE_ENV = production in `farrow start`
+   * - NODE_ENV = development in `farrow dev`
+   */
   env?: NodeJS.ProcessEnv
-  // other options for esbuild
+  /**
+   * other options for esbuild
+   */
   esbuild?: Omit<BuildOptions, 'entryPoints' | 'outdir' | 'outbase'>
+  /**
+   * auto add closest package.json dependenties to esbuild external or not
+   */
+  autoAddExternal?: boolean
+}
+
+export type StartOptions = {
+  build?: boolean
+  watch?: boolean
+  run?: boolean
 }
 
 export const createServerBundler = (options: ServerBundlerOptions = {}) => {
@@ -100,15 +129,18 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
     src: 'src',
     dist: 'dist',
     nodeArgs: [],
+    autoAddExternal: true,
     ...options,
     esbuild: {
       sourcemap: true,
+      keepNames: true,
       ...options.esbuild,
     },
   }
   let srcEntry = join(config.src, config.entry)
   let distEntry = join(config.dist, config.entry).replace(/\.(tsx?)$/, '.js')
   let bundler = createBundler({
+    autoAddExternal: config.autoAddExternal,
     build: {
       ...config.esbuild,
       platform: 'node',
@@ -123,7 +155,7 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
   let childProcess: ExecaChildProcess | null
 
   let run = () => {
-    stop()
+    cancel()
     childProcess = execa('node', [...config.nodeArgs, distEntry], {
       stdout: 'inherit',
       stderr: 'inherit',
@@ -132,10 +164,13 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
         ...config.env,
       },
     })
-    return childProcess
+    childProcess.catch((error) => {
+      if (error.isCanceled) return
+      throw error
+    })
   }
 
-  let stop = () => {
+  let cancel = () => {
     if (childProcess) {
       childProcess.cancel()
       childProcess = null
@@ -154,11 +189,8 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
     watcher.on('all', async () => {
       try {
         await build()
-        await run()
+        run()
       } catch (error) {
-        if (error?.stack.includes('Command was canceled')) {
-          return
-        }
         console.log('watcher:', error.stack)
       }
     })
@@ -177,63 +209,76 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
     console.log(`finish build in ${(Date.now() - start).toFixed(2)}ms`)
   }
 
-  type StartOptions = {
-    build?: boolean
-    watch?: boolean
-    run?: boolean
-  }
-
   let isStarted = false
 
   let start = async (startOptions?: StartOptions) => {
-    if (isStarted) return
+    if (isStarted) {
+      await stop()
+    }
+
+    // eslint-disable-next-line require-atomic-updates
     isStarted = true
 
     let startConfig = {
       ...startOptions,
     }
 
-    try {
-      if (startConfig.build) {
-        await build()
-      }
+    if (startConfig.build) {
+      await build()
+    }
 
-      if (startConfig.watch) {
-        await watch()
-      }
+    if (startConfig.watch) {
+      await watch()
+    }
 
-      if (startConfig.run) {
-        await run()
-      }
-    } catch (error) {
-      if (error?.stack.includes('Command was canceled')) {
-        return
-      }
-      throw error
+    if (startConfig.run) {
+      run()
     }
 
     if (!startConfig.run && !startConfig.watch) {
-      await dispose()
+      await stop()
     }
   }
 
-  let dispose = async () => {
-    stop()
+  let stop = async () => {
+    cancel()
     await bundler.dispose()
     if (hasWatcher) {
       let watcher = await getWatcher()
       await watcher.close()
     }
+    isStarted = false
   }
 
   return {
     start,
-    watch,
-    build,
-    run,
-    dispose,
+    stop,
   }
 }
+
+export type ServerBundlersOptions = {
+  bundlers: ServerBundlerOptions[]
+}
+
+export const createServerBundlers = (options: ServerBundlersOptions) => {
+  let bundlers = options.bundlers.map(createServerBundler)
+
+  let start = async (startOptions?: StartOptions) => {
+    let promises = bundlers.map((bundler) => bundler.start(startOptions))
+    await Promise.all(promises)
+  }
+
+  let stop = async () => {
+    let promises = bundlers.map((bundler) => bundler.stop())
+    await Promise.all(promises)
+  }
+
+  return {
+    start,
+    stop,
+  }
+}
+
 const createResolveDirnamePlugin = (dist: string): Plugin => {
   return {
     name: 'farrow.resolve.dirname',

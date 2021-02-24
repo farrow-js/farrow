@@ -5,6 +5,22 @@
     "outDir": "./dist",
     "composite": true
   },
-  "references": [],
+  "references": [
+    {
+      "path": "../http/tsconfig.json"
+    },
+    {
+      "path": "../pipeline/tsconfig.json"
+    },
+    {
+      "path": "../api/tsconfig.json"
+    },
+    {
+      "path": "../api-server/tsconfig.json"
+    },
+    {
+      "path": "../schema/tsconfig.json"
+    }
+  ],
   "include": ["src"]
 }

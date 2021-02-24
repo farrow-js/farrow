@@ -4,6 +4,8 @@ import { router as api } from './api'
 import { router as pages } from './pages'
 import { Action2Api } from './middleware/Action2Page'
 import { router as flight } from './flight'
+import { service as TodoService } from './services/todo'
+import { service as PetStoreService } from './services/pet-store'
 
 const http = Http({
   basenames: ['/base'],
@@ -24,6 +26,9 @@ http.serve('/static', path.join(__dirname, '../static'))
 
 http.route('/api').use(api)
 http.route('/flight').use(flight)
+
+http.route('/service/todo').use(TodoService)
+http.route('/service/pet-store').use(PetStoreService)
 
 http.listen(3002, () => {
   console.log(`server started at http://localhost:3002`)

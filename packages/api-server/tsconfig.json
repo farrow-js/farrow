@@ -1,0 +1,23 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "../schema/tsconfig.json"
+    },
+    {
+      "path": "../api/tsconfig.json"
+    },
+    {
+      "path": "../http/tsconfig.json"
+    },
+    {
+      "path": "../pipeline/tsconfig.json"
+    }
+  ],
+  "include": ["src"]
+}

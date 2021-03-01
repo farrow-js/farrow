@@ -1,6 +1,6 @@
 {
   "name": "farrow-api",
-  "version": "1.5.3",
+  "version": "1.6.0",
   "description": "A type-friendly BFF framework",
   "main": "dist/index.js",
   "scripts": {
@@ -26,12 +26,12 @@
     "farrow-schema": "^1.5.3"
   },
   "devDependencies": {
-    "farrow-pipeline": "^1.5.3",
-    "farrow-schema": "^1.5.3"
+    "farrow-pipeline": "^1.6.0",
+    "farrow-schema": "^1.6.0"
   },
   "dependencies": {
-    "tslib": "^2.1.0",
+    "cosmiconfig": "^7.0.0",
     "prettier": "^2.2.1",
-    "cosmiconfig": "^7.0.0"
+    "tslib": "^2.1.0"
   }
 }

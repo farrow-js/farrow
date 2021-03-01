@@ -1,6 +1,7 @@
 {
-  "name": "test-react-vite",
+  "name": "farrow-vite-todo-app",
   "version": "1.6.0",
+  "private": true,
   "scripts": {
     "vite:dev": "vite",
     "dev": "farrow dev",

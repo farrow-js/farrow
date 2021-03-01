@@ -318,7 +318,7 @@ export const Strict = <T extends SchemaCtorInput>(Item: T) => {
 export abstract class NonStrictType<T extends SchemaCtorInput = SchemaCtorInput> extends Schema<
   TypeOf<ToSchemaCtor<T>>
 > {
-  __kind = kind('Strict')
+  __kind = kind('NonStrict')
   abstract Item: ToSchemaCtor<T>
 }
 

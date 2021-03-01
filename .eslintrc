@@ -46,7 +46,7 @@
     "valid-typeof": ["error", { "requireStringLiterals": true }],
     "accessor-pairs": "error",
     "array-callback-return": "error",
-    "class-methods-use-this": "error",
+    "class-methods-use-this": "off",
     "curly": ["error", "multi-line"],
     "default-case": "error",
     "eqeqeq": "error",

@@ -1,6 +1,6 @@
 import * as Schema from '../schema'
 import { Prettier, ReadOnly, TypeOf, ReadOnlyDeep } from '../schema'
-import { createSchemaValidator, ValidationResult } from '../validator'
+import { createSchemaValidator, ValidationResult, ValidatorType } from '../validator'
 
 const { Type, ObjectType, Struct, Int, Float, Literal, List, Union, Intersect, Nullable, Record, Json, Any } = Schema
 
@@ -770,5 +770,65 @@ describe('Validator', () => {
         d: false,
       },
     })
+  })
+
+  it('supports built-in validate schema', () => {
+    class DateType extends ValidatorType<Date> {
+      validate(input: unknown) {
+        if (input instanceof Date) {
+          return this.Ok(input)
+        }
+
+        if (typeof input === 'number' || typeof input === 'string') {
+          return this.Ok(new Date(input))
+        }
+
+        return this.Err(`${input} is not a valid date`)
+      }
+    }
+
+    class EmailType extends ValidatorType<string> {
+      validate(input: unknown) {
+        if (typeof input !== 'string') {
+          return this.Err(`${input} should be a string`)
+        }
+
+        if (/^example@farrow\.com$/.test(input)) {
+          return this.Ok(input)
+        }
+
+        return this.Err(`${input} is not a valid email`)
+      }
+    }
+
+    let User = Struct({
+      name: String,
+      email: EmailType,
+      createAt: DateType,
+    })
+
+    let validateUser = createSchemaValidator(User)
+
+    let result0 = assertOk(
+      validateUser({
+        name: 'test',
+        email: 'example@farrow.com',
+        createAt: Date.now(),
+      }),
+    )
+
+    expect(result0.name).toBe('test')
+    expect(result0.email).toBe('example@farrow.com')
+    expect(result0.createAt instanceof Date).toBe(true)
+
+    expect(() =>
+      assertOk(
+        validateUser({
+          name: 'test',
+          email: 'example1@farrow.com',
+          createAt: Date.now(),
+        }),
+      ),
+    ).toThrow()
   })
 })

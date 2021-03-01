@@ -2,6 +2,20 @@ import * as Schema from './schema'
 import { Err, Ok, Result } from './result'
 import { createTransformer, TransformRule, TransformContext } from './transformer'
 
+export abstract class ValidatorType<T> extends Schema.Schema<T> {
+  __kind = Schema.kind('Validator')
+
+  abstract validate(input: unknown): ValidationResult<T>
+
+  Ok(value: T): ValidationResult<T> {
+    return Ok(value)
+  }
+
+  Err(message: string): ValidationResult<T> {
+    return SchemaErr(message)
+  }
+}
+
 export type ValidationError = {
   path?: (string | number)[]
   message: string
@@ -45,7 +59,14 @@ export const createValidator = <S extends Schema.SchemaCtor, Context extends Val
     if (validate) {
       return validate(input)
     }
-    validate = transformer(SchemaCtor)
+
+    if (SchemaCtor.prototype instanceof ValidatorType) {
+      let schema = new SchemaCtor() as ValidatorType<any>
+      validate = schema.validate.bind(schema)
+    } else {
+      validate = transformer(SchemaCtor)
+    }
+
     return validate(input)
   }
 

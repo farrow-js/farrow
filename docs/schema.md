@@ -125,3 +125,39 @@ if (result0.isOk) {
   console.log(result0.value)
 }
 ```
+
+## ValidatorType
+
+it's useful to build your own validator-type with custom validate function.
+
+```typescript
+import { ValidatorType } from 'farrow-schema/validator'
+
+class DateType extends ValidatorType<Date> {
+  validate(input: unknown) {
+    if (input instanceof Date) {
+      return this.Ok(input)
+    }
+
+    if (typeof input === 'number' || typeof input === 'string') {
+      return this.Ok(new Date(input))
+    }
+
+    return this.Err(`${input} is not a valid date`)
+  }
+}
+
+class EmailType extends ValidatorType<string> {
+  validate(input: unknown) {
+    if (typeof input !== 'string') {
+      return this.Err(`${input} should be a string`)
+    }
+
+    if (/^example@farrow\.com$/.test(input)) {
+      return this.Ok(input)
+    }
+
+    return this.Err(`${input} is not a valid email`)
+  }
+}
+```

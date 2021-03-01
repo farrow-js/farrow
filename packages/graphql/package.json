@@ -1,6 +1,6 @@
 {
   "name": "farrow-graphql",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "Code-first GraphQL(WIP)",
   "main": "dist/index.js",
   "private": true,
@@ -29,7 +29,7 @@
   },
   "devDependencies": {
     "farrow-pipeline": "^1.6.0",
-    "farrow-schema": "^1.6.0",
+    "farrow-schema": "^1.6.1",
     "graphql": "^15.4.0",
     "ts-node": "^9.1.1"
   },

@@ -1,6 +1,6 @@
 {
   "name": "farrow-react",
-  "version": "1.6.0",
+  "version": "1.6.1",
   "description": "React bindings for farrow-http",
   "main": "dist/index.js",
   "files": [
@@ -33,7 +33,7 @@
     "@types/multistream": "^2.1.1",
     "@types/react": "^16.9.52",
     "@types/react-dom": "^16.9.8",
-    "farrow-http": "^1.6.0",
+    "farrow-http": "^1.6.1",
     "react": "^16.14.0",
     "react-dom": "^16.14.0"
   },

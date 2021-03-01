@@ -1,6 +1,6 @@
 import * as Schema from '../schema'
 import { Prettier, ReadOnly, TypeOf, ReadOnlyDeep } from '../schema'
-import { createSchemaValidator, ValidationResult, ValidatorType } from '../validator'
+import { createSchemaValidator, RegExp, ValidationResult, ValidatorType } from '../validator'
 
 const { Type, ObjectType, Struct, Int, Float, Literal, List, Union, Intersect, Nullable, Record, Json, Any } = Schema
 
@@ -830,5 +830,20 @@ describe('Validator', () => {
         }),
       ),
     ).toThrow()
+  })
+
+  it('supports RegExp Schema', () => {
+    let Reg0 = RegExp(/123/)
+    let Reg1 = RegExp(/abc/i)
+
+    let validateReg0 = createSchemaValidator(Reg0)
+    let validateReg1 = createSchemaValidator(Reg1)
+
+    expect(assertOk(validateReg0('123'))).toBe('123')
+    expect(() => assertOk(validateReg0('12'))).toThrow()
+
+    expect(assertOk(validateReg1('abc'))).toBe('abc')
+    expect(assertOk(validateReg1('ABC'))).toBe('ABC')
+    expect(() => assertOk(validateReg1('cba'))).toThrow()
   })
 })

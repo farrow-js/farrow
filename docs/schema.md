@@ -161,3 +161,22 @@ class EmailType extends ValidatorType<string> {
   }
 }
 ```
+
+## RegExp
+
+Given a `regexp` for creating a validator-type
+
+```typescript
+let Reg0 = RegExp(/123/)
+let Reg1 = RegExp(/abc/i)
+
+let validateReg0 = createSchemaValidator(Reg0)
+let validateReg1 = createSchemaValidator(Reg1)
+
+expect(assertOk(validateReg0('123'))).toBe('123')
+expect(() => assertOk(validateReg0('12'))).toThrow()
+
+expect(assertOk(validateReg1('abc'))).toBe('abc')
+expect(assertOk(validateReg1('ABC'))).toBe('ABC')
+expect(() => assertOk(validateReg1('cba'))).toThrow()
+```

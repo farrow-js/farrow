@@ -11,8 +11,22 @@ export abstract class ValidatorType<T> extends Schema.Schema<T> {
     return Ok(value)
   }
 
-  Err(message: string): ValidationResult<T> {
-    return SchemaErr(message)
+  Err(...args: Parameters<typeof SchemaErr>): ValidationResult<T> {
+    return SchemaErr(...args)
+  }
+}
+
+export const RegExp = (regexp: RegExp) => {
+  return class RegExp extends ValidatorType<string> {
+    validate(input: unknown) {
+      let text = `${input}`
+
+      if (regexp.test(text)) {
+        return this.Ok(text)
+      }
+
+      return this.Err(`${text} was not matched: ${regexp}`)
+    }
   }
 }
 

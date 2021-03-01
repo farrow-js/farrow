@@ -167,6 +167,8 @@ class EmailType extends ValidatorType<string> {
 Given a `regexp` for creating a validator-type
 
 ```typescript
+import { RegExp, createSchemaValidator } from 'farrow-schema/validator'
+
 let Reg0 = RegExp(/123/)
 let Reg1 = RegExp(/abc/i)
 

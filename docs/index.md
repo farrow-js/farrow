@@ -35,3 +35,7 @@ Useful tools for developing farrow app
 ## [farrow-vite](./vite.md)
 
 **farrow-vite**: Vite adapter for farrow-http
+
+## [farrow-next](./next.md)
+
+**farrow-next**: A framework runs on Next.js

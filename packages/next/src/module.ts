@@ -62,6 +62,10 @@ export const initilize = <T extends Module>(
     configs.set(moduleConfig.constructor as ModuleConfigCtor, moduleConfig)
   })
 
+  if (modules.has(Ctor)) {
+    return modules.get(Ctor)! as T
+  }
+
   let module = newModule(Ctor, { modules, configs })
 
   modules.set(Ctor, module)

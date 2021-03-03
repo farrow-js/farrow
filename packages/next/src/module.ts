@@ -2,13 +2,39 @@
  * a module abstraction providing dependencies management
  */
 
+function isObject(o: unknown): o is object {
+  return Object.prototype.toString.call(o) === '[object Object]'
+}
+
+function isPlainObject(o: unknown) {
+  let ctor, prot
+
+  if (!isObject(o)) return false
+
+  // If has modified constructor
+  ctor = o.constructor
+  if (ctor === undefined) return true
+
+  // If has modified prototype
+  prot = ctor.prototype
+  if (!isObject(prot)) return false
+
+  // If constructor does not have an Object-specific method
+  if (Object.prototype.hasOwnProperty.call(prot, 'isPrototypeOf') === false) {
+    return false
+  }
+
+  // Most likely a plain Object
+  return true
+}
+
 export type ModuleCtor<T extends Module = Module> = new (ctx: ModuleContext) => T
 
-export type ModuleConfigCtor<T extends ModuleConfig = ModuleConfig> = new (...args: any) => T
+export type Constructor = new (...args: any[]) => {}
 
 export type ModuleContext = {
   modules: WeakMap<ModuleCtor, Module>
-  configs: WeakMap<ModuleConfigCtor, ModuleConfig>
+  configs: WeakMap<Constructor, object>
 }
 
 const ModuleContextKey = Symbol('module.context.key')
@@ -36,9 +62,9 @@ export const getModule = <T extends Module>(Ctor: ModuleCtor<T>, ctx: ModuleCont
   return m as T
 }
 
-export const getModuleConfig = <T extends ModuleConfig>(Ctor: ModuleConfigCtor<T>, ctx: ModuleContext): T => {
+export const getModuleConfig = <T extends Constructor>(Ctor: T, ctx: ModuleContext): InstanceType<T> => {
   if (ctx.configs.has(Ctor)) {
-    return ctx.configs.get(Ctor)! as T
+    return ctx.configs.get(Ctor)! as InstanceType<T>
   }
 
   throw new Error(`Module Config ${Ctor} is using without injecting`)
@@ -49,10 +75,21 @@ export const createModuleContext = (): ModuleContext => ({
   configs: new WeakMap(),
 })
 
-const attachModuleConfig = (ctx: ModuleContext, configs: ModuleConfig[]) => {
+const attachModuleConfig = (ctx: ModuleContext, configs: any[]) => {
   for (let config of configs) {
-    let ConfigCtor = config.constructor as ModuleConfigCtor
+    if (!isObject(config)) {
+      throw new Error(`Expected module-config to be an object, instead of ${config}`)
+    }
+
+    if (isPlainObject(config)) {
+      throw new Error(
+        `Expected module-config be an instance of some Class, instead of plan object: ${JSON.stringify(config)}`,
+      )
+    }
+
+    let ConfigCtor = config.constructor as Constructor
     let hasConfig = ctx.configs.has(ConfigCtor)
+
     if (!hasConfig) {
       ctx.configs.set(ConfigCtor, config)
     }
@@ -61,7 +98,7 @@ const attachModuleConfig = (ctx: ModuleContext, configs: ModuleConfig[]) => {
 
 export const initilize = <T extends Module>(
   Ctor: ModuleCtor<T>,
-  moduleConfigs: ModuleConfig[],
+  moduleConfigs: object[],
   ctx: ModuleContext = createModuleContext(),
 ) => {
   attachModuleConfig(ctx, moduleConfigs)
@@ -77,10 +114,8 @@ export const initilize = <T extends Module>(
   return module
 }
 
-export abstract class ModuleConfig {}
-
 export abstract class BaseModule {
-  [ModuleConfigKey]?: ModuleConfig[];
+  [ModuleConfigKey]?: object[];
 
   [ModuleContextKey] = createModuleContext()
 
@@ -90,7 +125,7 @@ export abstract class BaseModule {
    */
   use<T extends Module>(Ctor: ModuleCtor<T>): T
 
-  use<T extends ModuleConfig>(Ctor: new (...args: any) => T): T
+  use<T extends Constructor>(Ctor: T): InstanceType<T>
 
   use(Ctor: new (...args: any) => any) {
     let configs = this[ModuleConfigKey]
@@ -100,15 +135,18 @@ export abstract class BaseModule {
       attachModuleConfig(ctx, configs)
     }
 
-    if (Ctor.prototype instanceof ModuleConfig) {
-      return getModuleConfig(Ctor, ctx)
+    if (!(this instanceof Module)) {
+      let Self = this.constructor as Constructor
+      if (!ctx.configs.has(Self)) {
+        ctx.configs.set(Self, this)
+      }
     }
 
     if (Ctor.prototype instanceof Module) {
       return getModule(Ctor, ctx)
     }
 
-    throw new Error(`Unsupported Constructor: ${Ctor}`)
+    return getModuleConfig(Ctor, ctx)
   }
 }
 
@@ -126,10 +164,8 @@ export abstract class Module extends BaseModule {
  * examples
  */
 
-// class PageInfo extends ModuleConfig {
-//   constructor(public url: string, public env: string) {
-//     super()
-//   }
+// class PageInfo {
+//   constructor(public url: string, public env: string) {}
 // }
 
 // class User extends Module {
@@ -167,12 +203,19 @@ export abstract class Module extends BaseModule {
 //   }
 // }
 
-// class App extends BaseModule {
-//   [ModuleConfigKey] = [new PageInfo('/path/for/test', 'test')]
+// class Home extends Module {
 //   root = this.use(Root)
+//   get app() {
+//     return this.use(App)
+//   }
+// }
+
+// class App {
+//   home = initilize(Home, [this, new PageInfo('/path/for/test', 'test')])
 // }
 
 // let app = new App()
+
 // let root = initilize(Root, [new PageInfo('/path/for/test', 'test')])
 
 // let log = (root: Root, tag = 'info') => {
@@ -186,5 +229,9 @@ export abstract class Module extends BaseModule {
 //   })
 // }
 
-// log(app.root, 'app-info')
-// log(root)
+// log(app.home.root, 'app.home.root')
+// log(root, 'root')
+
+// console.log({
+//   [`app.home.app is equal to app`]: app === app.home.app,
+// })

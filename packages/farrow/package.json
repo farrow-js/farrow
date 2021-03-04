@@ -1,6 +1,6 @@
 {
   "name": "farrow",
-  "version": "1.6.1",
+  "version": "1.6.2",
   "description": "Useful modules for developing Farrow App",
   "main": "dist/index.js",
   "bin": {
@@ -31,8 +31,8 @@
     "@types/node-fetch": "^2.5.8",
     "@types/supertest": "^2.0.10",
     "farrow-api": "^1.5.3",
-    "farrow-api-server": "^1.6.1",
-    "farrow-http": "^1.6.1",
+    "farrow-api-server": "^1.6.2",
+    "farrow-http": "^1.6.2",
     "farrow-pipeline": "^1.6.0",
     "supertest": "^6.0.1"
   },

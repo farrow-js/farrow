@@ -1,6 +1,6 @@
 {
   "name": "farrow-module",
-  "version": "1.6.0",
+  "version": "1.6.2",
   "description": "A module abstraction providing dependencies management",
   "main": "dist/index.js",
   "files": [

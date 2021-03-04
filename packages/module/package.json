@@ -1,0 +1,27 @@
+{
+  "name": "farrow-module",
+  "version": "1.6.0",
+  "description": "A module abstraction providing dependencies management",
+  "main": "dist/index.js",
+  "files": [
+    "src",
+    "dist"
+  ],
+  "scripts": {
+    "start": ""
+  },
+  "keywords": [
+    "Web Framework",
+    "TypeScript",
+    "Dependencies Injection"
+  ],
+  "author": "Jade Gu",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lucifier129/farrow.git"
+  },
+  "dependencies": {
+    "tslib": "^2.1.0"
+  }
+}

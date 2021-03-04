@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "tslib": "^2.1.0",
+    "farrow-module": "^1.6.0",
     "isomorphic-fetch": "^3.0.0",
     "qs": "^6.9.6",
     "js-cookie": "^2.2.1",

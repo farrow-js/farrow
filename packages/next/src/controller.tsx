@@ -125,7 +125,7 @@ export abstract class Controller extends Module {
     const { store } = ctrl
 
     // modified from react-redux useSelector
-    const [_, forceRender] = useReducer(s => s + 1, 0)
+    const [_, forceRender] = useReducer((s) => s + 1, 0)
 
     const latestSubscriptionCallbackError = useRef<Error | null>(null)
     const latestSelector = useRef<Selector | undefined>()

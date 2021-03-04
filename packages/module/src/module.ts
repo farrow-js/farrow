@@ -87,7 +87,7 @@ export const createModuleContext = (options?: ModuleContextOptions): ModuleConte
     configs: new Map(),
     providers: new Map(),
   }
-  attachModuleContextOptions(ctx, options)
+  attachModuleContextOptions(ctx, options, true)
   return ctx
 }
 
@@ -192,7 +192,7 @@ export const attachModuleContextOptions = (ctx: ModuleContext, options?: ModuleC
 export const initilize = <T extends Module>(
   Ctor: ModuleCtor<T>,
   options?: ModuleContextOptions,
-  ctx: ModuleContext = createModuleContext(options),
+  ctx: ModuleContext = createModuleContext(),
 ) => {
   attachModuleContextOptions(ctx, options, true)
 
@@ -271,7 +271,6 @@ const attachModuleContainer = <T extends ModuleContainer>(container: T) => {
     attachModuleProviderValues(ctx, providers, false)
   }
 
-  // eslint-disable-next-line
   if (container instanceof Module) {
     if (ctx.modules.has(SelfCtor)) {
       ctx.modules.set(SelfCtor, container)
@@ -335,7 +334,6 @@ export class ModuleContainer {
       return getModuleProvider(Ctor, ctx)
     }
 
-    // eslint-disable-next-line
     if (Ctor.prototype instanceof Module) {
       return getModule(Ctor as ModuleCtor, ctx)
     }
@@ -350,81 +348,3 @@ export abstract class Module extends ModuleContainer {
     this[ModuleContextSymbol] = ctx || this[ModuleContextSymbol]
   }
 }
-
-/**
- * examples
- */
-
-// class PageInfo {
-//   constructor(public url: string, public env: string) {}
-// }
-
-// class User extends Module {
-//   page = this.use(PageInfo)
-//   path = `${this.page.url}/user`
-//   get product() {
-//     return this.use(Product)
-//   }
-// }
-
-// class Product extends Module {
-//   page = this.use(PageInfo)
-//   path = `${this.page.url}/product`
-//   get user() {
-//     return this.use(User)
-//   }
-// }
-
-// class Root extends Module {
-//   page = this.use(PageInfo)
-//   user = this.use(User)
-//   product = this.use(Product)
-
-//   get self() {
-//     return this.use(Root)
-//   }
-
-//   getInfo() {
-//     return {
-//       url: this.page.url,
-//       env: this.page.env,
-//       user: this.user.path,
-//       product: this.product.path,
-//     }
-//   }
-// }
-
-// class App extends ModuleContainer {
-//   [ModuleConfigSymbol] = [new PageInfo('/path/for/test', 'test')]
-//   root = this.use(Root)
-//   root1 = this.use(Root)
-//   root2 = this.new(Root, {
-//     configs: [new PageInfo('/path/for/new', 'new')],
-//   })
-// }
-
-// let app = new App()
-
-// let root = initilize(Root, {
-//   configs: [new PageInfo('/path/for/test', 'test')],
-// })
-
-// let log = (root: Root, tag = 'info') => {
-//   console.log(tag, {
-//     info: root.self.self.self.getInfo(),
-//     [`root is equal to root.self`]: root === root.self,
-//     [`user.page is equal to product.page`]: root.user.page === root.product.page,
-//     [`user.product is euqal to product`]: root.user.product === root.product,
-//     [`product.user is equal to user`]: root.product.user === root.user,
-//     [`product.user.product is equal to product`]: root.product.user.product === root.product,
-//   })
-// }
-
-// log(app.root, 'app.root')
-// log(app.root2, 'app.root2')
-// log(root, 'root')
-
-// console.log({
-//   [`app.root is equal to app.root1`]: app.root === app.root1,
-//   [`app.root is not equal to app.root2`]: app.root === app.root2,
-// })

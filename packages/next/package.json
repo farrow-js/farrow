@@ -3,6 +3,7 @@
   "version": "1.6.1",
   "description": "A framework runs on Next.js",
   "main": "dist/index.js",
+  "private": true,
   "files": [
     "src",
     "dist"

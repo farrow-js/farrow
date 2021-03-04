@@ -38,10 +38,13 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
         tag: 'FC',
       }
       let pageInfo = new PageInfo(pageCtx)
-      let moduleContext = createModuleContext()
+      let configs = [pageInfo]
+      let moduleContext = createModuleContext({
+        configs,
+      })
 
       let ctrls = Object.values(Controllers).map((Controller, index) => {
-        let ctrl = initilize(Controller, [pageInfo], moduleContext)
+        let ctrl = initilize(Controller, undefined, moduleContext)
         let state = props.states[index]
         replaceState(ctrl.store, state)
         return ctrl
@@ -71,15 +74,16 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
     }
 
     let pageInfo = new PageInfo(pageCtx)
+    let configs = [pageInfo]
 
-    let moduleCtx = createModuleContext()
+    let moduleCtx = createModuleContext({ configs })
 
     let ctrlsMap = {} as ControllerInstancesType<T>
 
     let ctrlsKeys = Object.keys(Controllers)
 
     let ctrls = Object.values(Controllers).map((Controller, index) => {
-      let ctrl = initilize(Controller, [pageInfo], moduleCtx)
+      let ctrl = initilize(Controller, undefined, moduleCtx)
       let key = ctrlsKeys[index] as keyof T
       ctrlsMap[key] = ctrl as ControllerInstancesType<T>[keyof T]
       return ctrl

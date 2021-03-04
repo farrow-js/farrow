@@ -28,26 +28,67 @@ function isPlainObject(o: unknown) {
   return true
 }
 
-export type ModuleCtor<T extends Module = Module> = new (ctx: ModuleContext) => T
-
-export type Constructor = new (...args: any[]) => {}
-
-export type ModuleContext = {
-  modules: WeakMap<ModuleCtor, Module>
-  configs: WeakMap<Constructor, object>
+interface AssertInstance {
+  <T = object>(input: unknown): asserts input is T
 }
 
-const ModuleContextKey = Symbol('module.context.key')
+const assertInstance: AssertInstance = (input) => {
+  if (!isObject(input)) {
+    throw new Error(`Expected an object, instead of ${input}`)
+  }
 
-export const ModuleConfigKey = Symbol('module.config.key')
+  if (isPlainObject(input)) {
+    throw new Error(`Expected an instance of Custom Class, instead of plan object: ${JSON.stringify(input)}`)
+  }
+}
 
-let disableContructorCall = true
+export type ModuleCtor<T extends Module = Module> = new (ctx?: ModuleContext) => T
 
-export const newModule = <T extends Module>(Ctor: ModuleCtor<T>, ctx: ModuleContext): T => {
-  disableContructorCall = false
-  let module = new Ctor(ctx)
-  disableContructorCall = true
-  return module
+export type ModuleConfigCtor = new (...args: any[]) => {}
+
+export type ModuleProvider<T = any> = {
+  isModuleProvider: true
+  name: string
+  provide(value: T): ModuleProviderValue<T>
+}
+
+export type ModuleProviderValue<T = any> = {
+  Provider: ModuleProvider<T>
+  value: T
+}
+
+export function createProvider<T>(name = ''): ModuleProvider<T> {
+  let Provider: ModuleProvider<T> = {
+    isModuleProvider: true,
+    name,
+    provide(value) {
+      return {
+        Provider,
+        value,
+      }
+    },
+  }
+  return Provider
+}
+
+export const isModuleProvider = <T>(input: any): input is ModuleProvider<T> => {
+  return !!input?.isModuleProvider
+}
+
+export type ModuleContext = {
+  modules: Map<ModuleCtor, Module>
+  configs: Map<ModuleConfigCtor, object>
+  providers: Map<ModuleProvider, any>
+}
+
+export const createModuleContext = (options?: ModuleContextOptions): ModuleContext => {
+  let ctx: ModuleContext = {
+    modules: new Map(),
+    configs: new Map(),
+    providers: new Map(),
+  }
+  attachModuleContextOptions(ctx, options)
+  return ctx
 }
 
 export const getModule = <T extends Module>(Ctor: ModuleCtor<T>, ctx: ModuleContext): T => {
@@ -55,108 +96,258 @@ export const getModule = <T extends Module>(Ctor: ModuleCtor<T>, ctx: ModuleCont
     return ctx.modules.get(Ctor)! as T
   }
 
-  let m = newModule(Ctor, ctx)
+  let module = new Ctor(ctx)
 
-  ctx.modules.set(Ctor, m)
+  ctx.modules.set(Ctor, module)
 
-  return m as T
+  return module as T
 }
 
-export const getModuleConfig = <T extends Constructor>(Ctor: T, ctx: ModuleContext): InstanceType<T> => {
+export const getModuleConfig = <T extends ModuleConfigCtor>(Ctor: T, ctx: ModuleContext): InstanceType<T> => {
   if (ctx.configs.has(Ctor)) {
     return ctx.configs.get(Ctor)! as InstanceType<T>
   }
 
-  throw new Error(`Module Config ${Ctor} is using without injecting`)
+  throw new Error(`Module Config is using without injecting: ${Ctor.name}`)
 }
 
-export const createModuleContext = (): ModuleContext => ({
-  modules: new WeakMap(),
-  configs: new WeakMap(),
-})
+export const getModuleProvider = <T>(Provider: ModuleProvider<T>, ctx: ModuleContext): T => {
+  if (ctx.providers.has(Provider)) {
+    return ctx.providers.get(Provider)! as T
+  }
 
-const attachModuleConfig = (ctx: ModuleContext, configs: any[]) => {
+  throw new Error(`Module Provider is using without injecting: ${Provider.name}`)
+}
+
+export const attachModules = (ctx: ModuleContext, modules: Module[], throws = true) => {
+  for (let module of modules) {
+    assertInstance<{ constructor: ModuleCtor }>(module)
+
+    let Ctor = module.constructor
+
+    if (ctx.modules.has(Ctor)) {
+      if (throws) {
+        throw new Error(`Unexpected duplicate module: ${Ctor.name}`)
+      }
+    } else {
+      ctx.modules.set(Ctor, module)
+    }
+  }
+}
+
+export const attachModuleConfigs = (ctx: ModuleContext, configs: object[], throws = true) => {
   for (let config of configs) {
-    if (!isObject(config)) {
-      throw new Error(`Expected module-config to be an object, instead of ${config}`)
-    }
+    assertInstance<{ constructor: ModuleConfigCtor }>(config)
 
-    if (isPlainObject(config)) {
-      throw new Error(
-        `Expected module-config be an instance of some Class, instead of plan object: ${JSON.stringify(config)}`,
-      )
-    }
+    let Ctor = config.constructor
 
-    let ConfigCtor = config.constructor as Constructor
-    let hasConfig = ctx.configs.has(ConfigCtor)
-
-    if (!hasConfig) {
-      ctx.configs.set(ConfigCtor, config)
+    if (ctx.configs.has(Ctor)) {
+      if (throws) {
+        throw new Error(`Unexpected duplicate module-config: ${Ctor.name}`)
+      }
+    } else {
+      ctx.configs.set(Ctor, config)
     }
+  }
+}
+
+export const attachModuleProviderValues = (
+  ctx: ModuleContext,
+  providerValues: ModuleProviderValue[],
+  throws = true,
+) => {
+  for (let providerValue of providerValues) {
+    let { Provider, value } = providerValue
+
+    if (ctx.providers.has(Provider)) {
+      if (throws) {
+        throw new Error(`Unexpected duplicate module-provider: ${Provider.name}`)
+      }
+    } else {
+      ctx.providers.set(Provider, value)
+    }
+  }
+}
+
+export type ModuleContextOptions = {
+  modules?: Module[]
+  configs?: object[]
+  providers?: ModuleProviderValue[]
+}
+
+export const attachModuleContextOptions = (ctx: ModuleContext, options?: ModuleContextOptions, throws = true) => {
+  if (options?.modules) {
+    attachModules(ctx, options?.modules, throws)
+  }
+
+  if (options?.configs) {
+    attachModuleConfigs(ctx, options?.configs, throws)
+  }
+
+  if (options?.providers) {
+    attachModuleProviderValues(ctx, options?.providers, throws)
   }
 }
 
 export const initilize = <T extends Module>(
   Ctor: ModuleCtor<T>,
-  moduleConfigs: object[],
-  ctx: ModuleContext = createModuleContext(),
+  options?: ModuleContextOptions,
+  ctx: ModuleContext = createModuleContext(options),
 ) => {
-  attachModuleConfig(ctx, moduleConfigs)
+  attachModuleContextOptions(ctx, options, true)
 
   if (ctx.modules.has(Ctor)) {
     return ctx.modules.get(Ctor)! as T
   }
 
-  let module = newModule(Ctor, ctx)
+  let module = new Ctor(ctx)
 
   ctx.modules.set(Ctor, module)
 
   return module
 }
 
-export abstract class BaseModule {
-  [ModuleConfigKey]?: object[];
+export const ModuleContextSymbol = Symbol('module.context')
 
-  [ModuleContextKey] = createModuleContext()
+export const ModuleConfigSymbol = Symbol('module.config')
+
+export const ModuleProviderSymbol = Symbol('module.provider')
+
+export const ModuleContainerSymbol = Symbol('module.container')
+
+export type Constructable = new (...args: any[]) => any
+
+export const Container = <T extends Constructable>(Ctor: T) => {
+  return class Container extends Ctor {
+    [ModuleConfigSymbol]?: object[];
+    [ModuleProviderSymbol]?: ModuleProviderValue[];
+    [ModuleContainerSymbol] = new ModuleContainer()
+
+    constructor(...args: any[]) {
+      super(...args)
+      let container = this[ModuleContainerSymbol]
+      let configs = container[ModuleContextSymbol].configs
+      // a container is also a module-config which can be injected via this.use(MyContainer)
+      configs.set(this.constructor as ModuleConfigCtor, this)
+    }
+
+    new<T extends Module>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
+      let container = this[ModuleContainerSymbol]
+      container[ModuleConfigSymbol] = this[ModuleConfigSymbol]
+      container[ModuleProviderSymbol] = this[ModuleProviderSymbol]
+      attachModuleContainer(container)
+      return this[ModuleContainerSymbol].new(Ctor, options)
+    }
+    /**
+     *
+     * @param Ctor get instance from weak-map
+     */
+    use<T extends Module>(Ctor: ModuleCtor<T>): T
+    use<T extends ModuleConfigCtor>(Ctor: T): InstanceType<T>
+    use<T>(Ctor: ModuleProvider<T>): T
+    use(Ctor: ModuleCtor | ModuleConfigCtor | ModuleProvider) {
+      let container = this[ModuleContainerSymbol]
+      container[ModuleConfigSymbol] = this[ModuleConfigSymbol]
+      container[ModuleProviderSymbol] = this[ModuleProviderSymbol]
+      attachModuleContainer(container)
+      return this[ModuleContainerSymbol].use(Ctor as any)
+    }
+  }
+}
+
+const attachModuleContainer = <T extends ModuleContainer>(container: T) => {
+  let ctx = container[ModuleContextSymbol]
+  let configs = container[ModuleConfigSymbol]
+  let providers = container[ModuleProviderSymbol]
+  let SelfCtor = container.constructor as ModuleCtor
+
+  // add config if needed
+  if (configs) {
+    attachModuleConfigs(ctx, configs, false)
+  }
+
+  // add provider if needed
+  if (providers) {
+    attachModuleProviderValues(ctx, providers, false)
+  }
+
+  // eslint-disable-next-line
+  if (container instanceof Module) {
+    if (ctx.modules.has(SelfCtor)) {
+      ctx.modules.set(SelfCtor, container)
+    }
+  } else {
+    if (!ctx.configs.has(SelfCtor)) {
+      ctx.configs.set(SelfCtor, container)
+    }
+  }
+}
+
+export class ModuleContainer {
+  [ModuleConfigSymbol]?: object[];
+
+  [ModuleProviderSymbol]?: ModuleProviderValue[];
+
+  [ModuleContextSymbol] = createModuleContext()
+
+  new<T extends Module>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
+    attachModuleContainer(this)
+
+    let ctx = this[ModuleContextSymbol]
+    let context = createModuleContext()
+
+    attachModuleContextOptions(context, options, true)
+
+    // clone configs
+    for (let [Config, value] of ctx.configs.entries()) {
+      if (!context.configs.has(Config)) {
+        context.configs.set(Config, value)
+      }
+    }
+
+    // clone providers
+    for (let [Provider, value] of ctx.providers.entries()) {
+      if (ctx.providers.has(Provider)) {
+        context.providers.set(Provider, value)
+      }
+    }
+
+    let module = new Ctor(context)
+
+    context.modules.set(Ctor, module)
+
+    return module
+  }
 
   /**
    *
    * @param Ctor get instance from weak-map
    */
   use<T extends Module>(Ctor: ModuleCtor<T>): T
+  use<T extends ModuleConfigCtor>(Ctor: T): InstanceType<T>
+  use<T>(Ctor: ModuleProvider<T>): T
+  use(Ctor: ModuleCtor | ModuleConfigCtor | ModuleProvider) {
+    attachModuleContainer(this)
 
-  use<T extends Constructor>(Ctor: T): InstanceType<T>
+    let ctx = this[ModuleContextSymbol]
 
-  use(Ctor: new (...args: any) => any) {
-    let configs = this[ModuleConfigKey]
-    let ctx = this[ModuleContextKey]
-
-    if (configs) {
-      attachModuleConfig(ctx, configs)
+    if (isModuleProvider(Ctor)) {
+      return getModuleProvider(Ctor, ctx)
     }
 
-    if (!(this instanceof Module)) {
-      let Self = this.constructor as Constructor
-      if (!ctx.configs.has(Self)) {
-        ctx.configs.set(Self, this)
-      }
-    }
-
+    // eslint-disable-next-line
     if (Ctor.prototype instanceof Module) {
-      return getModule(Ctor, ctx)
+      return getModule(Ctor as ModuleCtor, ctx)
     }
 
     return getModuleConfig(Ctor, ctx)
   }
 }
 
-export abstract class Module extends BaseModule {
-  constructor(ctx: ModuleContext) {
+export abstract class Module extends ModuleContainer {
+  constructor(ctx?: ModuleContext) {
     super()
-    if (disableContructorCall) {
-      throw new Error('Should not new Module() manually, using this.using(ModuleCtor) instead')
-    }
-    this[ModuleContextKey] = ctx
+    this[ModuleContextSymbol] = ctx || this[ModuleContextSymbol]
   }
 }
 
@@ -203,20 +394,20 @@ export abstract class Module extends BaseModule {
 //   }
 // }
 
-// class Home extends Module {
+// class App extends ModuleContainer {
+//   [ModuleConfigSymbol] = [new PageInfo('/path/for/test', 'test')]
 //   root = this.use(Root)
-//   get app() {
-//     return this.use(App)
-//   }
-// }
-
-// class App {
-//   home = initilize(Home, [this, new PageInfo('/path/for/test', 'test')])
+//   root1 = this.use(Root)
+//   root2 = this.new(Root, {
+//     configs: [new PageInfo('/path/for/new', 'new')],
+//   })
 // }
 
 // let app = new App()
 
-// let root = initilize(Root, [new PageInfo('/path/for/test', 'test')])
+// let root = initilize(Root, {
+//   configs: [new PageInfo('/path/for/test', 'test')],
+// })
 
 // let log = (root: Root, tag = 'info') => {
 //   console.log(tag, {
@@ -229,9 +420,11 @@ export abstract class Module extends BaseModule {
 //   })
 // }
 
-// log(app.home.root, 'app.home.root')
+// log(app.root, 'app.root')
+// log(app.root2, 'app.root2')
 // log(root, 'root')
 
 // console.log({
-//   [`app.home.app is equal to app`]: app === app.home.app,
+//   [`app.root is equal to app.root1`]: app.root === app.root1,
+//   [`app.root is not equal to app.root2`]: app.root === app.root2,
 // })

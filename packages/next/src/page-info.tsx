@@ -1,7 +1,6 @@
-import { ModuleConfig } from './module'
 import { PageContextType } from './page'
 
-export class PageInfo extends ModuleConfig {
+export class PageInfo {
   /**
    * userAgent
    */
@@ -41,7 +40,6 @@ export class PageInfo extends ModuleConfig {
    * `Component` the tree of the App to use if needing to render separately
    */
   constructor(ctx: PageContextType) {
-    super()
     Object.assign(this, ctx)
   }
 }

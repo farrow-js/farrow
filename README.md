@@ -42,7 +42,7 @@
 
 ## Environment Requirement
 
-- TypeScript 4.1
+- TypeScript 4.2
 - Node.js 14.0.0
 
 ## Usage

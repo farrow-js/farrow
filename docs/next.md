@@ -19,7 +19,7 @@
 ## Contents
 
 - [Basic Usage](#basic-usage)
-- React Hooks API](#react-hooks-api)
+- [React Hooks API](#react-hooks-api)
 - [Controller API](#controller-api)
 - [Dependency Injection](#dependency-injection)
 

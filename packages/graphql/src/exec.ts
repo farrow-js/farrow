@@ -114,14 +114,14 @@ class Circle extends ObjectType {
 const isTrue = true as boolean
 
 const queryCircle = Circle.select({
-  origin: {
-    field: 'origin',
-    selections: Point2D.select({
-      width: {
-        field: 'x',
-      },
-    } as const),
-  },
+  // origin: {
+  //   field: 'origin',
+  //   selections: Point2D.select({
+  //     width: {
+  //       field: 'x',
+  //     },
+  //   } as const),
+  // },
 } as const)
 
 type T00 = SelectObjectTypeOf<Circle, typeof queryCircle>
@@ -163,38 +163,38 @@ class Query extends ObjectType {
   })
 }
 
-const query0 = Query.select({
-  circle0: {
-    field: 'getCircle',
-    args: {
-      x: 10.0,
-      y: 0.0,
-    },
-    selected: true,
-    selections: {
-      radius: {
-        field: 'radius',
-        selected: true,
-      },
-      origin: {
-        field: 'origin',
-        selected: true,
-        selections: {
-          width: {
-            field: 'x',
-            selected: true,
-          },
-          height: {
-            field: 'y',
-            selected: true,
-          },
-        },
-      },
-    },
-  },
-} as const)
+// const query0 = Query.select({
+//   circle0: {
+//     field: 'getCircle',
+//     args: {
+//       x: 10.0,
+//       y: 0.0,
+//     },
+//     selected: true,
+//     selections: {
+//       radius: {
+//         field: 'radius',
+//         selected: true,
+//       },
+//       origin: {
+//         field: 'origin',
+//         selected: true,
+//         selections: {
+//           width: {
+//             field: 'x',
+//             selected: true,
+//           },
+//           height: {
+//             field: 'y',
+//             selected: true,
+//           },
+//         },
+//       },
+//     },
+//   },
+// } as const)
 
-type Query0 = SelectObjectTypeOf<Query, typeof query0>
+// type Query0 = SelectObjectTypeOf<Query, typeof query0>
 
 type T6 = InstanceType<Circle['fields']['origin']['type']>
 

@@ -5,10 +5,10 @@ type PageInfo = {
   env: string
 }
 
-const PageInfoProvider = createProvider<PageInfo>()
+const PageInfo = createProvider<PageInfo>()
 
 class User extends Module {
-  page = this.use(PageInfoProvider)
+  page = this.use(PageInfo)
   path = `${this.page.url}/user`
   get product() {
     return this.use(Product)
@@ -16,7 +16,7 @@ class User extends Module {
 }
 
 class Product extends Module {
-  page = this.use(PageInfoProvider)
+  page = this.use(PageInfo)
   path = `${this.page.url}/product`
   get user() {
     return this.use(User)
@@ -24,7 +24,7 @@ class Product extends Module {
 }
 
 class Root extends Module {
-  page = this.use(PageInfoProvider)
+  page = this.use(PageInfo)
   user = this.use(User)
   product = this.use(Product)
 
@@ -44,7 +44,7 @@ class Root extends Module {
 
 class App extends Container {
   [ModuleProviderSymbol] = [
-    PageInfoProvider.provide({
+    PageInfo.provide({
       url: '/path/for/app',
       env: 'app',
     }),
@@ -53,7 +53,7 @@ class App extends Container {
   root1 = this.use(Root)
   root2 = this.new(Root, {
     providers: [
-      PageInfoProvider.provide({
+      PageInfo.provide({
         url: '/path/for/new',
         env: 'new',
       }),
@@ -93,7 +93,7 @@ describe('Basic Usage of Module', () => {
 
   let root = initilize(Root, {
     providers: [
-      PageInfoProvider.provide({
+      PageInfo.provide({
         url: '/path/for/initilize',
         env: 'initilize',
       }),

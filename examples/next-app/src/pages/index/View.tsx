@@ -134,7 +134,7 @@ class Counter extends Module {
   }
 
   decre = (step = 1) => {
-    let count = this.app.state.count + step
+    let count = this.app.state.count - step
     this.app.setState({ count })
   }
 

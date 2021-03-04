@@ -38,7 +38,7 @@ type PageInfo = {
 /**
  * create a provider carries extra data
  */
-const PageInfoProvider = createProvider<PageInfo>()
+const PageInfo = createProvider<PageInfo>()
 
 /**
  * define a module class and inject deps via this.use(Dep)

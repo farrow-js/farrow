@@ -4,44 +4,41 @@ A module abstraction providing dependencies management
 
 ## Glossary
 
-- `module`:
+- `Module`:
 
   - Any `Class` which `extends Module`
   - it's a basic unit for writing logic code
-  - it should not be define custom constructor paramaters
-  - it should not be instantiated via `new` keyword manually except for testing
+  - it should not define custom constructor parameters
+  - it should not be instantiated via the `new` keyword manually
   - everything it needed is via `this.use(DepClass)`
 
-- `module-config`
+- `Provider`
 
-  - Any normal `Class` for injecting some data to `module`
-  - it can has its own constructor paramaters
-  - it should be instantiate by `new` keywords in `module-container`
-  - it should be placed only one for a `module-container`, duplicated is not allow
+  - it can be created via `createProvider<Type>(defaultValue)`
+  - it should be attached to `Container` via `Provider.provide(value)`
+  - it should be placed only once for a `Container`, duplicated is not allow
 
-- `module-container`
+- `Container`
 
-  - Any `Class` which `extends ModuleContainer`
+  - Any `Class` which `extends Container`
   - it's the entry of our code of `modules`
-  - it should be instantiate by `new` keywords
-  - it can use `[ModuleConfigSymbol]` filed for providing `module-config`
+  - it should be instantiated by the `new` keyword
+  - it can use `[ModuleProviderSymbol]` field for injecting the value created by `Provider`
 
 ## Usage
 
 ```typescript
-import { Module, ModuleContainer, ModuleConfigSymbol } from 'farrow-module'
+import { Module, Container, createProvider, ModuleProviderSymbol } from 'farrow-module'
 
-/**
- * define a normal class for injecting module-config
- */
-class PageInfo {
+type PageInfo = {
   url: string
   env: string
-  constructor(url: string, env: string) {
-    this.url = url
-    this.env = env
-  }
 }
+
+/**
+ * create a provider carries extra data
+ */
+const PageInfoProvider = createProvider<PageInfo>()
 
 /**
  * define a module class and inject deps via this.use(Dep)
@@ -95,12 +92,24 @@ class Root extends Module {
   }
 }
 
+// prepared value of provider
+const pageInfoForApp = PageInfoProvider.provide({
+  url: '/path/for/app',
+  env: 'app',
+})
+
+// prepared value of provider
+const pageInfoForNew = PageInfoProvider.provide({
+  url: '/path/for/new',
+  env: 'new',
+})
+
 /**
  * define a module-container class for entry
- * use [ModuleConfigSymbol] filed for providing module-config
+ * use [ModuleProviderSymbol] filed for providing Provider
  */
-class App extends ModuleContainer {
-  [ModuleConfigSymbol] = [new PageInfo('/path/for/app', 'app')]
+class App extends Container {
+  [ModuleProviderSymbol] = [pageInfoForApp]
 
   // app.root is equal to app.root1
   root = this.use(Root)
@@ -108,11 +117,11 @@ class App extends ModuleContainer {
   root1 = this.use(Root)
 
   /**
-   * create a new Root and provide new module-config
+   * create a new Root and provide new Provider
    *  app.root2 is not equal to app.root, it's a new one
    */
   root2 = this.new(Root, {
-    configs: [new PageInfo('/path/for/new', 'new')],
+    providers: [pageInfoForNew],
   })
 }
 
@@ -125,14 +134,25 @@ app.root.getInfo()
 
 ### Module#use(DepClass)
 
-`module.use(DepClass)` will read or create a DepClass instance from the `module-container`
+`module.use(DepClass)` will read or create a DepClass instance from the `Container`
 
 ### Module#new(DepClass, options?)
 
 `module.new(DepClass, options)` will create a new DepClass instance
 
-- `options.configs`, an list of `module-config` instances for injecting.
+- `options.providers`, an list of value created by `Provider` for injecting.
 
-### ModuleContainer#[ModuleConfigSymbol]
+### Container#[ModuleProviderSymbol]
 
-`ModuleContainer#[ModuleConfigSymbol]` is a place for injecting `module-config` in `module-container`
+`ModuleContainer#[ModuleProviderSymbol]` is a place for injecting the value of any `Provider` in `Container`
+
+### Container.from(Class)
+
+`Container.from(Class)` can extends a existed `Class` make it become a `Container` which supports `this.use()` and `this.new()`
+
+### createProvider<Type>(defaultValue?)
+
+`createProvider<Type>(defaultValue?)` create a `Provider` by given `Type` and `defaultValue`
+
+- `Provider.provide(value)`: create a injectable value of `Provider` for `Container`
+- `Provider.defaultValue`: the `defaultValue` of `Provider`, it's optional, maybe `undefined`

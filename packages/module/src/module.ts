@@ -42,25 +42,30 @@ const assertInstance: AssertInstance = (input) => {
   }
 }
 
-export type ModuleCtor<T extends Module = Module> = new (ctx?: ModuleContext) => T
+export type Injectable = {
+  __injectable__: true
+}
 
-export type ModuleConfigCtor = new (...args: any[]) => {}
+export type InjectableCtor<T = {}> = (new (...args: any[]) => T) & Injectable
+
+export type ModuleCtor<T extends Module = Module> = (new (ctx?: ModuleContext) => T) & Injectable
 
 export type ModuleProvider<T = any> = {
   isModuleProvider: true
-  name: string
+  defaultValue?: T
   provide(value: T): ModuleProviderValue<T>
-}
+} & Injectable
 
 export type ModuleProviderValue<T = any> = {
   Provider: ModuleProvider<T>
   value: T
 }
 
-export function createProvider<T>(name = ''): ModuleProvider<T> {
+export function createProvider<T>(defaultValue?: T): ModuleProvider<T> {
   let Provider: ModuleProvider<T> = {
+    __injectable__: true,
     isModuleProvider: true,
-    name,
+    defaultValue,
     provide(value) {
       return {
         Provider,
@@ -76,47 +81,39 @@ export const isModuleProvider = <T>(input: any): input is ModuleProvider<T> => {
 }
 
 export type ModuleContext = {
-  modules: Map<ModuleCtor, Module>
-  configs: Map<ModuleConfigCtor, object>
-  providers: Map<ModuleProvider, any>
+  injectables: Map<Injectable, any>
 }
 
 export const createModuleContext = (options?: ModuleContextOptions): ModuleContext => {
   let ctx: ModuleContext = {
-    modules: new Map(),
-    configs: new Map(),
-    providers: new Map(),
+    injectables: new Map(),
   }
   attachModuleContextOptions(ctx, options, true)
   return ctx
 }
 
 export const getModule = <T extends Module>(Ctor: ModuleCtor<T>, ctx: ModuleContext): T => {
-  if (ctx.modules.has(Ctor)) {
-    return ctx.modules.get(Ctor)! as T
+  if (ctx.injectables.has(Ctor)) {
+    return ctx.injectables.get(Ctor)! as T
   }
 
   let module = new Ctor(ctx)
 
-  ctx.modules.set(Ctor, module)
+  ctx.injectables.set(Ctor, module)
 
   return module as T
 }
 
-export const getModuleConfig = <T extends ModuleConfigCtor>(Ctor: T, ctx: ModuleContext): InstanceType<T> => {
-  if (ctx.configs.has(Ctor)) {
-    return ctx.configs.get(Ctor)! as InstanceType<T>
-  }
-
-  throw new Error(`Module Config is using without injecting: ${Ctor.name}`)
-}
-
 export const getModuleProvider = <T>(Provider: ModuleProvider<T>, ctx: ModuleContext): T => {
-  if (ctx.providers.has(Provider)) {
-    return ctx.providers.get(Provider)! as T
+  if (ctx.injectables.has(Provider)) {
+    return ctx.injectables.get(Provider)! as T
   }
 
-  throw new Error(`Module Provider is using without injecting: ${Provider.name}`)
+  if (Provider.defaultValue !== undefined) {
+    return Provider.defaultValue
+  }
+
+  throw new Error(`Provider is using without injecting`)
 }
 
 export const attachModules = (ctx: ModuleContext, modules: Module[], throws = true) => {
@@ -125,28 +122,12 @@ export const attachModules = (ctx: ModuleContext, modules: Module[], throws = tr
 
     let Ctor = module.constructor
 
-    if (ctx.modules.has(Ctor)) {
+    if (ctx.injectables.has(Ctor)) {
       if (throws) {
         throw new Error(`Unexpected duplicate module: ${Ctor.name}`)
       }
     } else {
-      ctx.modules.set(Ctor, module)
-    }
-  }
-}
-
-export const attachModuleConfigs = (ctx: ModuleContext, configs: object[], throws = true) => {
-  for (let config of configs) {
-    assertInstance<{ constructor: ModuleConfigCtor }>(config)
-
-    let Ctor = config.constructor
-
-    if (ctx.configs.has(Ctor)) {
-      if (throws) {
-        throw new Error(`Unexpected duplicate module-config: ${Ctor.name}`)
-      }
-    } else {
-      ctx.configs.set(Ctor, config)
+      ctx.injectables.set(Ctor, module)
     }
   }
 }
@@ -159,29 +140,24 @@ export const attachModuleProviderValues = (
   for (let providerValue of providerValues) {
     let { Provider, value } = providerValue
 
-    if (ctx.providers.has(Provider)) {
+    if (ctx.injectables.has(Provider)) {
       if (throws) {
-        throw new Error(`Unexpected duplicate module-provider: ${Provider.name}`)
+        throw new Error(`Unexpected duplicate Provider`)
       }
     } else {
-      ctx.providers.set(Provider, value)
+      ctx.injectables.set(Provider, value)
     }
   }
 }
 
 export type ModuleContextOptions = {
   modules?: Module[]
-  configs?: object[]
   providers?: ModuleProviderValue[]
 }
 
 export const attachModuleContextOptions = (ctx: ModuleContext, options?: ModuleContextOptions, throws = true) => {
   if (options?.modules) {
     attachModules(ctx, options?.modules, throws)
-  }
-
-  if (options?.configs) {
-    attachModuleConfigs(ctx, options?.configs, throws)
   }
 
   if (options?.providers) {
@@ -196,20 +172,18 @@ export const initilize = <T extends Module>(
 ) => {
   attachModuleContextOptions(ctx, options, true)
 
-  if (ctx.modules.has(Ctor)) {
-    return ctx.modules.get(Ctor)! as T
+  if (ctx.injectables.has(Ctor)) {
+    return ctx.injectables.get(Ctor)! as T
   }
 
   let module = new Ctor(ctx)
 
-  ctx.modules.set(Ctor, module)
+  ctx.injectables.set(Ctor, module)
 
   return module
 }
 
 export const ModuleContextSymbol = Symbol('module.context')
-
-export const ModuleConfigSymbol = Symbol('module.config')
 
 export const ModuleProviderSymbol = Symbol('module.provider')
 
@@ -217,37 +191,52 @@ export const ModuleContainerSymbol = Symbol('module.container')
 
 export type Constructable = new (...args: any[]) => any
 
-export const Container = <T extends Constructable>(Ctor: T) => {
-  return class Container extends Ctor {
-    [ModuleConfigSymbol]?: object[];
+const attachModuleContainer = <T extends Container>(container: T) => {
+  let ctx = container[ModuleContextSymbol]
+  let providers = container[ModuleProviderSymbol]
+  let SelfCtor = container.constructor as ModuleCtor
+
+  // add provider if needed
+  if (providers) {
+    attachModuleProviderValues(ctx, providers, false)
+  }
+
+  // add Self if needed
+  if (ctx.injectables.has(SelfCtor)) {
+    ctx.injectables.set(SelfCtor, container)
+  }
+}
+
+const mixinModuleContainer = <T extends Constructable>(Ctor: T) => {
+  return class ContainerMixin extends Ctor {
+    // mark injectable
+    static __injectable__ = true as const;
+
     [ModuleProviderSymbol]?: ModuleProviderValue[];
-    [ModuleContainerSymbol] = new ModuleContainer()
+    [ModuleContainerSymbol] = new Container()
 
     constructor(...args: any[]) {
       super(...args)
       let container = this[ModuleContainerSymbol]
-      let configs = container[ModuleContextSymbol].configs
+      let ctx = container[ModuleContextSymbol]
       // a container is also a module-config which can be injected via this.use(MyContainer)
-      configs.set(this.constructor as ModuleConfigCtor, this)
+      ctx.injectables.set(this.constructor as typeof ContainerMixin, this)
     }
 
     new<T extends Module>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
       let container = this[ModuleContainerSymbol]
-      container[ModuleConfigSymbol] = this[ModuleConfigSymbol]
       container[ModuleProviderSymbol] = this[ModuleProviderSymbol]
       attachModuleContainer(container)
       return this[ModuleContainerSymbol].new(Ctor, options)
     }
     /**
      *
-     * @param Ctor get instance from weak-map
+     * @param Ctor get instance from container
      */
-    use<T extends Module>(Ctor: ModuleCtor<T>): T
-    use<T extends ModuleConfigCtor>(Ctor: T): InstanceType<T>
+    use<T>(Ctor: InjectableCtor<T>): T
     use<T>(Ctor: ModuleProvider<T>): T
-    use(Ctor: ModuleCtor | ModuleConfigCtor | ModuleProvider) {
+    use(Ctor: InjectableCtor | ModuleProvider) {
       let container = this[ModuleContainerSymbol]
-      container[ModuleConfigSymbol] = this[ModuleConfigSymbol]
       container[ModuleProviderSymbol] = this[ModuleProviderSymbol]
       attachModuleContainer(container)
       return this[ModuleContainerSymbol].use(Ctor as any)
@@ -255,35 +244,13 @@ export const Container = <T extends Constructable>(Ctor: T) => {
   }
 }
 
-const attachModuleContainer = <T extends ModuleContainer>(container: T) => {
-  let ctx = container[ModuleContextSymbol]
-  let configs = container[ModuleConfigSymbol]
-  let providers = container[ModuleProviderSymbol]
-  let SelfCtor = container.constructor as ModuleCtor
+export class Container {
+  // mark injectable
+  static __injectable__ = true as const
 
-  // add config if needed
-  if (configs) {
-    attachModuleConfigs(ctx, configs, false)
+  static from<T extends Constructable>(Ctor: T) {
+    return mixinModuleContainer(Ctor)
   }
-
-  // add provider if needed
-  if (providers) {
-    attachModuleProviderValues(ctx, providers, false)
-  }
-
-  if (container instanceof Module) {
-    if (ctx.modules.has(SelfCtor)) {
-      ctx.modules.set(SelfCtor, container)
-    }
-  } else {
-    if (!ctx.configs.has(SelfCtor)) {
-      ctx.configs.set(SelfCtor, container)
-    }
-  }
-}
-
-export class ModuleContainer {
-  [ModuleConfigSymbol]?: object[];
 
   [ModuleProviderSymbol]?: ModuleProviderValue[];
 
@@ -295,37 +262,30 @@ export class ModuleContainer {
     let ctx = this[ModuleContextSymbol]
     let context = createModuleContext()
 
+    // clone module/providers from options
     attachModuleContextOptions(context, options, true)
 
-    // clone configs
-    for (let [Config, value] of ctx.configs.entries()) {
-      if (!context.configs.has(Config)) {
-        context.configs.set(Config, value)
+    // clone providers from current container
+    for (let [Injectable, value] of ctx.injectables.entries()) {
+      if (isModuleProvider(Injectable)) {
+        if (!context.injectables.has(Injectable)) {
+          context.injectables.set(Injectable, value)
+        }
       }
     }
 
-    // clone providers
-    for (let [Provider, value] of ctx.providers.entries()) {
-      if (ctx.providers.has(Provider)) {
-        context.providers.set(Provider, value)
-      }
-    }
-
-    let module = new Ctor(context)
-
-    context.modules.set(Ctor, module)
+    let module = initilize(Ctor, undefined, context)
 
     return module
   }
 
   /**
    *
-   * @param Ctor get instance from weak-map
+   * @param Ctor get instance from container
    */
-  use<T extends Module>(Ctor: ModuleCtor<T>): T
-  use<T extends ModuleConfigCtor>(Ctor: T): InstanceType<T>
+  use<T>(Ctor: InjectableCtor<T>): T
   use<T>(Ctor: ModuleProvider<T>): T
-  use(Ctor: ModuleCtor | ModuleConfigCtor | ModuleProvider) {
+  use(Ctor: InjectableCtor | ModuleProvider) {
     attachModuleContainer(this)
 
     let ctx = this[ModuleContextSymbol]
@@ -338,11 +298,11 @@ export class ModuleContainer {
       return getModule(Ctor as ModuleCtor, ctx)
     }
 
-    return getModuleConfig(Ctor, ctx)
+    throw new Error(`Unsupported input in this.use(): ${Ctor}`)
   }
 }
 
-export abstract class Module extends ModuleContainer {
+export abstract class Module extends Container {
   constructor(ctx?: ModuleContext) {
     super()
     this[ModuleContextSymbol] = ctx || this[ModuleContextSymbol]

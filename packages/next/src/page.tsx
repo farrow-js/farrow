@@ -37,10 +37,9 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
         asPath: props.asPath,
         tag: 'FC',
       }
-      let pageInfo = new PageInfo(pageCtx)
-      let configs = [pageInfo]
+      let pageInfo = PageInfo.provide(pageCtx)
       let moduleContext = createModuleContext({
-        configs,
+        providers: [pageInfo],
       })
 
       let ctrls = Object.values(Controllers).map((Controller, index) => {
@@ -73,10 +72,10 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
       tag: 'getInitialProps',
     }
 
-    let pageInfo = new PageInfo(pageCtx)
-    let configs = [pageInfo]
-
-    let moduleCtx = createModuleContext({ configs })
+    let pageInfo = PageInfo.provide(pageCtx)
+    let moduleCtx = createModuleContext({
+      providers: [pageInfo],
+    })
 
     let ctrlsMap = {} as ControllerInstancesType<T>
 

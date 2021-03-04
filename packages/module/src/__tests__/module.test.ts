@@ -1,16 +1,14 @@
-import { Module, ModuleContainer, ModuleConfigSymbol, initilize } from '../module'
+import { Module, Container, createProvider, initilize, ModuleProviderSymbol } from '../module'
 
-class PageInfo {
+type PageInfo = {
   url: string
   env: string
-  constructor(url: string, env: string) {
-    this.url = url
-    this.env = env
-  }
 }
 
+const PageInfoProvider = createProvider<PageInfo>()
+
 class User extends Module {
-  page = this.use(PageInfo)
+  page = this.use(PageInfoProvider)
   path = `${this.page.url}/user`
   get product() {
     return this.use(Product)
@@ -18,7 +16,7 @@ class User extends Module {
 }
 
 class Product extends Module {
-  page = this.use(PageInfo)
+  page = this.use(PageInfoProvider)
   path = `${this.page.url}/product`
   get user() {
     return this.use(User)
@@ -26,7 +24,7 @@ class Product extends Module {
 }
 
 class Root extends Module {
-  page = this.use(PageInfo)
+  page = this.use(PageInfoProvider)
   user = this.use(User)
   product = this.use(Product)
 
@@ -44,12 +42,22 @@ class Root extends Module {
   }
 }
 
-class App extends ModuleContainer {
-  [ModuleConfigSymbol] = [new PageInfo('/path/for/app', 'app')]
+class App extends Container {
+  [ModuleProviderSymbol] = [
+    PageInfoProvider.provide({
+      url: '/path/for/app',
+      env: 'app',
+    }),
+  ]
   root = this.use(Root)
   root1 = this.use(Root)
   root2 = this.new(Root, {
-    configs: [new PageInfo('/path/for/new', 'new')],
+    providers: [
+      PageInfoProvider.provide({
+        url: '/path/for/new',
+        env: 'new',
+      }),
+    ],
   })
 }
 
@@ -84,13 +92,18 @@ describe('Basic Usage of Module', () => {
   let app = new App()
 
   let root = initilize(Root, {
-    configs: [new PageInfo('/path/for/initlize', 'initlize')],
+    providers: [
+      PageInfoProvider.provide({
+        url: '/path/for/initilize',
+        env: 'initilize',
+      }),
+    ],
   })
 
   describe('initilize', () => {
     testRoot(root, {
-      url: '/path/for/initlize',
-      env: 'initlize',
+      url: '/path/for/initilize',
+      env: 'initilize',
     })
   })
 

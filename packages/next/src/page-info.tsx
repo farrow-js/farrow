@@ -1,6 +1,7 @@
+import { createProvider } from 'farrow-module'
 import { PageContextType } from './page'
 
-export class PageInfo {
+export type PageInfo = {
   /**
    * userAgent
    */
@@ -24,22 +25,17 @@ export class PageInfo {
   /**
    * Path section of `URL`.
    */
-  pathname!: PageContextType['pathname']
+  pathname: PageContextType['pathname']
 
   /**
    * Query string section of `URL` parsed as an object.
    */
-  query!: PageContextType['query']
+  query: PageContextType['query']
 
   /**
    * `String` of the actual path including query.
    */
   asPath?: PageContextType['asPath']
-
-  /**
-   * `Component` the tree of the App to use if needing to render separately
-   */
-  constructor(ctx: PageContextType) {
-    Object.assign(this, ctx)
-  }
 }
+
+export const PageInfo = createProvider<PageInfo>()

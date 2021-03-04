@@ -56,7 +56,7 @@ type AppState = {
   text: string
 }
 
-class App extends Container(React.Component) {
+class App extends Container.from(React.Component) {
   state: AppState = {
     count: 0,
     text: '',
@@ -120,7 +120,7 @@ interface CounterProviderType {
   setState(satet: this['state']): void
 }
 
-const CounterProvider = createProvider<CounterProviderType>('CounterProviderType')
+const CounterProvider = createProvider<CounterProviderType>()
 
 class Counter extends Module {
   app = this.use(CounterProvider)
@@ -160,7 +160,7 @@ interface TextManagerProviderType {
   setState(state: this['state']): void
 }
 
-const TextManagerProvider = createProvider<TextManagerProviderType>('TextManagerProvider')
+const TextManagerProvider = createProvider<TextManagerProviderType>()
 
 class TextManager extends Module {
   app = this.use(TextManagerProvider)

@@ -211,15 +211,24 @@ const mixinModuleContainer = <T extends Constructable>(Ctor: T) => {
     new<T extends Module>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
       return getContainer(this).new(Ctor, options)
     }
+
+    /**
+     * set dependent to container
+     * @param value
+     */
+    inject<T>(providerValue: ModuleProviderValue<T>): T
+    inject<T>(Ctor: () => T): T
+    inject(input: ModuleProviderValue | (() => any)) {
+      return getContainer(this).inject(input as any)
+    }
+
     /**
      *
      * @param Ctor get instance from container
      */
     use<T>(Ctor: InjectableCtor<T>): T
     use<T>(Ctor: ModuleProvider<T>): T
-    use<T>(providerValue: ModuleProviderValue<T>): T
-    use<T>(Ctor: () => T): T
-    use(Ctor: InjectableCtor | ModuleProvider | ModuleProviderValue | (() => any)) {
+    use(Ctor: InjectableCtor | ModuleProvider) {
       return getContainer(this).use(Ctor as any)
     }
   }
@@ -298,7 +307,6 @@ export class Container {
    */
   use<T>(Ctor: InjectableCtor<T>): T
   use<T>(Ctor: ModuleProvider<T>): T
-
   use(Ctor: InjectableCtor | ModuleProvider) {
     attachModuleContainer(this)
 

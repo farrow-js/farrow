@@ -129,3 +129,260 @@ describe('Basic Usage of Module', () => {
     expect(app.root === app.root2).toBe(false)
   })
 })
+
+describe('Container', () => {
+  it('support using Container as entry', () => {
+    class Root extends Container {
+      prefix: string
+
+      constructor(prefix: string) {
+        super()
+        this.prefix = prefix
+      }
+
+      show() {
+        return `${this.prefix}/root`
+      }
+
+      a = this.use(A)
+      b = this.use(B)
+    }
+
+    class A extends Module {
+      root = this.use(Root)
+      show() {
+        return `${this.root.show()}/a`
+      }
+    }
+
+    class B extends Module {
+      root = this.use(Root)
+      show() {
+        return `${this.root.show()}/b`
+      }
+    }
+
+    let root = new Root('container')
+
+    // Root inherit Container
+    expect(root instanceof Container).toBe(true)
+    expect(root.a instanceof A).toBe(true)
+    expect(root.b instanceof B).toBe(true)
+
+    // a Container can be injected to its dependencies too
+    expect(root.a.root === root).toBe(true)
+    expect(root.b.root === root).toBe(true)
+    expect(root.a.root === root.b.root).toBe(true)
+
+    expect(root.show()).toBe('container/root')
+    expect(root.a.show()).toBe('container/root/a')
+    expect(root.b.show()).toBe('container/root/b')
+  })
+
+  it('support making another Class to a Contaienr via Container.from', () => {
+    class Base {
+      prefix: string
+      constructor(prefix: string = '') {
+        this.prefix = prefix
+      }
+      show() {
+        return `${this.prefix}/base`
+      }
+    }
+
+    class Root extends Container.from(Base) {
+      a = this.use(A)
+      b = this.use(B)
+    }
+
+    class A extends Module {
+      root = this.use(Root)
+      show() {
+        return `${this.root.show()}/a`
+      }
+    }
+
+    class B extends Module {
+      root = this.use(Root)
+      show() {
+        return `${this.root.show()}/b`
+      }
+    }
+
+    let root = new Root('container/from')
+
+    // Container.from does not inherit Container, it just mixin
+    expect(root instanceof Container).toBe(false)
+    expect(root instanceof Base).toBe(true)
+    expect(root.a instanceof A).toBe(true)
+    expect(root.b instanceof B).toBe(true)
+
+    // a minxin Container can be injected to its dependencies too
+    expect(root.a.root === root).toBe(true)
+    expect(root.b.root === root).toBe(true)
+    expect(root.a.root === root.b.root).toBe(true)
+
+    expect(root.show()).toBe('container/from/base')
+    expect(root.a.show()).toBe('container/from/base/a')
+    expect(root.b.show()).toBe('container/from/base/b')
+  })
+
+  it('support share the same context in multiple containers', () => {
+    type Data = {
+      count: number
+    }
+
+    let Data = createProvider<Data>()
+
+    class A extends Module {
+      data = this.use(Data)
+      show() {
+        return 'A'
+      }
+    }
+
+    class Container0 extends Container {
+      data = this.use(Data)
+      a = this.use(A)
+      name: string
+      constructor(name = '') {
+        super()
+        this.name = name
+      }
+    }
+
+    class Container1 extends Container {
+      data = this.use(Data)
+      a = this.use(A)
+      name: string
+      constructor(name = '') {
+        super()
+        this.name = name
+      }
+    }
+
+    class Container2 extends Container {
+      [ModuleProviderSymbol] = [Data.provide({ count: 100 })]
+      data = this.use(Data)
+      a = this.use(A)
+      container0 = this.use(() => new Container0('0'))
+      container1 = this.use(() => new Container1('1'))
+    }
+
+    let container2 = new Container2()
+
+    expect(container2.data === container2.container0.data).toBe(true)
+    expect(container2.data === container2.container1.data).toBe(true)
+
+    expect(container2.a === container2.container0.a).toBe(true)
+    expect(container2.a === container2.container1.a).toBe(true)
+  })
+})
+
+describe('Provider', () => {
+  it('support reusing or re-injecting providers in this.new()', () => {
+    interface Data {
+      count: number
+    }
+
+    let Data = createProvider<Data>({
+      count: 10,
+    })
+
+    class A extends Module {
+      data = this.use(Data)
+    }
+
+    class Root extends Container {
+      [ModuleProviderSymbol] = [
+        Data.provide({
+          count: 100,
+        }),
+      ]
+      useA = this.use(A)
+      newA = this.new(A)
+
+      newAWithProviders = this.new(A, {
+        providers: [
+          Data.provide({
+            count: 200,
+          }),
+        ],
+      })
+    }
+
+    let root = new Root()
+
+    expect(root.useA === root.newA).toBe(false)
+    expect(root.newA === root.newAWithProviders).toBe(false)
+
+    expect(root.newA.data === root.useA.data).toBe(true)
+    expect(root.useA.data === root.newAWithProviders.data).toBe(false)
+
+    expect(root.useA.data).toEqual({
+      count: 100,
+    })
+
+    expect(root.newA.data).toEqual({
+      count: 100,
+    })
+
+    expect(root.newAWithProviders.data).toEqual({
+      count: 200,
+    })
+  })
+
+  it('support default value', () => {
+    interface Data {
+      count: number
+    }
+
+    let Data = createProvider<Data>({
+      count: 10,
+    })
+
+    class Root extends Container {
+      data = this.use(Data)
+    }
+
+    let root = new Root()
+
+    expect(root.data).toEqual({
+      count: 10,
+    })
+
+    expect(root.data === Data.defaultValue).toBe(true)
+  })
+})
+
+describe('Module', () => {
+  it('can inject module to this.new()', () => {
+    class A extends Module {
+      count = 0
+      incre() {
+        this.count++
+      }
+      decre() {
+        this.count--
+      }
+    }
+
+    class Child extends Module {
+      a = this.use(A)
+    }
+
+    class Root extends Container {
+      child = this.use(Child)
+      a = this.use(A)
+      newChild = this.new(Child, {
+        modules: [this.a],
+      })
+    }
+
+    let root = new Root()
+
+    expect(root.child.a === root.a).toBe(true)
+    expect(root.newChild.a === root.child.a).toBe(true)
+    expect(root.newChild === root.child).toBe(false)
+  })
+})

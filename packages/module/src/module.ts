@@ -1,47 +1,6 @@
 /**
  * a module abstraction providing dependencies management
  */
-
-function isObject(o: unknown): o is object {
-  return Object.prototype.toString.call(o) === '[object Object]'
-}
-
-function isPlainObject(o: unknown) {
-  let ctor, prot
-
-  if (!isObject(o)) return false
-
-  // If has modified constructor
-  ctor = o.constructor
-  if (ctor === undefined) return true
-
-  // If has modified prototype
-  prot = ctor.prototype
-  if (!isObject(prot)) return false
-
-  // If constructor does not have an Object-specific method
-  if (Object.prototype.hasOwnProperty.call(prot, 'isPrototypeOf') === false) {
-    return false
-  }
-
-  // Most likely a plain Object
-  return true
-}
-
-interface AssertInstance {
-  <T = object>(input: unknown): asserts input is T
-}
-
-const assertInstance: AssertInstance = (input) => {
-  if (!isObject(input)) {
-    throw new Error(`Expected an object, instead of ${input}`)
-  }
-
-  if (isPlainObject(input)) {
-    throw new Error(`Expected an instance of Custom Class, instead of plan object: ${JSON.stringify(input)}`)
-  }
-}
-
 export type Injectable = {
   __injectable__: true
 }
@@ -116,11 +75,17 @@ export const getModuleProvider = <T>(Provider: ModuleProvider<T>, ctx: ModuleCon
   throw new Error(`Provider is using without injecting`)
 }
 
+export const getInjectable = <T>(Injectable: Injectable, ctx: ModuleContext): T => {
+  if (ctx.injectables.has(Injectable)) {
+    return ctx.injectables.get(Injectable)! as T
+  }
+
+  throw new Error(`Injectable is using without injecting: ${Injectable}`)
+}
+
 export const attachModules = (ctx: ModuleContext, modules: Module[], throws = true) => {
   for (let module of modules) {
-    assertInstance<{ constructor: ModuleCtor }>(module)
-
-    let Ctor = module.constructor
+    let Ctor = module.constructor as ModuleCtor
 
     if (ctx.injectables.has(Ctor)) {
       if (throws) {
@@ -194,7 +159,7 @@ export type Constructable = new (...args: any[]) => any
 const attachModuleContainer = <T extends Container>(container: T) => {
   let ctx = container[ModuleContextSymbol]
   let providers = container[ModuleProviderSymbol]
-  let SelfCtor = container.constructor as ModuleCtor
+  let SelfCtor = container.constructor as InjectableCtor<T>
 
   // add provider if needed
   if (providers) {
@@ -202,18 +167,26 @@ const attachModuleContainer = <T extends Container>(container: T) => {
   }
 
   // add Self if needed
-  if (ctx.injectables.has(SelfCtor)) {
+  if (!ctx.injectables.has(SelfCtor)) {
     ctx.injectables.set(SelfCtor, container)
   }
 }
 
 const mixinModuleContainer = <T extends Constructable>(Ctor: T) => {
-  return class ContainerMixin extends Ctor {
+  return class ContainerMixin extends Ctor implements ModuleContextual {
     // mark injectable
     static __injectable__ = true as const;
 
     [ModuleProviderSymbol]?: ModuleProviderValue[];
     [ModuleContainerSymbol] = new Container()
+
+    get [ModuleContextSymbol]() {
+      return this[ModuleContainerSymbol][ModuleContextSymbol]
+    }
+
+    set [ModuleContextSymbol](ctx) {
+      this[ModuleContainerSymbol][ModuleContextSymbol] = ctx
+    }
 
     constructor(...args: any[]) {
       super(...args)
@@ -226,8 +199,7 @@ const mixinModuleContainer = <T extends Constructable>(Ctor: T) => {
     new<T extends Module>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
       let container = this[ModuleContainerSymbol]
       container[ModuleProviderSymbol] = this[ModuleProviderSymbol]
-      attachModuleContainer(container)
-      return this[ModuleContainerSymbol].new(Ctor, options)
+      return container.new(Ctor, options)
     }
     /**
      *
@@ -235,16 +207,24 @@ const mixinModuleContainer = <T extends Constructable>(Ctor: T) => {
      */
     use<T>(Ctor: InjectableCtor<T>): T
     use<T>(Ctor: ModuleProvider<T>): T
-    use(Ctor: InjectableCtor | ModuleProvider) {
+    use<T extends ModuleContextual>(Ctor: () => T): T
+    use(Ctor: InjectableCtor | ModuleProvider | (() => ModuleContextual)) {
       let container = this[ModuleContainerSymbol]
       container[ModuleProviderSymbol] = this[ModuleProviderSymbol]
-      attachModuleContainer(container)
-      return this[ModuleContainerSymbol].use(Ctor as any)
+      return container.use(Ctor as any)
     }
   }
 }
 
-export class Container {
+export type ModuleContextual = {
+  [ModuleContextSymbol]: ModuleContext
+}
+
+let currentContext: ModuleContext | undefined
+
+let currentProviderValues: ModuleProviderValue[] | undefined
+
+export class Container implements ModuleContextual {
   // mark injectable
   static __injectable__ = true as const
 
@@ -252,9 +232,9 @@ export class Container {
     return mixinModuleContainer(Ctor)
   }
 
-  [ModuleProviderSymbol]?: ModuleProviderValue[];
+  [ModuleProviderSymbol] = currentProviderValues;
 
-  [ModuleContextSymbol] = createModuleContext()
+  [ModuleContextSymbol] = currentContext ?? createModuleContext()
 
   new<T extends Module>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
     attachModuleContainer(this)
@@ -285,17 +265,39 @@ export class Container {
    */
   use<T>(Ctor: InjectableCtor<T>): T
   use<T>(Ctor: ModuleProvider<T>): T
-  use(Ctor: InjectableCtor | ModuleProvider) {
+  use<T extends ModuleContextual>(Ctor: () => T): T
+  use(Ctor: InjectableCtor | ModuleProvider | (() => ModuleContextual)) {
     attachModuleContainer(this)
 
     let ctx = this[ModuleContextSymbol]
 
+    // handle module provider
     if (isModuleProvider(Ctor)) {
       return getModuleProvider(Ctor, ctx)
     }
 
+    // handle normal module
     if (Ctor.prototype instanceof Module) {
       return getModule(Ctor as ModuleCtor, ctx)
+    }
+
+    // handle injectable like container or container-mixin
+    if ('__injectable__' in Ctor) {
+      return getInjectable(Ctor, ctx)
+    }
+
+    // connect the context for this.use(new MyContainer(xxx))
+    if (typeof Ctor === 'function') {
+      let prevContext = currentContext
+      let prevProviderValues = currentProviderValues
+      try {
+        currentContext = ctx
+        currentProviderValues = this[ModuleProviderSymbol]
+        return Ctor()
+      } finally {
+        currentContext = prevContext
+        currentProviderValues = prevProviderValues
+      }
     }
 
     throw new Error(`Unsupported input in this.use(): ${Ctor}`)

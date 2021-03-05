@@ -2,6 +2,16 @@
 
 A module abstraction providing dependencies management
 
+## Installation
+
+```shell
+# from npm
+npm install --save farrow-module
+
+# from yarn
+yarn add farrow-module
+```
+
 ## Glossary
 
 - `Module`:

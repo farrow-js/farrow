@@ -43,7 +43,7 @@ class Root extends Module {
 }
 
 class App extends Container {
-  page = this.use(
+  page = this.inject(
     PageInfo.provide({
       url: '/path/for/app',
       env: 'app',
@@ -262,10 +262,10 @@ describe('Container', () => {
     }
 
     class Container2 extends Container {
-      data = this.use(Data.provide({ count: 100 }))
+      data = this.inject(Data.provide({ count: 100 }))
       a = this.use(A)
-      container0 = this.use(() => new Container0('0'))
-      container1 = this.use(() => new Container1('1'))
+      container0 = this.inject(() => new Container0('0'))
+      container1 = this.inject(() => new Container1('1'))
     }
 
     let container2 = new Container2()
@@ -293,7 +293,7 @@ describe('Provider', () => {
     }
 
     class Root extends Container {
-      data = this.use(
+      data = this.inject(
         Data.provide({
           count: 100,
         }),

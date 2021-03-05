@@ -263,23 +263,46 @@ export class Container {
   }
 
   /**
-   *
-   * @param Ctor get instance from container
+   * set dependent to container
+   * @param value
    */
-  use<T>(Ctor: InjectableCtor<T>): T
-  use<T>(Ctor: ModuleProvider<T>): T
-  use<T>(providerValue: ModuleProviderValue<T>): T
-  use<T>(Ctor: () => T): T
-  use(Ctor: InjectableCtor | ModuleProvider | ModuleProviderValue | (() => any)) {
+  inject<T>(providerValue: ModuleProviderValue<T>): T
+  inject<T>(Ctor: () => T): T
+  inject(input: ModuleProviderValue | (() => any)) {
     attachModuleContainer(this)
 
     let ctx = getModuleContext(this)
 
     // handle provder value
-    if (isModuleProviderValue(Ctor)) {
-      attachModuleProviderValues(ctx, [Ctor], true)
-      return Ctor.value
+    if (isModuleProviderValue(input)) {
+      attachModuleProviderValues(ctx, [input], true)
+      return input.value
     }
+
+    // connect the context for this.use(() => new MyContainer(xxx))
+    if (typeof input === 'function') {
+      let prevContext = currentContext
+      try {
+        currentContext = ctx
+        return input()
+      } finally {
+        currentContext = prevContext
+      }
+    }
+
+    throw new Error(`Unsupported input in this.inject(): ${input}`)
+  }
+
+  /**
+   * get dependent from container
+   */
+  use<T>(Ctor: InjectableCtor<T>): T
+  use<T>(Ctor: ModuleProvider<T>): T
+
+  use(Ctor: InjectableCtor | ModuleProvider) {
+    attachModuleContainer(this)
+
+    let ctx = getModuleContext(this)
 
     // handle module provider
     if (isModuleProvider(Ctor)) {
@@ -294,17 +317,6 @@ export class Container {
     // handle injectable like container or container-mixin
     if ('__injectable__' in Ctor) {
       return getInjectable(Ctor, ctx)
-    }
-
-    // connect the context for this.use(() => new MyContainer(xxx))
-    if (typeof Ctor === 'function') {
-      let prevContext = currentContext
-      try {
-        currentContext = ctx
-        return Ctor()
-      } finally {
-        currentContext = prevContext
-      }
     }
 
     throw new Error(`Unsupported input in this.use(): ${Ctor}`)

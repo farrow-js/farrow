@@ -25,7 +25,7 @@ yarn add farrow-module
 - `Provider`
 
   - it can be created via `createProvider<Type>(defaultValue)`
-  - it should be attached to `Container` via `Provider.provide(value)`
+  - it should be attached to `Container` via `this.inject(Provider.provide(value))`
   - it should be placed only once for a `Container`, duplicated is not allow
 
 - `Container`
@@ -33,12 +33,12 @@ yarn add farrow-module
   - Any `Class` which `extends Container`
   - it's the entry of our code of `modules`
   - it should be instantiated by the `new` keyword
-  - it can use `[ModuleProviderSymbol]` field for injecting the value created by `Provider`
+  - it should be attached to another `Container` via `this.inject(() => new MyContainer(...args))`
 
 ## Usage
 
 ```typescript
-import { Module, Container, createProvider, ModuleProviderSymbol } from 'farrow-module'
+import { Module, Container, createProvider } from 'farrow-module'
 
 type PageInfo = {
   url: string
@@ -102,24 +102,17 @@ class Root extends Module {
   }
 }
 
-// prepared value of provider
-const pageInfoForApp = PageInfoProvider.provide({
-  url: '/path/for/app',
-  env: 'app',
-})
-
-// prepared value of provider
-const pageInfoForNew = PageInfoProvider.provide({
-  url: '/path/for/new',
-  env: 'new',
-})
-
 /**
  * define a module-container class for entry
  * use [ModuleProviderSymbol] filed for providing Provider
  */
 class App extends Container {
-  [ModuleProviderSymbol] = [pageInfoForApp]
+  page = this.inject(
+    PageInfoProvider.provide({
+      url: '/path/for/app',
+      env: 'app',
+    }),
+  )
 
   // app.root is equal to app.root1
   root = this.use(Root)
@@ -131,7 +124,12 @@ class App extends Container {
    *  app.root2 is not equal to app.root, it's a new one
    */
   root2 = this.new(Root, {
-    providers: [pageInfoForNew],
+    providers: [
+      PageInfoProvider.provide({
+        url: '/path/for/new',
+        env: 'new',
+      }),
+    ],
   })
 }
 
@@ -146,11 +144,16 @@ app.root.getInfo()
 
 `module.use(DepClass)` will read or create a DepClass instance from the `Container`
 
+### Module#inject(providerValue | () => container)
+
+`module.inject` will add `provider-value` or `container` to the `Container`
+
 ### Module#new(DepClass, options?)
 
-`module.new(DepClass, options)` will create a new DepClass instance
+`module.new(DepClass, options)` will create a new DepClass instance in current container/context
 
-- `options.providers`, an list of value created by `Provider` for injecting.
+- `options.providers`, an list of values created by `Provider` for injecting/reusing.
+- `options.modules`, an list of modules for injecting/resuing.
 
 ### Container#[ModuleProviderSymbol]
 

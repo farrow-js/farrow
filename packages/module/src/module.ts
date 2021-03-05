@@ -152,14 +152,10 @@ export const initilize = <T extends Module>(
   return module
 }
 
-export const ModuleContextSymbol = Symbol('module.context')
-
-export const ModuleContainerSymbol = Symbol('module.container')
-
 export type Constructable = new (...args: any[]) => any
 
 const attachModuleContainer = <T extends Container>(container: T) => {
-  let ctx = container[ModuleContextSymbol]
+  let ctx = getModuleContext(container)
   let SelfCtor = container.constructor as InjectableCtor<T>
 
   // add Self if needed
@@ -168,31 +164,52 @@ const attachModuleContainer = <T extends Container>(container: T) => {
   }
 }
 
+const moduleContextWeakMap = new WeakMap<object, ModuleContext>()
+
+const getModuleContext = (object: object): ModuleContext => {
+  let ctx = moduleContextWeakMap.get(object)
+  if (!ctx) {
+    throw new Error(`Can not get module-context via ${JSON.stringify(object)}`)
+  }
+  return ctx
+}
+
+const setModuleContext = (object: object, ctx: ModuleContext) => {
+  moduleContextWeakMap.set(object, ctx)
+}
+
+const containerWeakMap = new WeakMap<object, Container>()
+
+const getContainer = (object: object): Container => {
+  let container = containerWeakMap.get(object)
+  if (!container) {
+    throw new Error(`Can not get module-container via ${JSON.stringify(object)}`)
+  }
+  return container
+}
+
+const setContainer = (object: object, container: Container) => {
+  containerWeakMap.set(object, container)
+}
+
 const mixinModuleContainer = <T extends Constructable>(Ctor: T) => {
-  return class ContainerMixin extends Ctor implements ModuleContextual {
+  return class ContainerMixin extends Ctor {
     // mark injectable
-    static __injectable__ = true as const;
-    [ModuleContainerSymbol] = new Container()
-
-    get [ModuleContextSymbol]() {
-      return this[ModuleContainerSymbol][ModuleContextSymbol]
-    }
-
-    set [ModuleContextSymbol](ctx) {
-      this[ModuleContainerSymbol][ModuleContextSymbol] = ctx
-    }
+    static __injectable__ = true as const
 
     constructor(...args: any[]) {
       super(...args)
-      let container = this[ModuleContainerSymbol]
-      let ctx = container[ModuleContextSymbol]
+      let container = new Container()
+      let ctx = getModuleContext(container)
+
+      setContainer(this, container)
+
       // a container is also a module-config which can be injected via this.use(MyContainer)
       ctx.injectables.set(this.constructor as typeof ContainerMixin, this)
     }
 
     new<T extends Module>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
-      let container = this[ModuleContainerSymbol]
-      return container.new(Ctor, options)
+      return getContainer(this).new(Ctor, options)
     }
     /**
      *
@@ -201,21 +218,16 @@ const mixinModuleContainer = <T extends Constructable>(Ctor: T) => {
     use<T>(Ctor: InjectableCtor<T>): T
     use<T>(Ctor: ModuleProvider<T>): T
     use<T>(providerValue: ModuleProviderValue<T>): T
-    use<T extends ModuleContextual>(Ctor: () => T): T
-    use(Ctor: InjectableCtor | ModuleProvider | ModuleProviderValue | (() => ModuleContextual)) {
-      let container = this[ModuleContainerSymbol]
-      return container.use(Ctor as any)
+    use<T>(Ctor: () => T): T
+    use(Ctor: InjectableCtor | ModuleProvider | ModuleProviderValue | (() => any)) {
+      return getContainer(this).use(Ctor as any)
     }
   }
 }
 
-export type ModuleContextual = {
-  [ModuleContextSymbol]: ModuleContext
-}
-
 let currentContext: ModuleContext | undefined
 
-export class Container implements ModuleContextual {
+export class Container {
   // mark injectable
   static __injectable__ = true as const
 
@@ -223,12 +235,14 @@ export class Container implements ModuleContextual {
     return mixinModuleContainer(Ctor)
   }
 
-  [ModuleContextSymbol] = currentContext ?? createModuleContext()
+  constructor() {
+    setModuleContext(this, currentContext ?? createModuleContext())
+  }
 
   new<T extends Module>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
     attachModuleContainer(this)
 
-    let ctx = this[ModuleContextSymbol]
+    let ctx = getModuleContext(this)
     let context = createModuleContext()
 
     // clone module/providers from options
@@ -255,11 +269,11 @@ export class Container implements ModuleContextual {
   use<T>(Ctor: InjectableCtor<T>): T
   use<T>(Ctor: ModuleProvider<T>): T
   use<T>(providerValue: ModuleProviderValue<T>): T
-  use<T extends ModuleContextual>(Ctor: () => T): T
-  use(Ctor: InjectableCtor | ModuleProvider | ModuleProviderValue | (() => ModuleContextual)) {
+  use<T>(Ctor: () => T): T
+  use(Ctor: InjectableCtor | ModuleProvider | ModuleProviderValue | (() => any)) {
     attachModuleContainer(this)
 
-    let ctx = this[ModuleContextSymbol]
+    let ctx = getModuleContext(this)
 
     // handle provder value
     if (isModuleProviderValue(Ctor)) {
@@ -282,7 +296,7 @@ export class Container implements ModuleContextual {
       return getInjectable(Ctor, ctx)
     }
 
-    // connect the context for this.use(new MyContainer(xxx))
+    // connect the context for this.use(() => new MyContainer(xxx))
     if (typeof Ctor === 'function') {
       let prevContext = currentContext
       try {
@@ -300,6 +314,8 @@ export class Container implements ModuleContextual {
 export abstract class Module extends Container {
   constructor(ctx?: ModuleContext) {
     super()
-    this[ModuleContextSymbol] = ctx || this[ModuleContextSymbol]
+    if (ctx) {
+      setModuleContext(this, ctx)
+    }
   }
 }

@@ -1,4 +1,4 @@
-import { Module, Container, createProvider, initilize, ModuleProviderSymbol } from '../module'
+import { Module, Container, createProvider, initilize } from '../module'
 
 type PageInfo = {
   url: string
@@ -43,12 +43,12 @@ class Root extends Module {
 }
 
 class App extends Container {
-  [ModuleProviderSymbol] = [
+  page = this.use(
     PageInfo.provide({
       url: '/path/for/app',
       env: 'app',
     }),
-  ]
+  )
   root = this.use(Root)
   root1 = this.use(Root)
   root2 = this.new(Root, {
@@ -262,8 +262,7 @@ describe('Container', () => {
     }
 
     class Container2 extends Container {
-      [ModuleProviderSymbol] = [Data.provide({ count: 100 })]
-      data = this.use(Data)
+      data = this.use(Data.provide({ count: 100 }))
       a = this.use(A)
       container0 = this.use(() => new Container0('0'))
       container1 = this.use(() => new Container1('1'))
@@ -294,11 +293,11 @@ describe('Provider', () => {
     }
 
     class Root extends Container {
-      [ModuleProviderSymbol] = [
+      data = this.use(
         Data.provide({
           count: 100,
         }),
-      ]
+      )
       useA = this.use(A)
       newA = this.new(A)
 

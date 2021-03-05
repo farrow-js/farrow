@@ -20,6 +20,10 @@ export type ModuleProviderValue<T = any> = {
   value: T
 }
 
+export const isModuleProviderValue = <T = any>(input: any): input is ModuleProviderValue<T> => {
+  return !!(input && 'Provider' in input && 'value' in input)
+}
+
 export function createProvider<T>(defaultValue?: T): ModuleProvider<T> {
   let Provider: ModuleProvider<T> = {
     __injectable__: true,
@@ -150,21 +154,13 @@ export const initilize = <T extends Module>(
 
 export const ModuleContextSymbol = Symbol('module.context')
 
-export const ModuleProviderSymbol = Symbol('module.provider')
-
 export const ModuleContainerSymbol = Symbol('module.container')
 
 export type Constructable = new (...args: any[]) => any
 
 const attachModuleContainer = <T extends Container>(container: T) => {
   let ctx = container[ModuleContextSymbol]
-  let providers = container[ModuleProviderSymbol]
   let SelfCtor = container.constructor as InjectableCtor<T>
-
-  // add provider if needed
-  if (providers) {
-    attachModuleProviderValues(ctx, providers, false)
-  }
 
   // add Self if needed
   if (!ctx.injectables.has(SelfCtor)) {
@@ -176,8 +172,6 @@ const mixinModuleContainer = <T extends Constructable>(Ctor: T) => {
   return class ContainerMixin extends Ctor implements ModuleContextual {
     // mark injectable
     static __injectable__ = true as const;
-
-    [ModuleProviderSymbol]?: ModuleProviderValue[];
     [ModuleContainerSymbol] = new Container()
 
     get [ModuleContextSymbol]() {
@@ -198,7 +192,6 @@ const mixinModuleContainer = <T extends Constructable>(Ctor: T) => {
 
     new<T extends Module>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
       let container = this[ModuleContainerSymbol]
-      container[ModuleProviderSymbol] = this[ModuleProviderSymbol]
       return container.new(Ctor, options)
     }
     /**
@@ -207,10 +200,10 @@ const mixinModuleContainer = <T extends Constructable>(Ctor: T) => {
      */
     use<T>(Ctor: InjectableCtor<T>): T
     use<T>(Ctor: ModuleProvider<T>): T
+    use<T>(providerValue: ModuleProviderValue<T>): T
     use<T extends ModuleContextual>(Ctor: () => T): T
-    use(Ctor: InjectableCtor | ModuleProvider | (() => ModuleContextual)) {
+    use(Ctor: InjectableCtor | ModuleProvider | ModuleProviderValue | (() => ModuleContextual)) {
       let container = this[ModuleContainerSymbol]
-      container[ModuleProviderSymbol] = this[ModuleProviderSymbol]
       return container.use(Ctor as any)
     }
   }
@@ -222,8 +215,6 @@ export type ModuleContextual = {
 
 let currentContext: ModuleContext | undefined
 
-let currentProviderValues: ModuleProviderValue[] | undefined
-
 export class Container implements ModuleContextual {
   // mark injectable
   static __injectable__ = true as const
@@ -231,8 +222,6 @@ export class Container implements ModuleContextual {
   static from<T extends Constructable>(Ctor: T) {
     return mixinModuleContainer(Ctor)
   }
-
-  [ModuleProviderSymbol] = currentProviderValues;
 
   [ModuleContextSymbol] = currentContext ?? createModuleContext()
 
@@ -265,11 +254,18 @@ export class Container implements ModuleContextual {
    */
   use<T>(Ctor: InjectableCtor<T>): T
   use<T>(Ctor: ModuleProvider<T>): T
+  use<T>(providerValue: ModuleProviderValue<T>): T
   use<T extends ModuleContextual>(Ctor: () => T): T
-  use(Ctor: InjectableCtor | ModuleProvider | (() => ModuleContextual)) {
+  use(Ctor: InjectableCtor | ModuleProvider | ModuleProviderValue | (() => ModuleContextual)) {
     attachModuleContainer(this)
 
     let ctx = this[ModuleContextSymbol]
+
+    // handle provder value
+    if (isModuleProviderValue(Ctor)) {
+      attachModuleProviderValues(ctx, [Ctor], true)
+      return Ctor.value
+    }
 
     // handle module provider
     if (isModuleProvider(Ctor)) {
@@ -289,14 +285,11 @@ export class Container implements ModuleContextual {
     // connect the context for this.use(new MyContainer(xxx))
     if (typeof Ctor === 'function') {
       let prevContext = currentContext
-      let prevProviderValues = currentProviderValues
       try {
         currentContext = ctx
-        currentProviderValues = this[ModuleProviderSymbol]
         return Ctor()
       } finally {
         currentContext = prevContext
-        currentProviderValues = prevProviderValues
       }
     }
 

@@ -1,19 +1,11 @@
 /**
- * a module abstraction providing dependencies management
+ * ModuleProvider for inject interface/data
  */
-export type Injectable = {
-  __injectable__: true
-}
-
-export type InjectableCtor<T = {}> = (new (...args: any[]) => T) & Injectable
-
-export type ModuleCtor<T extends Module = Module> = (new (ctx?: ModuleContext) => T) & Injectable
-
 export type ModuleProvider<T = any> = {
   isModuleProvider: true
   defaultValue?: T
   provide(value: T): ModuleProviderValue<T>
-} & Injectable
+}
 
 export type ModuleProviderValue<T = any> = {
   Provider: ModuleProvider<T>
@@ -26,7 +18,6 @@ export const isModuleProviderValue = <T = any>(input: any): input is ModuleProvi
 
 export function createProvider<T>(defaultValue?: T): ModuleProvider<T> {
   let Provider: ModuleProvider<T> = {
-    __injectable__: true,
     isModuleProvider: true,
     defaultValue,
     provide(value) {
@@ -43,299 +34,343 @@ export const isModuleProvider = <T>(input: any): input is ModuleProvider<T> => {
   return !!input?.isModuleProvider
 }
 
-export type ModuleContext = {
-  injectables: Map<Injectable, any>
-}
+/**
+ * ModuleContext for manager dependencies
+ */
+export type ModuleCtor<T = any> = new (...args: any[]) => T
 
-export const createModuleContext = (options?: ModuleContextOptions): ModuleContext => {
-  let ctx: ModuleContext = {
-    injectables: new Map(),
-  }
-  attachModuleContextOptions(ctx, options, true)
-  return ctx
-}
-
-export const getModule = <T extends Module>(Ctor: ModuleCtor<T>, ctx: ModuleContext): T => {
-  if (ctx.injectables.has(Ctor)) {
-    return ctx.injectables.get(Ctor)! as T
-  }
-
-  let module = new Ctor(ctx)
-
-  ctx.injectables.set(Ctor, module)
-
-  return module as T
-}
-
-export const getModuleProvider = <T>(Provider: ModuleProvider<T>, ctx: ModuleContext): T => {
-  if (ctx.injectables.has(Provider)) {
-    return ctx.injectables.get(Provider)! as T
-  }
-
-  if (Provider.defaultValue !== undefined) {
-    return Provider.defaultValue
-  }
-
-  throw new Error(`Provider is using without injecting`)
-}
-
-export const getInjectable = <T>(Injectable: Injectable, ctx: ModuleContext): T => {
-  if (ctx.injectables.has(Injectable)) {
-    return ctx.injectables.get(Injectable)! as T
-  }
-
-  throw new Error(`Injectable is using without injecting: ${Injectable}`)
-}
-
-export const attachModules = (ctx: ModuleContext, modules: Module[], throws = true) => {
-  for (let module of modules) {
-    let Ctor = module.constructor as ModuleCtor
-
-    if (ctx.injectables.has(Ctor)) {
-      if (throws) {
-        throw new Error(`Unexpected duplicate module: ${Ctor.name}`)
-      }
-    } else {
-      ctx.injectables.set(Ctor, module)
-    }
-  }
-}
-
-export const attachModuleProviderValues = (
-  ctx: ModuleContext,
-  providerValues: ModuleProviderValue[],
-  throws = true,
-) => {
-  for (let providerValue of providerValues) {
-    let { Provider, value } = providerValue
-
-    if (ctx.injectables.has(Provider)) {
-      if (throws) {
-        throw new Error(`Unexpected duplicate Provider`)
-      }
-    } else {
-      ctx.injectables.set(Provider, value)
-    }
-  }
-}
+export type Injectable<T = any> = ModuleCtor<T> | ModuleProvider<T>
 
 export type ModuleContextOptions = {
-  modules?: Module[]
+  modules?: object[]
   providers?: ModuleProviderValue[]
 }
 
-export const attachModuleContextOptions = (ctx: ModuleContext, options?: ModuleContextOptions, throws = true) => {
-  if (options?.modules) {
-    attachModules(ctx, options?.modules, throws)
+export class ModuleContext {
+  deps = {
+    modules: new Map<ModuleCtor, unknown>(),
+    providers: new Map<ModuleProvider, unknown>(),
   }
 
-  if (options?.providers) {
-    attachModuleProviderValues(ctx, options?.providers, throws)
+  /**
+   * add ModuleCtor instance
+   * @param Dep
+   * @param module
+   * @param replace replace current value or throw error
+   */
+  addModule<T>(Ctor: ModuleCtor<T>, module: T, replace = false): this {
+    if (this.deps.modules.has(Ctor)) {
+      let current = this.deps.modules.get(Ctor)! as T
+
+      if (replace) {
+        this.deps.modules.set(Ctor, module)
+      } else if (module !== current) {
+        throw new Error(`Unexpected duplicate ModuleConstructor: ${Ctor}`)
+      }
+
+      return this
+    }
+    this.deps.modules.set(Ctor, module)
+    return this
   }
-}
 
-export const initilize = <T extends Module>(
-  Ctor: ModuleCtor<T>,
-  options?: ModuleContextOptions,
-  ctx: ModuleContext = createModuleContext(),
-) => {
-  attachModuleContextOptions(ctx, options, true)
+  /**
+   * add Provider value
+   * @param Provider
+   * @param value
+   * @param replace replace current value or throw error
+   */
+  addProvider<T>(Provider: ModuleProvider<T>, value: T, replace = false): this {
+    if (this.deps.providers.has(Provider)) {
+      let current = this.deps.providers.get(Provider)! as T
 
-  if (ctx.injectables.has(Ctor)) {
-    return ctx.injectables.get(Ctor)! as T
+      if (replace) {
+        this.deps.providers.set(Provider, value)
+      } else if (value !== current) {
+        throw new Error(`Unexpected duplicate Provider`)
+      }
+
+      return this
+    }
+    this.deps.providers.set(Provider, value)
+    return this
   }
 
-  let module = new Ctor(ctx)
-
-  ctx.injectables.set(Ctor, module)
-
-  return module
-}
-
-export type Constructable = new (...args: any[]) => any
-
-const attachModuleContainer = <T extends Container>(container: T) => {
-  let ctx = getModuleContext(container)
-  let SelfCtor = container.constructor as InjectableCtor<T>
-
-  // add Self if needed
-  if (!ctx.injectables.has(SelfCtor)) {
-    ctx.injectables.set(SelfCtor, container)
-  }
-}
-
-const moduleContextWeakMap = new WeakMap<object, ModuleContext>()
-
-const getModuleContext = (object: object): ModuleContext => {
-  let ctx = moduleContextWeakMap.get(object)
-  if (!ctx) {
-    throw new Error(`Can not get module-context via ${JSON.stringify(object)}`)
-  }
-  return ctx
-}
-
-const setModuleContext = (object: object, ctx: ModuleContext) => {
-  moduleContextWeakMap.set(object, ctx)
-}
-
-const containerWeakMap = new WeakMap<object, Container>()
-
-const getContainer = (object: object): Container => {
-  let container = containerWeakMap.get(object)
-  if (!container) {
-    throw new Error(`Can not get module-container via ${JSON.stringify(object)}`)
-  }
-  return container
-}
-
-const setContainer = (object: object, container: Container) => {
-  containerWeakMap.set(object, container)
-}
-
-const mixinModuleContainer = <T extends Constructable>(Ctor: T) => {
-  return class ContainerMixin extends Ctor {
-    // mark injectable
-    static __injectable__ = true as const
-
-    constructor(...args: any[]) {
-      super(...args)
-      let container = new Container()
-      let ctx = getModuleContext(container)
-
-      setContainer(this, container)
-
-      // a container is also a module-config which can be injected via this.use(MyContainer)
-      ctx.injectables.set(this.constructor as typeof ContainerMixin, this)
+  /**
+   * get ModuleCtor instance
+   * @param ModuleCtor
+   */
+  useModule<T>(Ctor: ModuleCtor<T>): T {
+    if (this.deps.modules.has(Ctor)) {
+      return this.deps.modules.get(Ctor)! as T
     }
 
-    new<T extends Module>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
-      return getContainer(this).new(Ctor, options)
+    if (Ctor.length > 0) {
+      throw new Error(`The ModuleConstructor was not found in context: ${Ctor}`)
     }
 
-    /**
-     * set dependent to container
-     * @param value
-     */
-    inject<T>(providerValue: ModuleProviderValue<T>): T
-    inject<T>(Ctor: () => T): T
-    inject(input: ModuleProviderValue | (() => any)) {
-      return getContainer(this).inject(input as any)
+    return newModule(Ctor, this)
+  }
+
+  /**
+   * get Provider value
+   * @param Provider
+   */
+  useProvider<T>(Provider: ModuleProvider<T>): T {
+    if (this.deps.providers.has(Provider)) {
+      return this.deps.providers.get(Provider)! as T
     }
 
-    /**
-     *
-     * @param Ctor get instance from container
-     */
-    use<T>(Ctor: InjectableCtor<T>): T
-    use<T>(Ctor: ModuleProvider<T>): T
-    use(Ctor: InjectableCtor | ModuleProvider) {
-      return getContainer(this).use(Ctor as any)
+    if (Provider.defaultValue !== undefined) {
+      return Provider.defaultValue
     }
+
+    throw new Error(`The Provider is used without injecting or no defaultValue found`)
+  }
+
+  /**
+   * get dep by Dep key
+   * @param Dep
+   */
+  use<T>(Dep: ModuleCtor<T>): T
+  use<T>(Dep: ModuleProvider<T>): T
+  use<T>(Dep: Injectable<T>): T {
+    if (isModuleProvider(Dep)) {
+      return this.useProvider(Dep)
+    }
+    return this.useModule(Dep)
+  }
+
+  /**
+   * inject provider-value
+   * @param providerValue
+   */
+  inject<T>(providerValue: ModuleProviderValue<T>): T {
+    let { Provider, value } = providerValue
+    this.addProvider(Provider, value)
+    return value
+  }
+
+  /**
+   * inject modules to module-context
+   * @param modules
+   */
+  injectModules(modules: object[]) {
+    for (let module of modules) {
+      if (module.constructor === Object || module.constructor === Array || module.constructor === Function) {
+        throw new Error(`Expected module to be an instance of custom Class, instead of ${JSON.stringify(module)}`)
+      }
+      this.addModule(module.constructor as ModuleCtor, module, true)
+    }
+    return this
+  }
+
+  /**
+   * inject provider-values to module-context
+   * @param providers
+   */
+  injectProviderValues(providers: ModuleProviderValue[]) {
+    for (let { Provider, value } of providers) {
+      this.addProvider(Provider, value, true)
+    }
+    return this
+  }
+
+  /**
+   * create a new context for Dep
+   * @param Ctor
+   * @param options options for resusing deps or others
+   */
+  new<T>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
+    let ctx = new ModuleContext()
+
+    // reusing provider-values of current-context
+    for (let [Provider, value] of this.deps.providers.entries()) {
+      ctx.addProvider(Provider, value)
+    }
+
+    // inject modules
+    if (options?.modules) {
+      ctx.injectModules(options.modules)
+    }
+
+    // inject provider-values
+    if (options?.providers) {
+      ctx.injectProviderValues(options.providers)
+    }
+
+    return newModule(Ctor, ctx)
   }
 }
 
-let currentContext: ModuleContext | undefined
+/**
+ * ModuleContextManager for manager ModuleContext
+ */
+
+let currentModuleContext: ModuleContext | undefined
+
+export const runInContext = <T>(f: () => T, ctx = new ModuleContext()) => {
+  let prevModuleContext = currentModuleContext
+  try {
+    currentModuleContext = ctx
+    let module = f()
+    if (module && typeof module !== 'object') {
+      throw new Error(`Expected function return object, but got ${module}`)
+    }
+    currentModuleContext.injectModules([(module as unknown) as object])
+    Context.set((module as unknown) as object, currentModuleContext)
+    return module
+  } finally {
+    currentModuleContext = prevModuleContext
+  }
+}
+
+export const newModule = <T>(Ctor: ModuleCtor<T>, ctx = new ModuleContext()) => {
+  if (Ctor.length > 0) {
+    throw new Error(`Expected ModuleConstructor without parameters, but got ${Ctor}`)
+  }
+  return runInContext(() => new Ctor(), ctx)
+}
+
+class ModuleContextManager {
+  contexts = new WeakMap<object, ModuleContext>()
+
+  set(object: object, ctx: ModuleContext) {
+    this.contexts.set(object, ctx)
+  }
+
+  from(object: object): ModuleContext {
+    if (this.contexts.has(object)) {
+      return this.contexts.get(object)!
+    }
+
+    let context = currentModuleContext ?? new ModuleContext()
+
+    this.set(object, context)
+    context.injectModules([object])
+
+    return context
+  }
+
+  /**
+   * get dep by Dep key
+   * @param Dep
+   */
+  use<T>(Dep: ModuleCtor<T>): T
+  use<T>(Dep: ModuleProvider<T>): T
+  use<T>(Dep: Injectable<T>): T {
+    if (!currentModuleContext) {
+      throw new Error(`Expected use(...) call with runInContext(f)`)
+    }
+    return currentModuleContext.use(Dep as any)
+  }
+
+  /**
+   * inject provider-value
+   * @param providerValue
+   */
+  inject<T>(providerValue: ModuleProviderValue<T>): T {
+    if (!currentModuleContext) {
+      throw new Error(`Expected inject(...) call with runInContext(f)`)
+    }
+    return currentModuleContext.inject(providerValue)
+  }
+
+  /**
+   * create a new context for Dep
+   * @param Ctor
+   * @param options options for resusing deps or others
+   */
+  new<T>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
+    if (!currentModuleContext) {
+      throw new Error(`Expected new(...) call with runInContext(f)`)
+    }
+    return currentModuleContext.new(Ctor, options)
+  }
+}
+
+export const Context = new ModuleContextManager()
+
+/**
+ * Container and Module
+ */
 
 export class Container {
-  // mark injectable
-  static __injectable__ = true as const
+  static from<T extends ModuleCtor>(Ctor: T) {
+    return class InjectableClass extends Ctor {
+      constructor(...args: any[]) {
+        super(...args)
+        /**
+         * add instance to current-context with Constructor as key
+         */
+        Context.from(this).addModule(this.constructor as ModuleCtor, this)
+      }
 
-  static from<T extends Constructable>(Ctor: T) {
-    return mixinModuleContainer(Ctor)
+      /**
+       * get dep by Dep key
+       * @param Dep
+       */
+      use<T>(Dep: ModuleCtor<T>): T
+      use<T>(Dep: ModuleProvider<T>): T
+      use<T>(Dep: Injectable<T>): T {
+        return Context.from(this).use(Dep as any)
+      }
+
+      /**
+       * inject provider-value
+       * @param providerValue
+       */
+      inject<T>(providerValue: ModuleProviderValue<T>): T {
+        return Context.from(this).inject(providerValue)
+      }
+
+      /**
+       * create a new context for Dep
+       * @param Ctor
+       * @param options options for resusing deps or others
+       */
+      new<T>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
+        return Context.from(this).new(Ctor, options)
+      }
+    }
   }
 
   constructor() {
-    setModuleContext(this, currentContext ?? createModuleContext())
+    /**
+     * add instance to current-context with Constructor as key
+     */
+    Context.from(this).addModule(this.constructor as ModuleCtor, this)
   }
-
-  new<T extends Module>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
-    attachModuleContainer(this)
-
-    let ctx = getModuleContext(this)
-    let context = createModuleContext()
-
-    // clone module/providers from options
-    attachModuleContextOptions(context, options, true)
-
-    // clone providers from current container
-    for (let [Injectable, value] of ctx.injectables.entries()) {
-      if (isModuleProvider(Injectable)) {
-        if (!context.injectables.has(Injectable)) {
-          context.injectables.set(Injectable, value)
-        }
-      }
-    }
-
-    let module = initilize(Ctor, undefined, context)
-
-    return module
+  /**
+   * get dep by Dep key
+   * @param Dep
+   */
+  use<T>(Dep: ModuleCtor<T>): T
+  use<T>(Dep: ModuleProvider<T>): T
+  use<T>(Dep: Injectable<T>): T {
+    return Context.from(this).use(Dep as any)
   }
 
   /**
-   * set dependent to container
-   * @param value
+   * inject provider-value
+   * @param providerValue
    */
-  inject<T>(providerValue: ModuleProviderValue<T>): T
-  inject<T>(Ctor: () => T): T
-  inject(input: ModuleProviderValue | (() => any)) {
-    attachModuleContainer(this)
-
-    let ctx = getModuleContext(this)
-
-    // handle provder value
-    if (isModuleProviderValue(input)) {
-      attachModuleProviderValues(ctx, [input], true)
-      return input.value
-    }
-
-    // connect the context for this.use(() => new MyContainer(xxx))
-    if (typeof input === 'function') {
-      let prevContext = currentContext
-      try {
-        currentContext = ctx
-        return input()
-      } finally {
-        currentContext = prevContext
-      }
-    }
-
-    throw new Error(`Unsupported input in this.inject(): ${input}`)
+  inject<T>(providerValue: ModuleProviderValue<T>): T {
+    return Context.from(this).inject(providerValue)
   }
 
   /**
-   * get dependent from container
+   * create a new context for Dep
+   * @param Ctor
+   * @param options options for resusing deps or others
    */
-  use<T>(Ctor: InjectableCtor<T>): T
-  use<T>(Ctor: ModuleProvider<T>): T
-  use(Ctor: InjectableCtor | ModuleProvider) {
-    attachModuleContainer(this)
-
-    let ctx = getModuleContext(this)
-
-    // handle module provider
-    if (isModuleProvider(Ctor)) {
-      return getModuleProvider(Ctor, ctx)
-    }
-
-    // handle normal module
-    if (Ctor.prototype instanceof Module) {
-      return getModule(Ctor as ModuleCtor, ctx)
-    }
-
-    // handle injectable like container or container-mixin
-    if ('__injectable__' in Ctor) {
-      return getInjectable(Ctor, ctx)
-    }
-
-    throw new Error(`Unsupported input in this.use(): ${Ctor}`)
+  new<T>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
+    return Context.from(this).new(Ctor, options)
   }
 }
 
-export abstract class Module extends Container {
-  constructor(ctx?: ModuleContext) {
-    super()
-    if (ctx) {
-      setModuleContext(this, ctx)
-    }
-  }
+export class Module extends Container {}
+
+export const initilize = <T>(Dep: ModuleCtor<T>, options?: ModuleContextOptions, ctx = new ModuleContext()) => {
+  return ctx.new(Dep, options)
 }

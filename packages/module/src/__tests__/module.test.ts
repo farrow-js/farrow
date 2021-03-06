@@ -1,4 +1,4 @@
-import { Module, Container, createProvider, initilize } from '../module'
+import { Module, Container, createProvider, initilize, Context, runInContext } from '../module'
 
 type PageInfo = {
   url: string
@@ -226,56 +226,6 @@ describe('Container', () => {
     expect(root.a.show()).toBe('container/from/base/a')
     expect(root.b.show()).toBe('container/from/base/b')
   })
-
-  it('support share the same context in multiple containers', () => {
-    type Data = {
-      count: number
-    }
-
-    let Data = createProvider<Data>()
-
-    class A extends Module {
-      data = this.use(Data)
-      show() {
-        return 'A'
-      }
-    }
-
-    class Container0 extends Container {
-      data = this.use(Data)
-      a = this.use(A)
-      name: string
-      constructor(name = '') {
-        super()
-        this.name = name
-      }
-    }
-
-    class Container1 extends Container {
-      data = this.use(Data)
-      a = this.use(A)
-      name: string
-      constructor(name = '') {
-        super()
-        this.name = name
-      }
-    }
-
-    class Container2 extends Container {
-      data = this.inject(Data.provide({ count: 100 }))
-      a = this.use(A)
-      container0 = this.inject(() => new Container0('0'))
-      container1 = this.inject(() => new Container1('1'))
-    }
-
-    let container2 = new Container2()
-
-    expect(container2.data === container2.container0.data).toBe(true)
-    expect(container2.data === container2.container1.data).toBe(true)
-
-    expect(container2.a === container2.container0.a).toBe(true)
-    expect(container2.a === container2.container1.a).toBe(true)
-  })
 })
 
 describe('Provider', () => {
@@ -383,5 +333,87 @@ describe('Module', () => {
     expect(root.child.a === root.a).toBe(true)
     expect(root.newChild.a === root.child.a).toBe(true)
     expect(root.newChild === root.child).toBe(false)
+  })
+})
+
+describe('Context', () => {
+  it('supports dependencies-injection without inheritance', () => {
+    class A {
+      root = Context.from(this).use(Root)
+      get b() {
+        return Context.from(this).use(B)
+      }
+    }
+
+    class B {
+      root = Context.from(this).use(Root)
+      get a() {
+        return Context.from(this).use(A)
+      }
+    }
+
+    class Root {
+      name: string
+      constructor(name = '') {
+        this.name = name
+      }
+      a = Context.from(this).use(A)
+      b = Context.from(this).use(B)
+    }
+
+    let root = new Root('Context.use')
+
+    expect(root.name).toBe('Context.use')
+    expect(root.a instanceof A).toBe(true)
+    expect(root.b instanceof B).toBe(true)
+    expect(root.a.root === root).toBe(true)
+    expect(root.b.root === root).toBe(true)
+    expect(root.a.b === root.b).toBe(true)
+    expect(root.b.a === root.a).toBe(true)
+  })
+
+  it('supports dependency-injection without Context.from(this) if possible', () => {
+    class A {
+      get root() {
+        return Context.from(this).use(Root)
+      }
+      get b() {
+        return Context.from(this).use(B)
+      }
+      c = Context.use(C)
+    }
+
+    class B {
+      get root() {
+        return Context.from(this).use(Root)
+      }
+      get a() {
+        return Context.from(this).use(A)
+      }
+      c = Context.use(C)
+    }
+
+    class C {
+      count = 0
+    }
+
+    class Root {
+      name: string
+      constructor(name = '') {
+        this.name = name
+      }
+      a = Context.use(A)
+      b = Context.use(B)
+    }
+
+    let root = runInContext(() => new Root('Context.use'))
+
+    expect(root.a instanceof A).toBe(true)
+    expect(root.b instanceof B).toBe(true)
+    expect(root.a.root === root).toBe(true)
+    expect(root.b.root === root).toBe(true)
+    expect(root.a.b === root.b).toBe(true)
+    expect(root.b.a === root.a).toBe(true)
+    expect(root.a.c === root.b.c).toBe(true)
   })
 })

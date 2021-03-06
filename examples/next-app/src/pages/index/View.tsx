@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import { Index } from './Controller'
 import type { Todo } from '../../api/todo'
-import { Module, createProvider, Container, ModuleProviderSymbol } from 'farrow-next'
+import { Module, createProvider, Container } from 'farrow-next'
 
 export const View = () => {
   let ctrl = Index.use()
@@ -60,9 +60,11 @@ class App extends Container.from(React.Component) {
   state: AppState = {
     count: 0,
     text: '',
-  };
+  }
 
-  [ModuleProviderSymbol] = [CounterProvider.provide(this), TextManagerProvider.provide(this)]
+  counterProvider = this.inject(CounterProvider.provide(this))
+
+  textProviders = this.inject(TextManagerProvider.provide(this))
 
   // eslint-disable-next-line
   counter = this.use(Counter)

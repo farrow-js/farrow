@@ -2,7 +2,7 @@ import React, { ComponentType, useRef } from 'react'
 import { NextPage, NextPageContext } from 'next'
 import { Controller, Provider, ControllerCtors, ControllerInstancesType, getUserAgent } from './controller'
 import { replaceState } from './store'
-import { initilize, createModuleContext } from './module'
+import { ModuleContext } from './module'
 import { PageInfo } from './page-info'
 
 export type PageOptions<T extends ControllerCtors> = {
@@ -38,12 +38,10 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
         tag: 'FC',
       }
       let pageInfo = PageInfo.provide(pageCtx)
-      let moduleContext = createModuleContext({
-        providers: [pageInfo],
-      })
+      let moduleContext = new ModuleContext().injectProviderValues([pageInfo])
 
       let ctrls = Object.values(Controllers).map((Controller, index) => {
-        let ctrl = initilize(Controller, undefined, moduleContext)
+        let ctrl = moduleContext.new(Controller)
         let state = props.states[index]
         replaceState(ctrl.store, state)
         return ctrl
@@ -73,16 +71,14 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
     }
 
     let pageInfo = PageInfo.provide(pageCtx)
-    let moduleCtx = createModuleContext({
-      providers: [pageInfo],
-    })
+    let moduleCtx = new ModuleContext().injectProviderValues([pageInfo])
 
     let ctrlsMap = {} as ControllerInstancesType<T>
 
     let ctrlsKeys = Object.keys(Controllers)
 
     let ctrls = Object.values(Controllers).map((Controller, index) => {
-      let ctrl = initilize(Controller, undefined, moduleCtx)
+      let ctrl = moduleCtx.new(Controller)
       let key = ctrlsKeys[index] as keyof T
       ctrlsMap[key] = ctrl as ControllerInstancesType<T>[keyof T]
       return ctrl

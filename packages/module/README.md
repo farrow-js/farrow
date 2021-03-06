@@ -144,7 +144,7 @@ app.root.getInfo()
 
 `module.use(DepClass)` will read or create a DepClass instance from the `Container`
 
-### Module#inject(providerValue | () => container)
+### Module#inject(providerValue)
 
 `module.inject` will add `provider-value` or `container` to the `Container`
 
@@ -154,10 +154,6 @@ app.root.getInfo()
 
 - `options.providers`, an list of values created by `Provider` for injecting/reusing.
 - `options.modules`, an list of modules for injecting/resuing.
-
-### Container#[ModuleProviderSymbol]
-
-`ModuleContainer#[ModuleProviderSymbol]` is a place for injecting the value of any `Provider` in `Container`
 
 ### Container.from(Class)
 

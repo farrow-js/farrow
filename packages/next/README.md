@@ -10,7 +10,7 @@
 
 - Provides a friendly `React-Hooks api`
 
-- Wraps `cookie|fetch|userAgent` and other convenient homomorphic methods
+- Wraps `cookie|fetch|userAgent` and other convenient isomorphic methods
 
 - Based on `TypeScript` development, providing good type derivation capabilities
 

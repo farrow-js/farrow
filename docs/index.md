@@ -8,6 +8,10 @@ Useful tools for developing farrow app
 
 **farrow-schema**: A powerful and extensible schema builder
 
+## [farrow-module](../packages/module/README.md)
+
+**farrow-module**: A module abstraction providing dependencies management
+
 ## [farrow-pipeline](../packages/pipeline/README.md)
 
 **farrow-pipeline**: A type-friendly middleware library

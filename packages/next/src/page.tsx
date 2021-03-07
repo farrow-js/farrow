@@ -5,15 +5,17 @@ import { replaceState } from './store'
 import { ModuleContext } from './module'
 import { PageInfo } from './page-info'
 
+export type ConstrollerStates<T extends ControllerCtors> = InstanceType<T[keyof T]>['state']
+
 export type PageOptions<T extends ControllerCtors> = {
   View: ComponentType<{}>
   Controllers: T
   preload?: (ctrls: ControllerInstancesType<T>) => void | Promise<void>
 }
 
-export type PageProps = Pick<NextPageContext, 'pathname' | 'query' | 'asPath'> & {
+export type PageProps<State = any> = Pick<NextPageContext, 'pathname' | 'query' | 'asPath'> & {
   userAgent: string
-  states: any[]
+  states: State[]
 }
 
 export type PageContextType = Omit<NextPageContext, 'AppTree'> & {
@@ -24,9 +26,11 @@ export type PageContextType = Omit<NextPageContext, 'AppTree'> & {
   userAgent: string
 }
 
-export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPage<PageProps> => {
+export type NextPageProps<T extends NextPage> = T extends NextPage<infer Props> ? Props : never
+
+export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPage<PageProps<ConstrollerStates<T>>> => {
   let { Controllers, preload, View } = options
-  let Page: NextPage<PageProps> = (props) => {
+  let Page: NextPage<PageProps<ConstrollerStates<T>>> = (props) => {
     let ctrlsRef = useRef<Controller[] | null>(null)
 
     if (!ctrlsRef.current) {

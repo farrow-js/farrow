@@ -1,6 +1,5 @@
-/* eslint-disable */
+import 'isomorphic-fetch'
 import React, { useContext, useReducer, useRef } from 'react'
-import fetch from 'isomorphic-fetch'
 import { CookieSerializeOptions } from 'cookie'
 import { stringify as stringifyQuery } from 'qs'
 import { StateType, Store, Reducers, createStore } from './store'
@@ -51,7 +50,7 @@ const getControllerStore = <T extends Controller>(ctrl: T): Store<T['initialStat
     return StoreWeakMap.get(ctrl)!
   }
 
-  const store = createStore({
+  let store = createStore({
     name: typeof ctrl.devtools === 'string' ? ctrl.devtools : ctrl.constructor.name,
     initialState: ctrl.initialState,
     reducers: ctrl.reducers,
@@ -74,7 +73,7 @@ export abstract class Controller extends Module {
       return ControllerIdWeakMap.get(this)!
     }
 
-    const id = uid
+    let id = uid
 
     uid += 1
 
@@ -89,10 +88,10 @@ export abstract class Controller extends Module {
    * @returns get Controller instance via react-hooks
    */
   static use<T extends Controller>(this: ControllerCtor<T>): T {
-    const id = this.getId()
-    const ctx = useContext(ControllerReactContext)
+    let id = this.getId()
+    let ctx = useContext(ControllerReactContext)
 
-    const ctrl = ctx ? ctx[`${id}`] : null
+    let ctrl = ctx ? ctx[`${id}`] : null
 
     if (!ctrl) {
       throw new Error('You may forget to add Controller to page({ Controllers: {} }) before using Controller.use()')
@@ -116,23 +115,23 @@ export abstract class Controller extends Module {
     selector = selector ?? identity
     compare = compare ?? shallowEqual
 
-    const ctrl = this.use()
+    let ctrl = this.use()
 
     type State = StateType<T['store']>
     type Selector = typeof selector
     type SelectedState = ReturnType<Selector>
 
-    const { store } = ctrl
+    let { store } = ctrl
 
     // modified from react-redux useSelector
-    const [_, forceRender] = useReducer((s) => s + 1, 0)
+    let [_, forceRender] = useReducer((s) => s + 1, 0)
 
-    const latestSubscriptionCallbackError = useRef<Error | null>(null)
-    const latestSelector = useRef<Selector | undefined>()
-    const latestStoreState = useRef<State | DefaultValueType>(DefaultValue)
-    const latestSelectedState = useRef<SelectedState | DefaultValueType>(DefaultValue)
+    let latestSubscriptionCallbackError = useRef<Error | null>(null)
+    let latestSelector = useRef<Selector | undefined>()
+    let latestStoreState = useRef<State | DefaultValueType>(DefaultValue)
+    let latestSelectedState = useRef<SelectedState | DefaultValueType>(DefaultValue)
 
-    const storeState = store.getState()
+    let storeState = store.getState()
     let selectedState: SelectedState | DefaultValueType = DefaultValue
 
     try {
@@ -162,7 +161,7 @@ export abstract class Controller extends Module {
 
     useIsomorphicLayoutEffect(() => {
       let isUnmounted = false
-      const checkForUpdates = () => {
+      let checkForUpdates = () => {
         if (!latestSelector.current) return
         if (isUnmounted) return
 
@@ -171,8 +170,8 @@ export abstract class Controller extends Module {
         }
 
         try {
-          const storeState = store.getState()
-          const newSelectedState = latestSelector.current(storeState)
+          let storeState = store.getState()
+          let newSelectedState = latestSelector.current(storeState)
 
           if (compare!(newSelectedState, latestSelectedState.current)) {
             return
@@ -190,7 +189,7 @@ export abstract class Controller extends Module {
 
         forceRender()
       }
-      const unsubscribe = store.subscribe(checkForUpdates)
+      let unsubscribe = store.subscribe(checkForUpdates)
 
       return () => {
         isUnmounted = true
@@ -395,14 +394,14 @@ export type ProviderProps = {
  * Provider for injecting controllers
  */
 export const Provider: React.FC<ProviderProps> = ({ controllers, children }) => {
-  const valueRef = useRef<ControllerReactContextValue | null>(null)
+  let valueRef = useRef<ControllerReactContextValue | null>(null)
 
   if (!valueRef.current) {
-    const ctrls = {} as ControllerReactContextValue
+    let ctrls = {} as ControllerReactContextValue
 
     for (let i = controllers.length - 1; i >= 0; i -= 1) {
-      const ctrl = controllers[i]
-      const ctrlId = ((ctrl.constructor as unknown) as ControllerCtor).getId()
+      let ctrl = controllers[i]
+      let ctrlId = ((ctrl.constructor as unknown) as ControllerCtor).getId()
       ctrls[`${ctrlId}`] = ctrl
     }
 

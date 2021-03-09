@@ -403,6 +403,10 @@ controller.setCookie is used to set the value of the cookie corresponding to the
 
 controller.removeCookie is used to remove the value of the cookie corresponding to the key parameter. The third parameter options is an object, see [documentation](https://github.com/js-cookie/js-cookie#cookie-attributes)
 
+#### controller.redirect(url)
+
+`controller.redirect` is used to redirect, it will take care the environment of `server/client`, and chose the right way to redirect.
+
 #### controller.isClient
 
 controller.isClient is a boolean value that determines whether the client is currently on the server.

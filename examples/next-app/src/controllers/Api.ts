@@ -1,5 +1,5 @@
-import { Controller as BaseController } from 'farrow-next'
-import { JsonType, createApiClient as createTodoApi, CreateApiClientOptions } from './api/todo'
+import { Controller } from 'farrow-next'
+import { JsonType, createApiClient as createTodoApi, CreateApiClientOptions } from '../api/todo'
 
 const url = `http://localhost:3002/api`
 
@@ -42,8 +42,6 @@ export const createApi = <T>(name: string, createApiClient: (options: CreateApiC
     },
   })
 
-export class Controller extends BaseController {
-  api = {
-    todo: createApi('todo', createTodoApi),
-  }
+export class ApiCtrl extends Controller {
+  todo = createApi('todo', createTodoApi)
 }

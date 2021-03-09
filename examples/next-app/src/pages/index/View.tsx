@@ -4,13 +4,13 @@ import type { Todo } from '../../api/todo'
 import { Module, createProvider, Container } from 'farrow-next'
 
 export const View = () => {
-  let ctrl = Index.use()
+  let indexCtrl = Index.use()
   let [count, setCount] = useState(110)
   let [todos, setTodos] = useState<Todo[]>([])
 
   useEffect(() => {
     let task = async () => {
-      let result = await ctrl.api.todo.addTodo({
+      let result = await indexCtrl.api.todo.addTodo({
         content: `count:${count}`,
       })
       setTodos(result.todos)
@@ -62,9 +62,7 @@ class App extends Container.from(React.Component) {
     text: '',
   }
 
-  counterProvider = this.inject(CounterProvider.provide(this))
-
-  textProviders = this.inject(TextManagerProvider.provide(this))
+  providers = [this.inject(CounterProvider.provide(this)), this.inject(TextManagerProvider.provide(this))]
 
   // eslint-disable-next-line
   counter = this.use(Counter)

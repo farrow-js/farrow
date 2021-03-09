@@ -1,5 +1,6 @@
 import 'isomorphic-fetch'
 import React, { useContext, useReducer, useRef } from 'react'
+import Router from 'next/router'
 import { CookieSerializeOptions } from 'cookie'
 import { stringify as stringifyQuery } from 'qs'
 import { StateType, Store, Reducers, createStore } from './store'
@@ -248,7 +249,7 @@ export abstract class Controller extends Module {
   /**
    * preload state for SSR
    */
-  preload?(): Promise<void>
+  preload?(): Promise<void> | void
 
   /**
    * page info
@@ -383,6 +384,22 @@ export abstract class Controller extends Module {
     let json = JSON.parse(text)
 
     return json
+  }
+
+  /**
+   * redirect to url
+   * @param url
+   */
+  async redirect(url: string) {
+    if (this.page.res) {
+      let res = this.page.res
+      res.writeHead(302, { Location: url })
+      res.end()
+    } else if (url.startsWith('http') || url.startsWith('//')) {
+      window.location.replace(url)
+    } else {
+      await Router.replace(url, url)
+    }
   }
 }
 

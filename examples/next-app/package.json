@@ -1,6 +1,6 @@
 {
   "name": "farrow-next-app",
-  "version": "1.6.8",
+  "version": "1.6.9",
   "private": true,
   "scripts": {
     "dev": "farrow dev",
@@ -12,7 +12,7 @@
     "farrow-api": "^1.6.7",
     "farrow-api-server": "^1.6.7",
     "farrow-http": "^1.6.7",
-    "farrow-next": "^1.6.8",
+    "farrow-next": "^1.6.9",
     "farrow-pipeline": "^1.6.7",
     "farrow-schema": "^1.6.7",
     "next": "^10.0.7",

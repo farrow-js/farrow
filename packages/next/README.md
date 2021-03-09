@@ -405,7 +405,7 @@ controller.removeCookie is used to remove the value of the cookie corresponding 
 
 #### controller.redirect(url)
 
-`controller.redirect` is used to redirect, it will take care the environment of `server/client`, and chose the right way to redirect.
+`controller.redirect` is used to redirect, it will take care the `server/client`, and chose the right way to redirect.
 
 #### controller.isClient
 

@@ -33,7 +33,6 @@ yarn add farrow-module
   - Any `Class` which `extends Container`
   - it's the entry of our code of `modules`
   - it should be instantiated by the `new` keyword
-  - it should be attached to another `Container` via `this.inject(() => new MyContainer(...args))`
 
 ## Usage
 

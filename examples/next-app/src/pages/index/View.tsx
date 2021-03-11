@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { Index } from './Controller'
-import type { Todo } from '../../api/todo'
+import { api as TodoApi, Todo } from '../../api/todo'
 import { Module, createProvider, Container } from 'farrow-next'
 
 export const View = () => {
@@ -10,7 +10,7 @@ export const View = () => {
 
   useEffect(() => {
     let task = async () => {
-      let result = await indexCtrl.api.todo.addTodo({
+      let result = await TodoApi.addTodo({
         content: `count:${count}`,
       })
       setTodos(result.todos)

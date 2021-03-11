@@ -23,6 +23,12 @@ export type ApiClientOptions = {
    * file address of codegen target
    */
   dist: string
+
+  /**
+   * use alias for farrow-api-client instead of src address
+   */
+  alias?: string
+
   /**
    * codegen options
    */
@@ -93,7 +99,10 @@ export const createApiClient = (options: ApiClientOptions) => {
       return
     }
 
-    let source = codegen(result.output, config.codegen)
+    let source = codegen(result.output, {
+      ...config.codegen,
+      url: config.alias ?? config.src,
+    })
 
     if (config.transform) {
       source = config.transform(source)

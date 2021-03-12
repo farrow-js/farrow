@@ -22,6 +22,7 @@
     "farrow": "^1.6.7",
     "farrow-api": "^1.6.7",
     "farrow-api-server": "^1.6.7",
+    "farrow-api-client": "^1.6.7",
     "farrow-http": "^1.6.7",
     "farrow-pipeline": "^1.6.7",
     "farrow-react": "^1.6.7",

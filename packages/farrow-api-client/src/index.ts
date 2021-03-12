@@ -1,4 +1,4 @@
-import 'isomorphic-fetch'
+import 'isomorphic-unfetch'
 import { AsyncPipeline, createAsyncPipeline, MaybeAsync, Middleware } from 'farrow-pipeline'
 
 export type JsonType =

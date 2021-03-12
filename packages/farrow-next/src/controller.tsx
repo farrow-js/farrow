@@ -1,4 +1,4 @@
-import 'isomorphic-fetch'
+import 'isomorphic-unfetch'
 import React, { useContext, useReducer, useRef } from 'react'
 import Router from 'next/router'
 import { CookieSerializeOptions } from 'cookie'

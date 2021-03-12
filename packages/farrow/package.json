@@ -30,7 +30,6 @@
     "@types/fs-extra": "^9.0.6",
     "@types/node-fetch": "^2.5.8",
     "@types/supertest": "^2.0.10",
-    "farrow-api": "^1.5.3",
     "farrow-api-server": "^1.6.7",
     "farrow-http": "^1.6.7",
     "farrow-pipeline": "^1.6.7",

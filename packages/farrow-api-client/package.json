@@ -25,11 +25,10 @@
     "farrow-pipeline": "^1.6.7"
   },
   "devDependencies": {
-    "@types/isomorphic-fetch": "^0.0.35",
     "farrow-pipeline": "^1.6.7"
   },
   "dependencies": {
     "tslib": "^2.1.0",
-    "isomorphic-fetch": "^3.0.0"
+    "isomorphic-unfetch": "^3.1.0"
   }
 }

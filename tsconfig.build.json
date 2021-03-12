@@ -4,18 +4,42 @@
     "noEmit": true
   },
   "references": [
-    { "path": "./packages/pipeline/tsconfig.json" },
-    { "path": "./packages/module/tsconfig.json" },
-    { "path": "./packages/schema/tsconfig.json" },
-    { "path": "./packages/http/tsconfig.json" },
-    { "path": "./packages/react/tsconfig.json" },
-    { "path": "./packages/cors/tsconfig.json" },
-    { "path": "./packages/api/tsconfig.json" },
-    { "path": "./packages/api-server/tsconfig.json" },
-    { "path": "./packages/api-client/tsconfig.json" },
-    { "path": "./packages/farrow/tsconfig.json" },
-    { "path": "./packages/vite/tsconfig.json" },
-    { "path": "./packages/next/tsconfig.json" }
+    {
+      "path": "./packages/farrow-pipeline/tsconfig.json"
+    },
+    {
+      "path": "./packages/farrow-module/tsconfig.json"
+    },
+    {
+      "path": "./packages/farrow-schema/tsconfig.json"
+    },
+    {
+      "path": "./packages/farrow-http/tsconfig.json"
+    },
+    {
+      "path": "./packages/farrow-react/tsconfig.json"
+    },
+    {
+      "path": "./packages/farrow-cors/tsconfig.json"
+    },
+    {
+      "path": "./packages/farrow-api/tsconfig.json"
+    },
+    {
+      "path": "./packages/farrow-api-server/tsconfig.json"
+    },
+    {
+      "path": "./packages/farrow-api-client/tsconfig.json"
+    },
+    {
+      "path": "./packages/farrow/tsconfig.json"
+    },
+    {
+      "path": "./packages/farrow-vite/tsconfig.json"
+    },
+    {
+      "path": "./packages/farrow-next/tsconfig.json"
+    }
   ],
   "exclude": ["./examples/*"]
 }

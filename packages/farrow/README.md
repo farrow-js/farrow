@@ -56,11 +56,11 @@ module.exports = createFarrowConfig({
       external: [...Object.keys(pkg.dependencies)],
     },
   },
-  // for connecting farrow-api-server
+  // for connecting farrow-api-server and codegen farrow-api-client
   // api: [
   //   {
   //     src: 'http://localhost:3002/api/todo',
-  //     dist: `${__dirname}/src/api/todo/createApiClient.ts`,
+  //     dist: `${__dirname}/src/api/todo.ts`,
   //   },
   // ],
 })

@@ -85,6 +85,18 @@ http.listen(3000, () => {
 
 In client-side, for consuming data we need to use [farrow-api-client](../farrow-api-client/README.md).
 
+```typescript
+// import file codegened by farrow
+import { api as TodoApi } from '../api/todo'
+
+const main = async () => {
+  // invoke api
+  let result = await TodoApi.addTodo({
+    content: 'todo content',
+  })
+}
+```
+
 ## API
 
 ```typescript

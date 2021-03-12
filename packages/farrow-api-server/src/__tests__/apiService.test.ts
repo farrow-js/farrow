@@ -94,6 +94,7 @@ describe('ApiService', () => {
       //   console.log('res', JSON.stringify(res.body, null, 2))
       // })
       .expect(200, {
+        type: 'ApiSuccessResponse',
         output: {
           protocol: 'Farrow-API',
           types: {
@@ -189,6 +190,7 @@ describe('ApiService', () => {
         input: {},
       })
       .expect(200, {
+        type: 'ApiSuccessResponse',
         output: {
           count: 0,
         },
@@ -203,6 +205,7 @@ describe('ApiService', () => {
         },
       })
       .expect(200, {
+        type: 'ApiSuccessResponse',
         output: {
           count: 10,
         },
@@ -215,6 +218,7 @@ describe('ApiService', () => {
         input: {},
       })
       .expect(200, {
+        type: 'ApiSuccessResponse',
         output: {
           count: 10,
         },
@@ -234,6 +238,7 @@ describe('ApiService', () => {
         input: {},
       })
       .expect(200, {
+        type: 'ApiErrorResponse',
         error: {
           message: 'trigger error',
         },
@@ -253,6 +258,7 @@ describe('ApiService', () => {
         input: {},
       })
       .expect(200, {
+        type: 'ApiErrorResponse',
         error: {
           message: 'The target API was not found with the path: [nonExisted]',
         },
@@ -274,6 +280,7 @@ describe('ApiService', () => {
         },
       })
       .expect(200, {
+        type: 'ApiErrorResponse',
         error: {
           message: 'path: ["newCount"]\nfalse is not an integer',
         },

@@ -16,7 +16,7 @@ yarn add farrow-api-server
 
 ## Usage
 
-`farrow-api` just defining API, it's not directly bind to an server.
+[farrow-api](../farrow-api/README.md) just defining API, it's not directly bind to an server.
 
 `farrow-api-server` can convert an `api-entries` to a router of `farrow-http`.
 
@@ -83,64 +83,7 @@ http.listen(3000, () => {
 })
 ```
 
-In client-side, we need to implement a fetcher for calling `api-services`, it's better to use [farrow](./farrow.md) to codegen the `api-client`
-
-```typescript
-// client-side
-
-type ApiErrorResponse = {
-  error: {
-    message: string
-  }
-}
-
-type ApiSuccessResponse = {
-  output: JsonType
-  // ...others
-}
-
-type ApiResponse = ApiErrorResponse | ApiSuccessResponse
-
-export const fetcher = async (input) => {
-  let options = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(input),
-  }
-  let response = await fetch(`http://localhost:3000/api/todo`, options)
-  /**
-   * api-service will return ApiResponse
-   * the server can return more data/fields for other purposes
-   */
-  let json = (await response.json()) as ApiResponse
-
-  if ('error' in json) {
-    throw new Error(json.error.message)
-  } else {
-    return json.output
-  }
-}
-
-// calling addTodo
-fetcher({
-  // specify the path of api in api-entries
-  path: ['addTodo'],
-  // pass the input of api to server
-  input: {
-    content: 'todo content',
-  },
-})
-
-// calling removeTodo
-fetcher({
-  path: ['removeTodo'],
-  input: {
-    id: 0,
-  },
-})
-```
+In client-side, for consuming data we need to use [farrow-api-client](../farrow-api-client/README.md).
 
 ## API
 

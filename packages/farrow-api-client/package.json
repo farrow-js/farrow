@@ -25,7 +25,8 @@
     "farrow-pipeline": "^1.6.7"
   },
   "devDependencies": {
-    "farrow-pipeline": "^1.6.7"
+    "farrow-pipeline": "^1.6.7",
+    "farrow-api-server": "1.6.7"
   },
   "dependencies": {
     "tslib": "^2.1.0",

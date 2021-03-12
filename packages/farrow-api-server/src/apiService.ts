@@ -4,6 +4,7 @@ import { ApiDefinition, ApiEntries, getContentType, isApi } from 'farrow-api'
 import { FormatResult, toJSON } from 'farrow-api/dist/toJSON'
 import { createSchemaValidator, ValidationError, Validator } from 'farrow-schema/validator'
 import get from 'lodash.get'
+import { ApiError, ApiSuccess } from './apiResponse'
 
 export type ApiServiceType = RouterPipeline
 
@@ -62,27 +63,21 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
      */
     if (request.body?.input?.__introspection__ === true) {
       let output = (formatResult = formatResult ?? toJSON(entries))
-      return Response.json({
-        output,
-      })
+      return Response.json(ApiSuccess(output))
     }
 
     let bodyResult = validateBody(request.body)
 
     if (bodyResult.isErr) {
       let message = getErrorMessage(bodyResult.value)
-      return Response.json({
-        error: { message },
-      })
+      return Response.json(ApiError(message))
     }
 
     let api = get(entries, bodyResult.value.path)
 
     if (!isApi(api)) {
       let message = `The target API was not found with the path: [${bodyResult.value.path.join(', ')}]`
-      return Response.json({
-        error: { message },
-      })
+      return Response.json(ApiError(message))
     }
 
     let definition = api.definition as ApiDefinition<SchemaCtorInput>
@@ -97,9 +92,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
 
     if (inputResult.isErr) {
       let message = getErrorMessage(inputResult.value)
-      return Response.json({
-        error: { message },
-      })
+      return Response.json(ApiError(message))
     }
 
     try {
@@ -115,22 +108,16 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
 
       if (outputResult.isErr) {
         let message = getErrorMessage(outputResult.value)
-        return Response.json({
-          error: { message },
-        })
+        return Response.json(ApiError(message))
       }
 
       /**
        * response output
        */
-      return Response.json({
-        output: outputResult.value,
-      })
+      return Response.json(ApiSuccess(outputResult.value))
     } catch (error) {
       let message = (config.errorStack ? error?.stack || error?.message : error?.message) ?? ''
-      return Response.json({
-        error: { message },
-      })
+      return Response.json(ApiError(message))
     }
   })
 

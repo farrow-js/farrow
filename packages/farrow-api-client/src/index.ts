@@ -1,40 +1,8 @@
 import 'isomorphic-unfetch'
 import { AsyncPipeline, createAsyncPipeline, MaybeAsync, Middleware } from 'farrow-pipeline'
+import type { ApiRequest, ApiResponse, JsonType, ApiErrorResponse, ApiSuccessResponse } from 'farrow-api-server'
 
-export type JsonType =
-  | number
-  | string
-  | boolean
-  | null
-  | undefined
-  | JsonType[]
-  | {
-      toJSON(): string
-    }
-  | {
-      [key: string]: JsonType
-    }
-
-export type ApiRequest = {
-  url: string
-  body: {
-    path: string[]
-    input: JsonType
-  }
-  options?: RequestInit
-}
-
-export type ApiErrorResponse = {
-  error: {
-    message: string
-  }
-}
-
-export type ApiSuccessResponse = {
-  output: JsonType
-}
-
-export type ApiResponse = ApiErrorResponse | ApiSuccessResponse
+export { ApiRequest, ApiResponse, JsonType, ApiErrorResponse, ApiSuccessResponse }
 
 export type ApiPipeline = AsyncPipeline<ApiRequest, ApiResponse> & {
   match(pattern: string | RegExp, middleware: Middleware<ApiRequest, MaybeAsync<ApiResponse>>): void
@@ -70,9 +38,11 @@ export const createApiPipeline = (): ApiPipeline => {
 
   let invoke: ApiPipeline['invoke'] = async (url, body) => {
     let result = await run({ url, body })
-    if ('error' in result) {
+
+    if (result.type === 'ApiErrorResponse') {
       throw new Error(result.error.message)
     }
+
     return result.output
   }
 

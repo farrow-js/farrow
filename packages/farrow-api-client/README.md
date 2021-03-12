@@ -1,3 +1,86 @@
 # farrow-api-client
 
 **farrow-api-client** is an api-client for `farrow-api-server`
+
+## Installation
+
+```shell
+# via npm
+npm install --save farrow-api-clien t
+
+# via yarn
+yarn add farrow-api-clien t
+```
+
+## Usage
+
+```typescript
+import { apiPipeline } from 'farrow-api-client'
+
+/**
+ * match(string | regexp, middleware)
+ * match the request url and handle it via farrow-pipeline
+ */
+apiPipeline.match('/todo', async (request, next) => {
+  /**
+   * add extra fileds for post requeset body
+   */
+  let body = {
+    ...request.body,
+    token: 'abc',
+  }
+
+  /**
+   * add extra headers for post request
+   */
+  let options: RequestInit = {
+    headers: {
+      'x-access-token': 'abc',
+    },
+  }
+
+  /**
+   * pass new request to next and await for the response
+   */
+  let response = await next({
+    ...request,
+    body,
+    options,
+  })
+
+  // handle the response if needed
+  return response
+})
+```
+
+### Api
+
+### apiPipeline
+
+```typescript
+export type ApiRequest = {
+  url: string
+  body: {
+    path: string[]
+    input: JsonType
+  }
+  options?: RequestInit
+}
+
+export type ApiErrorResponse = {
+  error: {
+    message: string
+  }
+}
+
+export type ApiSuccessResponse = {
+  output: JsonType
+}
+
+export type ApiResponse = ApiErrorResponse | ApiSuccessResponse
+
+export type ApiPipeline = AsyncPipeline<ApiRequest, ApiResponse> & {
+  match(pattern: string | RegExp, middleware: Middleware<ApiRequest, MaybeAsync<ApiResponse>>): void
+  invoke(url: string, body: ApiRequest['body']): Promise<JsonType>
+}
+```

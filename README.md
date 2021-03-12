@@ -97,7 +97,7 @@ and then:
 
 `farrow` assumes that your source code is in `src` folder, and the output code is in `dist` folder.
 
-You can use `farrow.config.js` to change the default configuration, see the [documentation](./docs/farrow.md) for more detail.
+You can use `farrow.config.js` to change the default configuration, see the [documentation](./packages/farrow/README.md) for more detail.
 
 ### How to setup a server
 
@@ -174,7 +174,7 @@ http.use((request) => {
 
 ### How to match specific request
 
-Click [Router-Url-Schema](./docs/http.md#router-url-schema) to read more
+Click [Router-Url-Schema](./packages/farrow-http/README.md#router-url-schema) to read more
 
 ```typescript
 // http.match(schema).use(...middlewares)
@@ -392,7 +392,7 @@ http.use(() => {
 
 ### How to write a farrow hooks
 
-[Click here to learn more.](./docs/pipeline.md#createcontextdefaultvalue-t-context)
+[Click here to learn more.](./packages/farrow-pipeline/README.md#createcontextdefaultvalue-t-context)
 
 ```tsx
 import { createContext } from 'farrow-pipeline'

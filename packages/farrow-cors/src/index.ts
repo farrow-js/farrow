@@ -3,10 +3,13 @@ import { Response, useReq, useRes, MaybeAsyncResponse } from 'farrow-http'
 import { promisify } from 'util'
 
 import Cors, { CorsOptions, CorsOptionsDelegate, CorsRequest } from 'cors'
+import { IncomingMessage } from 'http'
 
 export { CorsOptions, CorsOptionsDelegate, CorsRequest }
 
-export const cors = (options?: CorsOptions | CorsOptionsDelegate<CorsRequest>): Middleware<any, MaybeAsyncResponse> => {
+export const cors = (
+  options?: CorsOptions | CorsOptionsDelegate<IncomingMessage>,
+): Middleware<any, MaybeAsyncResponse> => {
   let cors = promisify(
     Cors(
       typeof options === 'function'

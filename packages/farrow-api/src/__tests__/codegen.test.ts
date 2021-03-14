@@ -93,7 +93,7 @@ describe('codegen', () => {
 
     let expected = await fs.readFile(`${__dirname}/expected/01.txt`)
 
-    expect(formatedSource).toEqual(expected.toString())
+    expect(formatedSource.replace(/\r|\n/g, '')).toEqual(expected.toString().replace(/\r|\n/g, ''))
   })
 
   it('can disable emiting api-client', async () => {
@@ -107,6 +107,6 @@ describe('codegen', () => {
 
     let expected = await fs.readFile(`${__dirname}/expected/02.txt`)
 
-    expect(formatedSource).toEqual(expected.toString())
+    expect(formatedSource.replace(/\r|\n/g, '')).toEqual(expected.toString().replace(/\r|\n/g, ''))
   })
 })

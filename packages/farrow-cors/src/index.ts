@@ -6,21 +6,17 @@ import Cors, { CorsOptions, CorsOptionsDelegate, CorsRequest } from 'cors'
 
 export { CorsOptions, CorsOptionsDelegate, CorsRequest }
 
-export const cors = <T extends CorsRequest = CorsRequest>(
-  options?: CorsOptions | CorsOptionsDelegate<T>,
-): Middleware<any, MaybeAsyncResponse> => {
-  let cors: any
-
-  if (typeof options === 'function') {
-    cors = promisify(Cors(options))
-  } else {
-    cors = promisify(
-      Cors({
-        ...options,
-        preflightContinue: true,
-      }),
-    )
-  }
+export const cors = (options?: CorsOptions | CorsOptionsDelegate<CorsRequest>): Middleware<any, MaybeAsyncResponse> => {
+  let cors = promisify(
+    Cors(
+      typeof options === 'function'
+        ? options
+        : {
+            ...options,
+            preflightContinue: true,
+          },
+    ),
+  )
 
   return async (request, next) => {
     let req = useReq()

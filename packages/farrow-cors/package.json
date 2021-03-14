@@ -10,7 +10,8 @@
   "keywords": [
     "Web Framework",
     "TypeScript",
-    "Functional Programming"
+    "Functional Programming",
+    "cors"
   ],
   "author": "Jade Gu",
   "license": "MIT",

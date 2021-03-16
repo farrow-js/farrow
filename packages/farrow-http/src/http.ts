@@ -3,10 +3,9 @@ import fs from 'fs'
 import path from 'path'
 import { Stream } from 'stream'
 
-import parseBody, { Options as BodyOptions } from 'co-body'
+import type { Options as BodyOptions } from 'co-body'
 import { parse as parseCookies, CookieParseOptions as CookieOptions } from 'cookie'
 import { parse as parseQuery, IParseOptions as QueryOptions } from 'qs'
-import typeis from 'type-is'
 import CookiesClass from 'cookies'
 import statuses from 'statuses'
 import accepts from 'accepts'
@@ -17,7 +16,7 @@ import onfinish from 'on-finished'
 import destroy from 'destroy'
 import mime from 'mime-types'
 
-import { createContext, createContainer, runWithContainer, Container, ContextStorage } from 'farrow-pipeline'
+import { createContainer, runWithContainer, Container, ContextStorage } from 'farrow-pipeline'
 
 import { JsonType } from 'farrow-schema'
 
@@ -33,54 +32,9 @@ import { Router, RouterPipeline } from './router'
 
 import { createLogger, LoggerEvent, LoggerOptions } from './logger'
 
-import { access } from './util'
+import { access, getBody, getContentLength } from './util'
 
-const RequestContext = createContext<IncomingMessage | null>(null)
-
-export const useRequest = () => {
-  let request = RequestContext.use().value
-  return request
-}
-
-const ResponseContext = createContext<ServerResponse | null>(null)
-
-export const useResponse = () => {
-  let response = ResponseContext.use().value
-
-  return response
-}
-
-export const useReq = () => {
-  let req = useRequest()
-
-  if (!req) {
-    throw new Error(`Expected request, but got: ${req}`)
-  }
-
-  return req
-}
-
-export const useRes = () => {
-  let res = useResponse()
-
-  if (!res) {
-    throw new Error(`Expected response, but got: ${res}`)
-  }
-
-  return res
-}
-
-const RequestInfoContext = createContext<RequestInfo | null>(null)
-
-export const useRequestInfo = () => {
-  let requestInfo = RequestInfoContext.use().value
-
-  if (!requestInfo) {
-    throw new Error(`Expected request info, but got: ${requestInfo}`)
-  }
-
-  return requestInfo
-}
+import { RequestContext, RequestInfoContext, ResponseContext } from './context'
 
 export type HttpPipelineOptions = {
   basenames?: string[]
@@ -245,33 +199,6 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
 }
 
 export const Http = createHttpPipeline
-
-const getContentLength = (res: ServerResponse) => {
-  let contentLength = res.getHeader('Content-Length')
-  if (typeof contentLength === 'string') {
-    let length = parseFloat(contentLength)
-    return isNaN(length) ? 0 : length
-  }
-  if (typeof contentLength !== 'number') {
-    return 0
-  }
-  return contentLength
-}
-
-const jsonTypes = ['json', 'application/*+json', 'application/csp-report']
-const formTypes = ['urlencoded']
-const textTypes = ['text']
-
-const getBody = async (req: IncomingMessage, options?: BodyOptions) => {
-  let type = typeis(req, jsonTypes) || typeis(req, formTypes) || typeis(req, textTypes)
-
-  if (type) {
-    let body = await parseBody(req, options)
-    return body
-  }
-
-  return null
-}
 
 export type ResponseParams = {
   requestInfo: RequestInfo

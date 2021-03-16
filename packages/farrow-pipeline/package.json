@@ -3,6 +3,7 @@
   "version": "1.7.0",
   "description": "Type-Friendly middleware library",
   "main": "dist/index.js",
+  "module": "esm/index.js",
   "files": [
     "src",
     "dist",

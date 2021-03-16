@@ -1,0 +1,17 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ES2020",
+    "target": "ES2020",
+    "outDir": "./esm"
+  },
+  "references": [
+    {
+      "path": "../farrow-pipeline/tsconfig.json"
+    },
+    {
+      "path": "../farrow-api-server/tsconfig.json"
+    }
+  ],
+  "include": ["src"]
+}

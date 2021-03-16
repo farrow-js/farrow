@@ -27,9 +27,9 @@ process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 
 describe('Https', () => {
   it('Response', async () => {
-    let http = createHttps()
+    let https = createHttps()
 
-    http
+    https
       .match({
         pathname: '/test',
       })
@@ -37,7 +37,7 @@ describe('Https', () => {
         return Response.text(JSON.stringify(data))
       })
 
-    await request(http.server())
+    await request(https.server())
       .get('/test')
       .expect('Content-Type', /text/)
       .expect(
@@ -55,9 +55,9 @@ describe('Https', () => {
   })
 
   it('Request', async () => {
-    let http = createHttps()
+    let https = createHttps()
 
-    http.use(() => {
+    https.use(() => {
       let req = useReq()
       let res = useRes()
 
@@ -67,13 +67,13 @@ describe('Https', () => {
       return Response.custom()
     })
 
-    await request(http.server()).get('/test-abc').expect(200, '/test-abc')
+    await request(https.server()).get('/test-abc').expect(200, '/test-abc')
   })
 
   it('Router', async () => {
-    let http = createHttps()
+    let https = createHttps()
     let router = Router()
-    let server = http.server()
+    let server = https.server()
 
     router
       .match({
@@ -83,8 +83,8 @@ describe('Https', () => {
         return Response.text(request.pathname)
       })
 
-    http.use(router)
-    http.route('/base').use(router)
+    https.use(router)
+    https.route('/base').use(router)
 
     await request(server).get('/abc').expect(200, '/abc')
     await request(server).get('/base/abc').expect(200, '/abc')

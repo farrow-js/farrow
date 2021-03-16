@@ -277,10 +277,14 @@ export const codegen = (formatResult: FormatResult, options?: CodegenOptions): s
 
   let definitions = handleTypes(formatResult.types)
 
-  let source = `
-  import type { JsonType } from 'farrow-api-client'
-  ${definitions.join('\n\n')}
-  `
+  let source = definitions.join('\n\n')
+
+  if (source.includes('JsonType')) {
+    source = `
+    import type { JsonType } from 'farrow-api-client'
+    ${source}
+    `
+  }
 
   if (config.emitApiClient) {
     let entries = handleEntries(formatResult.entries)

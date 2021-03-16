@@ -16,7 +16,7 @@ yarn add farrow-api-server
 
 ## Usage
 
-Writing `farrow-api` is just like typing in a higher-order way, we define a api-type via `farrow-schema`.
+Writing `farrow-api` is just like typing in a higher-order way, we define a api-type via `farrow-schema`. And then use [farrow-api-server](../farrow-api-server/README.md) to attach api to a http server.
 
 ```typescript
 import { Api } from 'farrow-api'

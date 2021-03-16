@@ -43,7 +43,6 @@ and then:
 ```javascript
 // farrow.config.js
 const { createFarrowConfig } = require('farrow')
-const pkg = require('./package.json')
 
 module.exports = createFarrowConfig({
   server: {
@@ -51,10 +50,7 @@ module.exports = createFarrowConfig({
     src: 'src',
     dist: 'dist',
     // uncomment next-line to debug
-    // nodeArgs: ['--inspect-brk'],
-    esbuild: {
-      external: [...Object.keys(pkg.dependencies)],
-    },
+    // nodeArgs: ['--inspect-brk']
   },
   // for connecting farrow-api-server and codegen farrow-api-client
   // api: [
@@ -75,22 +71,38 @@ export type Config = {
 }
 
 export type ServerBundlerOptions = {
-  // filename of entry
+  /**
+   * filename of entry
+   */
   entry?: string
-  // folder of source code
+  /**
+   * folder of source code
+   */
   src?: string
-  // folder of output code
+  /**
+   * folder of output code
+   */
   dist?: string
-  // args for node.js
-  // eg. ['--inspect-brk'] for debugging
+  /**
+   * - args for node.js
+   * - eg. ['--inspect-brk'] for debugging
+   */
   nodeArgs?: string[]
-  // env for node.js
-  // eg. { NODE_ENV: 'production' }
-  // NODE_ENV = production in `farrow start`
-  // NODE_ENV = development in `farrow dev`
+  /**
+   * - env for node.js
+   * - eg. { NODE_ENV: 'production' }
+   * - NODE_ENV = production in `farrow start`
+   * - NODE_ENV = development in `farrow dev`
+   */
   env?: NodeJS.ProcessEnv
-  // other options for esbuild
+  /**
+   * other options for esbuild
+   */
   esbuild?: Omit<BuildOptions, 'entryPoints' | 'outdir' | 'outbase'>
+  /**
+   * auto add closest package.json dependenties to esbuild external or not
+   */
+  autoExternal?: boolean
 }
 
 export type ApiClientOptions = {

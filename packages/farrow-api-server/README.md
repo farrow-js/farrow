@@ -16,7 +16,7 @@ yarn add farrow-api-server
 
 ## Usage
 
-[farrow-api](../farrow-api/README.md) just defining API, it's not directly bind to an server.
+[farrow-api](../farrow-api/README.md) just defining API, it's not directly bind to a server.
 
 `farrow-api-server` can convert an `api-entries` to a router of `farrow-http`.
 

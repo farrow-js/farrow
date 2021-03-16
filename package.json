@@ -8,10 +8,12 @@
     "node": "14.x"
   },
   "scripts": {
-    "build": "run-s clean build:dist clean:tests",
-    "build:dist": "tsc -b ./tsconfig.build.json",
-    "clean": "shx rm -rf ./packages/*/*.tsbuildinfo && shx rm -rf ./packages/*/dist",
-    "clean:tests": "shx rm -rf ./packages/*/dist/**/__tests__",
+    "build": "run-s clean build:source clean:tests",
+    "build:dist": "tsc -b ./tsconfig.dist.json",
+    "build:esm": "tsc -b ./tsconfig.esm.json",
+    "build:source": "run-p build:dist build:esm",
+    "clean": "shx rm -rf ./packages/*/*.tsbuildinfo && shx rm -rf ./packages/*/{dist,esm}",
+    "clean:tests": "shx rm -rf ./packages/*/{dist,esm}/**/__tests__",
     "lint": "eslint --report-unused-disable-directives ./packages",
     "format": "run-p format:source format:other",
     "format:other": "prettier ./**/*.{md,yml,json} --write",

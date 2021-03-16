@@ -76,7 +76,7 @@
     "no-unmodified-loop-condition": "error",
     "no-useless-call": "error",
     "no-useless-catch": "error",
-    "no-useless-concat": "error",
+    "no-useless-concat": "off",
     "no-useless-escape": "error",
     "no-useless-return": "error",
     "no-with": "error",
@@ -96,7 +96,7 @@
         "ignoreRestSiblings": true
       }
     ],
-    "global-require": "error",
+    "global-require": "off",
     "handle-callback-err": "error",
     "no-buffer-constructor": "error",
     "no-path-concat": "error",

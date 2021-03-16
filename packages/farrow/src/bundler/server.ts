@@ -112,9 +112,14 @@ export type ServerBundlerOptions = {
    */
   esbuild?: Omit<BuildOptions, 'entryPoints' | 'outdir' | 'outbase'>
   /**
+   * alias of autoExternal
    * auto add closest package.json dependenties to esbuild external or not
    */
   autoAddExternal?: boolean
+  /**
+   * auto add closest package.json dependenties to esbuild external or not
+   */
+  autoExternal?: boolean
 }
 
 export type StartOptions = {
@@ -129,7 +134,6 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
     src: 'src',
     dist: 'dist',
     nodeArgs: [],
-    autoAddExternal: true,
     ...options,
     esbuild: {
       sourcemap: true,
@@ -140,7 +144,7 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
   let srcEntry = join(config.src, config.entry)
   let distEntry = join(config.dist, config.entry).replace(/\.(tsx?)$/, '.js')
   let bundler = createBundler({
-    autoAddExternal: config.autoAddExternal,
+    autoAddExternal: config.autoExternal ?? config.autoAddExternal ?? true,
     build: {
       ...config.esbuild,
       platform: 'node',

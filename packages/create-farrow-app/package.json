@@ -1,6 +1,6 @@
 {
   "name": "create-farrow-app",
-  "version": "1.7.1",
+  "version": "1.8.0",
   "description": "A cli-tools for scaffolding farrow project",
   "main": "dist/index.js",
   "bin": {
@@ -28,10 +28,10 @@
     "url": "git+https://github.com/Lucifier129/farrow.git"
   },
   "dependencies": {
-    "tslib": "^2.1.0",
     "enquirer": "^2.3.6",
     "kolorist": "^1.2.9",
     "minimist": "^1.2.5",
+    "tslib": "^2.1.0",
     "yargs": "^15.3.1"
   }
 }

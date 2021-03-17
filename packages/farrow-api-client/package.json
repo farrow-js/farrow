@@ -1,6 +1,6 @@
 {
   "name": "farrow-api-client",
-  "version": "1.7.1",
+  "version": "1.8.0",
   "description": "A type-friendly BFF framework",
   "main": "dist/index.js",
   "module": "esm/index.js",
@@ -27,8 +27,8 @@
     "farrow-pipeline": "^1.6.7"
   },
   "devDependencies": {
-    "farrow-api-server": "^1.7.1",
-    "farrow-pipeline": "^1.7.0"
+    "farrow-api-server": "^1.8.0",
+    "farrow-pipeline": "^1.8.0"
   },
   "dependencies": {
     "isomorphic-unfetch": "^3.1.0",

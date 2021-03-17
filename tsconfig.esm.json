@@ -1,7 +1,6 @@
 {
   "extends": "./tsconfig.json",
   "compilerOptions": {
-    "module": "ES2015",
     "noEmit": true
   },
   "references": [
@@ -16,6 +15,9 @@
     },
     {
       "path": "./packages/farrow-module/tsconfig.esm.json"
+    },
+    {
+      "path": "./packages/farrow-next/tsconfig.esm.json"
     }
   ],
   "exclude": ["./examples/*", "./packages/create-farrow-app/templates/**/*"]

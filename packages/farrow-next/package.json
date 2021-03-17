@@ -3,9 +3,11 @@
   "version": "1.7.0",
   "description": "A framework runs on Next.js",
   "main": "dist/index.js",
+  "module": "esm/index.js",
   "files": [
     "src",
-    "dist"
+    "dist",
+    "esm"
   ],
   "keywords": [
     "Next.js",

@@ -1,4 +1,4 @@
-import fs from 'fs/promises'
+import fsm from 'fs'
 import { Api } from '../api'
 import { toJSON } from '../toJSON'
 import { codegen } from '../codegen'
@@ -20,6 +20,8 @@ import {
   Union,
   Unknown,
 } from 'farrow-schema'
+
+const fs = fsm.promises
 
 class Collection extends ObjectType {
   number = Number

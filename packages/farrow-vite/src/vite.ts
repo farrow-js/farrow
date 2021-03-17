@@ -1,8 +1,10 @@
 import path from 'path'
-import fs from 'fs/promises'
+import fsm from 'fs'
 import type { IncomingMessage, ServerResponse } from 'http'
 import { Response, Router } from 'farrow-http'
 import { createServer as createViteServer, InlineConfig } from 'vite'
+
+const fs = fsm.promises
 
 export const vite = (options?: InlineConfig) => {
   let router = Router()

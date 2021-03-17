@@ -2,12 +2,14 @@ import path from 'path'
 import execa, { ExecaChildProcess } from 'execa'
 import { Plugin, startService, BuildOptions } from 'esbuild'
 import slash from 'slash'
-import fs from 'fs/promises'
+import fsm from 'fs'
 import readPkgUp from 'read-pkg-up'
 
 import { watchFiles } from '../util/watchFiles'
 import { join } from '../util/join'
 import { memo } from '../util/memo'
+
+const fs = fsm.promises
 
 export type BundlerOptions = {
   /**

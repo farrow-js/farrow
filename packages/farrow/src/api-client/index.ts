@@ -1,10 +1,12 @@
-import fs from 'fs/promises'
+import fsm from 'fs'
 import { ensureDir } from 'fs-extra'
 import { dirname } from 'path'
 import fetch from 'node-fetch'
 import { FormatResult } from 'farrow-api/dist/toJSON'
 import { codegen, CodegenOptions } from 'farrow-api/dist/codegen'
 import { format } from 'farrow-api/dist/prettier'
+
+const fs = fsm.promises
 
 const writeFile = async (filename: string, content: string) => {
   try {

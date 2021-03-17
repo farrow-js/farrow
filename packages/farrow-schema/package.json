@@ -4,9 +4,28 @@
   "description": "A powerful and extensible schema builder",
   "main": "dist/index.js",
   "module": "esm/index.js",
+  "exports": {
+    ".": {
+      "import": "./esm/index.js",
+      "require": "./dist/index.js"
+    },
+    "./validator": {
+      "import": "./esm/validator.js",
+      "require": "./dist/validator.js"
+    },
+    "./transformer": {
+      "import": "./esm/transformer.js",
+      "require": "./dist/transformer.js"
+    },
+    "./formater": {
+      "import": "./esm/formater.js",
+      "require": "./dist/formater.js"
+    }
+  },
   "files": [
     "src",
     "dist",
+    "esm",
     "validator.d.ts",
     "validator.js",
     "transformer.js",

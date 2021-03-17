@@ -9,7 +9,8 @@
   },
   "files": [
     "src",
-    "dist"
+    "dist",
+    "esm"
   ],
   "keywords": [
     "Web Framework",

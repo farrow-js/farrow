@@ -6,7 +6,8 @@
   "module": "esm/index.js",
   "files": [
     "src",
-    "dist"
+    "dist",
+    "esm"
   ],
   "scripts": {
     "start": "ts-node ./src/module.new"

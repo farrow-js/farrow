@@ -18,23 +18,43 @@ A Type-Friendly Web Framework
 
 ## Usage
 
-- [How to install](#how-to-install)
-- [How to setup a development environment](#how-to-setup-a-development-environment)
-- [How to setup a server](#how-to-setup-a-server)
-- [How to serve static assets](#how-to-serve-static-assets)
-- [How to respond text or json or html or file](#how-to-respond-text-or-json-or-html-or-file)
-- [How to access request info](#how-to-access-request-info)
-- [How to match specific request](#how-to-match-specific-request)
-- [How to pass new request info for downstream middleware](#how-to-pass-new-request-info-for-downstream-middleware)
-- [How to filter and manipulate response in upstream middleware](#how-to-filter-and-manipulate-response-in-upstream-middleware)
-- [How to set response headers](#how-to-set-response-headers)
-- [How to set response cookies](#how-to-set-response-cookies)
-- [How to set response status](#how-to-set-response-status)
-- [How to redirect](#how-to-redirect)
-- [How to merge responses](#how-to-merge-responses)
-- [How to add router](#how-to-add-router)
-- [How to add view-engine](#how-to-add-view-engine)
-- [How to write a farrow hooks](#how-to-write-a-farrow-hooks)
+- [farrow-http](#farrow-http)
+  - [Benefits](#benefits)
+  - [Environment Requirement](#environment-requirement)
+  - [Usage](#usage)
+    - [How to install](#how-to-install)
+    - [How to setup a development environment](#how-to-setup-a-development-environment)
+    - [How to setup a server](#how-to-setup-a-server)
+    - [How to setup a https server](#how-to-setup-a-https-server)
+    - [How to serve static assets](#how-to-serve-static-assets)
+    - [How to respond text or json or html or file](#how-to-respond-text-or-json-or-html-or-file)
+    - [How to access request info](#how-to-access-request-info)
+    - [How to match specific request](#how-to-match-specific-request)
+    - [How to pass new request info for downstream middleware](#how-to-pass-new-request-info-for-downstream-middleware)
+    - [How to filter and manipulate response in upstream middleware](#how-to-filter-and-manipulate-response-in-upstream-middleware)
+    - [How to set response headers](#how-to-set-response-headers)
+    - [How to set response cookies](#how-to-set-response-cookies)
+    - [How to set response status](#how-to-set-response-status)
+    - [How to redirect](#how-to-redirect)
+    - [How to merge responses](#how-to-merge-responses)
+    - [How to add router](#how-to-add-router)
+    - [How to add view-engine](#how-to-add-view-engine)
+    - [How to write a farrow hooks](#how-to-write-a-farrow-hooks)
+  - [API](#api)
+  - [Http(options?: HttpPipelineOptions): HttpPipeline](#httpoptions-httppipelineoptions-httppipeline)
+  - [Https(options?: HttpsPipelineOptions): HttpsPipeline](#httpsoptions-httpspipelineoptions-httpspipeline)
+  - [Response](#response)
+  - [Router(): RouterPipeline](#router-routerpipeline)
+  - [Router-Url-Schema](#router-url-schema)
+    - [Dynamic parameter](#dynamic-parameter)
+    - [Static parameter](#static-parameter)
+    - [Current supported types in `router-url-schema`](#current-supported-types-in-router-url-schema)
+  - [Routing methods](#routing-methods)
+  - [useReq(): IncomingMessage](#usereq-incomingmessage)
+  - [useRes(): ServerResponse](#useres-serverresponse)
+  - [useRequestInfo(): RequestInfo](#userequestinfo-requestinfo)
+  - [useBasenames(): string[]](#usebasenames-string)
+  - [usePrefix(): string](#useprefix-string)
 
 ### How to install
 
@@ -84,6 +104,32 @@ http.use(() => {
 })
 
 http.listen(3000)
+```
+
+### How to setup a https server
+
+```ts
+import { Https, Response } from 'farrow-http'
+
+const CERT = fs.readFileSync(path.join(__dirname, './keys/https-cert.pem'))
+const KEY = fs.readFileSync(path.join(__dirname, './keys/https-key.pem'))
+const CA = fs.readFileSync(path.join(__dirname, 'keys/https-csr.pem'))
+
+const https = Https({
+  tsl: {
+    cert: CERT,
+    ca: CA,
+    key: KEY,
+  },
+})
+
+// add http middleware
+https.use(() => {
+  // returning response in middleware
+  return Response.text(`Hello Farrow`)
+})
+
+https.listen(3000)
 ```
 
 ### How to serve static assets
@@ -426,7 +472,8 @@ http
 
 ```typescript
 import {
-  Http, // use to create http
+  Http, // use to create http server
+  Https, // use to create https server
   Response, // use to respond user
   Router, // use to create router
   useReq, // farrow-hooks for accessing the original request of node.js http module
@@ -439,7 +486,7 @@ import {
 
 ## Http(options?: HttpPipelineOptions): HttpPipeline
 
-create a http
+create a http server
 
 ```typescript
 type HttpPipelineOptions = {
@@ -477,6 +524,33 @@ type LoggerOptions = {
   transporter?: (str: string) => void
 }
 ```
+
+## Https(options?: HttpsPipelineOptions): HttpsPipeline
+
+create a https server
+
+```ts
+export type HttpsOptions = SecureContextOptions & TlsOptions
+
+export type HttpsPipelineOptions = HttpPipelineOptions & {
+  // Intersection between options from tls.createServer() and tls.createSecureContext() in Node.js
+  tsl?: HttpsOptions
+}
+
+type HttpsPipeline = RouterPipeline & {
+  // https.handle(req, res), handle request and respond to user, you can use this function to make farrow-http work in expressjs/koajs or other web framework in node.js
+  handle: (req: IncomingMessage, res: ServerResponse) => Promise<void>
+  // the same args of https.createServer().listen(...), create a server and listen to port
+  listen: (...args: Parameters<Server['listen']>) => Server
+  // just create a server with https.handle(req, res), don't listen to any port
+  server: () => Server
+}
+```
+
+- tls <[HttpsOptions](https://github.com/Lucifier129/farrow/blob/6c0208e0f9e3e3015042caf4f001717750800602/packages/farrow-http/src/https.ts#L22)>
+  Intersection between options from [tls.createServer()](https://nodejs.org/dist/latest-v15.x/docs/api/tls.html#tls_tls_createserver_options_secureconnectionlistener) and [tls.createSecureContext()](https://nodejs.org/dist/latest-v15.x/docs/api/tls.html#tls_tls_createsecurecontext_options) in [Node.js](https://nodejs.org/)
+
+> Notes: Server created by http is different from created by https.
 
 ## Response
 

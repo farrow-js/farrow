@@ -6,10 +6,10 @@
 
 ```shell
 # via npm
-npm install --save farrow-api-clien t
+npm install --save farrow-api-client
 
 # via yarn
-yarn add farrow-api-clien t
+yarn add farrow-api-client
 ```
 
 ## Usage

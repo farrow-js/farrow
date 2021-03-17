@@ -8,10 +8,10 @@ Install via npm or yarn
 
 ```shell
 # via npm
-npm install --save farrow-api-server
+npm install --save farrow-api
 
 # via yarn
-yarn add farrow-api-server
+yarn add farrow-api
 ```
 
 ## Usage

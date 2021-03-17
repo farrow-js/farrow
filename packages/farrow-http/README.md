@@ -41,20 +41,20 @@ A Type-Friendly Web Framework
     - [How to add view-engine](#how-to-add-view-engine)
     - [How to write a farrow hooks](#how-to-write-a-farrow-hooks)
   - [API](#api)
-  - [Http(options?: HttpPipelineOptions): HttpPipeline](#httpoptions-httppipelineoptions-httppipeline)
-  - [Https(options?: HttpsPipelineOptions): HttpsPipeline](#httpsoptions-httpspipelineoptions-httpspipeline)
-  - [Response](#response)
-  - [Router(): RouterPipeline](#router-routerpipeline)
-  - [Router-Url-Schema](#router-url-schema)
-    - [Dynamic parameter](#dynamic-parameter)
-    - [Static parameter](#static-parameter)
-    - [Current supported types in `router-url-schema`](#current-supported-types-in-router-url-schema)
-  - [Routing methods](#routing-methods)
-  - [useReq(): IncomingMessage](#usereq-incomingmessage)
-  - [useRes(): ServerResponse](#useres-serverresponse)
-  - [useRequestInfo(): RequestInfo](#userequestinfo-requestinfo)
-  - [useBasenames(): string[]](#usebasenames-string)
-  - [usePrefix(): string](#useprefix-string)
+    - [Http(options?: HttpPipelineOptions): HttpPipeline](#httpoptions-httppipelineoptions-httppipeline)
+    - [Https(options?: HttpsPipelineOptions): HttpsPipeline](#httpsoptions-httpspipelineoptions-httpspipeline)
+    - [Response](#response)
+    - [Router(): RouterPipeline](#router-routerpipeline)
+      - [Router-Url-Schema](#router-url-schema)
+        - [Dynamic parameter](#dynamic-parameter)
+        - [Static parameter](#static-parameter)
+        - [Current supported types in `router-url-schema`](#current-supported-types-in-router-url-schema)
+      - [Routing methods](#routing-methods)
+    - [useReq(): IncomingMessage](#usereq-incomingmessage)
+    - [useRes(): ServerResponse](#useres-serverresponse)
+    - [useRequestInfo(): RequestInfo](#userequestinfo-requestinfo)
+    - [useBasenames(): string[]](#usebasenames-string)
+    - [usePrefix(): string](#useprefix-string)
 
 ### How to install
 
@@ -484,7 +484,7 @@ import {
 } from 'farrow-http'
 ```
 
-## Http(options?: HttpPipelineOptions): HttpPipeline
+### Http(options?: HttpPipelineOptions): HttpPipeline
 
 create a http server
 
@@ -525,7 +525,7 @@ type LoggerOptions = {
 }
 ```
 
-## Https(options?: HttpsPipelineOptions): HttpsPipeline
+### Https(options?: HttpsPipelineOptions): HttpsPipeline
 
 create a https server
 
@@ -552,7 +552,7 @@ type HttpsPipeline = RouterPipeline & {
 
 > Notes: Server created by http is different from created by https.
 
-## Response
+### Response
 
 `Response` can be used to describe the shape of the real server response, farrow-http will perform it later
 
@@ -612,7 +612,7 @@ type Response = {
 }
 ```
 
-## Router(): RouterPipeline
+### Router(): RouterPipeline
 
 create a router
 
@@ -693,7 +693,7 @@ router
   })
 ```
 
-## Router-Url-Schema
+#### Router-Url-Schema
 
 Since farrow `v1.2.0`, a new feature `router-url-schema` is supported. it combines `{ pathname, params, query }` into `{ url }`, and use [Template literal types](https://devblogs.microsoft.com/typescript/announcing-typescript-4-1-beta/#template-literal-types) to extract the type info
 
@@ -724,7 +724,7 @@ router
   })
 ```
 
-### Dynamic parameter
+##### Dynamic parameter
 
 A dynamic parameter has the form `<key:type>`.
 
@@ -737,13 +737,13 @@ Dynamic parameter support `modifier`(learn more from [here](https://github.com/p
 - `<key*:type>` means zero or more, the corresponding type is `{ key?: type[] }`, the corresponding pattern is `/:key*`
 - `<key+:type>` means one or more, the corresponding type is `{ key: type[] }`, the corresponding pattern is `/:key+`
 
-### Static parameter
+##### Static parameter
 
 A static parameter can only be placed in `querystring`, it will regard as `literal string type`.
 
 For example: `/?<a:int>&b=2` has the type `{ pathname: string, query: { a: number, b: '2' } }`
 
-### Current supported types in `router-url-schema`
+##### Current supported types in `router-url-schema`
 
 The supported types in `<key:type>` are list below:
 
@@ -756,7 +756,7 @@ The supported types in `<key:type>` are list below:
 - `{*+}` -> use the string wrapped by `{}` as `string literal type`. eg. `{abc}` has type `"abc"`, only `string literal type` is supported
 - `|` -> ts `union types`. eg. `<a:int|boolean|string>` has ts type `number|boolean|string`
 
-## Routing methods
+#### Routing methods
 
 `router[get|post|put|patch|head|delte|options](url, schema?, options?)` is supported as shortcut of `router.match({ url, method: get|post|put|patch|head|delte|options }, options?)`
 
@@ -769,7 +769,7 @@ router.get('/get0/<arg0:int>?<arg1:int>').use((request) => {
 })
 ```
 
-## useReq(): IncomingMessage
+### useReq(): IncomingMessage
 
 ```typescript
 http.use(() => {
@@ -778,7 +778,7 @@ http.use(() => {
 })
 ```
 
-## useRes(): ServerResponse
+### useRes(): ServerResponse
 
 ```typescript
 http.use(() => {
@@ -787,7 +787,7 @@ http.use(() => {
 })
 ```
 
-## useRequestInfo(): RequestInfo
+### useRequestInfo(): RequestInfo
 
 ```typescript
 http.use((request0) => {
@@ -796,7 +796,7 @@ http.use((request0) => {
 })
 ```
 
-## useBasenames(): string[]
+### useBasenames(): string[]
 
 ```typescript
 const http = Http({
@@ -809,7 +809,7 @@ http.route('/base1').use(() => {
 })
 ```
 
-## usePrefix(): string
+### usePrefix(): string
 
 ```typescript
 const http = Http({

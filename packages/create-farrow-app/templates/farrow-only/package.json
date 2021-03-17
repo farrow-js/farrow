@@ -1,6 +1,7 @@
 {
-  "name": "farrow-server-only-template",
+  "name": "farrow-only-template",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
     "dev": "farrow dev",
     "build": "tsc && farrow build",

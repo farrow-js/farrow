@@ -1,6 +1,7 @@
 {
   "name": "farrow-next-react-template",
   "version": "1.0.0",
+  "private": true,
   "scripts": {
     "dev": "farrow dev",
     "build": "tsc && next build && farrow build",

@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import minimist from 'minimist'
 import { prompt } from 'enquirer'
-import { yellow, green, cyan, magenta, lightRed, stripColors } from 'kolorist'
+import { yellow, green, lightRed, stripColors } from 'kolorist'
 
 const argv = minimist(process.argv.slice(2))
 
@@ -11,9 +11,9 @@ const cwd = process.cwd()
 
 // prettier-ignore
 const TEMPLATES = [
-  yellow('server-only'),
-  lightRed('server-and-vite-react'),
-  green('server-and-next-react')
+  yellow('farrow-only'),
+  lightRed('farrow-vite-react'),
+  green('farrow-next-react')
 ]
 
 const renameFiles = {
@@ -65,7 +65,7 @@ async function init() {
       type: 'input',
       name: 'name',
       message: `Project name:`,
-      initial: 'vite-project',
+      initial: 'farrow-project',
     })
     targetDir = name
   }

@@ -14,6 +14,6 @@ if (process.env.NODE_ENV === 'development') {
   http.serve('/', path.join(__dirname, '../dist/client'))
 }
 
-http.listen(3002, () => {
+http.listen(3003, () => {
   console.log('server started at http://localhost:3002')
 })

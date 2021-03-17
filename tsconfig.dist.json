@@ -42,6 +42,9 @@
     },
     {
       "path": "./packages/farrow-next-server/tsconfig.json"
+    },
+    {
+      "path": "./packages/create-farrow-app/tsconfig.json"
     }
   ],
   "exclude": ["./examples/*", "./packages/create-farrow-app/templates/**/*"]

@@ -3,7 +3,7 @@ import fs from 'fs'
 import path from 'path'
 import minimist from 'minimist'
 import { prompt } from 'enquirer'
-import { yellow, green, lightRed, stripColors } from 'kolorist'
+import { green, blue, stripColors, magenta } from 'kolorist'
 
 const argv = minimist(process.argv.slice(2))
 
@@ -11,9 +11,9 @@ const cwd = process.cwd()
 
 // prettier-ignore
 const TEMPLATES = [
-  yellow('farrow-only'),
-  lightRed('farrow-vite-react'),
-  green('farrow-next-react')
+  blue('farrow-only'),
+  green('farrow-vite-react'),
+  magenta('farrow-next-react')
 ]
 
 const renameFiles = {
@@ -111,7 +111,7 @@ async function init() {
     template = stripColors(t)
   }
 
-  let templateDir = path.join(__dirname, `templates/${template}`)
+  let templateDir = path.join(__dirname, `../templates/${template}`)
 
   let write = (file: string, content?: string) => {
     let targetPath = renameFiles[file] ? path.join(root, renameFiles[file]) : path.join(root, file)

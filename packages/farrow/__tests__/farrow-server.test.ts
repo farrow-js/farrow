@@ -46,7 +46,6 @@ describe('Farrow', () => {
 
     expect(shell.test('-d', distPath)).toBe(true)
 
-    // eslint-disable-next-line global-require
     let { server } = require(distPath).default as { http: HttpPipeline; server: Server }
 
     await request(server)

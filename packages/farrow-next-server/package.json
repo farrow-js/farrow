@@ -1,6 +1,6 @@
 {
   "name": "farrow-next-server",
-  "version": "1.8.0",
+  "version": "1.8.1",
   "description": "A next.js adapter for farrow-http",
   "main": "dist/index.js",
   "files": [
@@ -30,7 +30,7 @@
   "devDependencies": {
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
-    "farrow-http": "^1.8.0",
+    "farrow-http": "^1.8.1",
     "farrow-pipeline": "^1.8.0",
     "farrow-schema": "^1.8.0",
     "next": "^10.0.5",

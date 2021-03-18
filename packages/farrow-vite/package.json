@@ -19,7 +19,7 @@
     "url": "git+https://github.com/Lucifier129/farrow.git"
   },
   "peerDependencies": {
-    "farrow-http": "^1.0.0",
+    "farrow-http": "^1.8.0",
     "vite": "^2.0.1"
   },
   "devDependencies": {

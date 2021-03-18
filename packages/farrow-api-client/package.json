@@ -24,7 +24,7 @@
     "url": "git+https://github.com/Lucifier129/farrow.git"
   },
   "peerDependencies": {
-    "farrow-pipeline": "^1.6.7"
+    "farrow-pipeline": "^1.8.0"
   },
   "devDependencies": {
     "farrow-api-server": "^1.8.0",

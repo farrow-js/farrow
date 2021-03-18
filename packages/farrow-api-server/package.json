@@ -22,10 +22,10 @@
     "url": "git+https://github.com/Lucifier129/farrow.git"
   },
   "peerDependencies": {
-    "farrow-api": "^1.5.3",
-    "farrow-http": "^1.5.3",
-    "farrow-pipeline": "^1.5.3",
-    "farrow-schema": "^1.5.3"
+    "farrow-api": "^1.8.0",
+    "farrow-http": "^1.8.0",
+    "farrow-pipeline": "^1.8.0",
+    "farrow-schema": "^1.8.0"
   },
   "devDependencies": {
     "@types/lodash.get": "^4.4.6",

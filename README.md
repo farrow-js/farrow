@@ -62,6 +62,8 @@
 
 - [farrow-next](./packages/farrow-next/README.md): An isomorphic MVC layer runs on top of Next.js
 
+- [farrow-next-server](./packages/farrow-next/README.md): Run next.js in farrow
+
 ## Community Packages
 
 - [farrow-session](https://github.com/tqma113/farrow-session): A session middleware for farrow.

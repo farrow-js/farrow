@@ -27,7 +27,7 @@ apiPipeline.use(async (request, next) => {
   }
 })
 
-apiPipeline.match('/match', async (request, next) => {
+apiPipeline.match('/match/success', async (request, next) => {
   let body = {
     ...request.body,
     fromMatchStringForBody: true,
@@ -247,7 +247,6 @@ describe('farrow-api-client', () => {
     let result2 = await apiPipeline.run(request2)
 
     expect(result0).toEqual({
-      fromMatchStringForResponse: true,
       fromUseForResponse: true,
       type: 'ApiErrorResponse',
       error: {

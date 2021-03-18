@@ -24,6 +24,8 @@ import { apiPipeline } from 'farrow-api-client'
 /**
  * match(string | regexp, middleware)
  * match the request url and handle it via farrow-pipeline
+ * if pass a string, it will be matched by url.endsWith(pattern)
+ * if pass a regexp, it will be matched by pattern.test(url)
  */
 apiPipeline.match('/todo', async (request, next) => {
   /**

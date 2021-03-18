@@ -28,7 +28,7 @@ export const createApiPipeline = (): ApiPipeline => {
         return next()
       }
 
-      if (request.url.includes(pattern)) {
+      if (request.url.endsWith(pattern)) {
         return middleware(request, next)
       }
 

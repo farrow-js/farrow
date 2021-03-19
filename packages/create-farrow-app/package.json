@@ -14,7 +14,7 @@
     "scripts",
     "bin",
     "src",
-    "templates/*"
+    "templates"
   ],
   "keywords": [
     "Web Framework",

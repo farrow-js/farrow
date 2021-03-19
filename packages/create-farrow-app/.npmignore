@@ -1,1 +1,3 @@
-templates/*/.next
+./templates/*/.next
+./templates/*/node_modules
+

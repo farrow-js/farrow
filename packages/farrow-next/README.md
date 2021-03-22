@@ -31,6 +31,7 @@ yarn add farrow-next
 - [Basic Usage](#basic-usage)
 - [React Hooks API](#react-hooks-api)
 - [Controller API](#controller-api)
+- [Controller Life-Cycle](#controller-life-cycle)
 - [Dependency Injection](#dependency-injection)
 
 ## Basic Usage
@@ -304,20 +305,6 @@ Accesses the current `this.store.getState()` latest state
 
 Accesses the `actions` update function of `redux-store`, with the same structure as `this.reducers`.
 
-#### controller.preload?(): Promise<void>
-
-Lifecycle function that expresses a preload, where you can fetch `SSR` related data
-
-```typescript
-class Test extends Controller {
-  // Preload data
-  async preload() {
-    let json = await this.postJson(url, this.state.body)
-    this.actions.updateJson(json)
-  }
-}
-```
-
 #### controller.page
 
 Access the data associated with `NextPageContext`, structured roughly as follows
@@ -424,6 +411,35 @@ Gets the `userAgent` string, which can be used to construct other properties or 
 The `controller.use` method is used to implement dependency injection and returns the instance of the used class.
 
 See [Dependency Injection](#dependency-injection) for more on this.
+
+### Controller Life-Cycle
+
+#### controller.preload?(): Promise<void>
+
+Call on preload phase(before component rendering), you can fetch `SSR` related data in this method
+
+```typescript
+class Test extends Controller {
+  // Preload data
+  async preload() {
+    let json = await this.postJson(url, this.state.body)
+    this.actions.updateJson(json)
+  }
+}
+```
+
+#### controller.reload?(prevCtrl: this): any
+
+Call on reload phase(after query-changed), you can touch `prev-controller` in this method for resuing state or other things.
+
+```typescript
+class Test extends Controller {
+  // reload
+  async reload(prevCtrl: this) {
+    // do something
+  }
+}
+```
 
 ### Dependency Injection
 

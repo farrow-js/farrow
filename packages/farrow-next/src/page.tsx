@@ -1,4 +1,4 @@
-import React, { ComponentType, useRef } from 'react'
+import React, { ComponentType, useEffect, useRef } from 'react'
 import { NextPage, NextPageContext } from 'next'
 import { Controller, Provider, ControllerCtors, ControllerInstancesType, getUserAgent } from './controller'
 import { replaceState } from './store'
@@ -31,9 +31,11 @@ export type NextPageProps<T extends NextPage> = T extends NextPage<infer Props> 
 export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPage<PageProps<ConstrollerStates<T>>> => {
   let { Controllers, preload, View } = options
   let Page: NextPage<PageProps<ConstrollerStates<T>>> = (props) => {
-    let ctrlsRef = useRef<Controller[] | null>(null)
+    type Props = PageProps<ConstrollerStates<T>>
+    type PageInfo = { ctrls: Controller[]; props: Props }
+    let pageInfoRef = useRef<PageInfo | null>(null)
 
-    if (!ctrlsRef.current) {
+    let getPageInfo = (prevPageInfo?: PageInfo): PageInfo => {
       let pageCtx: PageContextType = {
         userAgent: props.userAgent,
         pathname: props.pathname,
@@ -48,14 +50,30 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
         let ctrl = moduleContext.new(Controller)
         let state = props.states[index]
         replaceState(ctrl.store, state)
+        if (prevPageInfo?.ctrls) {
+          ctrl.reload?.(prevPageInfo.ctrls[index])
+        }
         return ctrl
       })
 
-      ctrlsRef.current = ctrls
+      return {
+        ctrls,
+        props,
+      }
+    }
+
+    // initilize
+    if (!pageInfoRef.current) {
+      pageInfoRef.current = getPageInfo()
+    }
+
+    // reload
+    if (props.asPath !== pageInfoRef.current.props.asPath) {
+      pageInfoRef.current = getPageInfo(pageInfoRef.current)
     }
 
     return (
-      <Provider controllers={ctrlsRef.current}>
+      <Provider controllers={pageInfoRef.current.ctrls}>
         <View />
       </Provider>
     )

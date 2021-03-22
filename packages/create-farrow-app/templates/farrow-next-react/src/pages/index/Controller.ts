@@ -31,15 +31,28 @@ export class Index extends Controller {
         count: state.count - step,
       }
     },
+    setCount(state: IndexState, count: number): IndexState {
+      return {
+        ...state,
+        count,
+      }
+    },
   }
 
   /**
-   * preload state for ssr
+   * load ssr state on preload
    */
   async preload() {
     let result = await GreetApi.greet({
       name: `Farrow + Next.js + React`,
     })
     this.actions.updateGreet(result.greet)
+  }
+
+  /**
+   * sync prev ctrl.state.count on reload
+   */
+  reload(prevCtrl: this) {
+    this.actions.setCount(prevCtrl.state.count)
   }
 }

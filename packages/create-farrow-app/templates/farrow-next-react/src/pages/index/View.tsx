@@ -1,10 +1,17 @@
 import React from 'react'
+import Router from 'next/router'
 import { Index } from './Controller'
 
 export const View = () => {
   let greet = Index.useState((state) => state.greet)
   let count = Index.useState((state) => state.count)
   let index = Index.use()
+
+  let handleJump = () => {
+    Router.push(`/?count=${count}`).catch((err) => {
+      console.error(err)
+    })
+  }
 
   return (
     <div className="App">
@@ -15,6 +22,9 @@ export const View = () => {
           <button onClick={() => index.actions.incre()}>+1</button>
           {count}
           <button onClick={() => index.actions.decre()}>-1</button>
+        </p>
+        <p>
+          <button onClick={handleJump}>jump to {count}</button>
         </p>
         <p>
           Edit <code>App.tsx</code> and save to test HMR updates.

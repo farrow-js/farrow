@@ -1,6 +1,6 @@
 {
   "name": "farrow-vite-react-template",
-  "version": "1.8.1",
+  "version": "1.8.4",
   "private": true,
   "scripts": {
     "dev": "farrow dev",

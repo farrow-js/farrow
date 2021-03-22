@@ -21,5 +21,5 @@ if (process.env.NODE_ENV === 'development') {
 
 // start listening
 http.listen(3003, () => {
-  console.log('server started at http://localhost:3002')
+  console.log('server started at http://localhost:3003')
 })

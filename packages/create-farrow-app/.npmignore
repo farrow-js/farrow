@@ -1,3 +1,8 @@
-./templates/*/.next
-./templates/*/node_modules
-
+node_modules
+.DS_Store
+*.local
+templates/*/.next
+templates/*/node_modules
+templates/*/dist
+templates/*/package-lock.json
+*.tsbuildinfo 

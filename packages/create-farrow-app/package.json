@@ -9,13 +9,6 @@
   "scripts": {
     "build": "tsc -b"
   },
-  "files": [
-    "dist",
-    "scripts",
-    "bin",
-    "src",
-    "templates"
-  ],
   "keywords": [
     "Web Framework",
     "TypeScript",

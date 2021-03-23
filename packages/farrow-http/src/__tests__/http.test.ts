@@ -591,6 +591,19 @@ describe('Http', () => {
       await request(server).get('/static').expect(200, 'Cheer!')
     })
 
+    it('should only serve files under argument.dirname', async () => {
+      let http = createHttp()
+      let server = http.server()
+      let dirname = path.join(__dirname, '../../fixtures/static')
+      let content = await fs.promises.readFile(path.join(dirname, 'foo.js'))
+
+      http.serve('/static', dirname)
+
+      await request(server).get('/static/foo.js').expect(200, content.toString())
+
+      await request(server).get('/static/../bar.js').expect(404, '404 Not Found')
+    })
+
     it('support capturing response by type', async () => {
       let http = createHttp()
       let server = http.server()

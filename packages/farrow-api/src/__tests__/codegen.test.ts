@@ -87,7 +87,9 @@ describe('codegen', () => {
   it('support codegen', async () => {
     let formatResult = toJSON(entries)
 
-    let source = codegen(formatResult)
+    let source = codegen(formatResult, {
+      noCheck: 'just for testing',
+    })
 
     let formatedSource = format(source)
 
@@ -101,6 +103,7 @@ describe('codegen', () => {
 
     let source = codegen(formatResult, {
       emitApiClient: false,
+      noCheck: 'just for testing',
     })
 
     let formatedSource = format(source)

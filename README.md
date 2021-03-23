@@ -62,7 +62,7 @@
 
 - [farrow-next](./packages/farrow-next/README.md): An isomorphic MVC layer runs on top of Next.js
 
-- [farrow-next-server](./packages/farrow-next/README.md): Run next.js in farrow
+- [farrow-next-server](./packages/farrow-next-server/README.md): Run next.js in farrow
 
 ## Community Packages
 

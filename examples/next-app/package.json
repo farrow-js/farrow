@@ -1,6 +1,6 @@
 {
   "name": "farrow-next-app",
-  "version": "1.8.4",
+  "version": "1.8.5",
   "private": true,
   "scripts": {
     "dev": "farrow dev",
@@ -8,12 +8,12 @@
     "start": "farrow start"
   },
   "dependencies": {
-    "farrow": "^1.8.1",
-    "farrow-api": "^1.8.1",
-    "farrow-api-client": "^1.8.1",
-    "farrow-api-server": "^1.8.1",
+    "farrow": "^1.8.5",
+    "farrow-api": "^1.8.5",
+    "farrow-api-client": "^1.8.5",
+    "farrow-api-server": "^1.8.5",
     "farrow-http": "^1.8.1",
-    "farrow-next": "^1.8.4",
+    "farrow-next": "^1.8.5",
     "farrow-pipeline": "^1.8.0",
     "farrow-schema": "^1.8.0",
     "next": "^10.0.7",

@@ -1,6 +1,6 @@
-import { apiPipeline } from 'farrow-api-client'
+import { apiPipeline } from './api/todo'
 
-apiPipeline.match('/todo', async (request, next) => {
+apiPipeline.use(async (request, next) => {
   let body = {
     ...request.body,
     token: 'abc',

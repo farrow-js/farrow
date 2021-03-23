@@ -1,11 +1,11 @@
 import 'isomorphic-unfetch'
-import { AsyncPipeline, createAsyncPipeline, MaybeAsync, Middleware } from 'farrow-pipeline'
+import { AsyncPipeline, createAsyncPipeline, getMiddleware, MaybeAsync, MiddlewareInput } from 'farrow-pipeline'
 import type { ApiRequest, ApiResponse, JsonType, ApiErrorResponse, ApiSuccessResponse } from 'farrow-api-server'
 
 export { ApiRequest, ApiResponse, JsonType, ApiErrorResponse, ApiSuccessResponse }
 
 export type ApiPipeline = AsyncPipeline<ApiRequest, ApiResponse> & {
-  match(pattern: string | RegExp, middleware: Middleware<ApiRequest, MaybeAsync<ApiResponse>>): void
+  match(pattern: string | RegExp, middleware: MiddlewareInput<ApiRequest, MaybeAsync<ApiResponse>>): void
   invoke(url: string, body: ApiRequest['body']): Promise<JsonType>
 }
 
@@ -19,7 +19,8 @@ export const createApiPipeline = (): ApiPipeline => {
     })
   }
 
-  let match: ApiPipeline['match'] = (pattern, middleware) => {
+  let match: ApiPipeline['match'] = (pattern, middlewareInput) => {
+    let middleware = getMiddleware(middlewareInput)
     pipeline.use(async (request, next) => {
       if (pattern instanceof RegExp) {
         if (pattern.test(request.url)) {
@@ -84,7 +85,7 @@ export const createApiPipelineWithUrl = (url: string): ApiPipelineWithUrl => {
   let invoke: ApiPipelineWithUrl['invoke'] = (body) => {
     return apiPipeline.invoke(url, body)
   }
-  apiPipeline.use(pipeline)
+  apiPipeline.match(url, pipeline)
   return {
     ...pipeline,
     invoke,

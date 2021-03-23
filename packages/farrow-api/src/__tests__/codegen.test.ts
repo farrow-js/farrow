@@ -91,7 +91,7 @@ describe('codegen', () => {
 
     let formatedSource = format(source)
 
-    let expected = await fs.readFile(`${__dirname}/expected/01.txt`)
+    let expected = await fs.readFile(`${__dirname}/expected/01.ts`)
 
     expect(formatedSource.replace(/\r|\n/g, '')).toEqual(expected.toString().replace(/\r|\n/g, ''))
   })
@@ -105,7 +105,7 @@ describe('codegen', () => {
 
     let formatedSource = format(source)
 
-    let expected = await fs.readFile(`${__dirname}/expected/02.txt`)
+    let expected = await fs.readFile(`${__dirname}/expected/02.ts`)
 
     expect(formatedSource.replace(/\r|\n/g, '')).toEqual(expected.toString().replace(/\r|\n/g, ''))
   })

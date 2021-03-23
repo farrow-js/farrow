@@ -251,9 +251,7 @@ export const codegen = (formatResult: FormatResult, options?: CodegenOptions): s
     let inputType = getFieldType(api.input.typeId, formatResult.types)
     let outputType = getFieldType(api.output.typeId, formatResult.types)
     return `
-      (input: ${inputType}) => apiPipeline.invoke(url, { path: ${JSON.stringify(
-      path,
-    )}, input }) as Promise<${outputType}>
+      (input: ${inputType}) => apiPipeline.invoke({ path: ${JSON.stringify(path)}, input }) as Promise<${outputType}>
     `
   }
 
@@ -289,11 +287,13 @@ export const codegen = (formatResult: FormatResult, options?: CodegenOptions): s
   if (config.emitApiClient) {
     let entries = handleEntries(formatResult.entries)
     source = `
-    import { apiPipeline } from 'farrow-api-client'
+    import { createApiPipelineWithUrl } from 'farrow-api-client'
 
     ${source}
 
     export const url = "${options?.url ?? ''}"
+
+    export const apiPipeline = createApiPipelineWithUrl(url)
 
     export const api = ${entries}
     `

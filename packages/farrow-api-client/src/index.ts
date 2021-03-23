@@ -74,3 +74,19 @@ export const fetcher = async (request: ApiRequest): Promise<ApiResponse> => {
 
   return json
 }
+
+export type ApiPipelineWithUrl = AsyncPipeline<ApiRequest, ApiResponse> & {
+  invoke(body: ApiRequest['body']): Promise<JsonType>
+}
+
+export const createApiPipelineWithUrl = (url: string): ApiPipelineWithUrl => {
+  let pipeline = createAsyncPipeline<ApiRequest, ApiResponse>()
+  let invoke: ApiPipelineWithUrl['invoke'] = (body) => {
+    return apiPipeline.invoke(url, body)
+  }
+  apiPipeline.use(pipeline)
+  return {
+    ...pipeline,
+    invoke,
+  }
+}

@@ -3,7 +3,7 @@
  * Don't modify it manually
  */
 
-import { apiPipeline } from 'farrow-api-client'
+import { createApiPipelineWithUrl } from 'farrow-api-client'
 
 import type { JsonType } from 'farrow-api-client'
 
@@ -44,7 +44,9 @@ export type Collection = {
 
 export const url = ''
 
+export const apiPipeline = createApiPipelineWithUrl(url)
+
 export const api = {
-  methodA: (input: Collection) => apiPipeline.invoke(url, { path: ['methodA'], input }) as Promise<Collection>,
-  methodB: (input: Collection) => apiPipeline.invoke(url, { path: ['methodB'], input }) as Promise<Collection>,
+  methodA: (input: Collection) => apiPipeline.invoke({ path: ['methodA'], input }) as Promise<Collection>,
+  methodB: (input: Collection) => apiPipeline.invoke({ path: ['methodB'], input }) as Promise<Collection>,
 }

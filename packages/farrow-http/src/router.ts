@@ -332,31 +332,40 @@ export const createRouterPipeline = (): RouterPipeline => {
   }
 
   let serve: RouterPipeline['serve'] = (name, dirname) => {
+    dirname = path.normalize(dirname)
+
     let getIndexHtmlPath = (filename: string): string => {
       if (filename.endsWith('/')) {
         return `${filename}index.html`
       }
       return `${filename}/index.html`
     }
+
     route(name).use(async (request, next) => {
-      let filename = path.join(dirname, request.pathname)
-      let stats = await getStats(filename)
+      // prevent directory traversal attack
+      let filename = path.normalize(request.pathname)
+      let fullpath = path.join(dirname, filename)
+      if (fullpath.indexOf(dirname) !== 0) {
+        return next(request)
+      }
+
+      let stats = await getStats(fullpath)
 
       /**
        * handle file
        */
       if (stats?.isFile()) {
-        return Response.file(filename)
+        return Response.file(fullpath)
       }
 
       /**
        * handle {dirname}/index.html
        */
       if (stats?.isDirectory()) {
-        let indexHtmlPath = getIndexHtmlPath(filename)
+        let indexHtmlPath = getIndexHtmlPath(fullpath)
         let indexHtmlStats = await getStats(indexHtmlPath)
         if (indexHtmlStats?.isFile()) {
-          return Response.file(getIndexHtmlPath(filename))
+          return Response.file(getIndexHtmlPath(fullpath))
         }
       }
 

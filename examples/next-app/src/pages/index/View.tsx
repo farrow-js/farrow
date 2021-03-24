@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { Index } from './Controller'
 import { api as TodoApi, Todo } from '../../api/todo'
-import { Module, createProvider, Container } from 'farrow-next'
+import router from 'next/router'
+import { Module, createProvider, Container, useQueryChangedEffect } from 'farrow-next'
 
 export const View = () => {
   let indexCtrl = Index.use()
@@ -20,6 +21,20 @@ export const View = () => {
     })
   }, [count])
 
+  useQueryChangedEffect(() => {
+    let page = indexCtrl.page
+    console.log('changed', page.query)
+    return () => {
+      console.log('clean changed', page.query)
+    }
+  })
+
+  let handleJump = () => {
+    router.push(`/?count=${count}`).catch((error) => {
+      console.log('error', error)
+    })
+  }
+
   return (
     <div className="App">
       <App />
@@ -28,6 +43,9 @@ export const View = () => {
         <p>Hello Vite + React!</p>
         <p>
           <button onClick={() => setCount((count) => count + 1)}>count is: {count}</button>
+        </p>
+        <p>
+          <button onClick={handleJump}>jump to /?count={count}</button>
         </p>
         <p>
           Edit <code>App.tsx</code> and save to test HMR updates.

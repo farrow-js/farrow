@@ -1,9 +1,9 @@
-import React, { ComponentType, useEffect, useRef } from 'react'
+import React, { ComponentType, useContext, useEffect, useRef } from 'react'
 import { NextPage, NextPageContext } from 'next'
 import { Controller, Provider, ControllerCtors, ControllerInstancesType, getUserAgent } from './controller'
 import { replaceState } from './store'
 import { ModuleContext } from './module'
-import { PageInfo } from './page-info'
+import { PageInfo, GetPageInfo } from './page-info'
 
 export type ConstrollerStates<T extends ControllerCtors> = InstanceType<T[keyof T]>['state']
 
@@ -18,64 +18,91 @@ export type PageProps<State = any> = Pick<NextPageContext, 'pathname' | 'query' 
   states: State[]
 }
 
-export type PageContextType = Omit<NextPageContext, 'AppTree'> & {
-  /**
-   * the controller was initilized at.
-   */
-  tag: 'getInitialProps' | 'FC'
-  userAgent: string
+export const PageInfoContext = React.createContext<PageInfo | null>(null)
+
+export const usePageInfo = (): PageInfo => {
+  let pageInfo = useContext(PageInfoContext)
+  if (!pageInfo) {
+    throw new Error(`pageInfo was not found`)
+  }
+  return pageInfo
 }
 
-export type NextPageProps<T extends NextPage> = T extends NextPage<infer Props> ? Props : never
+/**
+ * trigger effect callback when query changed
+ * @param effect
+ */
+export const useQueryChangedEffect = (effect: React.EffectCallback) => {
+  let pageInfo = usePageInfo()
+  let effectCallbackRef = useRef<React.EffectCallback>(effect)
+  let pageInfoRef = useRef<PageInfo>(pageInfo)
+
+  useEffect(() => {
+    if (pageInfoRef.current !== pageInfo) {
+      pageInfoRef.current = pageInfo
+      return effectCallbackRef.current()
+    }
+  }, [pageInfo])
+
+  useEffect(() => {
+    effectCallbackRef.current = effect
+  }, [effect])
+}
 
 export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPage<PageProps<ConstrollerStates<T>>> => {
   let { Controllers, preload, View } = options
   let Page: NextPage<PageProps<ConstrollerStates<T>>> = (props) => {
     type Props = PageProps<ConstrollerStates<T>>
-    type PageInfo = { ctrls: Controller[]; props: Props }
-    let pageInfoRef = useRef<PageInfo | null>(null)
+    type PageRefValueType = { ctrls: Controller[]; props: Props; pageInfo: PageInfo }
+    let pageInfoRef = useRef<PageRefValueType | null>(null)
 
-    let getPageInfo = (prevPageInfo?: PageInfo): PageInfo => {
-      let pageCtx: PageContextType = {
-        userAgent: props.userAgent,
-        pathname: props.pathname,
-        query: props.query,
-        asPath: props.asPath,
-        tag: 'FC',
-      }
-      let pageInfo = PageInfo.provide(pageCtx)
-      let moduleContext = new ModuleContext().injectProviderValues([pageInfo])
+    let pageInfo = {
+      userAgent: props.userAgent,
+      pathname: props.pathname,
+      query: props.query,
+      asPath: props.asPath,
+    }
+
+    let getCtrls = () => {
+      let getPageInfo = GetPageInfo.provide(() => {
+        if (!pageInfoRef.current?.pageInfo) {
+          throw new Error(`Page info is not found`)
+        }
+        return pageInfoRef.current.pageInfo
+      })
+      let moduleContext = new ModuleContext().injectProviderValues([getPageInfo])
 
       let ctrls = Object.values(Controllers).map((Controller, index) => {
         let ctrl = moduleContext.new(Controller)
         let state = props.states[index]
         replaceState(ctrl.store, state)
-        if (prevPageInfo?.ctrls) {
-          ctrl.reload?.(prevPageInfo.ctrls[index])
-        }
         return ctrl
       })
 
-      return {
-        ctrls,
-        props,
-      }
+      return ctrls
     }
 
     // initilize
     if (!pageInfoRef.current) {
-      pageInfoRef.current = getPageInfo()
+      pageInfoRef.current = {
+        ctrls: getCtrls(),
+        props,
+        pageInfo,
+      }
     }
 
-    // reload
+    // update
     if (props.asPath !== pageInfoRef.current.props.asPath) {
-      pageInfoRef.current = getPageInfo(pageInfoRef.current)
+      pageInfoRef.current.pageInfo = pageInfo
+      pageInfoRef.current.props = props
     }
 
     return (
-      <Provider controllers={pageInfoRef.current.ctrls}>
-        <View />
-      </Provider>
+      <PageInfoContext.Provider value={pageInfo}>
+        <Provider controllers={pageInfoRef.current.ctrls}>
+          <View />
+        </Provider>
+      </PageInfoContext.Provider>
     )
   }
 
@@ -86,14 +113,13 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
 
     let userAgent = getUserAgent(ctx.req)
 
-    let pageCtx: PageContextType = {
+    let pageInfo: PageInfo = {
       ...rest,
       userAgent,
-      tag: 'getInitialProps',
     }
 
-    let pageInfo = PageInfo.provide(pageCtx)
-    let moduleCtx = new ModuleContext().injectProviderValues([pageInfo])
+    let getPageInfo = GetPageInfo.provide(() => pageInfo)
+    let moduleCtx = new ModuleContext().injectProviderValues([getPageInfo])
 
     let ctrlsMap = {} as ControllerInstancesType<T>
 

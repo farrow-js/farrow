@@ -1,5 +1,5 @@
 import { createProvider } from 'farrow-module'
-import { PageContextType } from './page'
+import { NextPageContext } from 'next'
 
 export type PageInfo = {
   /**
@@ -10,32 +10,32 @@ export type PageInfo = {
   /**
    * Error object if encountered during rendering
    */
-  err?: PageContextType['err']
+  err?: NextPageContext['err']
 
   /**
    * `HTTP` request object.
    */
-  req?: PageContextType['req']
+  req?: NextPageContext['req']
 
   /**
    * `HTTP` response object.
    */
-  res?: PageContextType['res']
+  res?: NextPageContext['res']
 
   /**
    * Path section of `URL`.
    */
-  pathname: PageContextType['pathname']
+  pathname: NextPageContext['pathname']
 
   /**
    * Query string section of `URL` parsed as an object.
    */
-  query: PageContextType['query']
+  query: NextPageContext['query']
 
   /**
    * `String` of the actual path including query.
    */
-  asPath?: PageContextType['asPath']
+  asPath?: NextPageContext['asPath']
 }
 
-export const PageInfo = createProvider<PageInfo>()
+export const GetPageInfo = createProvider<() => PageInfo>()

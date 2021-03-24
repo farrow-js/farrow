@@ -264,6 +264,75 @@ Get and listen to `Controller`'s `state` in `React Function Component`
 let state = Controller.useState((state) => state, shallowEqual)
 ```
 
+#### usePageInfo(): PageInfo
+
+`usePageInfo` to access current page info
+
+```typescript
+import { usePageInfo } from 'farrow-next'
+
+const App = () => {
+  let pageInfo = usePageInfo()
+  // ...
+}
+
+type PageInfo = {
+  /**
+   * userAgent
+   */
+  userAgent?: string
+
+  /**
+   * Error object if encountered during rendering
+   */
+  err?: NextPageContext['err']
+
+  /**
+   * `HTTP` request object.
+   */
+  req?: NextPageContext['req']
+
+  /**
+   * `HTTP` response object.
+   */
+  res?: NextPageContext['res']
+
+  /**
+   * Path section of `URL`.
+   */
+  pathname: NextPageContext['pathname']
+
+  /**
+   * Query string section of `URL` parsed as an object.
+   */
+  query: NextPageContext['query']
+
+  /**
+   * `String` of the actual path including query.
+   */
+  asPath?: NextPageContext['asPath']
+}
+```
+
+#### useQueryChangedEffect(effectCallback)
+
+`useQueryChangedEffect` to perform effect when query was changed
+
+```typescript
+import { useQueryChangedEffect } from 'farrow-next'
+
+const App = () => {
+  useQueryChangedEffect(() => {
+    let changed = false
+    // do something
+    return () => {
+      // clean up
+      changed = true
+    }
+  })
+}
+```
+
 ### Controller API
 
 #### controller.initialState
@@ -424,19 +493,6 @@ class Test extends Controller {
   async preload() {
     let json = await this.postJson(url, this.state.body)
     this.actions.updateJson(json)
-  }
-}
-```
-
-#### controller.reload?(prevCtrl: this): any
-
-Call on reload phase(after query-changed), you can touch `prev-controller` in this method for resuing state or other things.
-
-```typescript
-class Test extends Controller {
-  // reload
-  async reload(prevCtrl: this) {
-    // do something
   }
 }
 ```

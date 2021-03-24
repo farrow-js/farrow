@@ -8,7 +8,7 @@ import { identity, shallowEqual } from './util'
 import { useIsomorphicLayoutEffect } from './useIsomorphicLayoutEffect'
 import { Module, ModuleCtor } from './module'
 import * as Cookie from './cookie'
-import { PageInfo } from './page-info'
+import { GetPageInfo } from './page-info'
 import type { IncomingMessage } from 'http'
 
 export type ControllerCtor<T extends Controller = Controller> = ModuleCtor<T> & typeof Controller
@@ -262,7 +262,10 @@ export abstract class Controller extends Module {
   /**
    * page info
    */
-  page = this.use(PageInfo)
+  get page() {
+    let getPageInfo = this.use(GetPageInfo)
+    return getPageInfo()
+  }
 
   /**
    * get cookie without caring whether in server or client

@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { act } from 'react-dom/test-utils'
-import { Controller, NextPageProps, page } from '../index'
+import { Controller, page } from '../index'
 
 const delay = (duration: number) => {
   return new Promise<void>((resolve) => {

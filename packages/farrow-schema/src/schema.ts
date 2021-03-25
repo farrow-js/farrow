@@ -44,7 +44,7 @@ export type FieldInfo = {
 
 export type FieldDescriptor = SchemaCtor | FieldInfo
 
-export const filed = <T extends FieldInfo>(fieldInfo: T): T => {
+export const field = <T extends FieldInfo>(fieldInfo: T): T => {
   return fieldInfo
 }
 
@@ -419,7 +419,7 @@ export const ReadOnlyDeep = <T extends SchemaCtorInput>(Item: T) => {
 //   getUser = User
 //   getOrder = Order
 //   // supports { [Type]: SchemaCtor }
-//   getProduct = filed({
+//   getProduct = field({
 //     [Type]: Product,
 //     description: 'get product',
 //   })

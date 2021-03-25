@@ -36,13 +36,17 @@ export const Type = Symbol('type')
 
 export type Type = typeof Type
 
-export type FieldDescriptor =
-  | SchemaCtor
-  | {
-      [Type]: SchemaCtor
-      description?: string
-      deprecated?: string
-    }
+export type FieldInfo = {
+  [Type]: SchemaCtor
+  description?: string
+  deprecated?: string
+}
+
+export type FieldDescriptor = SchemaCtor | FieldInfo
+
+export const filed = <T extends FieldInfo>(fieldInfo: T): T => {
+  return fieldInfo
+}
 
 export const isFieldDescriptor = (input: any): input is FieldDescriptor => {
   return isSchemaCtor(input?.[Type] ?? input)
@@ -415,10 +419,10 @@ export const ReadOnlyDeep = <T extends SchemaCtorInput>(Item: T) => {
 //   getUser = User
 //   getOrder = Order
 //   // supports { [Type]: SchemaCtor }
-//   getProduct = {
+//   getProduct = filed({
 //     [Type]: Product,
 //     description: 'get product',
-//   }
+//   })
 // }
 
 // type T0 = TypeOf<AppState>

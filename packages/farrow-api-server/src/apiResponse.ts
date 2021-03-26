@@ -2,12 +2,27 @@ import type { JsonType } from 'farrow-schema'
 
 export { JsonType }
 
+export type IntrospectionCalling = {
+  input: {
+    __introspection__: true
+  }
+}
+
+export type SingleCalling = {
+  path: string[]
+  input: Readonly<JsonType>
+}
+
+export type BatchCalling = {
+  __batch__: true
+  callings: Readonly<SingleCalling[]>
+}
+
+export type Calling = SingleCalling | BatchCalling | IntrospectionCalling
+
 export type ApiRequest = {
   url: string
-  body: {
-    path: string[]
-    input: JsonType
-  }
+  calling: Calling
   options?: RequestInit
 }
 
@@ -45,4 +60,17 @@ export const isApiSuccess = (input: any): input is ApiSuccessResponse => {
   return input?.type === 'ApiSuccessResponse'
 }
 
-export type ApiResponse = ApiErrorResponse | ApiSuccessResponse
+export const BatchResponse = (result: ApiResponseSingle[]): ApiResponseBatch => {
+  return {
+    __batch__: true,
+    result,
+  }
+}
+
+export type ApiResponseSingle = ApiErrorResponse | ApiSuccessResponse
+export type ApiResponseBatch = {
+  __batch__: true
+  result: ApiResponseSingle[]
+}
+
+export type ApiResponse = ApiResponseSingle | ApiResponseBatch

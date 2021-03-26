@@ -286,4 +286,56 @@ describe('ApiService', () => {
         },
       })
   })
+
+  it('supports batch calling api', async () => {
+    let http = createHttp()
+    let server = http.server()
+
+    http.route('/counter').use(CounterService)
+
+    await request(server)
+      .post('/counter')
+      .send({
+        __batch__: true,
+        callings: [
+          {
+            path: ['getCount'],
+            input: {},
+          },
+          {
+            path: ['setCount'],
+            input: {
+              newCount: 10,
+            },
+          },
+          {
+            path: ['getCount'],
+            input: {},
+          },
+        ],
+      })
+      .expect(200, {
+        __batch__: true,
+        result: [
+          {
+            type: 'ApiSuccessResponse',
+            output: {
+              count: 0,
+            },
+          },
+          {
+            type: 'ApiSuccessResponse',
+            output: {
+              count: 10,
+            },
+          },
+          {
+            type: 'ApiSuccessResponse',
+            output: {
+              count: 10,
+            },
+          },
+        ],
+      })
+  })
 })

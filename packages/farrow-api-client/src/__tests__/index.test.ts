@@ -2,8 +2,8 @@ import { ApiError, ApiSuccess } from 'farrow-api-server'
 import { apiPipeline } from '../index'
 
 apiPipeline.use(async (request, next) => {
-  let body = {
-    ...request.body,
+  let calling = {
+    ...request.calling,
     fromUseForBody: true,
   }
 
@@ -17,7 +17,7 @@ apiPipeline.use(async (request, next) => {
 
   let response = await next({
     ...request,
-    body,
+    calling,
     options,
   })
 
@@ -28,8 +28,8 @@ apiPipeline.use(async (request, next) => {
 })
 
 apiPipeline.match('/match/success', async (request, next) => {
-  let body = {
-    ...request.body,
+  let calling = {
+    ...request.calling,
     fromMatchStringForBody: true,
   }
 
@@ -43,7 +43,7 @@ apiPipeline.match('/match/success', async (request, next) => {
 
   let response = await next({
     ...request,
-    body,
+    calling,
     options,
   })
 
@@ -54,8 +54,8 @@ apiPipeline.match('/match/success', async (request, next) => {
 })
 
 apiPipeline.match(/regexp/i, async (request, next) => {
-  let body = {
-    ...request.body,
+  let calling = {
+    ...request.calling,
     fromMatchRegexpForBody: true,
   }
 
@@ -69,7 +69,7 @@ apiPipeline.match(/regexp/i, async (request, next) => {
 
   let response = await next({
     ...request,
-    body,
+    calling,
     options,
   })
 
@@ -82,7 +82,7 @@ apiPipeline.match(/regexp/i, async (request, next) => {
 apiPipeline.use(async (input) => {
   let data = {
     url: input.url,
-    body: input.body,
+    body: input.calling as any,
     headers: input.options?.headers as Record<string, string>,
   }
 
@@ -116,7 +116,7 @@ describe('farrow-api-client', () => {
   it('can attach extra body/headers/response fields', async () => {
     let result = await apiPipeline.run({
       url: '/use/success',
-      body: {
+      calling: {
         path: ['a'],
         input: {
           b: 1,
@@ -149,7 +149,7 @@ describe('farrow-api-client', () => {
   it('can attach extra body/headers/response fields via .match(string)', async () => {
     let result = await apiPipeline.run({
       url: '/match/success',
-      body: {
+      calling: {
         path: ['a'],
         input: {
           b: 1,
@@ -185,7 +185,7 @@ describe('farrow-api-client', () => {
   it('can attach extra body/headers/response fields via .match(regexp)', async () => {
     let result = await apiPipeline.run({
       url: '/regexp/success',
-      body: {
+      calling: {
         path: ['a'],
         input: {
           b: 1,
@@ -221,7 +221,7 @@ describe('farrow-api-client', () => {
   it('may response error', async () => {
     let request0 = {
       url: '/match/error',
-      body: {
+      calling: {
         path: [],
         input: {},
       },
@@ -230,7 +230,7 @@ describe('farrow-api-client', () => {
 
     let request1 = {
       url: '/regexp/error',
-      body: {
+      calling: {
         path: [],
         input: {},
       },
@@ -239,7 +239,7 @@ describe('farrow-api-client', () => {
 
     let request2 = {
       url: '/non-existed',
-      body: {
+      calling: {
         path: [],
         input: {},
       },
@@ -271,16 +271,77 @@ describe('farrow-api-client', () => {
       },
     })
 
-    await expect(async () => {
-      await apiPipeline.invoke(request0.url, request0.body)
-    }).rejects.toThrow('/match/error')
+    expect(await apiPipeline.invoke(request0.url, request0.calling)).toBeInstanceOf(Error)
 
-    await expect(async () => {
-      await apiPipeline.invoke(request1.url, request1.body)
-    }).rejects.toThrow('/regexp/error')
+    expect(await apiPipeline.invoke(request1.url, request1.calling)).toBeInstanceOf(Error)
 
-    await expect(async () => {
-      await apiPipeline.invoke(request2.url, request2.body)
-    }).rejects.toThrow('handler not found')
+    expect(await apiPipeline.invoke(request2.url, request2.calling)).toBeInstanceOf(Error)
+  })
+
+  it('can send batch request', async () => {
+    let result = await apiPipeline.run({
+      url: '/use/success',
+      calling: {
+        __batch__: true,
+        callings: [
+          {
+            path: ['a'],
+            input: {
+              b: 1,
+            },
+          },
+          {
+            path: ['a'],
+            input: {
+              b: 2,
+            },
+          },
+          {
+            path: ['a'],
+            input: {
+              b: 3,
+            },
+          },
+        ],
+      },
+    })
+
+    expect(result).toEqual({
+      type: 'ApiSuccessResponse',
+      fromUseForResponse: true,
+      output: {
+        data: {
+          url: '/use/success',
+          body: {
+            fromUseForBody: true,
+            __batch__: true,
+            callings: [
+              {
+                path: ['a'],
+                input: {
+                  b: 1,
+                },
+              },
+              {
+                path: ['a'],
+                input: {
+                  b: 2,
+                },
+              },
+              {
+                path: ['a'],
+                input: {
+                  b: 3,
+                },
+              },
+            ],
+          },
+          headers: {
+            'from-use-for-header': '1',
+          },
+        },
+        a: 1,
+      },
+    })
   })
 })

@@ -110,6 +110,7 @@ export const fetcher = async (request: ApiRequest): Promise<ApiResponse> => {
 
 export type ApiPipelineWithUrl = AsyncPipeline<ApiRequest, ApiResponse> & {
   invoke(calling: SingleCalling, batch?: boolean): Promise<JsonType>
+  invoke(calling: SingleCalling[], batch?: boolean): Promise<JsonType[]>
 }
 
 export const createApiPipelineWithUrl = (url: string): ApiPipelineWithUrl => {
@@ -124,17 +125,39 @@ export const createApiPipelineWithUrl = (url: string): ApiPipelineWithUrl => {
   }
   let dataLoader = new DataLoader(batchInvoke)
 
-  async function invoke(calling: SingleCalling, batch?: boolean) {
+  async function invoke(calling: SingleCalling, batch?: boolean): Promise<JsonType>
+  async function invoke(calling: SingleCalling[], batch?: boolean): Promise<JsonType[]>
+  async function invoke(calling: SingleCalling | SingleCalling[], batch: boolean = true) {
     if (batch) {
+      if (Array.isArray(calling)) {
+        return dataLoader.loadMany(calling)
+      }
       return dataLoader.load(calling)
     }
-    let result = await apiPipeline.invoke(url, calling)
 
-    if (result instanceof Error) {
-      throw result
+    if (Array.isArray(calling)) {
+      let body: BatchCalling = {
+        __batch__: true,
+        callings: calling,
+      }
+      let result = await apiPipeline.invoke(url, body)
+      result.forEach((result, index) => {
+        if (result instanceof Error) {
+          throw result
+        } else {
+          dataLoader.prime(calling[index], result)
+          return result
+        }
+      })
     } else {
-      dataLoader.prime(calling, result)
-      return result
+      let result = await apiPipeline.invoke(url, calling)
+
+      if (result instanceof Error) {
+        throw result
+      } else {
+        dataLoader.prime(calling, result)
+        return result
+      }
     }
   }
 

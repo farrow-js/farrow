@@ -1,4 +1,4 @@
-import type { SingleCalling, JsonType } from 'farrow-api-server'
+import type { JsonType } from 'farrow-api-server'
 import type { ApiPipelineWithUrl } from './apiPipeline'
 
 /**
@@ -29,12 +29,14 @@ export const createApiMerge = (apiPipeline: ApiPipelineWithUrl) => <
   ...apis: APIS
 ): ClientApi<I, O> => {
   let paths = apis.map((api) => api.name)
-
-  return (input: I, batch: boolean = true): Promise<O> => {
-    let callings: SingleCalling[] = paths.map((path) => ({
-      path: [path],
-      input,
-    }))
-    return apiPipeline.invoke(callings, batch) as Promise<O>
+  return (input: I): Promise<O> => {
+    return Promise.all(
+      paths.map((path) =>
+        apiPipeline.invoke({
+          path: [path],
+          input,
+        }),
+      ),
+    ) as Promise<O>
   }
 }

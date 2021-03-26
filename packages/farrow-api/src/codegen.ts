@@ -256,7 +256,9 @@ export const codegen = (formatResult: FormatResult, options?: CodegenOptions): s
     let inputType = getFieldType(api.input.typeId, formatResult.types)
     let outputType = getFieldType(api.output.typeId, formatResult.types)
     return `
-      (input: ${inputType}) => apiPipeline.invoke({ path: ${JSON.stringify(path)}, input }) as Promise<${outputType}>
+      (input: ${inputType}, batch: boolean = true) => apiPipeline.invoke({ path: ${JSON.stringify(
+      path,
+    )}, input }, batch) as Promise<${outputType}>
     `
   }
 

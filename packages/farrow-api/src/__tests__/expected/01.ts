@@ -48,8 +48,6 @@ export const url = ''
 export const apiPipeline = createApiPipelineWithUrl(url)
 
 export const api = {
-  methodA: (input: Collection, batch: boolean = true) =>
-    apiPipeline.invoke({ path: ['methodA'], input }, batch) as Promise<Collection>,
-  methodB: (input: Collection, batch: boolean = true) =>
-    apiPipeline.invoke({ path: ['methodB'], input }, batch) as Promise<Collection>,
+  methodA: (input: Collection) => apiPipeline.invoke({ path: ['methodA'], input }) as Promise<Collection>,
+  methodB: (input: Collection) => apiPipeline.invoke({ path: ['methodB'], input }) as Promise<Collection>,
 }

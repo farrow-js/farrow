@@ -2,19 +2,20 @@ import type { JsonType } from 'farrow-schema'
 
 export { JsonType }
 
+// __introspection__ = true is no need since we have tag now.
 export type IntrospectionCalling = {
-  input: {
-    __introspection__: true
-  }
+  type: 'Introspection'
 }
 
 export type SingleCalling = {
+  type: 'Single'
   path: string[]
   input: Readonly<JsonType>
 }
 
+// __batch__ = true is no need since we have tag now
 export type BatchCalling = {
-  __batch__: true
+  type: 'Batch'
   callings: Readonly<SingleCalling[]>
 }
 
@@ -62,14 +63,14 @@ export const isApiSuccess = (input: any): input is ApiSuccessResponse => {
 
 export const BatchResponse = (result: ApiResponseSingle[]): ApiResponseBatch => {
   return {
-    __batch__: true,
+    type: 'Batch',
     result,
   }
 }
 
 export type ApiResponseSingle = ApiErrorResponse | ApiSuccessResponse
 export type ApiResponseBatch = {
-  __batch__: true
+  type: 'Batch'
   result: ApiResponseSingle[]
 }
 

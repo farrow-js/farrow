@@ -64,7 +64,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
     /**
      * capture introspection request
      */
-    if (typeof calling.input === 'object' && calling.input !== null && '__introspection__' in calling.input) {
+    if (calling.type === 'Introspection') {
       let output = (formatResult = formatResult ?? toJSON(entries))
       return ApiSuccess(output)
     }
@@ -129,7 +129,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
       return next()
     }
 
-    if (request.body?.__batch__ === true) {
+    if (request.body?.type === 'Batch') {
       // batch calling
       let callings = request.body!.callings
 
@@ -140,6 +140,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
       let message = `Unknown structure of request`
       return Response.json(ApiError(message))
     }
+
     // single calling
     return Response.json(await handleCalling(request.body))
   })

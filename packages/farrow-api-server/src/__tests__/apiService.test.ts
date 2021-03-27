@@ -86,9 +86,7 @@ describe('ApiService', () => {
     await request(server)
       .post('/counter')
       .send({
-        input: {
-          __introspection__: true,
-        },
+        type: 'Introspection',
       })
       // .expect((res) => {
       //   console.log('res', JSON.stringify(res.body, null, 2))
@@ -296,7 +294,7 @@ describe('ApiService', () => {
     await request(server)
       .post('/counter')
       .send({
-        __batch__: true,
+        type: 'Batch',
         callings: [
           {
             path: ['getCount'],
@@ -315,7 +313,7 @@ describe('ApiService', () => {
         ],
       })
       .expect(200, {
-        __batch__: true,
+        type: 'Batch',
         result: [
           {
             type: 'ApiSuccessResponse',

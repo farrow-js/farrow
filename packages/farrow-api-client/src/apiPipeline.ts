@@ -73,7 +73,7 @@ export const createApiPipeline = (): ApiPipeline => {
       return apiResponse.output
     }
 
-    if ('__batch__' in result) {
+    if (result.type === 'Batch') {
       return result.result.map(handleResult)
     }
     return handleResult(result)
@@ -117,7 +117,7 @@ export const createApiPipelineWithUrl = (url: string): ApiPipelineWithUrl => {
 
   let batchInvoke = (callings: Readonly<SingleCalling[]>) => {
     let body: BatchCalling = {
-      __batch__: true,
+      type: 'Batch',
       callings,
     }
     return apiPipeline.invoke(url, body)

@@ -1,4 +1,4 @@
-import { ApiError, ApiSuccess, SingleCalling, IntrospectionCalling, BatchResponse } from 'farrow-api-server'
+import { ApiError, ApiSuccess } from 'farrow-api-server'
 import { apiPipeline } from '../index'
 
 apiPipeline.use(async (request, next) => {
@@ -107,20 +107,6 @@ apiPipeline.use((input) => {
 
   if (input.url === '/regexp/error') {
     return ApiError('/regexp/error')
-  }
-
-  if (input.url === '/normal/api') {
-    let handleCalling = (calling: SingleCalling | IntrospectionCalling) => {
-      if ('input' in calling && 'path' in calling) {
-        return ApiSuccess({ [calling.path[0]]: (calling.input as any)[calling.path[0]] })
-      }
-      return ApiError('')
-    }
-    if ('__batch__' in input.calling) {
-      let result = input.calling.callings.map(handleCalling)
-      return BatchResponse(result)
-    }
-    return handleCalling(input.calling)
   }
 
   return ApiError('handler not found')

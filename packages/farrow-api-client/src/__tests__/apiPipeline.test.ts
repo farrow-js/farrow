@@ -6,6 +6,7 @@ describe('ApiPipeline', () => {
     let result = await apiPipeline.run({
       url: '/use/success',
       calling: {
+        type: 'Single' as const,
         path: ['a'],
         input: {
           b: 1,
@@ -21,6 +22,7 @@ describe('ApiPipeline', () => {
           url: '/use/success',
           body: {
             fromUseForBody: true,
+            type: 'Single',
             path: ['a'],
             input: {
               b: 1,
@@ -39,6 +41,7 @@ describe('ApiPipeline', () => {
     let result = await apiPipeline.run({
       url: '/match/success',
       calling: {
+        type: 'Single' as const,
         path: ['a'],
         input: {
           b: 1,
@@ -56,6 +59,7 @@ describe('ApiPipeline', () => {
           body: {
             fromUseForBody: true,
             fromMatchStringForBody: true,
+            type: 'Single',
             path: ['a'],
             input: {
               b: 1,
@@ -75,6 +79,7 @@ describe('ApiPipeline', () => {
     let result = await apiPipeline.run({
       url: '/regexp/success',
       calling: {
+        type: 'Single' as const,
         path: ['a'],
         input: {
           b: 1,
@@ -92,6 +97,7 @@ describe('ApiPipeline', () => {
           body: {
             fromUseForBody: true,
             fromMatchRegexpForBody: true,
+            type: 'Single',
             path: ['a'],
             input: {
               b: 1,
@@ -111,6 +117,7 @@ describe('ApiPipeline', () => {
     let request0 = {
       url: '/match/error',
       calling: {
+        type: 'Single' as const,
         path: [],
         input: {},
       },
@@ -120,6 +127,7 @@ describe('ApiPipeline', () => {
     let request1 = {
       url: '/regexp/error',
       calling: {
+        type: 'Single' as const,
         path: [],
         input: {},
       },
@@ -129,6 +137,7 @@ describe('ApiPipeline', () => {
     let request2 = {
       url: '/non-existed',
       calling: {
+        type: 'Single' as const,
         path: [],
         input: {},
       },
@@ -171,21 +180,24 @@ describe('ApiPipeline', () => {
     let result = await apiPipeline.run({
       url: '/use/success',
       calling: {
-        __batch__: true,
+        type: 'Batch',
         callings: [
           {
+            type: 'Single',
             path: ['a'],
             input: {
               b: 1,
             },
           },
           {
+            type: 'Single',
             path: ['a'],
             input: {
               b: 2,
             },
           },
           {
+            type: 'Single',
             path: ['a'],
             input: {
               b: 3,
@@ -203,21 +215,24 @@ describe('ApiPipeline', () => {
           url: '/use/success',
           body: {
             fromUseForBody: true,
-            __batch__: true,
+            type: 'Batch',
             callings: [
               {
+                type: 'Single',
                 path: ['a'],
                 input: {
                   b: 1,
                 },
               },
               {
+                type: 'Single',
                 path: ['a'],
                 input: {
                   b: 2,
                 },
               },
               {
+                type: 'Single',
                 path: ['a'],
                 input: {
                   b: 3,

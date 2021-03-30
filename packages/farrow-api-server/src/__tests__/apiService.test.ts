@@ -86,9 +86,7 @@ describe('ApiService', () => {
     await request(server)
       .post('/counter')
       .send({
-        input: {
-          __introspection__: true,
-        },
+        type: 'Introspection',
       })
       // .expect((res) => {
       //   console.log('res', JSON.stringify(res.body, null, 2))
@@ -284,6 +282,58 @@ describe('ApiService', () => {
         error: {
           message: 'path: ["newCount"]\nfalse is not an integer',
         },
+      })
+  })
+
+  it('supports batch calling api', async () => {
+    let http = createHttp()
+    let server = http.server()
+
+    http.route('/counter').use(CounterService)
+
+    await request(server)
+      .post('/counter')
+      .send({
+        type: 'Batch',
+        callings: [
+          {
+            path: ['getCount'],
+            input: {},
+          },
+          {
+            path: ['setCount'],
+            input: {
+              newCount: 10,
+            },
+          },
+          {
+            path: ['getCount'],
+            input: {},
+          },
+        ],
+      })
+      .expect(200, {
+        type: 'Batch',
+        result: [
+          {
+            type: 'ApiSuccessResponse',
+            output: {
+              count: 0,
+            },
+          },
+          {
+            type: 'ApiSuccessResponse',
+            output: {
+              count: 10,
+            },
+          },
+          {
+            type: 'ApiSuccessResponse',
+            output: {
+              count: 10,
+            },
+          },
+        ],
       })
   })
 })

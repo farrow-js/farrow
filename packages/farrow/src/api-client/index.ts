@@ -5,6 +5,7 @@ import fetch from 'node-fetch'
 import { FormatResult } from 'farrow-api/dist/toJSON'
 import { codegen, CodegenOptions } from 'farrow-api/dist/codegen'
 import { format } from 'farrow-api/dist/prettier'
+import type { IntrospectionCalling } from 'farrow-api-server'
 
 const writeFile = async (filename: string, content: string) => {
   try {
@@ -64,10 +65,8 @@ export const createApiClient = (options: ApiClientOptions) => {
   let prevText = ''
 
   let getIntrospection = async () => {
-    let data = {
-      input: {
-        __introspection__: true,
-      },
+    let data: IntrospectionCalling = {
+      type: 'Introspection',
     }
     let options = {
       method: 'POST',

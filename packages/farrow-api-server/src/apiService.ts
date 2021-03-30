@@ -4,7 +4,14 @@ import { ApiDefinition, ApiEntries, getContentType, isApi } from 'farrow-api'
 import { FormatResult, toJSON } from 'farrow-api/dist/toJSON'
 import { createSchemaValidator, ValidationError, Validator } from 'farrow-schema/validator'
 import get from 'lodash.get'
-import { ApiError, ApiSuccess } from './apiResponse'
+import {
+  ApiError,
+  ApiSuccess,
+  SingleCalling,
+  ApiResponseSingle,
+  BatchResponse,
+  IntrospectionCalling,
+} from './apiResponse'
 
 export type ApiServiceType = RouterPipeline
 
@@ -53,31 +60,27 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
 
   let formatResult: FormatResult | undefined
 
-  router.use(async (request, next) => {
-    if (request.method?.toLowerCase() !== 'post') {
-      return next()
-    }
-
+  let handleCalling = async (calling: SingleCalling | IntrospectionCalling): Promise<ApiResponseSingle> => {
     /**
      * capture introspection request
      */
-    if (request.body?.input?.__introspection__ === true) {
+    if (calling.type === 'Introspection') {
       let output = (formatResult = formatResult ?? toJSON(entries))
-      return Response.json(ApiSuccess(output))
+      return ApiSuccess(output)
     }
 
-    let bodyResult = validateBody(request.body)
+    let bodyResult = validateBody(calling)
 
     if (bodyResult.isErr) {
       let message = getErrorMessage(bodyResult.value)
-      return Response.json(ApiError(message))
+      return ApiError(message)
     }
 
     let api = get(entries, bodyResult.value.path)
 
     if (!isApi(api)) {
       let message = `The target API was not found with the path: [${bodyResult.value.path.join(', ')}]`
-      return Response.json(ApiError(message))
+      return ApiError(message)
     }
 
     let definition = api.definition as ApiDefinition<SchemaCtorInput>
@@ -92,7 +95,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
 
     if (inputResult.isErr) {
       let message = getErrorMessage(inputResult.value)
-      return Response.json(ApiError(message))
+      return ApiError(message)
     }
 
     try {
@@ -108,17 +111,38 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
 
       if (outputResult.isErr) {
         let message = getErrorMessage(outputResult.value)
-        return Response.json(ApiError(message))
+        return ApiError(message)
       }
 
       /**
        * response output
        */
-      return Response.json(ApiSuccess(outputResult.value))
+      return ApiSuccess(outputResult.value)
     } catch (error) {
       let message = (config.errorStack ? error?.stack || error?.message : error?.message) ?? ''
+      return ApiError(message)
+    }
+  }
+
+  router.use(async (request, next) => {
+    if (request.method?.toLowerCase() !== 'post') {
+      return next()
+    }
+
+    if (request.body?.type === 'Batch') {
+      // batch calling
+      let callings = request.body!.callings
+
+      if (Array.isArray(callings)) {
+        let result = await Promise.all(callings.map(handleCalling))
+        return Response.json(BatchResponse(result))
+      }
+      let message = `Unknown structure of request`
       return Response.json(ApiError(message))
     }
+
+    // single calling
+    return Response.json(await handleCalling(request.body))
   })
 
   return router

@@ -110,6 +110,6 @@ describe('codegen', () => {
 
     let expected = await fs.readFile(`${__dirname}/expected/02.ts`)
 
-    expect(formatedSource.replace(/\r|\n/g, '')).toEqual(expected.toString().replace(/\r|\n/g, ''))
+    expect(formatedSource.replace(/\r|\n/g, '')).toBe(expected.toString().replace(/\r|\n/g, ''))
   })
 })

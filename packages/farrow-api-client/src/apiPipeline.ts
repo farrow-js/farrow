@@ -109,23 +109,33 @@ export const fetcher = async (request: ApiRequest): Promise<ApiResponse> => {
 }
 
 export type ApiPipelineWithUrl = AsyncPipeline<ApiRequest, ApiResponse> & {
-  invoke(calling: SingleCalling): Promise<JsonType>
+  invoke(calling: SingleCalling, batch?: boolean): Promise<JsonType>
 }
 
 export const createApiPipelineWithUrl = (url: string): ApiPipelineWithUrl => {
   let pipeline = createAsyncPipeline<ApiRequest, ApiResponse>()
 
   let batchInvoke = (callings: Readonly<SingleCalling[]>) => {
-    let body: BatchCalling = {
+    let calling: BatchCalling = {
       type: 'Batch',
       callings,
     }
-    return apiPipeline.invoke(url, body)
+    return apiPipeline.invoke(url, calling)
   }
   let dataLoader = new DataLoader(batchInvoke)
 
-  async function invoke(calling: SingleCalling): Promise<JsonType> {
-    return dataLoader.load(calling)
+  async function invoke(calling: SingleCalling, batch: boolean = true): Promise<JsonType> {
+    if (batch) {
+      return dataLoader.load(calling)
+    }
+    let result = await apiPipeline.invoke(url, calling)
+    dataLoader.prime(calling, result)
+
+    if (result instanceof Error) {
+      throw result
+    }
+
+    return result
   }
 
   apiPipeline.match(url, pipeline)

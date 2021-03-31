@@ -91,6 +91,16 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
       }
     }
 
+    // pathname change
+    // re-create ctrls
+    if (props.pathname !== pageInfoRef.current.props.pathname) {
+      pageInfoRef.current = {
+        ctrls: getCtrls(),
+        props,
+        pageInfo,
+      }
+    }
+
     // update
     if (props.asPath !== pageInfoRef.current.props.asPath) {
       pageInfoRef.current.pageInfo = pageInfo

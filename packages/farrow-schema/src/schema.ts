@@ -18,6 +18,9 @@ export const Phantom = Symbol('phantom')
 export type Phantom = typeof Phantom
 
 export abstract class Schema<T = unknown> {
+  static new<T extends Schema, V extends TypeOf<T>>(this: new () => T, value: V): V {
+    return value
+  }
   abstract readonly __kind: string
   readonly __phantom: T | Phantom = Phantom
 }
@@ -79,7 +82,7 @@ export type SchemaCtorInput = SchemaCtor | FieldDescriptors
 export type ToSchemaCtor<T extends SchemaCtorInput> = T extends SchemaCtor
   ? T
   : T extends FieldDescriptors
-  ? new () => StructType<T>
+  ? (new () => StructType<T>) & typeof Schema
   : never
 
 export type SchemaCtorInputs =
@@ -377,7 +380,7 @@ export const ReadOnlyDeep = <T extends SchemaCtorInput>(Item: T) => {
 //   id = ID
 //   title = String
 //   description = String
-//   price = Float
+//   price = List(Float)
 // }
 
 // // define AppState Object

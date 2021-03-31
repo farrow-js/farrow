@@ -108,8 +108,12 @@ export const fetcher = async (request: ApiRequest): Promise<ApiResponse> => {
   return json
 }
 
+export type ApiInvokeOptions = {
+  batch: boolean
+}
+
 export type ApiPipelineWithUrl = AsyncPipeline<ApiRequest, ApiResponse> & {
-  invoke(calling: SingleCalling, batch?: boolean): Promise<JsonType>
+  invoke(calling: SingleCalling, options?: ApiInvokeOptions): Promise<JsonType>
 }
 
 export const createApiPipelineWithUrl = (url: string): ApiPipelineWithUrl => {
@@ -122,12 +126,14 @@ export const createApiPipelineWithUrl = (url: string): ApiPipelineWithUrl => {
     }
     return apiPipeline.invoke(url, calling)
   }
+
   let dataLoader = new DataLoader(batchInvoke)
 
-  async function invoke(calling: SingleCalling, batch: boolean = true): Promise<JsonType> {
-    if (batch) {
+  let invoke: ApiPipelineWithUrl['invoke'] = async (calling, options) => {
+    if (options?.batch) {
       return dataLoader.load(calling)
     }
+
     let result = await apiPipeline.invoke(url, calling)
     dataLoader.prime(calling, result)
 

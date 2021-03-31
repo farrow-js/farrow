@@ -69,6 +69,7 @@ export const BatchResponse = (result: ApiResponseSingle[]): ApiResponseBatch => 
 }
 
 export type ApiResponseSingle = ApiErrorResponse | ApiSuccessResponse
+
 export type ApiResponseBatch = {
   type: 'Batch'
   result: ApiResponseSingle[]

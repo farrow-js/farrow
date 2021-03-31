@@ -146,12 +146,8 @@ export type TypeOfObjectType<T extends ObjectType> = {
 
 export const kind = <T extends string>(name: T) => name
 
-const Scalar = Symbol('Scalar')
-
-type Scalar = typeof Scalar
-
 export abstract class ScalarType<T = unknown> extends Schema<T> {
-  [Scalar] = true
+  __scalar = true
 }
 
 export class Number extends ScalarType<number> {

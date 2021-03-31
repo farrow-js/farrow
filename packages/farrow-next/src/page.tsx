@@ -1,5 +1,6 @@
 import React, { ComponentType, useContext, useEffect, useRef } from 'react'
 import { NextPage, NextPageContext } from 'next'
+import { stringify as stringifyQuery, ParsedQs } from 'qs'
 import { Controller, Provider, ControllerCtors, ControllerInstancesType, getUserAgent } from './controller'
 import { replaceState } from './store'
 import { ModuleContext } from './module'
@@ -28,19 +29,27 @@ export const usePageInfo = (): PageInfo => {
   return pageInfo
 }
 
+export type QueryChangedEffectCallback = (curr: ParsedQs, prev: ParsedQs) => unknown
+
 /**
  * trigger effect callback when query changed
  * @param effect
  */
-export const useQueryChangedEffect = (effect: React.EffectCallback) => {
+export const useQueryChangedEffect = (effect: QueryChangedEffectCallback) => {
   let pageInfo = usePageInfo()
-  let effectCallbackRef = useRef<React.EffectCallback>(effect)
+  let effectCallbackRef = useRef<QueryChangedEffectCallback>(effect)
   let pageInfoRef = useRef<PageInfo>(pageInfo)
 
   useEffect(() => {
     if (pageInfoRef.current !== pageInfo) {
+      let curr = pageInfo.query
+      let prev = pageInfoRef.current.query
+
       pageInfoRef.current = pageInfo
-      return effectCallbackRef.current()
+
+      if (stringifyQuery(pageInfoRef.current.query) === stringifyQuery(pageInfo.query)) {
+        effectCallbackRef.current(curr, prev)
+      }
     }
   }, [pageInfo])
 
@@ -82,7 +91,7 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
       return ctrls
     }
 
-    // initilize
+    // initialize
     if (!pageInfoRef.current) {
       pageInfoRef.current = {
         ctrls: getCtrls(),

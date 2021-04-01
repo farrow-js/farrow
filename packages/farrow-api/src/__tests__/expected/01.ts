@@ -49,7 +49,7 @@ export const apiPipeline = createApiPipelineWithUrl(url)
 
 export const api = {
   methodA: (input: Collection, options?: ApiInvokeOptions) =>
-    apiPipeline.invoke({ path: ['methodA'], input }, options) as Promise<Collection>,
+    apiPipeline.invoke({ type: 'Single', path: ['methodA'], input }, options) as Promise<Collection>,
   methodB: (input: Collection, options?: ApiInvokeOptions) =>
-    apiPipeline.invoke({ path: ['methodB'], input }, options) as Promise<Collection>,
+    apiPipeline.invoke({ type: 'Single', path: ['methodB'], input }, options) as Promise<Collection>,
 }

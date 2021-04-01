@@ -14,6 +14,19 @@ describe('Farrow-Vite', () => {
   http.use(vite({ root: __dirname }))
 
   let server = http.server()
+
+  afterAll(() => {
+    return new Promise<void>((resolve, reject) => {
+      server.close((error) => {
+        if (error) {
+          reject(error)
+        } else {
+          resolve()
+        }
+      })
+    })
+  })
+
   it('should match root when exact /', async () => {
     await request(server)
       .get('/')

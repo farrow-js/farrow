@@ -322,13 +322,8 @@ type PageInfo = {
 import { useQueryChangedEffect } from 'farrow-next'
 
 const App = () => {
-  useQueryChangedEffect(() => {
-    let changed = false
+  useQueryChangedEffect((currQuery, prevQuery) => {
     // do something
-    return () => {
-      // clean up
-      changed = true
-    }
   })
 }
 ```

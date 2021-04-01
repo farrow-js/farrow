@@ -47,7 +47,13 @@ export const useQueryChangedEffect = (effect: QueryChangedEffectCallback) => {
 
       pageInfoRef.current = pageInfo
 
-      if (stringifyQuery(pageInfoRef.current.query) === stringifyQuery(pageInfo.query)) {
+      // only detect query changed
+      if (pageInfo.pathname !== pageInfoRef.current.pathname) {
+        return
+      }
+
+      // trigger effect callback when query changed
+      if (stringifyQuery(prev) !== stringifyQuery(curr)) {
         effectCallbackRef.current(curr, prev)
       }
     }

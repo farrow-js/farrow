@@ -23,7 +23,7 @@
     "bootstrap": "lerna bootstrap --hoist",
     "init": "npm install && npm run bootstrap && npm run build",
     "release": "lerna publish",
-    "prerelease": "npm run format && npm run build && npm run test"
+    "prerelease": "npm run format && git add -A && npm run build && npm run test"
   },
   "devDependencies": {
     "@types/jest": "^26.0.14",

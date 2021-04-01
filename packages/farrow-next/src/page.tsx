@@ -143,6 +143,19 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
       userAgent,
     }
 
+    if (typeof window !== 'undefined') {
+      // detect query changed
+      if (window.location.pathname === pathname) {
+        return {
+          userAgent,
+          pathname,
+          query,
+          asPath,
+          states: [],
+        }
+      }
+    }
+
     let getPageInfo = GetPageInfo.provide(() => pageInfo)
     let moduleCtx = new ModuleContext().injectProviderValues([getPageInfo])
 

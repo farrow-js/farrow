@@ -3,7 +3,7 @@
  * Don't modify it manually
  */
 
-import { createApiPipelineWithUrl } from 'farrow-api-client'
+import { createApiPipelineWithUrl, ApiInvokeOptions } from 'farrow-api-client'
 
 /**
  * {@label AddTodoInput}
@@ -71,10 +71,11 @@ export const api = {
   /**
    * @remarks add todo
    */
-  addTodo: (input: AddTodoInput) => apiPipeline.invoke({ path: ['addTodo'], input }) as Promise<AddTodoOutput>,
+  addTodo: (input: AddTodoInput, options?: ApiInvokeOptions) =>
+    apiPipeline.invoke({ path: ['addTodo'], input }, options) as Promise<AddTodoOutput>,
   /**
    * @remarks remove todo
    */
-  removeTodo: (input: RemoveTodoInput) =>
-    apiPipeline.invoke({ path: ['removeTodo'], input }) as Promise<RemoveTodoOuput>,
+  removeTodo: (input: RemoveTodoInput, options?: ApiInvokeOptions) =>
+    apiPipeline.invoke({ path: ['removeTodo'], input }, options) as Promise<RemoveTodoOuput>,
 }

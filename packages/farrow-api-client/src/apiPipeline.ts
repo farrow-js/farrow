@@ -1,4 +1,5 @@
 import 'isomorphic-unfetch'
+import 'setimmediate'
 import DataLoader from 'dataloader'
 import {
   AsyncPipeline,

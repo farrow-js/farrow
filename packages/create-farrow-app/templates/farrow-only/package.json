@@ -1,6 +1,6 @@
 {
   "name": "farrow-only-template",
-  "version": "1.8.10",
+  "version": "1.8.12",
   "private": true,
   "scripts": {
     "dev": "farrow dev",
@@ -8,10 +8,10 @@
     "start": "farrow start"
   },
   "dependencies": {
-    "farrow": "^1.8.10",
-    "farrow-api": "^1.8.10",
-    "farrow-api-client": "^1.8.10",
-    "farrow-api-server": "^1.8.10",
+    "farrow": "^1.8.12",
+    "farrow-api": "^1.8.12",
+    "farrow-api-client": "^1.8.12",
+    "farrow-api-server": "^1.8.12",
     "farrow-http": "^1.8.10",
     "farrow-pipeline": "^1.8.0",
     "farrow-schema": "^1.8.10"

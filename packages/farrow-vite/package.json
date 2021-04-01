@@ -1,6 +1,6 @@
 {
   "name": "farrow-vite",
-  "version": "1.8.11",
+  "version": "1.8.12",
   "description": "Vite adapter for farrow",
   "main": "dist/index.js",
   "files": [

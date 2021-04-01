@@ -1,6 +1,6 @@
 {
   "name": "farrow-next-react-template",
-  "version": "1.8.10",
+  "version": "1.8.11",
   "private": true,
   "scripts": {
     "dev": "farrow dev",
@@ -13,7 +13,7 @@
     "farrow-api-client": "^1.8.10",
     "farrow-api-server": "^1.8.10",
     "farrow-http": "^1.8.10",
-    "farrow-next": "^1.8.10",
+    "farrow-next": "^1.8.11",
     "farrow-next-server": "^1.8.10",
     "farrow-pipeline": "^1.8.0",
     "farrow-schema": "^1.8.10",

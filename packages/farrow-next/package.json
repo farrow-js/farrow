@@ -1,6 +1,6 @@
 {
   "name": "farrow-next",
-  "version": "1.8.10",
+  "version": "1.8.11",
   "description": "A framework runs on Next.js",
   "main": "dist/index.js",
   "module": "esm/index.js",

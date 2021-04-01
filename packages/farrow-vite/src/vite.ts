@@ -33,7 +33,7 @@ export const vite = (options?: InlineConfig) => {
         await fs.access(maybeHtmlPath, constants.R_OK)
         return `${filename}/index.html`
       } catch (error) {
-        // 如果对应的 index.html 不存在，则使用默认的 html文件
+        // if subfolder has no index.html found, use the root folder's instead
         return `${viteServer.config.root}/index.html`
       }
     }

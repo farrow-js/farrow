@@ -16,7 +16,7 @@
     "clean:tests": "shx rm -rf ./packages/*/{dist,esm}/**/__tests__",
     "lint": "eslint --report-unused-disable-directives ./packages",
     "format": "run-p format:source format:other",
-    "format:other": "prettier ./**/*.{md,yml,json} --write",
+    "format:other": "prettier ./**/*.{md,yml,json,html} --write",
     "format:source": "prettier ./**/*.{ts,tsx,js} --write",
     "test": "jest",
     "test:coverage": "jest --collectCoverage --coverage",

@@ -20,7 +20,11 @@ describe('Farrow-Vite', () => {
       .expect('Content-Type', /html/)
       .expect(
         200,
-        '<!DOCTYPE html>\n<script type="module" src="/@vite/client"></script>\n<html lang="en">\n<body>\n  \n</body>\n</html>',
+        '<!DOCTYPE html>\n' +
+          '<script type="module" src="/@vite/client"></script>\n' +
+          '<html lang="en">\n' +
+          '  <body></body>\n' +
+          '</html>\n',
       )
   })
 
@@ -30,7 +34,11 @@ describe('Farrow-Vite', () => {
       .expect('Content-Type', /html/)
       .expect(
         200,
-        '<!DOCTYPE html>\n<script type="module" src="/@vite/client"></script>\n<html lang="en">\n<body>\n  \n</body>\n</html>',
+        '<!DOCTYPE html>\n' +
+          '<script type="module" src="/@vite/client"></script>\n' +
+          '<html lang="en">\n' +
+          '  <body></body>\n' +
+          '</html>\n',
       )
   })
   it('should match sub folder html', async () => {
@@ -39,7 +47,13 @@ describe('Farrow-Vite', () => {
       .expect('Content-Type', /html/)
       .expect(
         200,
-        '<!DOCTYPE html>\n<script type="module" src="/@vite/client"></script>\n<html lang="en">\n<body>\nsub\n</body>\n</html>',
+        '<!DOCTYPE html>\n' +
+          '<script type="module" src="/@vite/client"></script>\n' +
+          '<html lang="en">\n' +
+          '  <body>\n' +
+          '    sub\n' +
+          '  </body>\n' +
+          '</html>\n',
       )
   })
 })

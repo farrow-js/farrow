@@ -199,7 +199,7 @@ describe('Validator', () => {
     }
 
     let validate = createSchemaValidator(Obj)
-    
+
     expect(
       assertOk(
         validate({

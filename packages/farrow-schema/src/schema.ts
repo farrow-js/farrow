@@ -24,6 +24,32 @@ export abstract class Schema<T = unknown> {
 
 export type SchemaCtor = Primitives | (new () => Schema)
 
+export type SchemaTypeOf<T extends SchemaCtor> = T extends NumberConstructor
+  ? Number
+  : T extends StringConstructor
+  ? String
+  : T extends BooleanConstructor
+  ? Boolean
+  : T extends new () => infer S
+  ? S
+  : never
+
+export const getSchemaCtor = <T extends SchemaCtor>(Ctor: T): SchemaTypeOf<T> => {
+  if (isNumberConstructor(Ctor)) {
+    return Number as SchemaTypeOf<T>
+  }
+
+  if (isStringConstructor(Ctor)) {
+    return String as SchemaTypeOf<T>
+  }
+
+  if (isBooleanConstructor(Ctor)) {
+    return Boolean as SchemaTypeOf<T>
+  }
+
+  return Ctor as SchemaTypeOf<T>
+}
+
 export const isSchemaCtor = (input: any): input is SchemaCtor => {
   if (isNumberConstructor(input) || isStringConstructor(input) || isBooleanConstructor(input)) {
     return true

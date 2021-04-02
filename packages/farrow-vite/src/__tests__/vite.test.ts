@@ -13,22 +13,8 @@ describe('Farrow-Vite', () => {
 
   http.use(vite({ root: __dirname }))
 
-  let server = http.server()
-
-  afterAll(() => {
-    return new Promise<void>((resolve, reject) => {
-      server.close((error) => {
-        if (error) {
-          reject(error)
-        } else {
-          resolve()
-        }
-      })
-    })
-  })
-
   it('should match root when exact /', async () => {
-    await request(server)
+    await request(http.server())
       .get('/')
       .expect('Content-Type', /html/)
       .expect(
@@ -42,7 +28,7 @@ describe('Farrow-Vite', () => {
   })
 
   it("should match root when can't find html", async () => {
-    await request(server)
+    await request(http.server())
       .get('/')
       .expect('Content-Type', /html/)
       .expect(
@@ -55,7 +41,7 @@ describe('Farrow-Vite', () => {
       )
   })
   it('should match sub folder html', async () => {
-    await request(server)
+    await request(http.server())
       .get('/sub')
       .expect('Content-Type', /html/)
       .expect(

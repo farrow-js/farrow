@@ -153,25 +153,9 @@
           {
             "extendDefaults": false,
             "types": {
-              "String": {
-                "message": "Use string instead",
-                "fixWith": "string"
-              },
-              "Boolean": {
-                "message": "Use boolean instead",
-                "fixWith": "boolean"
-              },
-              "Number": {
-                "message": "Use number instead",
-                "fixWith": "number"
-              },
               "Symbol": {
                 "message": "Use symbol instead",
                 "fixWith": "symbol"
-              },
-              "Function": {
-                "message": "\nThe `Function` type accepts any function-like value.\n\nIt provides no type safety when calling the function, which can be a common source of bugs.\n\nIt also accepts things like class declarations, which will throw at runtime as they will not be called with `new`.\n\nIf you are expecting the function to accept certain arguments, you should explicitly define the function shape.",
-                "fixWith": "(...args: unknown[]) => unknown"
               },
               "Object": {
                 "message": "\nThe `Object` type actually means \"any non-nullish value\", so it is marginally better than `unknown`.\n\n- If you want a type meaning \"any object\", you probably want `Record<string, unknown>` instead.\n\n- If you want a type meaning \"any value\", you probably want `unknown` instead.\n",

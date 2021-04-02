@@ -2,24 +2,30 @@ import path from 'path'
 import fs from 'fs/promises'
 import { constants } from 'fs'
 import type { IncomingMessage, ServerResponse } from 'http'
-import { Response, Router } from 'farrow-http'
-import { createServer as createViteServer, InlineConfig } from 'vite'
+import { Response, Router, RouterPipeline } from 'farrow-http'
+import { createServer as createViteServer, ViteDevServer, InlineConfig } from 'vite'
 
-export const vite = (options?: InlineConfig) => {
+export type ViteRouterPipeline = RouterPipeline & {
+  close(): Promise<void>
+}
+
+export const vite = (options?: InlineConfig): ViteRouterPipeline => {
   let router = Router()
 
   let config = {
     ...options,
   }
 
+  let viteDevServer: ViteDevServer | undefined = undefined
+
   router.useLazy(async () => {
-    let viteServer = await createViteServer({
+    let viteServer = (viteDevServer = await createViteServer({
       server: {
         ...config.server,
         middlewareMode: true,
       },
       ...config,
-    })
+    }))
 
     let getHtmlPath = async (url: string): Promise<string> => {
       let filename = path.join(viteServer.config.root, url.slice(1))
@@ -67,5 +73,10 @@ export const vite = (options?: InlineConfig) => {
     }
   })
 
-  return router
+  return {
+    ...router,
+    async close() {
+      await viteDevServer?.close()
+    },
+  }
 }

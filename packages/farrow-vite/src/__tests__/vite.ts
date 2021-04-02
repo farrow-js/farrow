@@ -8,13 +8,21 @@ const createHttp = () => {
   })
 }
 
-describe('Farrow-Vite', () => {
-  let http = createHttp()
+const http = createHttp()
 
-  http.use(vite({ root: __dirname }))
+const server = http.server()
+
+const viteRouter = vite({ root: __dirname })
+
+http.use(viteRouter)
+
+describe('Farrow-Vite', () => {
+  afterAll(async () => {
+    await viteRouter.close()
+  })
 
   it('should match root when exact /', async () => {
-    await request(http.server())
+    await request(server)
       .get('/')
       .expect('Content-Type', /html/)
       .expect(
@@ -28,7 +36,7 @@ describe('Farrow-Vite', () => {
   })
 
   it("should match root when can't find html", async () => {
-    await request(http.server())
+    await request(server)
       .get('/')
       .expect('Content-Type', /html/)
       .expect(
@@ -41,7 +49,7 @@ describe('Farrow-Vite', () => {
       )
   })
   it('should match sub folder html', async () => {
-    await request(http.server())
+    await request(server)
       .get('/sub')
       .expect('Content-Type', /html/)
       .expect(

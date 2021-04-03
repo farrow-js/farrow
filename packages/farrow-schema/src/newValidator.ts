@@ -284,7 +284,6 @@ Validator.impl(S.ObjectType, (schema) => {
 
   return {
     validate: (input, options) => {
-      // console.log({ input, options, schema })
       return Validator.validate(Fields, input, options)
     },
   }

@@ -4,3 +4,4 @@ dist
 esm
 packages/farrow-schema/src/instance.ts
 packages/farrow-schema/src/newValidator.ts
+packages/farrow-schema/src/newFormatter.ts

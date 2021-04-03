@@ -38,6 +38,8 @@
 
 ## Official Packages
 
+- [create-farrow-app](./packages/create-farrow-app/README.md): A cli-tools for scaffolding farrow project
+
 - [farrow](./packages/farrow/README.md): A cli-tools for developing farrow app
 
 - [farrow-http](./packages/farrow-http/README.md): A type-friendly Web Framework for Node.js

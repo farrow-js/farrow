@@ -16,16 +16,16 @@ export const vite = (options?: InlineConfig): ViteRouterPipeline => {
     ...options,
   }
 
-  let viteDevServer: ViteDevServer | undefined = undefined
+  let viteDevServers: ViteDevServer[] = []
 
   router.useLazy(async () => {
-    let viteServer = (viteDevServer = await createViteServer({
+    let viteServer = await createViteServer({
       server: {
         ...config.server,
         middlewareMode: true,
       },
       ...config,
-    }))
+    })
 
     let getHtmlPath = async (url: string): Promise<string> => {
       let filename = path.join(viteServer.config.root, url.slice(1))
@@ -68,6 +68,8 @@ export const vite = (options?: InlineConfig): ViteRouterPipeline => {
       })
     }
 
+    viteDevServers.push(viteServer)
+
     return () => {
       return Response.custom(handler)
     }
@@ -76,7 +78,11 @@ export const vite = (options?: InlineConfig): ViteRouterPipeline => {
   return {
     ...router,
     async close() {
-      await viteDevServer?.close()
+      let servers = [...viteDevServers]
+
+      viteDevServers = []
+
+      await Promise.all(servers.map((server) => server.close()))
     },
   }
 }

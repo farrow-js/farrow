@@ -55,9 +55,21 @@ export const Validator = {
     validatorWeakMap.set(Ctor, impl as ValidatorImpl)
   },
 
-  get<T extends SchemaCtor>(Ctor: T): ValidatorImpl<SchemaTypeOf<T>> | undefined {
+  get<T extends SchemaCtor>(Ctor: T): ValidatorMethods<SchemaTypeOf<T>> | undefined {
     let finalCtor = S.getSchemaCtor(Ctor)
-    return getValidatorImpl(finalCtor as Function) as ValidatorImpl<SchemaTypeOf<T>> | undefined
+    let validatorImpl = getValidatorImpl(finalCtor as Function) as ValidatorImpl<SchemaTypeOf<T>> | undefined
+
+    // instantiation validator and save to weak-map
+    if (typeof validatorImpl === 'function') {
+      let schema = getInstance(Ctor) as SchemaTypeOf<T>
+      let impl = validatorImpl(schema)
+
+      validatorWeakMap.set(Ctor, impl)
+      
+      return impl
+    }
+
+    return validatorImpl
   },
 
   validate<T extends SchemaCtor>(Ctor: T, input: unknown, options?: ValidatorOptions): ValidationResult<TypeOf<T>> {
@@ -65,14 +77,6 @@ export const Validator = {
 
     if (!validatorImpl) {
       throw new Error(`No impl found for Validator, Ctor: ${Ctor}`)
-    }
-
-    // instantiation validator and save to weak-map
-    if (typeof validatorImpl === 'function') {
-      let schema = getInstance(Ctor) as SchemaTypeOf<T>
-      let impl = validatorImpl(schema)
-      validatorWeakMap.set(Ctor, impl)
-      return impl.validate(input, options) as ValidationResult<TypeOf<T>>
     }
 
     return validatorImpl.validate(input, options) as ValidationResult<TypeOf<T>>

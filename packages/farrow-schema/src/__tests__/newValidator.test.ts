@@ -1,18 +1,12 @@
 import * as Schema from '../schema'
 import { Prettier, ReadOnly, TypeOf, ReadOnlyDeep } from '../schema'
-import { Validator, ValidationResult, ValidatorOptions } from '../newValidator'
+import { createSchemaValidator, RegExp, ValidationResult, ValidatorType } from '../newValidator'
 
 const { Type, ObjectType, Struct, Int, Float, Literal, List, Union, Intersect, Nullable, Record, Json, Any } = Schema
 
 let assertOk = <T>(result: ValidationResult<T>): T => {
   if (result.isOk) return result.value
   throw new Error(result.value.message)
-}
-
-const createSchemaValidator = <S extends Schema.SchemaCtor>(SchemaCtor: S, options?: ValidatorOptions) => {
-  return (input: unknown) => {
-    return Validator.validate(SchemaCtor, input, options)
-  }
 }
 
 describe('Validator', () => {
@@ -776,5 +770,80 @@ describe('Validator', () => {
         d: false,
       },
     })
+  })
+
+  it('supports built-in validate schema', () => {
+    class DateType extends ValidatorType<Date> {
+      validate(input: unknown) {
+        if (input instanceof Date) {
+          return this.Ok(input)
+        }
+
+        if (typeof input === 'number' || typeof input === 'string') {
+          return this.Ok(new Date(input))
+        }
+
+        return this.Err(`${input} is not a valid date`)
+      }
+    }
+
+    class EmailType extends ValidatorType<string> {
+      validate(input: unknown) {
+        if (typeof input !== 'string') {
+          return this.Err(`${input} should be a string`)
+        }
+
+        if (/^example@farrow\.com$/.test(input)) {
+          return this.Ok(input)
+        }
+
+        return this.Err(`${input} is not a valid email`)
+      }
+    }
+
+    let User = Struct({
+      name: String,
+      email: EmailType,
+      createAt: DateType,
+    })
+
+    let validateUser = createSchemaValidator(User)
+
+    let result0 = assertOk(
+      validateUser({
+        name: 'test',
+        email: 'example@farrow.com',
+        createAt: Date.now(),
+      }),
+    )
+
+    expect(result0.name).toBe('test')
+    expect(result0.email).toBe('example@farrow.com')
+    expect(result0.createAt instanceof Date).toBe(true)
+
+    expect(() =>
+      assertOk(
+        validateUser({
+          name: 'test',
+          email: 'example1@farrow.com',
+          createAt: Date.now(),
+        }),
+      ),
+    ).toThrow()
+  })
+
+  it('supports RegExp Schema', () => {
+    let Reg0 = RegExp(/123/)
+    let Reg1 = RegExp(/abc/i)
+
+    let validateReg0 = createSchemaValidator(Reg0)
+    let validateReg1 = createSchemaValidator(Reg1)
+
+    expect(assertOk(validateReg0('123'))).toBe('123')
+    expect(() => assertOk(validateReg0('12'))).toThrow()
+
+    expect(assertOk(validateReg1('abc'))).toBe('abc')
+    expect(assertOk(validateReg1('ABC'))).toBe('ABC')
+    expect(() => assertOk(validateReg1('cba'))).toThrow()
   })
 })

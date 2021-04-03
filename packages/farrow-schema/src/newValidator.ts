@@ -428,3 +428,45 @@ Validator.impl<S.ReadOnlyDeepType>(S.ReadOnlyDeepType, (schema) => {
     },
   }
 })
+
+
+
+export const createSchemaValidator = <S extends S.SchemaCtor>(SchemaCtor: S, options?: ValidatorOptions) => {
+  return (input: unknown) => {
+    return Validator.validate(SchemaCtor, input, options)
+  }
+}
+
+export abstract class ValidatorType<T = unknown> extends S.Schema<T> {
+  __kind = S.kind('Validator')
+
+  abstract validate(input: unknown): ValidationResult<T>
+
+  Ok(value: T): ValidationResult<T> {
+    return Ok(value)
+  }
+
+  Err(...args: Parameters<typeof SchemaErr>): ValidationResult<T> {
+    return SchemaErr(...args)
+  }
+}
+
+Validator.impl<ValidatorType>(ValidatorType, schema => {
+  return {
+    validate: schema.validate.bind(schema)
+  }
+})
+
+export const RegExp = (regexp: RegExp) => {
+  return class RegExp extends ValidatorType<string> {
+    validate(input: unknown) {
+      let text = `${input}`
+
+      if (regexp.test(text)) {
+        return this.Ok(text)
+      }
+
+      return this.Err(`${text} was not matched: ${regexp}`)
+    }
+  }
+}

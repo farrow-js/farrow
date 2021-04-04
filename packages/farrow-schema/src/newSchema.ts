@@ -1,9 +1,9 @@
 /**
  * Idea:
- * We don't need to carry type in generic type position
- * We can keep it in class fields, such like __type
- * Using this-type to access the instance-type
- * Perform some type-level programming to infer the type of Schema
+ * - We don't need to carry type in generic type position
+ * - We can keep it in class fields, such like __type
+ * - Using this-type to access the instance-type
+ * - Perform some type-level programming to infer the type of Schema
  */
 abstract class Schema {
   static new<T extends SchemaCtor>(this: T, value: TypeOf<T>) {

@@ -54,6 +54,17 @@ abstract class ObjectType extends Schema {
   }
 }
 
+abstract class OptionalType extends Schema {
+  abstract ItemType: SchemaCtor
+  __type!: TypeOf<this['ItemType']> | undefined
+}
+
+const Optional = <T extends SchemaCtor>(ItemType: T) => {
+  return class Optional extends OptionalType {
+    ItemType = ItemType
+  }
+}
+
 abstract class UnionType extends Schema {
   __type!: TypeOf<this['ItemTypes'][number]>
   abstract ItemTypes: SchemaCtor[]
@@ -157,7 +168,7 @@ class PersonName extends ObjectType {
   lastname = StringType
 
   @deprecated('use lastname instead')
-  surname? = StringType
+  surname? = Optional(StringType)
 }
 
 // Description.impl(PersonName, {
@@ -184,7 +195,6 @@ class User extends ObjectType {
   isVip = BooleanType
   friends = List(User)
   tags = List(Tag)
-  s = 1
 }
 
 type T0 = User['__type']

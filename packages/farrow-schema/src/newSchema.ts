@@ -6,15 +6,15 @@
  * Perform some type-level programming to infer the type of Schema
  */
 abstract class Schema {
-  static new<T extends SchemaCtor, V extends TypeOfSchema<T>>(this: T, value: V) {
+  static new<T extends SchemaCtor>(this: T, value: TypeOf<T>) {
     return value
   }
   abstract __type: unknown
 }
 
-type SchemaCtor = new () => Schema
+type SchemaCtor<T extends Schema = Schema> = new () => T
 
-type TypeOfSchema<T extends SchemaCtor> = InstanceType<T>['__type']
+type TypeOf<T extends SchemaCtor> = InstanceType<T>['__type']
 
 class NumberType extends Schema {
   __type!: number
@@ -29,7 +29,7 @@ class BooleanType extends Schema {
 }
 
 abstract class ListType extends Schema {
-  __type!: TypeOfSchema<this['ItemType']>[]
+  __type!: TypeOf<this['ItemType']>[]
 
   abstract ItemType: SchemaCtor
 }
@@ -40,27 +40,22 @@ const List = <T extends SchemaCtor>(ItemType: T) => {
   }
 }
 
+type SchemaField<T extends object, key extends keyof T> = T[key] extends undefined
+  ? never
+  : T[key] extends SchemaCtor | undefined
+  ? key
+  : never
+
+type TypeOfField<T> = T extends SchemaCtor ? TypeOf<T> : T extends undefined ? undefined : never
+
 abstract class ObjectType extends Schema {
   __type!: {
-    [key in keyof this as this[key] extends SchemaCtor ? key : never]: this[key] extends SchemaCtor
-      ? TypeOfSchema<this[key]>
-      : never
-  }
-}
-
-abstract class NullableType extends Schema {
-  __type!: TypeOfSchema<this['ItemType']> | null
-  abstract ItemType: SchemaCtor
-}
-
-const Nullable = <T extends SchemaCtor>(ItemType: T) => {
-  return class Nullable extends NullableType {
-    ItemType = ItemType
+    [key in keyof this as SchemaField<this, key>]: TypeOfField<this[key]>
   }
 }
 
 abstract class UnionType extends Schema {
-  __type!: TypeOfSchema<this['ItemTypes'][number]>
+  __type!: TypeOf<this['ItemTypes'][number]>
   abstract ItemTypes: SchemaCtor[]
 }
 
@@ -83,11 +78,100 @@ const Literal = <T extends Literals>(value: T) => {
   }
 }
 
-class PersonName extends ObjectType {
-  firstname = StringType
-  middlename = Nullable(StringType)
-  lastname = StringType
+const Null = Literal(null)
+
+const Nullable = <T extends SchemaCtor>(Ctor: T) => {
+  return Union(Ctor, Null)
 }
+
+type DescriptionInfo<T extends ObjectType = ObjectType> = {
+  [key in keyof T['__type']]?: string
+}
+
+const descriptionWeakMap = new WeakMap<SchemaCtor<ObjectType>, DescriptionInfo>()
+
+const Description = {
+  impl<T extends ObjectType>(Ctor: SchemaCtor<T>, descriptionInfo: DescriptionInfo<T>) {
+    descriptionWeakMap.set(Ctor, {
+      ...descriptionWeakMap.get(Ctor),
+      ...descriptionInfo,
+    })
+  },
+  get<T extends ObjectType>(Ctor: SchemaCtor<T>): DescriptionInfo<T> {
+    // eslint-disable-next-line
+    new Ctor()
+    return descriptionWeakMap.get(Ctor) ?? {}
+  },
+  getField<T extends ObjectType>(Ctor: SchemaCtor<T>, field: keyof T['__type']) {
+    return this.get(Ctor)[field]
+  },
+}
+
+const description = (description: string) => {
+  return (target: object, key: string) => {
+    Description.impl(target.constructor as any, {
+      [key]: description,
+    })
+  }
+}
+
+type DeprecatedInfo<T extends ObjectType = ObjectType> = {
+  [key in keyof T['__type']]?: string
+}
+
+const DeprecatedWeakMap = new WeakMap<SchemaCtor<ObjectType>, DeprecatedInfo>()
+
+const Deprecated = {
+  impl<T extends ObjectType>(Ctor: SchemaCtor<T>, DeprecatedInfo: DeprecatedInfo<T>) {
+    DeprecatedWeakMap.set(Ctor, {
+      ...DeprecatedWeakMap.get(Ctor),
+      ...DeprecatedInfo,
+    })
+  },
+  get<T extends ObjectType>(Ctor: SchemaCtor<T>): DeprecatedInfo<T> {
+    // eslint-disable-next-line
+    new Ctor()
+    return DeprecatedWeakMap.get(Ctor) ?? {}
+  },
+  getField<T extends ObjectType>(Ctor: SchemaCtor<T>, field: keyof T['__type']) {
+    return this.get(Ctor)[field]
+  },
+}
+
+const deprecated = (deprecated: string) => {
+  return (target: object, key: string) => {
+    Deprecated.impl(target.constructor as any, {
+      [key]: deprecated,
+    })
+  }
+}
+
+class PersonName extends ObjectType {
+  @description('first name of person')
+  firstname = StringType
+
+  @description('optional middle name of person')
+  middlename = Nullable(StringType)
+
+  @description('last name of person')
+  lastname = StringType
+
+  @deprecated('use lastname instead')
+  surname? = StringType
+}
+
+// Description.impl(PersonName, {
+//   firstname: 'first name of person',
+//   middlename: 'optional middle name of person',
+//   lastname: 'last name of person',
+// })
+
+// Deprecated.impl(PersonName, {
+//   surname: 'use lastname instead',
+// })
+
+console.log('person name description info', Description.get(PersonName))
+console.log('person name deprecated info', Deprecated.get(PersonName))
 
 class Tag extends UnionType {
   ItemTypes = [Literal('happy'), Literal('sad'), Literal('angry')]
@@ -100,6 +184,7 @@ class User extends ObjectType {
   isVip = BooleanType
   friends = List(User)
   tags = List(Tag)
+  s = 1
 }
 
 type T0 = User['__type']
@@ -116,3 +201,5 @@ const user = User.new({
   friends: [],
   tags: ['happy'],
 })
+
+console.log('user', user)

@@ -2,7 +2,5 @@ examples/.cache
 node_modules
 dist
 esm
-packages/farrow-schema/src/newSchema/instance.ts
-packages/farrow-schema/src/instance.ts
-packages/farrow-schema/src/newValidator.ts
-packages/farrow-schema/src/newFormatter.ts
+packages/farrow-schema/src/schema/instance.ts
+packages/farrow-schema/src/validator.ts

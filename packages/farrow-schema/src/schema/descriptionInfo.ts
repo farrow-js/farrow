@@ -1,4 +1,4 @@
-import { ObjectType, SchemaCtor } from './newSchema'
+import { ObjectType, SchemaCtor } from './schema'
 
 export type DescriptionInfo<T extends ObjectType = ObjectType> = {
   [key in keyof T['__type']]?: string

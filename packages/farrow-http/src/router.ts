@@ -66,10 +66,10 @@ export type TypeOfRouterRequestField<T> = T extends string | string[]
   ? string
   : T extends Pathname
   ? string
-  : T extends Schema.FieldDescriptors
-  ? Schema.TypeOf<Schema.StructType<T>>
   : T extends Schema.FieldDescriptor
   ? Schema.TypeOfFieldDescriptor<T>
+  : T extends Schema.FieldDescriptors
+  ? Schema.TypeOfFieldDescriptors<T>
   : never
 
 export type TypeOfRequestSchema<T extends RouterRequestSchema> = MarkReadOnlyDeep<

@@ -9,6 +9,16 @@
 import { MarkReadOnlyDeep } from '../types'
 import { isBooleanConstructor, isNumberConstructor, isStringConstructor } from '../utils'
 
+export type Prettier<T> = T extends Promise<infer U>
+  ? Promise<Prettier<U>>
+  : T extends (...args: infer Args) => infer Return
+  ? (...args: Prettier<Args>) => Prettier<Return>
+  : T extends object | any[]
+  ? {
+      [key in keyof T]: Prettier<T[key]>
+    }
+  : T
+
 export type ShallowPrettier<T> = T extends object | any[]
   ? {
       [key in keyof T]: T[key]
@@ -16,9 +26,9 @@ export type ShallowPrettier<T> = T extends object | any[]
   : T
 
 export abstract class Schema {
-  static new<T extends SchemaCtor>(this: T, value: TypeOf<T>) {
-    return value
-  }
+  // static new<T extends SchemaCtor>(this: T, value: TypeOf<T>) {
+  //   return value
+  // }
   abstract __type: unknown
 }
 
@@ -34,41 +44,29 @@ export type TypeOf<T extends SchemaCtor | Schema> = T extends Primitives
   ? T['__type']
   : never
 
-export class NumberType extends Schema {
+export class Number extends Schema {
   __type!: number
 }
 
-export const Number = NumberType
-
-export class StringType extends Schema {
+export class String extends Schema {
   __type!: string
 }
 
-export const String = StringType
-
-export class BooleanType extends Schema {
+export class Boolean extends Schema {
   __type!: boolean
 }
 
-export const Boolean = BooleanType
-
-export class IDType extends Schema {
+export class ID extends Schema {
   __type!: string
 }
 
-export const ID = IDType
-
-export class IntType extends Schema {
+export class Int extends Schema {
   __type!: number
 }
 
-export const Int = IntType
-
-export class FloatType extends Schema {
+export class Float extends Schema {
   __type!: number
 }
-
-export const Float = FloatType
 
 export abstract class ListType extends Schema {
   __type!: TypeOf<this['Item']>[]
@@ -139,8 +137,15 @@ export const Null = Literal(null)
 
 export const Undefined = Literal(undefined)
 
-export const Nullable = <T extends SchemaCtorInput>(Ctor: T) => {
-  return Union(Ctor, Null, Undefined)
+export abstract class NullableType extends Schema {
+  __type!: TypeOf<this['Item']> | null | undefined
+  abstract Item: SchemaCtor
+}
+
+export const Nullable = <T extends SchemaCtorInput>(Item: T) => {
+  return class Nullable extends NullableType {
+    Item = toSchemaCtor(Item)
+  }
 }
 
 export const Type = '__type' as const
@@ -199,17 +204,13 @@ export const Record = <T extends SchemaCtorInput>(Item: T) => {
   }
 }
 
-export class AnyType extends Schema {
+export class Any extends Schema {
   __type!: any
 }
 
-export const Any = AnyType
-
-export class UnknownType extends Schema {
+export class Unknown extends Schema {
   __type!: unknown
 }
-
-export const Unknown = UnknownType
 
 export type JsonType =
   | number
@@ -274,26 +275,26 @@ export const ReadOnlyDeep = <T extends SchemaCtorInput>(Item: T) => {
 }
 
 export type SchemaTypeOf<T extends SchemaCtor> = T extends NumberConstructor
-  ? NumberType
+  ? Number
   : T extends StringConstructor
-  ? StringType
+  ? String
   : T extends BooleanConstructor
-  ? BooleanType
+  ? Boolean
   : T extends new () => infer S
   ? S
   : never
 
 export const getSchemaCtor = <T extends SchemaCtor>(Ctor: T): SchemaTypeOf<T> => {
   if (isNumberConstructor(Ctor)) {
-    return NumberType as SchemaTypeOf<T>
+    return Number as SchemaTypeOf<T>
   }
 
   if (isStringConstructor(Ctor)) {
-    return StringType as SchemaTypeOf<T>
+    return String as SchemaTypeOf<T>
   }
 
   if (isBooleanConstructor(Ctor)) {
-    return BooleanType as SchemaTypeOf<T>
+    return Boolean as SchemaTypeOf<T>
   }
 
   return Ctor as SchemaTypeOf<T>
@@ -324,7 +325,7 @@ export type SchemaCtorInput = SchemaCtor | FieldDescriptors
 export type ToSchemaCtor<T extends SchemaCtorInput> = T extends SchemaCtor
   ? T
   : T extends FieldDescriptors
-  ? new () => StructType
+  ? new () => { __type: TypeOfFieldDescriptors<T> }
   : never
 
 export type SchemaCtorInputs =

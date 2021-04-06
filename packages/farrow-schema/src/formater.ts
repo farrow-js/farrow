@@ -1,3 +1,4 @@
+import { Literals } from './schema'
 import * as Schema from './schema'
 import { createTransformer, TransformRule, TransformContext } from './transformer'
 
@@ -61,7 +62,7 @@ export type FormatUnknownType = {
 
 export type FormatLiteralType = {
   type: 'Literal'
-  value: string | number | boolean | null
+  value: Literals
 }
 
 export type FormatRecordType = {

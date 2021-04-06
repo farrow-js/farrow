@@ -1,7 +1,7 @@
-import * as S from './schema'
-import { SchemaCtor, TypeOf, Schema, SchemaTypeOf } from './schema'
+import * as S from './newSchema'
+import { SchemaCtor, TypeOf, Schema, SchemaTypeOf } from './newSchema'
+import { getInstance } from './newSchema/instance'
 
-import { getInstance } from './instance'
 import { Result, Err, Ok } from './result'
 
 export type ValidationError = {
@@ -83,7 +83,7 @@ export const Validator = {
   },
 }
 
-Validator.impl(S.String, {
+Validator.impl(S.StringType, {
   validate: (input) => {
     if (typeof input === 'string') {
       return Ok(input)
@@ -106,7 +106,7 @@ const parseNumberLiteral = (input: unknown): Result<number> => {
   return Err(`Expected a string, but got ${input}`)
 }
 
-Validator.impl(S.Number, {
+Validator.impl(S.NumberType, {
   validate: (input, options) => {
     if (isNumber(input)) return Ok(input)
 
@@ -119,7 +119,7 @@ Validator.impl(S.Number, {
   },
 })
 
-Validator.impl(S.Int, {
+Validator.impl(S.IntType, {
   validate: (input, options) => {
     if (typeof input === 'number' && Number.isInteger(input)) {
       return Ok(input)
@@ -135,7 +135,7 @@ Validator.impl(S.Int, {
   },
 })
 
-Validator.impl(S.Float, {
+Validator.impl(S.FloatType, {
   validate: (input, options) => {
     if (typeof input === 'number' && !isNaN(input)) {
       return Ok(input)
@@ -150,7 +150,7 @@ Validator.impl(S.Float, {
   },
 })
 
-Validator.impl(S.ID, {
+Validator.impl(S.IDType, {
   validate: (input) => {
     if (typeof input === 'string') {
       if (input === '') {
@@ -169,7 +169,7 @@ const parseBooleanLiteral = (input: unknown): Result<boolean> => {
   return Err('')
 }
 
-Validator.impl(S.Boolean, {
+Validator.impl(S.BooleanType, {
   validate: (input, options) => {
     if (typeof input === 'boolean') {
       return Ok(input)
@@ -313,17 +313,6 @@ Validator.impl<S.RecordType>(S.RecordType, (schema) => {
   }
 })
 
-Validator.impl<S.NullableType>(S.NullableType, (schema) => {
-  return {
-    validate: (input, options) => {
-      if (input === null || input === undefined) {
-        return Ok(input)
-      }
-      return Validator.validate(schema.Item, input, options)
-    },
-  }
-})
-
 Validator.impl<S.UnionType>(S.UnionType, (schema) => {
   return {
     validate: (input, options) => {
@@ -440,8 +429,8 @@ export const createSchemaValidator = <S extends S.SchemaCtor>(SchemaCtor: S, opt
   }
 }
 
-export abstract class ValidatorType<T = unknown> extends S.Schema<T> {
-  __kind = S.kind('Validator')
+export abstract class ValidatorType<T = unknown> extends S.Schema {
+  __type!: T
 
   abstract validate(input: unknown): ValidationResult<T>
 

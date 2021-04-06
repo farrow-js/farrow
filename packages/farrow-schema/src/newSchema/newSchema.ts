@@ -76,9 +76,9 @@ export abstract class ListType extends Schema {
   abstract Item: SchemaCtor
 }
 
-export const List = <T extends SchemaCtor>(Item: T) => {
+export const List = <T extends SchemaCtorInput>(Item: T) => {
   return class List extends ListType {
-    Item = Item
+    Item = toSchemaCtor(Item)
   }
 }
 
@@ -101,9 +101,9 @@ export abstract class UnionType extends Schema {
   abstract Items: SchemaCtor[]
 }
 
-export const Union = <T extends SchemaCtor[]>(...Items: T) => {
+export const Union = <T extends SchemaCtorInput[]>(...Items: T) => {
   return class Union extends UnionType {
-    Items = Items
+    Items = toSchemaCtors(Items)
   }
 }
 
@@ -116,9 +116,9 @@ export abstract class IntersectType extends Schema {
   abstract Items: SchemaCtor[]
 }
 
-export const Intersect = <T extends SchemaCtor[]>(...Items: T) => {
+export const Intersect = <T extends SchemaCtorInput[]>(...Items: T) => {
   return class Intersect extends IntersectType {
-    Items = Items
+    Items = toSchemaCtors(Items)
   }
 }
 
@@ -139,7 +139,7 @@ export const Null = Literal(null)
 
 export const Undefined = Literal(undefined)
 
-export const Nullable = <T extends SchemaCtor>(Ctor: T) => {
+export const Nullable = <T extends SchemaCtorInput>(Ctor: T) => {
   return Union(Ctor, Null, Undefined)
 }
 
@@ -193,9 +193,9 @@ export abstract class RecordType extends Schema {
   abstract Item: SchemaCtor
 }
 
-export const Record = <T extends SchemaCtor>(Item: T) => {
+export const Record = <T extends SchemaCtorInput>(Item: T) => {
   return class Record extends RecordType {
-    Item = Item
+    Item = toSchemaCtor(Item)
   }
 }
 
@@ -234,9 +234,9 @@ export abstract class StrictType extends Schema {
   abstract Item: SchemaCtor
 }
 
-export const Strict = <T extends SchemaCtor>(Item: T) => {
+export const Strict = <T extends SchemaCtorInput>(Item: T) => {
   return class Strict extends StrictType {
-    Item = Item
+    Item = toSchemaCtor(Item)
   }
 }
 
@@ -245,9 +245,9 @@ export abstract class NonStrictType extends Schema {
   abstract Item: SchemaCtor
 }
 
-export const NonStrict = <T extends SchemaCtor>(Item: T) => {
+export const NonStrict = <T extends SchemaCtorInput>(Item: T) => {
   return class Strict extends NonStrictType {
-    Item = Item
+    Item = toSchemaCtor(Item)
   }
 }
 
@@ -256,9 +256,9 @@ export abstract class ReadOnlyType extends Schema {
   abstract Item: SchemaCtor
 }
 
-export const ReadOnly = <T extends SchemaCtor>(Item: T) => {
+export const ReadOnly = <T extends SchemaCtorInput>(Item: T) => {
   return class ReadOnly extends ReadOnlyType {
-    Item = Item
+    Item = toSchemaCtor(Item)
   }
 }
 
@@ -267,9 +267,9 @@ export abstract class ReadOnlyDeepType extends Schema {
   abstract Item: SchemaCtor
 }
 
-export const ReadOnlyDeep = <T extends SchemaCtor>(Item: T) => {
+export const ReadOnlyDeep = <T extends SchemaCtorInput>(Item: T) => {
   return class Strict extends ReadOnlyDeepType {
-    Item = Item
+    Item = toSchemaCtor(Item)
   }
 }
 
@@ -313,4 +313,53 @@ export const isFieldDescriptor = (input: any): input is FieldDescriptor => {
 
 export const isFieldDescriptors = (input: any): input is FieldDescriptors => {
   return !!(input && typeof input === 'object')
+}
+
+export const field = <T extends FieldInfo>(fieldInfo: T): T => {
+  return fieldInfo
+}
+
+export type SchemaCtorInput = SchemaCtor | FieldDescriptors
+
+export type ToSchemaCtor<T extends SchemaCtorInput> = T extends SchemaCtor
+  ? T
+  : T extends FieldDescriptors
+  ? new () => StructType
+  : never
+
+export type SchemaCtorInputs =
+  | SchemaCtorInput[]
+  | {
+      [key: string]: SchemaCtorInput
+    }
+
+export type ToSchemaCtors<T extends SchemaCtorInputs> = {
+  [key in keyof T]: T[key] extends SchemaCtorInput ? ToSchemaCtor<T[key]> : never
+}
+
+export const toSchemaCtor = <T extends SchemaCtorInput>(Item: T) => {
+  if (isSchemaCtor(Item)) {
+    return Item as ToSchemaCtor<T>
+  }
+  return (Struct(Item as FieldDescriptors) as unknown) as ToSchemaCtor<T>
+}
+
+export const toSchemaCtors = <T extends SchemaCtorInputs>(Inputs: T): ToSchemaCtors<T> => {
+  if (Array.isArray(Inputs)) {
+    // @ts-ignore: ignore
+    return Inputs.map(toSchemaCtor)
+  }
+
+  if (Inputs && typeof Inputs === 'object') {
+    let result = {} as ToSchemaCtors<T>
+
+    for (let key in Inputs) {
+      // @ts-ignore: ignore
+      result[key] = toSchemaCtor(Inputs[key])
+    }
+
+    return result
+  }
+
+  throw new Error(`Unknown inputs: ${Inputs}`)
 }

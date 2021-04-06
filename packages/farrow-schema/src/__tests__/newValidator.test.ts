@@ -524,102 +524,102 @@ describe('Validator', () => {
     ).toThrow()
   })
 
-  // it('should support flexible FieldDescriptors as argument', () => {
-  //   let list = List({
-  //     a: Number,
-  //   })
+  it('should support flexible FieldDescriptors as argument', () => {
+    let list = List({
+      a: Number,
+    })
 
-  //   let nullable = Nullable({
-  //     a: Number,
-  //   })
+    let nullable = Nullable({
+      a: Number,
+    })
 
-  //   let union = Union(
-  //     {
-  //       a: Number,
-  //     },
-  //     {
-  //       b: String,
-  //     },
-  //   )
+    let union = Union(
+      {
+        a: Number,
+      },
+      {
+        b: String,
+      },
+    )
 
-  //   let intersect = Intersect(
-  //     {
-  //       a: Number,
-  //     },
-  //     {
-  //       b: String,
-  //     },
-  //   )
+    let intersect = Intersect(
+      {
+        a: Number,
+      },
+      {
+        b: String,
+      },
+    )
 
-  //   let record = Record({
-  //     a: Number,
-  //   })
+    let record = Record({
+      a: Number,
+    })
 
-  //   let validateList = createSchemaValidator(list)
-  //   let validateNullable = createSchemaValidator(nullable)
-  //   let validateUnion = createSchemaValidator(union)
-  //   let validateIntersect = createSchemaValidator(intersect)
-  //   let validateRecord = createSchemaValidator(record)
+    let validateList = createSchemaValidator(list)
+    let validateNullable = createSchemaValidator(nullable)
+    let validateUnion = createSchemaValidator(union)
+    let validateIntersect = createSchemaValidator(intersect)
+    let validateRecord = createSchemaValidator(record)
 
-  //   expect(assertOk(validateList([]))).toEqual([])
-  //   expect(
-  //     assertOk(
-  //       validateList([
-  //         {
-  //           a: 1,
-  //           b: 2,
-  //         },
-  //         {
-  //           a: 2,
-  //           b: 3,
-  //         },
-  //       ]),
-  //     ),
-  //   ).toEqual([
-  //     {
-  //       a: 1,
-  //     },
-  //     {
-  //       a: 2,
-  //     },
-  //   ])
+    expect(assertOk(validateList([]))).toEqual([])
+    expect(
+      assertOk(
+        validateList([
+          {
+            a: 1,
+            b: 2,
+          },
+          {
+            a: 2,
+            b: 3,
+          },
+        ]),
+      ),
+    ).toEqual([
+      {
+        a: 1,
+      },
+      {
+        a: 2,
+      },
+    ])
 
-  //   expect(assertOk(validateNullable(null))).toEqual(null)
-  //   expect(assertOk(validateNullable(undefined))).toEqual(undefined)
+    expect(assertOk(validateNullable(null))).toEqual(null)
+    expect(assertOk(validateNullable(undefined))).toEqual(undefined)
 
-  //   expect(assertOk(validateUnion({ a: 1 }))).toEqual({
-  //     a: 1,
-  //   })
+    expect(assertOk(validateUnion({ a: 1 }))).toEqual({
+      a: 1,
+    })
 
-  //   expect(assertOk(validateUnion({ b: '1' }))).toEqual({
-  //     b: '1',
-  //   })
+    expect(assertOk(validateUnion({ b: '1' }))).toEqual({
+      b: '1',
+    })
 
-  //   expect(assertOk(validateIntersect({ a: 1, b: '1' }))).toEqual({
-  //     a: 1,
-  //     b: '1',
-  //   })
+    expect(assertOk(validateIntersect({ a: 1, b: '1' }))).toEqual({
+      a: 1,
+      b: '1',
+    })
 
-  //   expect(
-  //     assertOk(
-  //       validateRecord({
-  //         key0: {
-  //           a: 1,
-  //         },
-  //         key1: {
-  //           a: 2,
-  //         },
-  //       }),
-  //     ),
-  //   ).toEqual({
-  //     key0: {
-  //       a: 1,
-  //     },
-  //     key1: {
-  //       a: 2,
-  //     },
-  //   })
-  // })
+    expect(
+      assertOk(
+        validateRecord({
+          key0: {
+            a: 1,
+          },
+          key1: {
+            a: 2,
+          },
+        }),
+      ),
+    ).toEqual({
+      key0: {
+        a: 1,
+      },
+      key1: {
+        a: 2,
+      },
+    })
+  })
 
   it('support strict or non-strict validation', () => {
     let struct = Struct({

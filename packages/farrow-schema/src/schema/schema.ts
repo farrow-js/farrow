@@ -26,9 +26,9 @@ export type ShallowPrettier<T> = T extends object | any[]
   : T
 
 export abstract class Schema {
-  // static new<T extends SchemaCtor>(this: T, value: TypeOf<T>) {
-  //   return value
-  // }
+  static create<T extends SchemaCtor>(this: T, value: TypeOf<T>) {
+    return value
+  }
   abstract __type: unknown
 }
 
@@ -80,13 +80,21 @@ export const List = <T extends SchemaCtorInput>(Item: T) => {
   }
 }
 
-export type SchemaField<T extends object, key extends keyof T> = T[key] extends undefined
+export type SchemaField<T extends object, key extends keyof T> = key extends '__type'
   ? never
-  : T[key] extends SchemaCtor | undefined
+  : T[key] extends undefined
+  ? never
+  : T[key] extends SchemaCtorInput | FieldInfo | undefined
   ? key
   : never
 
-export type TypeOfField<T> = T extends SchemaCtor ? TypeOf<T> : T extends undefined ? undefined : never
+export type TypeOfField<T> = T extends FieldInfo
+  ? TypeOf<T['__type']>
+  : T extends SchemaCtorInput
+  ? TypeOfSchemaCtorInput<T>
+  : T extends undefined
+  ? undefined
+  : never
 
 export abstract class ObjectType extends Schema {
   __type!: {
@@ -321,6 +329,12 @@ export const field = <T extends FieldInfo>(fieldInfo: T): T => {
 }
 
 export type SchemaCtorInput = SchemaCtor | FieldDescriptors
+
+export type TypeOfSchemaCtorInput<T extends SchemaCtor | FieldDescriptors> = T extends SchemaCtor
+  ? TypeOf<T>
+  : T extends FieldDescriptors
+  ? TypeOfFieldDescriptors<T>
+  : never
 
 export type ToSchemaCtor<T extends SchemaCtorInput> = T extends SchemaCtor
   ? T

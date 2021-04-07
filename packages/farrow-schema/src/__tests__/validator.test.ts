@@ -1,6 +1,7 @@
 import * as Schema from '../schema'
 import { Prettier, ReadOnly, TypeOf, ReadOnlyDeep } from '../schema'
-import { createSchemaValidator, RegExp, ValidationResult, ValidatorType } from '../validator'
+import { createSchemaValidator, RegExp, ValidationResult, Validator, ValidatorType } from '../validator'
+import { pick, omit } from '../helper'
 
 const { Type, ObjectType, Struct, Int, Float, Literal, List, Union, Intersect, Nullable, Record, Json, Any } = Schema
 
@@ -845,5 +846,205 @@ describe('Validator', () => {
     expect(assertOk(validateReg1('abc'))).toBe('abc')
     expect(assertOk(validateReg1('ABC'))).toBe('ABC')
     expect(() => assertOk(validateReg1('cba'))).toThrow()
+  })
+
+  it('supports pick object schema', () => {
+    class Test extends ObjectType {
+      a = String
+      b = Number
+      c = Boolean
+    }
+
+    let Test1 = pick(Test, ['a'])
+    let Test2 = pick(Test, ['b', 'c'])
+
+    expect(
+      assertOk(
+        Validator.validate(Test, {
+          a: '123',
+          b: 123,
+          c: false,
+        }),
+      ),
+    ).toEqual({
+      a: '123',
+      b: 123,
+      c: false,
+    })
+
+    expect(
+      assertOk(
+        Validator.validate(Test1, {
+          a: '123',
+          b: 123,
+          c: false,
+        }),
+      ),
+    ).toEqual({
+      a: '123',
+    })
+
+    expect(
+      assertOk(
+        Validator.validate(Test2, {
+          a: '123',
+          b: 123,
+          c: false,
+        }),
+      ),
+    ).toEqual({
+      b: 123,
+      c: false,
+    })
+  })
+
+  it('supports omit object schema', () => {
+    class Test extends ObjectType {
+      a = String
+      b = Number
+      c = Boolean
+    }
+
+    let Test1 = omit(Test, ['b', 'c'])
+    let Test2 = omit(Test, ['a'])
+
+    expect(
+      assertOk(
+        Validator.validate(Test, {
+          a: '123',
+          b: 123,
+          c: false,
+        }),
+      ),
+    ).toEqual({
+      a: '123',
+      b: 123,
+      c: false,
+    })
+
+    expect(
+      assertOk(
+        Validator.validate(Test1, {
+          a: '123',
+          b: 123,
+          c: false,
+        }),
+      ),
+    ).toEqual({
+      a: '123',
+    })
+
+    expect(
+      assertOk(
+        Validator.validate(Test2, {
+          a: '123',
+          b: 123,
+          c: false,
+        }),
+      ),
+    ).toEqual({
+      b: 123,
+      c: false,
+    })
+  })
+
+  it('supports pick struct schema', () => {
+    let Test = Struct({
+      a: String,
+      b: Number,
+      c: Boolean,
+    })
+
+    let Test1 = pick(Test, ['a'])
+    let Test2 = pick(Test, ['b', 'c'])
+
+    expect(
+      assertOk(
+        Validator.validate(Test, {
+          a: '123',
+          b: 123,
+          c: false,
+        }),
+      ),
+    ).toEqual({
+      a: '123',
+      b: 123,
+      c: false,
+    })
+
+    expect(
+      assertOk(
+        Validator.validate(Test1, {
+          a: '123',
+          b: 123,
+          c: false,
+        }),
+      ),
+    ).toEqual({
+      a: '123',
+    })
+
+    expect(
+      assertOk(
+        Validator.validate(Test2, {
+          a: '123',
+          b: 123,
+          c: false,
+        }),
+      ),
+    ).toEqual({
+      b: 123,
+      c: false,
+    })
+  })
+
+  it('supports omit struct schema', () => {
+    let Test = Struct({
+      a: String,
+      b: Number,
+      c: Boolean,
+    })
+
+    let Test1 = omit(Test, ['b', 'c'])
+    let Test2 = omit(Test, ['a'])
+
+    expect(
+      assertOk(
+        Validator.validate(Test, {
+          a: '123',
+          b: 123,
+          c: false,
+        }),
+      ),
+    ).toEqual({
+      a: '123',
+      b: 123,
+      c: false,
+    })
+
+    expect(
+      assertOk(
+        Validator.validate(Test1, {
+          a: '123',
+          b: 123,
+          c: false,
+        }),
+      ),
+    ).toEqual({
+      a: '123',
+    })
+
+    expect(
+      assertOk(
+        Validator.validate(Test2, {
+          a: '123',
+          b: 123,
+          c: false,
+        }),
+      ),
+    ).toEqual({
+      b: 123,
+      c: false,
+    })
   })
 })

@@ -7,6 +7,7 @@ import {
   Struct,
   SchemaField,
   FieldDescriptor,
+  isFieldDescriptors,
 } from './schema'
 
 export const pickStruct = <T extends StructType, Keys extends (keyof T['descriptors'])[]>(
@@ -55,10 +56,12 @@ export const pickObject = <T extends ObjectType, Keys extends SchemaField<T, key
   let descriptors = {} as FieldDescriptors
 
   if (instance instanceof ObjectType) {
-    for (let key in instance) {
+    for (let key of Object.keys(instance)) {
       if (keys.includes(key as any)) {
         let value = instance[key]
         if (isFieldDescriptor(value)) {
+          descriptors[key] = value
+        } else if (isFieldDescriptors(value)) {
           descriptors[key] = value
         }
       }
@@ -80,10 +83,12 @@ export const omitObject = <T extends ObjectType, Keys extends SchemaField<T, key
   let descriptors = {} as FieldDescriptors
 
   if (instance instanceof ObjectType) {
-    for (let key in instance) {
+    for (let key of Object.keys(instance)) {
       if (!keys.includes(key as any)) {
         let value = instance[key]
         if (isFieldDescriptor(value)) {
+          descriptors[key] = value
+        } else if (isFieldDescriptors(value)) {
           descriptors[key] = value
         }
       }

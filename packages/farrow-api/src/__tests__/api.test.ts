@@ -11,7 +11,7 @@ describe('Api', () => {
         [Type]: Int,
       },
     }
-    let incre = Api(definition, (input) => {
+    let incre = Api(definition, (input: number): number => {
       return input + 1
     })
 

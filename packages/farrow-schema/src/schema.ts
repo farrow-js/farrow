@@ -6,8 +6,8 @@
  * - Perform some type-level programming to infer the type of Schema
  */
 
-import { MarkReadOnlyDeep } from '../types'
-import { isBooleanConstructor, isNumberConstructor, isStringConstructor } from '../utils'
+import { MarkReadOnlyDeep } from './types'
+import { isBooleanConstructor, isNumberConstructor, isStringConstructor } from './utils'
 
 export type Prettier<T> = T extends Promise<infer U>
   ? Promise<Prettier<U>>
@@ -377,4 +377,40 @@ export const toSchemaCtors = <T extends SchemaCtorInputs>(Inputs: T): ToSchemaCt
   }
 
   throw new Error(`Unknown inputs: ${Inputs}`)
+}
+
+export type InstanceTypeOf<T extends SchemaCtor> = T extends NumberConstructor
+  ? Number
+  : T extends StringConstructor
+  ? String
+  : T extends BooleanConstructor
+  ? Boolean
+  : T extends new () => infer R
+  ? R
+  : never
+
+const instanceWeakMap = new WeakMap<SchemaCtor, Schema>()
+
+export const getInstance = <T extends SchemaCtor>(Ctor: T): InstanceTypeOf<T> => {
+  if (isNumberConstructor(Ctor)) {
+    return getInstance(Number) as InstanceTypeOf<T>
+  }
+
+  if (isStringConstructor(Ctor)) {
+    return getInstance(String) as InstanceTypeOf<T>
+  }
+
+  if (isBooleanConstructor(Ctor)) {
+    return getInstance(Boolean) as InstanceTypeOf<T>
+  }
+
+  if (instanceWeakMap.has(Ctor)) {
+    return instanceWeakMap.get(Ctor)! as InstanceTypeOf<T>
+  }
+
+  let instance = new Ctor()
+
+  instanceWeakMap.set(Ctor, instance as Schema)
+
+  return instance as InstanceTypeOf<T>
 }

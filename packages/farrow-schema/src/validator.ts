@@ -1,6 +1,5 @@
 import * as S from './schema'
-import { SchemaCtor, TypeOf, Schema, SchemaTypeOf } from './schema'
-import { getInstance } from './schema/instance'
+import { SchemaCtor, TypeOf, Schema, SchemaTypeOf, getInstance } from './schema'
 
 import { Result, Err, Ok } from './result'
 

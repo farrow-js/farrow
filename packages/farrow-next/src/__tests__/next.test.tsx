@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
 import { act } from 'react-dom/test-utils'
-import { Controller, page } from '../index'
+import { Controller, page, createProvider } from '../index'
 
 const delay = (duration: number) => {
   return new Promise<void>((resolve) => {
@@ -41,6 +41,14 @@ class Counter extends Controller {
   }
 }
 
+type TextPageEnv = {
+  env: 'online' | 'offline'
+}
+
+const TextEnvProvider = createProvider<TextPageEnv>({
+  env: 'online',
+})
+
 type TextManagerState = {
   type: 'text-manager'
   text: string
@@ -61,6 +69,8 @@ class TextManager extends Controller {
     },
   }
 
+  env = this.use(TextEnvProvider).env
+
   async preload() {
     let data = (await this.postJson('/text')) as { text: string }
     this.actions.updateText(data.text)
@@ -69,6 +79,7 @@ class TextManager extends Controller {
 
 const TestView = () => {
   let text = TextManager.useState((state) => state.text)
+  let textManager = TextManager.use()
   let count = Counter.useState((state) => state.count)
   let counter = Counter.use()
 
@@ -78,6 +89,7 @@ const TestView = () => {
 
   return (
     <>
+      <div id="env">{textManager.env}</div>
       <div id="text">{text}</div>
       <div id="count">{count}</div>
       <button id="counter-incre" onClick={handleIncre}>
@@ -93,6 +105,11 @@ const TestPage = page({
     TextManager,
     Counter,
   },
+  Providers: [
+    TextEnvProvider.provide({
+      env: 'offline',
+    }),
+  ],
 })
 
 describe('farrow-next', () => {
@@ -168,14 +185,17 @@ describe('farrow-next', () => {
       ReactDOM.render(<TestPage {...initialProps!} />, container!)
     })
 
+    let envElem = document.getElementById('env')
     let textElem = document.getElementById('text')
     let countElem = document.getElementById('count')
     let increElem = document.getElementById('counter-incre')
 
+    expect(!!envElem).toBe(true)
     expect(!!textElem).toBe(true)
     expect(!!countElem).toBe(true)
     expect(!!increElem).toBe(true)
 
+    expect(envElem!.textContent).toBe('offline')
     expect(textElem!.textContent).toBe(text)
     expect(countElem!.textContent).toBe(`${count}`)
 

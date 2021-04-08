@@ -32,6 +32,7 @@ yarn add farrow-next
 - [React Hooks API](#react-hooks-api)
 - [Controller API](#controller-api)
 - [Controller Life-Cycle](#controller-life-cycle)
+- [Page Api](#page-api)
 - [Dependency Injection](#dependency-injection)
 
 ## Basic Usage
@@ -70,7 +71,7 @@ export type CounterState = {
  */
 export class Counter extends Controller {
   /**
-   * Declare the initialization state
+   * add the initial state
    */
   initialState: CounterState = {
     count: 0,
@@ -490,6 +491,20 @@ class Test extends Controller {
     this.actions.updateJson(json)
   }
 }
+```
+
+### Page Api
+
+```typescript
+import { page } from 'farrow-next'
+
+export default page({
+  View, // React Component for Page
+  Controllers: {...}, // Controllers for Page
+  Providers: [...], // Optional Providers for Controllers above
+  async preload(ctrls) {}, // preload life-cycle method triggered after all controller.preload() finished
+})
+
 ```
 
 ### Dependency Injection

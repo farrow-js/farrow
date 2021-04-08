@@ -3,7 +3,7 @@ import { NextPage, NextPageContext } from 'next'
 import { stringify as stringifyQuery, ParsedQs } from 'qs'
 import { Controller, Provider, ControllerCtors, ControllerInstancesType, getUserAgent } from './controller'
 import { replaceState } from './store'
-import { ModuleContext } from './module'
+import { ModuleContext, ModuleProviderValue } from './module'
 import { PageInfo, GetPageInfo } from './page-info'
 
 export type ConstrollerStates<T extends ControllerCtors> = InstanceType<T[keyof T]>['state']
@@ -11,6 +11,7 @@ export type ConstrollerStates<T extends ControllerCtors> = InstanceType<T[keyof 
 export type PageOptions<T extends ControllerCtors> = {
   View: ComponentType<{}>
   Controllers: T
+  Providers?: ModuleProviderValue[]
   preload?: (ctrls: ControllerInstancesType<T>) => void | Promise<void>
 }
 
@@ -85,7 +86,7 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
         }
         return pageInfoRef.current.pageInfo
       })
-      let moduleContext = new ModuleContext().injectProviderValues([getPageInfo])
+      let moduleContext = new ModuleContext().injectProviderValues([getPageInfo, ...(options.Providers ?? [])])
 
       let ctrls = Object.values(Controllers).map((Controller, index) => {
         let ctrl = moduleContext.new(Controller)
@@ -157,7 +158,7 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
     }
 
     let getPageInfo = GetPageInfo.provide(() => pageInfo)
-    let moduleCtx = new ModuleContext().injectProviderValues([getPageInfo])
+    let moduleCtx = new ModuleContext().injectProviderValues([getPageInfo, ...(options.Providers ?? [])])
 
     let ctrlsMap = {} as ControllerInstancesType<T>
 

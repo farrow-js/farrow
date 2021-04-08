@@ -32,20 +32,24 @@ import {
   Any, // Any type
   Strict, // Strict type constructor
   NonStrict, // NonStrict type constructor
+  Tuple, // Tuple type constrcutor
+  pick, // pick object/struct keys to create a new object/struct type
+  omit, // omit object/struct keys to create a new object/struct type
+  keyof, // get the keys of object/struct
 } from 'farrow-schema'
 
-// create transformer for transforming schema to another type or structure
+// create transformer for transforming schema to another type
 import { createTransformer } from 'farrow-schema/transformer'
 
-// create schema validator by Schema
-import { createSchemaValidator } from 'farrow-schema/validator'
+// schema validator
+import { Validator } from 'farrow-schema/validator'
 ```
 
 ## Usage
 
 ```typescript
 import * as Schema from 'farrow-schema'
-import { createSchemaValidator } from 'farrow-schema/validator'
+import { Validator } from 'farrow-schema/validator'
 
 const { ObjectType, List, ID, Float, Nullable, Struct, Union, Intersect, Literal, Json, Any, Record } = Schema
 
@@ -122,11 +126,7 @@ type T1 = Schema.TypeOf<User>
 
 type T2 = Schema.TypeOf<Product>
 
-
-
-const validator = createSchemaValidator(Product)
-
-const result0 = validator({
+const result0 = Validator.validate(Product, {
   id : 'product id'
   title : 'product title'
   description : 'product description'

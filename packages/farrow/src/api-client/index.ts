@@ -6,6 +6,7 @@ import { FormatResult } from 'farrow-api/dist/toJSON'
 import { codegen, CodegenOptions } from 'farrow-api/dist/codegen'
 import { format } from 'farrow-api/dist/prettier'
 import type { IntrospectionCalling } from 'farrow-api-server'
+import { replaceUrl } from './replaceUrl'
 
 const writeFile = async (filename: string, content: string) => {
   try {
@@ -142,10 +143,15 @@ export const createApiClient = (options: ApiClientOptions) => {
     }
   }
 
+  let build = async () => {
+    await replaceUrl(options)
+  }
+
   return {
     sync,
     start,
     stop,
+    build,
   }
 }
 
@@ -169,9 +175,15 @@ export const createApiClients = (options: CreateApiClientsOptions) => {
     clients.map((syncer) => syncer.stop())
   }
 
+  let build = async () => {
+    let promises = clients.map((client) => client.build())
+    await Promise.all(promises)
+  }
+
   return {
     sync,
     start,
     stop,
+    build,
   }
 }

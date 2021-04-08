@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.9.2(2021/04/08)
+
+- fix(create-farrow-app): farrow build first to ensure the right api.src was replaced before client build)
+
 ## 1.9.1(2021/04/08)
 
 - fix: the `apiClient.build` of `farrow` replace the wrong content([#66](https://github.com/Lucifier129/farrow/pull/66))

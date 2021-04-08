@@ -1,6 +1,6 @@
 {
   "name": "farrow-next-react-template",
-  "version": "1.9.1",
+  "version": "1.9.2",
   "private": true,
   "scripts": {
     "dev": "farrow dev",

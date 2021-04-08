@@ -8,7 +8,13 @@ import {
   SchemaField,
   FieldDescriptor,
   isFieldDescriptors,
+  FieldInfo,
+  TypeOf,
 } from './schema'
+
+export const field = <T extends FieldInfo>(fieldInfo: T): T => {
+  return fieldInfo
+}
 
 export const pickStruct = <T extends StructType, Keys extends (keyof T['descriptors'])[]>(
   Ctor: new () => T,
@@ -125,3 +131,36 @@ export const omit = ((Ctor: any, keys: any) => {
 
   throw new Error(`Unknown Schema Constructor: ${Ctor}`)
 }) as PickSchema
+
+export const keyofStruct = <T extends StructType>(Ctor: new () => T): (keyof T['descriptors'])[] => {
+  return Object.keys(getInstance(Ctor).descriptors)
+}
+
+export const keyofObject = <T extends ObjectType>(Ctor: new () => T): (keyof TypeOf<T>)[] => {
+  let instance = getInstance(Ctor)
+  let keys = [] as (keyof TypeOf<T>)[]
+
+  for (let key of Object.keys(instance)) {
+    let value = instance[key]
+    if (isFieldDescriptor(value)) {
+      keys.push(key as keyof TypeOf<T>)
+    } else if (isFieldDescriptors(value)) {
+      keys.push(key as keyof TypeOf<T>)
+    }
+  }
+  return keys
+}
+
+export type KeyOfSchema = typeof keyofStruct & typeof keyofObject
+
+export const keyof = ((Ctor: any, keys: any) => {
+  if (Ctor?.prototype instanceof ObjectType) {
+    return keyofObject(Ctor)
+  }
+
+  if (Ctor?.prototype instanceof StructType) {
+    return keyofStruct(Ctor)
+  }
+
+  throw new Error(`Unknown Schema Constructor: ${Ctor}`)
+}) as KeyOfSchema

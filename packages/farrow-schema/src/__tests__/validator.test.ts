@@ -1,9 +1,24 @@
 import * as Schema from '../schema'
-import { Prettier, ReadOnly, TypeOf, ReadOnlyDeep } from '../schema'
+import { ReadOnly, TypeOf, ReadOnlyDeep } from '../schema'
 import { createSchemaValidator, RegExp, ValidationResult, Validator, ValidatorType } from '../validator'
-import { pick, omit } from '../helper'
+import { pick, omit, keyof } from '../helper'
 
-const { Type, ObjectType, Struct, Int, Float, Literal, List, Union, Intersect, Nullable, Record, Json, Any } = Schema
+const {
+  Type,
+  ObjectType,
+  Struct,
+  Int,
+  Float,
+  Literal,
+  List,
+  Union,
+  Intersect,
+  Nullable,
+  Record,
+  Json,
+  Any,
+  Tuple,
+} = Schema
 
 let assertOk = <T>(result: ValidationResult<T>): T => {
   if (result.isOk) return result.value
@@ -728,11 +743,11 @@ describe('Validator', () => {
     let ReadOnlyStruct = ReadOnly(Struct0)
     let ReadOnlyDeepStruct = ReadOnlyDeep(Struct0)
 
-    type T0 = Prettier<TypeOf<typeof Struct0>>
+    type T0 = TypeOf<typeof Struct0>
 
-    // type T1 = Prettier<TypeOf<typeof ReadOnlyStruct>>
+    // type T1 = TypeOf<typeof ReadOnlyStruct>
 
-    // type T2 = Prettier<TypeOf<typeof ReadOnlyDeepStruct>>
+    // type T2 = TypeOf<typeof ReadOnlyDeepStruct>
 
     let data: T0 = {
       a: 1,
@@ -771,6 +786,18 @@ describe('Validator', () => {
         d: false,
       },
     })
+  })
+
+  it('supports validate tuple', () => {
+    let Test = Tuple({ a: Literal('a') }, { b: Literal('b') })
+
+    type Test = TypeOf<typeof Test>
+
+    let test: Test = [{ a: 'a' }, { b: 'b' }]
+
+    expect(assertOk(Validator.validate(Test, test))).toEqual([{ a: 'a' }, { b: 'b' }])
+
+    expect(() => assertOk(Validator.validate(Test, []))).toThrow()
   })
 
   it('supports built-in validate schema', () => {
@@ -1046,5 +1073,28 @@ describe('Validator', () => {
       b: 123,
       c: false,
     })
+  })
+
+  it('support keyof object/struct', () => {
+    class TestObject extends ObjectType {
+      a = Int
+      b = Int
+      c = Int
+    }
+
+    let TestStruct = Struct({
+      d: Int,
+      e: Int,
+      f: Int,
+    })
+
+    let testObjectKeys = keyof(TestObject)
+    let testStructKeys = keyof(TestStruct)
+
+    let keys0: typeof testObjectKeys = ['a', 'b', 'c']
+    let keys1: typeof testStructKeys = ['d', 'e', 'f']
+
+    expect(testObjectKeys).toEqual(keys0)
+    expect(testStructKeys).toEqual(keys1)
   })
 })

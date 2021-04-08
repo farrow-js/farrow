@@ -430,6 +430,29 @@ Validator.impl<S.ReadOnlyDeepType>(S.ReadOnlyDeepType, (schema) => {
 })
 
 
+Validator.impl<S.TupleType>(S.TupleType, schema => {
+  return {
+    validate: (input, options): ValidationResult<any> => {
+      if (!Array.isArray(input)) {
+        return SchemaErr(`${input} is not an array`)
+      }
+
+      let tuple = [] as unknown[]
+
+      for (let i = 0; i < schema.Items.length; i++) {
+        let Item = schema.Items[i]
+        let result = Validator.validate(Item, input[i], options)
+        if (result.isErr) {
+          return SchemaErr(result.value.message, [...(result.value.path ?? []), i])
+        }
+        tuple.push(result.value)
+      }
+
+      return Ok(tuple)
+    }
+  }
+})
+
 
 export const createSchemaValidator = <S extends S.SchemaCtor>(SchemaCtor: S, options?: ValidatorOptions) => {
   return (input: unknown) => {

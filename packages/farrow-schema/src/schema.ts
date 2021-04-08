@@ -324,10 +324,6 @@ export const isFieldDescriptors = (input: any): input is FieldDescriptors => {
   return !!(input && typeof input === 'object')
 }
 
-export const field = <T extends FieldInfo>(fieldInfo: T): T => {
-  return fieldInfo
-}
-
 export type SchemaCtorInput = SchemaCtor | FieldDescriptors
 
 export type TypeOfSchemaCtorInput<T extends SchemaCtor | FieldDescriptors> = T extends SchemaCtor
@@ -413,4 +409,21 @@ export const getInstance = <T extends SchemaCtor>(Ctor: T): InstanceTypeOf<T> =>
   instanceWeakMap.set(Ctor, instance as Schema)
 
   return instance as InstanceTypeOf<T>
+}
+
+export type TypeOfTuple<T> = T extends []
+  ? []
+  : T extends [SchemaCtor, ...infer Rest]
+  ? [TypeOf<T[0]>, ...TypeOfTuple<Rest>]
+  : []
+
+export abstract class TupleType extends Schema {
+  __type!: TypeOfTuple<this['Items']>
+  abstract Items: SchemaCtor[]
+}
+
+export const Tuple = <T extends SchemaCtorInput[]>(...Items: T) => {
+  return class Tuple extends TupleType {
+    Items = toSchemaCtors(Items)
+  }
 }

@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "farrow dev",
-    "build": "tsc && next build && farrow build",
+    "build": "tsc && farrow build && next build",
     "start": "farrow start"
   },
   "dependencies": {

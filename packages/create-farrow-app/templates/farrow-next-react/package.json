@@ -1,6 +1,6 @@
 {
   "name": "farrow-next-react-template",
-  "version": "1.9.2",
+  "version": "1.9.3",
   "private": true,
   "scripts": {
     "dev": "farrow dev",
@@ -8,15 +8,15 @@
     "start": "farrow start"
   },
   "dependencies": {
-    "farrow": "^1.9.1",
-    "farrow-api": "^1.9.1",
-    "farrow-api-client": "^1.9.1",
-    "farrow-api-server": "^1.9.1",
-    "farrow-http": "^1.9.1",
+    "farrow": "^1.9.3",
+    "farrow-api": "^1.9.3",
+    "farrow-api-client": "^1.9.3",
+    "farrow-api-server": "^1.9.3",
+    "farrow-http": "^1.9.3",
     "farrow-next": "^1.9.0",
-    "farrow-next-server": "^1.9.1",
+    "farrow-next-server": "^1.9.3",
     "farrow-pipeline": "^1.8.0",
-    "farrow-schema": "^1.9.1",
+    "farrow-schema": "^1.9.3",
     "next": "^10.0.7",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"

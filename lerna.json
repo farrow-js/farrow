@@ -1,4 +1,4 @@
 {
   "packages": ["packages/*", "examples/*", "packages/create-farrow-app/templates/*"],
-  "version": "1.9.2"
+  "version": "1.9.3"
 }

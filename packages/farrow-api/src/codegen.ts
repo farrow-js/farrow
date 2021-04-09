@@ -59,8 +59,8 @@ export const InlineTypes = [
 ]
 
 export const isInlineType = (input: FormatType) => {
-  if (input.type === 'Struct' && input.name) {
-    return false
+  if (input.type === 'Struct' || input.type === 'Union' || input.type === 'Intersect') {
+    return !input.name
   }
   return InlineTypes.includes(input.type ?? '')
 }
@@ -69,8 +69,10 @@ const getTypeName = (input: FormatType): string | null => {
   if (input.type === 'Object' && input.name) {
     return input.name
   }
-  if (input.type === 'Struct' && input.name) {
-    return input.name
+  if (input.type === 'Struct' || input.type === 'Union' || input.type === 'Intersect') {
+    if (input.name) {
+      return input.name
+    }
   }
   return null
 }
@@ -236,7 +238,9 @@ export const codegen = (formatResult: FormatResult, options?: CodegenOptions): s
       let fields = getFieldsType(formatType.fields, formatResult.types)
 
       if (!typeName) {
-        throw new Error(`Empty name of Object/Struct: {${Object.keys(formatType.fields)}}`)
+        throw new Error(
+          `Empty name of Object/Struct: \ntypename: ${typeName}\nfields: {${Object.keys(formatType.fields)}}`,
+        )
       }
 
       if (exportSet.has(typeName)) {
@@ -252,6 +256,32 @@ export const codegen = (formatResult: FormatResult, options?: CodegenOptions): s
       export type ${typeName} = {
         ${fields.join(',  \n')}
       }
+      `
+    }
+
+    if (formatType.type === 'Union') {
+      let typeName = formatType.name!
+      let expression = formatType.itemTypes
+        .map((itemType) => getFieldType(itemType.typeId, formatResult.types))
+        .join(' | ')
+      return `
+      /**
+       * {@label ${typeName}} 
+       */
+      export type ${typeName} = ${expression}
+      `
+    }
+
+    if (formatType.type === 'Intersect') {
+      let typeName = formatType.name!
+      let expression = formatType.itemTypes
+        .map((itemType) => getFieldType(itemType.typeId, formatResult.types))
+        .join(' & ')
+      return `
+      /**
+       * {@label ${typeName}} 
+       */
+      export type ${typeName} = ${expression}
       `
     }
 

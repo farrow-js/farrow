@@ -27,8 +27,28 @@ const NamedStruct = Struct({
 
 NamedStruct.displayName = 'NamedStruct'
 
+const NamedUnion = Union(Int, String, Float)
+
+NamedUnion.displayName = 'NamedUnion'
+
+const NamedIntersect = Intersect(
+  {
+    a: Int,
+  },
+  {
+    b: Float,
+  },
+  {
+    c: Number,
+  },
+)
+
+NamedIntersect.displayName = 'NamedIntersect'
+
 class Collection extends ObjectType {
   namedStruct = NamedStruct
+  namedUnion = NamedUnion
+  namedIntersect = NamedIntersect
   number = Number
   int = Int
   float = Float

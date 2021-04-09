@@ -86,11 +86,13 @@ export type FormatNullableType = {
 
 export type FormatUnionType = {
   type: 'Union'
+  name?: string
   itemTypes: { typeId: number; $ref: string }[]
 }
 
 export type FormatIntersectType = {
   type: 'Intersect'
+  name?: string
   itemTypes: { typeId: number; $ref: string }[]
 }
 
@@ -496,10 +498,11 @@ const UnionFormaterRule: FormaterRule<Schema.UnionType> = {
   },
   transform: (schema, context) => {
     let itemsFormaters = (schema.Items as Schema.SchemaCtor[]).map((Item) => createFormater(Item, context))
-
+    let Constructor = schema.constructor as typeof Schema.Schema
     return () => {
       return context.addType({
         type: 'Union',
+        name: Constructor.displayName,
         itemTypes: itemsFormaters.map((format) => {
           let typeId = format()
           return {
@@ -518,10 +521,11 @@ const IntersectFormaterRule: FormaterRule<Schema.IntersectType> = {
   },
   transform: (schema, context) => {
     let itemsFormaters = schema.Items.map((Item) => createFormater(Item, context))
-
+    let Constructor = schema.constructor as typeof Schema.Schema
     return () => {
       return context.addType({
         type: 'Intersect',
+        name: Constructor.displayName,
         itemTypes: itemsFormaters.map((format) => {
           let typeId = format()
           return {

@@ -3,9 +3,7 @@
  * Don't modify it manually
  */
 
-import { apiPipeline } from 'farrow-api-client'
-
-import type { JsonType } from 'farrow-api-client'
+import { createApiPipelineWithUrl, ApiInvokeOptions } from 'farrow-api-client'
 
 /**
  * {@label AddPetInput}
@@ -430,25 +428,29 @@ export type CreateUserOutput = {
 
 export const url = 'http://localhost:3002/service/pet-store'
 
+export const apiPipeline = createApiPipelineWithUrl(url)
+
 export const api = {
   pet: {
     /**
      * @remarks Add a new pet to the store
      */
-    addPet: (input: AddPetInput) =>
-      apiPipeline.invoke(url, { path: ['pet', 'addPet'], input }) as Promise<InvalidInput | AddPetOutput>,
+    addPet: (input: AddPetInput, options?: ApiInvokeOptions) =>
+      apiPipeline.invoke({ type: 'Single', path: ['pet', 'addPet'], input }, options) as Promise<
+        InvalidInput | AddPetOutput
+      >,
     /**
      * @remarks Update an existing pet
      */
-    updatePet: (input: UpdatePetInput) =>
-      apiPipeline.invoke(url, { path: ['pet', 'updatePet'], input }) as Promise<
+    updatePet: (input: UpdatePetInput, options?: ApiInvokeOptions) =>
+      apiPipeline.invoke({ type: 'Single', path: ['pet', 'updatePet'], input }, options) as Promise<
         InvalidIDSupplied | PetNotFound | ValidationException | UpdatePetOutput
       >,
     /**
      * @remarks Deletes a pet
      */
-    deletePet: (input: DeletePetInput) =>
-      apiPipeline.invoke(url, { path: ['pet', 'deletePet'], input }) as Promise<
+    deletePet: (input: DeletePetInput, options?: ApiInvokeOptions) =>
+      apiPipeline.invoke({ type: 'Single', path: ['pet', 'deletePet'], input }, options) as Promise<
         InvalidIDSupplied | PetNotFound | DeletePetOutput
       >,
     /**
@@ -456,8 +458,8 @@ export const api = {
      *
      * Multiple status values can be provided with comma separated strings
      */
-    findPetByStatus: (input: FindPetByStatusInput) =>
-      apiPipeline.invoke(url, { path: ['pet', 'findPetByStatus'], input }) as Promise<
+    findPetByStatus: (input: FindPetByStatusInput, options?: ApiInvokeOptions) =>
+      apiPipeline.invoke({ type: 'Single', path: ['pet', 'findPetByStatus'], input }, options) as Promise<
         InvalidPetStatus | FindPetByStatusOutput
       >,
     /**
@@ -465,8 +467,8 @@ export const api = {
      *
      * Multiple tags can be provided with comma separated strings. Use tag1, tag2, tag3 for testing.
      */
-    findPetsByTags: (input: FindPetByStatusInput) =>
-      apiPipeline.invoke(url, { path: ['pet', 'findPetsByTags'], input }) as Promise<
+    findPetsByTags: (input: FindPetByStatusInput, options?: ApiInvokeOptions) =>
+      apiPipeline.invoke({ type: 'Single', path: ['pet', 'findPetsByTags'], input }, options) as Promise<
         InvalidPetTagValue | FindPetByStatusOutput
       >,
     /**
@@ -474,8 +476,8 @@ export const api = {
      *
      * Returns a single pet
      */
-    getPetById: (input: GetPetByIdInput) =>
-      apiPipeline.invoke(url, { path: ['pet', 'getPetById'], input }) as Promise<
+    getPetById: (input: GetPetByIdInput, options?: ApiInvokeOptions) =>
+      apiPipeline.invoke({ type: 'Single', path: ['pet', 'getPetById'], input }, options) as Promise<
         InvalidIDSupplied | PetNotFound | GetPetByIdOutput
       >,
   },
@@ -483,15 +485,17 @@ export const api = {
     /**
      * @remarks Place an order for a pet
      */
-    placeOrder: (input: PlaceOrderInput) =>
-      apiPipeline.invoke(url, { path: ['store', 'placeOrder'], input }) as Promise<InvalidOrder | PlaceOrderOutput>,
+    placeOrder: (input: PlaceOrderInput, options?: ApiInvokeOptions) =>
+      apiPipeline.invoke({ type: 'Single', path: ['store', 'placeOrder'], input }, options) as Promise<
+        InvalidOrder | PlaceOrderOutput
+      >,
     /**
      * @remarks Find purchase order by ID
      *
      * For valid response try integer IDs with value >= 1 and <= 10. Other values will generated exceptions
      */
-    getOrderById: (input: GetOrderByIdInput) =>
-      apiPipeline.invoke(url, { path: ['store', 'getOrderById'], input }) as Promise<
+    getOrderById: (input: GetOrderByIdInput, options?: ApiInvokeOptions) =>
+      apiPipeline.invoke({ type: 'Single', path: ['store', 'getOrderById'], input }, options) as Promise<
         InvalidIDSupplied | OrderNotFound | GetOrderByIdOutput
       >,
     /**
@@ -499,8 +503,8 @@ export const api = {
      *
      * For valid response try integer IDs with positive integer value. Negative or non-integer values will generate API errors
      */
-    deleteOrder: (input: DeleteOrderInput) =>
-      apiPipeline.invoke(url, { path: ['store', 'deleteOrder'], input }) as Promise<
+    deleteOrder: (input: DeleteOrderInput, options?: ApiInvokeOptions) =>
+      apiPipeline.invoke({ type: 'Single', path: ['store', 'deleteOrder'], input }, options) as Promise<
         InvalidIDSupplied | OrderNotFound | DeleteOrderOutput
       >,
     /**
@@ -508,20 +512,26 @@ export const api = {
      *
      * Returns a map of status codes to quantities
      */
-    getInventory: (input: {}) =>
-      apiPipeline.invoke(url, { path: ['store', 'getInventory'], input }) as Promise<GetInventoryOutput>,
+    getInventory: (input: {}, options?: ApiInvokeOptions) =>
+      apiPipeline.invoke(
+        { type: 'Single', path: ['store', 'getInventory'], input },
+        options,
+      ) as Promise<GetInventoryOutput>,
   },
   user: {
     /**
      * @remarks Creates list of users with given input array
      */
-    createUsersWithArray: (input: CreateUsersWithArrayInput) =>
-      apiPipeline.invoke(url, { path: ['user', 'createUsersWithArray'], input }) as Promise<CreateUsersWithArrayOutput>,
+    createUsersWithArray: (input: CreateUsersWithArrayInput, options?: ApiInvokeOptions) =>
+      apiPipeline.invoke(
+        { type: 'Single', path: ['user', 'createUsersWithArray'], input },
+        options,
+      ) as Promise<CreateUsersWithArrayOutput>,
     /**
      * @remarks Get user by user name
      */
-    getUserByName: (input: GetUserByNameInput) =>
-      apiPipeline.invoke(url, { path: ['user', 'getUserByName'], input }) as Promise<
+    getUserByName: (input: GetUserByNameInput, options?: ApiInvokeOptions) =>
+      apiPipeline.invoke({ type: 'Single', path: ['user', 'getUserByName'], input }, options) as Promise<
         InvalidUserSupplied | UserNotFound | GetUserByNameOutput
       >,
     /**
@@ -529,8 +539,8 @@ export const api = {
      *
      * This can only be done by the logged in user.
      */
-    updateUser: (input: UpdateUserInput) =>
-      apiPipeline.invoke(url, { path: ['user', 'updateUser'], input }) as Promise<
+    updateUser: (input: UpdateUserInput, options?: ApiInvokeOptions) =>
+      apiPipeline.invoke({ type: 'Single', path: ['user', 'updateUser'], input }, options) as Promise<
         InvalidUserSupplied | UserNotFound | UpdateUserOutput
       >,
     /**
@@ -538,20 +548,20 @@ export const api = {
      *
      * This can only be done by the logged in user.
      */
-    deleteUser: (input: DeleteUserInput) =>
-      apiPipeline.invoke(url, { path: ['user', 'deleteUser'], input }) as Promise<DeleteUserOutput>,
+    deleteUser: (input: DeleteUserInput, options?: ApiInvokeOptions) =>
+      apiPipeline.invoke({ type: 'Single', path: ['user', 'deleteUser'], input }, options) as Promise<DeleteUserOutput>,
     /**
      * @remarks Logs user into the system
      */
-    loginUser: (input: LoginUserInput) =>
-      apiPipeline.invoke(url, { path: ['user', 'loginUser'], input }) as Promise<
+    loginUser: (input: LoginUserInput, options?: ApiInvokeOptions) =>
+      apiPipeline.invoke({ type: 'Single', path: ['user', 'loginUser'], input }, options) as Promise<
         InvalidUsernameSupplied | InvalidPasswordSupplied | LoginUserOutput
       >,
     /**
      * @remarks Logs out current logged in user session
      */
-    logoutUser: (input: {}) =>
-      apiPipeline.invoke(url, { path: ['user', 'logoutUser'], input }) as Promise<{
+    logoutUser: (input: {}, options?: ApiInvokeOptions) =>
+      apiPipeline.invoke({ type: 'Single', path: ['user', 'logoutUser'], input }, options) as Promise<{
         username: string
       }>,
     /**
@@ -561,7 +571,7 @@ export const api = {
      * @param input - user input
      * @returns user output
      */
-    createUser: (input: CreateUserInput) =>
-      apiPipeline.invoke(url, { path: ['user', 'createUser'], input }) as Promise<CreateUserOutput>,
+    createUser: (input: CreateUserInput, options?: ApiInvokeOptions) =>
+      apiPipeline.invoke({ type: 'Single', path: ['user', 'createUser'], input }, options) as Promise<CreateUserOutput>,
   },
 }

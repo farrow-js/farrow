@@ -3,9 +3,7 @@
  * Don't modify it manually
  */
 
-import { apiPipeline } from 'farrow-api-client'
-
-import type { JsonType } from 'farrow-api-client'
+import { createApiPipelineWithUrl, ApiInvokeOptions } from 'farrow-api-client'
 
 /**
  * {@label AddTodoInput}
@@ -67,14 +65,17 @@ export type RemoveTodoOuput = {
 
 export const url = 'http://localhost:3002/service/todo'
 
+export const apiPipeline = createApiPipelineWithUrl(url)
+
 export const api = {
   /**
    * @remarks add todo
    */
-  addTodo: (input: AddTodoInput) => apiPipeline.invoke(url, { path: ['addTodo'], input }) as Promise<AddTodoOutput>,
+  addTodo: (input: AddTodoInput, options?: ApiInvokeOptions) =>
+    apiPipeline.invoke({ type: 'Single', path: ['addTodo'], input }, options) as Promise<AddTodoOutput>,
   /**
    * @remarks remove todo
    */
-  removeTodo: (input: RemoveTodoInput) =>
-    apiPipeline.invoke(url, { path: ['removeTodo'], input }) as Promise<RemoveTodoOuput>,
+  removeTodo: (input: RemoveTodoInput, options?: ApiInvokeOptions) =>
+    apiPipeline.invoke({ type: 'Single', path: ['removeTodo'], input }, options) as Promise<RemoveTodoOuput>,
 }

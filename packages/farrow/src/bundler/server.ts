@@ -4,6 +4,7 @@ import { Plugin, startService, BuildOptions } from 'esbuild'
 import slash from 'slash'
 import fs from 'fs/promises'
 import readPkgUp from 'read-pkg-up'
+import { nodeExternalsPlugin } from 'esbuild-node-externals'
 
 import { watchFiles } from '../util/watchFiles'
 import { join } from '../util/join'
@@ -48,12 +49,18 @@ export const createBundler = (options: BundlerOptions) => {
           safeGetKeys(pkgResult?.packageJson?.devDependencies),
           safeGetKeys(pkgResult?.packageJson?.dependencies),
           safeGetKeys(pkgResult?.packageJson?.peerDependencies),
+          safeGetKeys(pkgResult?.packageJson?.optionalDependencies),
         )
       : config.build.external
+
+    let plugins = config.autoAddExternal
+      ? [...(config.build.plugins ?? []), nodeExternalsPlugin()]
+      : config.build.plugins ?? []
 
     let result = await service.build({
       ...config.build,
       external,
+      plugins,
       incremental: true,
     })
     return result.rebuild

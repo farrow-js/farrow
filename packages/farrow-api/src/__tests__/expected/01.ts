@@ -12,6 +12,7 @@ import type { JsonType } from 'farrow-api-client'
  * {@label Collection}
  */
 export type Collection = {
+  namedStruct: NamedStruct
   number: number
   int: number
   float: number
@@ -41,6 +42,13 @@ export type Collection = {
    * @deprecated test deprecated
    */
   describable: number
+}
+
+/**
+ * {@label NamedStruct}
+ */
+export type NamedStruct = {
+  named: string
 }
 
 export const url = ''

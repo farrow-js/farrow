@@ -58,12 +58,18 @@ export const InlineTypes = [
   'Struct',
 ]
 
-export const isInlineType = (input: FormatType): input is FormatInlineTypes => {
-  return InlineTypes.includes(input?.type ?? '')
+export const isInlineType = (input: FormatType) => {
+  if (input.type === 'Struct' && input.name) {
+    return false
+  }
+  return InlineTypes.includes(input.type ?? '')
 }
 
 const getTypeName = (input: FormatType): string | null => {
   if (input.type === 'Object' && input.name) {
+    return input.name
+  }
+  if (input.type === 'Struct' && input.name) {
     return input.name
   }
   return null
@@ -225,12 +231,16 @@ export const codegen = (formatResult: FormatResult, options?: CodegenOptions): s
       return ''
     }
 
-    if (formatType.type === 'Object') {
-      let typeName = formatType.name
+    if (formatType.type === 'Object' || formatType.type === 'Struct') {
+      let typeName = formatType.name!
       let fields = getFieldsType(formatType.fields, formatResult.types)
 
+      if (!typeName) {
+        throw new Error(`Empty name of Object/Struct: {${Object.keys(formatType.fields)}}`)
+      }
+
       if (exportSet.has(typeName)) {
-        throw new Error(`Duplicate Object type name: ${typeName}`)
+        throw new Error(`Duplicate Object/Struct type name: ${typeName}`)
       }
 
       exportSet.add(typeName)

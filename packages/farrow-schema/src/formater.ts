@@ -21,6 +21,7 @@ export type FormatObjectType = {
 
 export type FormatStructType = {
   type: 'Struct'
+  name?: string
   fields: FormatFields
 }
 
@@ -421,8 +422,19 @@ const ObjectFormaterRule: FormaterRule<Schema.ObjectType | Schema.StructType> = 
     }
     let isStruct = schema.constructor.name === 'Struct'
 
+    let Constructor = schema.constructor as typeof Schema.Schema
+
     return () => {
       if (isStruct) {
+        if (Constructor.displayName) {
+          return context.addType({
+            type: 'Struct',
+            name: Constructor.displayName ?? '',
+            get fields() {
+              return getFields()
+            },
+          })
+        }
         return context.addType({
           type: 'Struct',
           get fields() {
@@ -433,7 +445,7 @@ const ObjectFormaterRule: FormaterRule<Schema.ObjectType | Schema.StructType> = 
 
       return context.addType({
         type: 'Object',
-        name: schema.constructor.name,
+        name: Constructor.displayName ?? Constructor.name,
         get fields() {
           return getFields()
         },

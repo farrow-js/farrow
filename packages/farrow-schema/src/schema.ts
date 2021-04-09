@@ -29,6 +29,7 @@ export abstract class Schema {
   static create<T extends SchemaCtor>(this: T, value: TypeOf<T>) {
     return value
   }
+  static displayName?: string
   abstract __type: unknown
 }
 

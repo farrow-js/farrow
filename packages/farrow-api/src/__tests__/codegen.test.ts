@@ -21,7 +21,14 @@ import {
   Unknown,
 } from 'farrow-schema'
 
+const NamedStruct = Struct({
+  named: String,
+})
+
+NamedStruct.displayName = 'NamedStruct'
+
 class Collection extends ObjectType {
+  namedStruct = NamedStruct
   number = Number
   int = Int
   float = Float

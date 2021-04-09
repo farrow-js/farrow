@@ -177,15 +177,13 @@ export type TypeOfFieldDescriptor<T extends FieldDescriptor> = T extends SchemaC
   ? TypeOf<T['__type']>
   : never
 
-export type TypeOfFieldDescriptors<T extends FieldDescriptors> = ShallowPrettier<
-  {
-    [key in keyof T]: T[key] extends FieldDescriptor
-      ? TypeOfFieldDescriptor<T[key]>
-      : T[key] extends FieldDescriptors
-      ? TypeOfFieldDescriptors<T[key]>
-      : never
-  }
->
+export type TypeOfFieldDescriptors<T extends FieldDescriptors> = {
+  [key in keyof T]: T[key] extends FieldDescriptor
+    ? TypeOfFieldDescriptor<T[key]>
+    : T[key] extends FieldDescriptors
+    ? ShallowPrettier<TypeOfFieldDescriptors<T[key]>>
+    : never
+}
 
 export abstract class StructType extends Schema {
   __type!: TypeOfFieldDescriptors<this['descriptors']>

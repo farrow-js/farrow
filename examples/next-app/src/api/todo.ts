@@ -72,10 +72,10 @@ export const api = {
    * @remarks add todo
    */
   addTodo: (input: AddTodoInput, options?: ApiInvokeOptions) =>
-    apiPipeline.invoke({ path: ['addTodo'], input }, options) as Promise<AddTodoOutput>,
+    apiPipeline.invoke({ type: 'Single', path: ['addTodo'], input }, options) as Promise<AddTodoOutput>,
   /**
    * @remarks remove todo
    */
   removeTodo: (input: RemoveTodoInput, options?: ApiInvokeOptions) =>
-    apiPipeline.invoke({ path: ['removeTodo'], input }, options) as Promise<RemoveTodoOuput>,
+    apiPipeline.invoke({ type: 'Single', path: ['removeTodo'], input }, options) as Promise<RemoveTodoOuput>,
 }

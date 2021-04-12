@@ -1,6 +1,7 @@
 import path from 'path'
 import execa, { ExecaChildProcess } from 'execa'
-import { Plugin, startService, BuildOptions } from 'esbuild'
+import { Plugin, BuildOptions } from 'esbuild'
+import * as esbuild from 'esbuild'
 import slash from 'slash'
 import fs from 'fs/promises'
 import readPkgUp from 'read-pkg-up'
@@ -34,12 +35,7 @@ export const createBundler = (options: BundlerOptions) => {
     ...options,
   }
 
-  let getService = memo(() => {
-    return startService()
-  })
-
   let getBuilder = memo(async () => {
-    let service = await getService()
     let pkgResult = await readPkgUp({
       cwd: config.build.entryPoints?.[0],
     })
@@ -57,7 +53,7 @@ export const createBundler = (options: BundlerOptions) => {
       ? [...(config.build.plugins ?? []), nodeExternalsPlugin()]
       : config.build.plugins ?? []
 
-    let result = await service.build({
+    let result = await esbuild.build({
       ...config.build,
       external,
       plugins,
@@ -76,10 +72,8 @@ export const createBundler = (options: BundlerOptions) => {
   let dispose = async () => {
     if (hasBuilt) {
       let builder = await getBuilder()
-      let service = await getService()
 
       builder.dispose()
-      service.stop()
     }
   }
 

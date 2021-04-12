@@ -1,6 +1,6 @@
 {
   "name": "farrow-example",
-  "version": "1.9.4",
+  "version": "1.9.5",
   "private": true,
   "description": "Functional style web framework for node.js",
   "scripts": {

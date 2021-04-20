@@ -24,7 +24,9 @@ describe('toJSON', () => {
       protocol: 'Farrow-API',
       types: {
         '0': {
-          type: 'Number',
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Number',
         },
       },
       entries: {

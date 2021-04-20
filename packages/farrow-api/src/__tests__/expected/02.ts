@@ -33,7 +33,7 @@ export type Collection = {
     c: number
   }
   any: any
-  unknown: any
+  unknown: unknown
   json: JsonType
   literal: 1 | '1' | false | null
   record: Record<string, Collection>

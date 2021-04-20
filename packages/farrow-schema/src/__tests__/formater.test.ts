@@ -18,6 +18,7 @@ import {
   NonStrict,
   ReadOnly,
   ReadOnlyDeep,
+  Tuple,
 } from '../schema'
 
 import { formatSchema } from '../formater'
@@ -30,7 +31,9 @@ describe('Formater', () => {
       typeId: 0,
       types: {
         '0': {
-          type: 'Number',
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Number',
         },
       },
     })
@@ -42,7 +45,9 @@ describe('Formater', () => {
       typeId: 0,
       types: {
         '0': {
-          type: 'Int',
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Int',
         },
       },
     })
@@ -54,7 +59,9 @@ describe('Formater', () => {
       typeId: 0,
       types: {
         '0': {
-          type: 'Float',
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Float',
         },
       },
     })
@@ -66,7 +73,9 @@ describe('Formater', () => {
       typeId: 0,
       types: {
         '0': {
-          type: 'String',
+          type: 'Scalar',
+          valueType: 'string',
+          valueName: 'String',
         },
       },
     })
@@ -78,7 +87,9 @@ describe('Formater', () => {
       typeId: 0,
       types: {
         '0': {
-          type: 'Boolean',
+          type: 'Scalar',
+          valueType: 'boolean',
+          valueName: 'Boolean',
         },
       },
     })
@@ -90,7 +101,9 @@ describe('Formater', () => {
       typeId: 0,
       types: {
         '0': {
-          type: 'ID',
+          type: 'Scalar',
+          valueType: 'string',
+          valueName: 'ID',
         },
       },
     })
@@ -149,7 +162,9 @@ describe('Formater', () => {
       typeId: 0,
       types: {
         '0': {
-          type: 'Json',
+          type: 'Scalar',
+          valueType: 'JsonType',
+          valueName: 'Json',
         },
       },
     })
@@ -161,7 +176,9 @@ describe('Formater', () => {
       typeId: 0,
       types: {
         '0': {
-          type: 'Any',
+          type: 'Scalar',
+          valueType: 'any',
+          valueName: 'Any',
         },
       },
     })
@@ -173,7 +190,9 @@ describe('Formater', () => {
       typeId: 0,
       types: {
         '0': {
-          type: 'Unknown',
+          type: 'Scalar',
+          valueType: 'unknown',
+          valueName: 'Unknown',
         },
       },
     })
@@ -186,7 +205,9 @@ describe('Formater', () => {
       typeId: 1,
       types: {
         '0': {
-          type: 'Int',
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Int',
         },
         '1': {
           type: 'Record',
@@ -204,12 +225,47 @@ describe('Formater', () => {
       typeId: 1,
       types: {
         '0': {
-          type: 'Int',
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Int',
         },
         '1': {
           type: 'Nullable',
           itemTypeId: 0,
           $ref: `#/types/0`,
+        },
+      },
+    })
+  })
+
+  it('support format Tuple', () => {
+    let result = formatSchema(Tuple(Int, String))
+
+    expect(result).toEqual({
+      typeId: 2,
+      types: {
+        '0': {
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Int',
+        },
+        '1': {
+          type: 'Scalar',
+          valueType: 'string',
+          valueName: 'String',
+        },
+        '2': {
+          type: 'Tuple',
+          itemTypes: [
+            {
+              typeId: 0,
+              $ref: '#/types/0',
+            },
+            {
+              typeId: 1,
+              $ref: '#/types/1',
+            },
+          ],
         },
       },
     })
@@ -222,7 +278,9 @@ describe('Formater', () => {
       typeId: 1,
       types: {
         '0': {
-          type: 'Int',
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Int',
         },
         '1': {
           type: 'List',
@@ -240,13 +298,19 @@ describe('Formater', () => {
       typeId: 3,
       types: {
         '0': {
-          type: 'Int',
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Int',
         },
         '1': {
-          type: 'Float',
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Float',
         },
         '2': {
-          type: 'Boolean',
+          type: 'Scalar',
+          valueType: 'boolean',
+          valueName: 'Boolean',
         },
 
         '3': {
@@ -277,15 +341,20 @@ describe('Formater', () => {
       typeId: 3,
       types: {
         '0': {
-          type: 'Int',
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Int',
         },
         '1': {
-          type: 'Float',
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Float',
         },
         '2': {
-          type: 'Boolean',
+          type: 'Scalar',
+          valueType: 'boolean',
+          valueName: 'Boolean',
         },
-
         '3': {
           type: 'Intersect',
           itemTypes: [
@@ -340,10 +409,14 @@ describe('Formater', () => {
           },
         },
         '1': {
-          type: 'Int',
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Int',
         },
         '2': {
-          type: 'Number',
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Number',
         },
         '3': {
           type: 'Struct',
@@ -359,7 +432,9 @@ describe('Formater', () => {
           },
         },
         '4': {
-          type: 'Float',
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Float',
         },
       },
     })
@@ -408,10 +483,14 @@ describe('Formater', () => {
           },
         },
         '1': {
-          type: 'Int',
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Int',
         },
         '2': {
-          type: 'Float',
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Float',
         },
         '3': {
           type: 'Struct',
@@ -472,10 +551,14 @@ describe('Formater', () => {
           },
         },
         '1': {
-          type: 'Int',
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Int',
         },
         '2': {
-          type: 'Float',
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Float',
         },
       },
     })
@@ -515,73 +598,101 @@ describe('Formater', () => {
     )
 
     expect(result0).toEqual({
-      typeId: 0,
+      typeId: 1,
       types: {
         '0': {
           type: 'Struct',
           fields: {
             a: {
-              typeId: 1,
-              $ref: '#/types/1',
+              typeId: 2,
+              $ref: '#/types/2',
             },
           },
         },
         '1': {
-          type: 'Int',
+          type: 'Strict',
+          itemTypeId: 0,
+          $ref: '#/types/0',
+        },
+        '2': {
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Int',
         },
       },
     })
 
     expect(result1).toEqual({
-      typeId: 0,
+      typeId: 1,
       types: {
         '0': {
           type: 'Struct',
           fields: {
             a: {
-              typeId: 1,
-              $ref: '#/types/1',
+              typeId: 2,
+              $ref: '#/types/2',
             },
           },
         },
         '1': {
-          type: 'Int',
+          type: 'NonStrict',
+          itemTypeId: 0,
+          $ref: '#/types/0',
+        },
+        '2': {
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Int',
         },
       },
     })
 
     expect(result2).toEqual({
-      typeId: 0,
+      typeId: 1,
       types: {
         '0': {
           type: 'Struct',
           fields: {
             a: {
-              typeId: 1,
-              $ref: '#/types/1',
+              typeId: 2,
+              $ref: '#/types/2',
             },
           },
         },
         '1': {
-          type: 'Int',
+          type: 'ReadOnly',
+          itemTypeId: 0,
+          $ref: '#/types/0',
+        },
+        '2': {
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Int',
         },
       },
     })
 
     expect(result3).toEqual({
-      typeId: 0,
+      typeId: 1,
       types: {
         '0': {
           type: 'Struct',
           fields: {
             a: {
-              typeId: 1,
-              $ref: '#/types/1',
+              typeId: 2,
+              $ref: '#/types/2',
             },
           },
         },
         '1': {
-          type: 'Int',
+          type: 'ReadOnlyDeep',
+          itemTypeId: 0,
+          $ref: '#/types/0',
+        },
+        '2': {
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Int',
         },
       },
     })

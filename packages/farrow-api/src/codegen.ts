@@ -1,75 +1,16 @@
-import {
-  FormatAnyType,
-  FormatBooleanType,
-  FormatFields,
-  FormatFloatType,
-  FormatIDType,
-  FormatIntersectType,
-  FormatIntType,
-  FormatJsonType,
-  FormatListType,
-  FormatLiteralType,
-  FormatNullableType,
-  FormatNumberType,
-  FormatRecordType,
-  FormatStringType,
-  FormatStructType,
-  FormatType,
-  FormatTypes,
-  FormatUnionType,
-  FormatUnknownType,
-} from 'farrow-schema/formater'
+import { FormatFields, FormatType, FormatTypes, isNamedFormatType } from 'farrow-schema/formater'
 import { FormatEntries, FormatResult, FormatApi } from './toJSON'
 
-export type FormatInlineTypes =
-  | FormatNumberType
-  | FormatIntType
-  | FormatFloatType
-  | FormatStringType
-  | FormatIDType
-  | FormatBooleanType
-  | FormatJsonType
-  | FormatAnyType
-  | FormatUnknownType
-  | FormatRecordType
-  | FormatLiteralType
-  | FormatNullableType
-  | FormatUnionType
-  | FormatIntersectType
-  | FormatListType
-  | FormatStructType
-
-export const InlineTypes = [
-  'Number',
-  'Int',
-  'Float',
-  'String',
-  'ID',
-  'Boolean',
-  'Json',
-  'Any',
-  'Unknown',
-  'Literal',
-  'Nullable',
-  'List',
-  'Union',
-  'Intersect',
-  'Record',
-  'Struct',
-]
-
 export const isInlineType = (input: FormatType) => {
-  if (input.type === 'Struct' || input.type === 'Union' || input.type === 'Intersect') {
+  if (isNamedFormatType(input)) {
     return !input.name
   }
-  return InlineTypes.includes(input.type ?? '')
+  return true
 }
 
 const getTypeName = (input: FormatType): string | null => {
-  if (input.type === 'Object' || input.type === 'Struct' || input.type === 'Union' || input.type === 'Intersect') {
-    if (input.name) {
-      return input.name
-    }
+  if (isNamedFormatType(input) && input.name) {
+    return input.name
   }
   return null
 }
@@ -113,49 +54,12 @@ const getFieldType = (typeId: number, types: FormatTypes): string => {
     return getTypeNameById(typeId)
   }
 
-  if (fieldType.type === 'Any') {
-    return 'any'
-  }
-
-  if (fieldType.type === 'Json') {
-    return 'JsonType'
-  }
-
-  if (fieldType.type === 'String') {
-    return 'string'
-  }
-
-  if (fieldType.type === 'Boolean') {
-    return 'boolean'
-  }
-
-  if (fieldType.type === 'Float') {
-    return 'number'
-  }
-
-  if (fieldType.type === 'ID') {
-    return 'string'
-  }
-
-  if (fieldType.type === 'Int') {
-    return 'number'
-  }
-
-  if (fieldType.type === 'Number') {
-    return 'number'
+  if (fieldType.type === 'Scalar') {
+    return fieldType.valueType
   }
 
   if (fieldType.type === 'Record') {
     return `Record<string, ${getFieldType(fieldType.valueTypeId, types)}>`
-  }
-
-  /**
-   * unknown type for provider/server will be unknown
-   * but unknown type for consumer/client should be any type
-   * because consumers can pass any value to the server, and the server should detect what type it is.
-   */
-  if (fieldType.type === 'Unknown') {
-    return 'any'
   }
 
   if (fieldType.type === 'Literal') {

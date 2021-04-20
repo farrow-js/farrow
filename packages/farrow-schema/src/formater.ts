@@ -1,6 +1,6 @@
-import { Literals } from './schema'
-import * as Schema from './schema'
-import { createTransformer, TransformRule, TransformContext } from './transformer'
+import * as S from './schema'
+import { SchemaCtor, Schema, SchemaTypeOf, getInstance, Literals } from './schema'
+import { getSchemaCtorFields } from './helper'
 
 export type FormatField = {
   typeId: number
@@ -25,40 +25,10 @@ export type FormatStructType = {
   fields: FormatFields
 }
 
-export type FormatNumberType = {
-  type: 'Number'
-}
-
-export type FormatIntType = {
-  type: 'Int'
-}
-
-export type FormatFloatType = {
-  type: 'Float'
-}
-
-export type FormatStringType = {
-  type: 'String'
-}
-
-export type FormatIDType = {
-  type: 'ID'
-}
-
-export type FormatBooleanType = {
-  type: 'Boolean'
-}
-
-export type FormatJsonType = {
-  type: 'Json'
-}
-
-export type FormatAnyType = {
-  type: 'Any'
-}
-
-export type FormatUnknownType = {
-  type: 'Unknown'
+export type FormatScalarType = {
+  type: 'Scalar'
+  valueType: string
+  valueName: string
 }
 
 export type FormatLiteralType = {
@@ -96,508 +66,508 @@ export type FormatIntersectType = {
   itemTypes: { typeId: number; $ref: string }[]
 }
 
+export type FormatTupleType = {
+  type: 'Tuple'
+  name?: string
+  itemTypes: { typeId: number; $ref: string }[]
+}
+
+export type FormatStrictType = {
+  type: 'Strict'
+  itemTypeId: number
+  $ref: string
+}
+
+export type FormatNonStrictType = {
+  type: 'NonStrict'
+  itemTypeId: number
+  $ref: string
+}
+
+export type FormatReadOnlyType = {
+  type: 'ReadOnly'
+  itemTypeId: number
+  $ref: string
+}
+
+export type FormatReadonlyDeepType = {
+  type: 'ReadOnlyDeep'
+  itemTypeId: number
+  $ref: string
+}
+
 export type FormatType =
+  | FormatScalarType
   | FormatObjectType
   | FormatUnionType
-  | FormatStringType
   | FormatStructType
-  | FormatUnknownType
-  | FormatAnyType
-  | FormatBooleanType
-  | FormatFloatType
-  | FormatIDType
   | FormatRecordType
   | FormatListType
   | FormatLiteralType
   | FormatNullableType
-  | FormatIntType
-  | FormatJsonType
-  | FormatNumberType
   | FormatIntersectType
+  | FormatTupleType
+  | FormatStrictType
+  | FormatNonStrictType
+  | FormatReadOnlyType
+  | FormatReadonlyDeepType
 
 export type FormatTypes = {
   [key: string]: FormatType
 }
 
-export type FormaterContext = {
+export type FormatContext = {
   addType: (type: FormatType) => number
-  writerCache: WeakMap<Schema.SchemaCtor, FormaterWriter>
+  formatCache: WeakMap<Function, number>
 }
 
-export type FormaterWriter = () => number
-
-export type FormaterRule<S extends Schema.Schema, Context extends FormaterContext = FormaterContext> = TransformRule<
-  S,
-  FormaterWriter,
-  Context
->
-
-export const createFormater = <S extends Schema.SchemaCtor, Context extends FormaterContext = FormaterContext>(
-  SchemaCtor: S,
-  context: TransformContext<Context, FormaterWriter>,
-): FormaterWriter => {
-  if (context.writerCache.has(SchemaCtor)) {
-    return context.writerCache.get(SchemaCtor)!
-  }
-
-  let transformer = createTransformer(context)
-  let typeId: number | undefined
-
-  let writer = () => {
-    if (typeof typeId === 'number') {
-      return typeId
-    }
-    let writer = transformer(SchemaCtor)
-    return (typeId = writer())
-  }
-
-  context.writerCache.set(SchemaCtor, writer)
-
-  return writer
+export type FormaterMethods = {
+  format(context: FormatContext): number
 }
 
-export const formatSchema = <S extends Schema.SchemaCtor, Context extends FormaterContext = FormaterContext>(
-  SchemaCtor: S,
-  context?: TransformContext<Partial<Context>, FormaterWriter>,
-) => {
-  let types: FormatTypes = {}
-  let uid = 0
+export type FormaterImpl<T extends Schema = Schema> = FormaterMethods | ((schema: T) => FormaterMethods)
 
-  let lazyTypeList = [] as (FormatStructType | FormatObjectType)[]
+export type NamedFormatType = 
+  | FormatTupleType
+  | FormatStructType
+  | FormatUnionType
+  | FormatIntersectType
+  | FormatObjectType
 
-  let addType = (type: FormatType): number => {
-    if (type.type === 'Object' || type.type === 'Struct') {
-      lazyTypeList.push(type)
-    }
+export const isNamedFormatType = (input: FormatType): input is NamedFormatType => {
+  return (
+    input.type === 'Object' || 
+    input.type === 'Struct' || 
+    input.type === 'Union' ||
+    input.type === 'Intersect' ||
+    input.type === 'Tuple'
+  )
+}
 
-    if (context?.addType) {
-      return context.addType(type)
-    }
+const formaterWeakMap = new WeakMap<Function, FormaterImpl>()
 
-    let id = uid++
-    types[`${id}`] = type
-    return id
+const getFormaterImpl = (input: Function): FormaterImpl | undefined => {
+  if (typeof input !== 'function') {
+    return undefined
   }
 
-  let finalContext = {
-    writerCache: new WeakMap(),
-    ...context,
-    addType,
-  } as TransformContext<Context, FormaterWriter>
-
-  let format = createFormater(SchemaCtor, {
-    ...finalContext,
-    rules: {
-      ...defaultFormaterRules,
-      ...finalContext?.rules,
-    },
-  })
-
-  let typeId = format()
-
-  // trigger all lazy fields to expand formatResult.types
-  while (lazyTypeList.length) {
-    let objectType = lazyTypeList.shift()
-    objectType?.fields
+  if (formaterWeakMap.has(input)) {
+    return formaterWeakMap.get(input)
   }
 
+  let next = Object.getPrototypeOf(input)
+
+  if (next === Function.prototype) {
+    return undefined
+  }
+
+  return getFormaterImpl(next)
+}
+
+export const Formater = {
+  impl<T extends Schema>(Ctor: abstract new () => T, impl: FormaterImpl<T>) {
+    formaterWeakMap.set(Ctor, impl as FormaterImpl)
+  },
+
+  get<T extends SchemaCtor>(Ctor: T): FormaterMethods | undefined {
+    let finalCtor = S.getSchemaCtor(Ctor)
+    let FormaterImpl = getFormaterImpl(finalCtor as Function) as FormaterImpl<SchemaTypeOf<T>> | undefined
+
+    // instantiation Formater and save to weak-map
+    if (typeof FormaterImpl === 'function') {
+      let schema = getInstance(Ctor) as SchemaTypeOf<T>
+      let impl = FormaterImpl(schema)
+
+      formaterWeakMap.set(Ctor, impl)
+
+      return impl
+    }
+
+    return FormaterImpl
+  },
+
+  formatSchema<T extends SchemaCtor>(Ctor: T, ctx: FormatContext): number {
+    if (ctx.formatCache.has(Ctor)) {
+      return ctx.formatCache.get(Ctor)!
+    }
+
+    let FormaterImpl = Formater.get(Ctor)
+
+    if (!FormaterImpl) {
+      throw new Error(`No impl found for Formater, Ctor: ${Ctor}`)
+    }
+    
+    let typeId = FormaterImpl.format(ctx)
+
+    ctx.formatCache.set(Ctor, typeId)
+
+    return typeId
+  },
+
+  format<T extends SchemaCtor>(Ctor: T, context?: FormatContext) {
+    let types: FormatTypes = {}
+    let uid = 0
+
+    let lazyTypeList = [] as (FormatStructType | FormatObjectType)[]
+
+    let addType = (type: FormatType): number => {
+      if (type.type === 'Object' || type.type === 'Struct') {
+        lazyTypeList.push(type)
+      }
+
+      if (context?.addType) {
+        return context.addType(type)
+      }
+
+      let id = uid++
+      types[`${id}`] = type
+      return id
+    }
+
+    let finalContext: FormatContext = {
+      formatCache: new WeakMap(),
+      ...context,
+      addType,
+    }
+
+    let typeId = Formater.formatSchema(Ctor, finalContext)
+
+    // trigger all lazy fields to expand formatResult.types
+    while (lazyTypeList.length) {
+      let objectType = lazyTypeList.shift()
+      objectType?.fields
+    }
+
+    return {
+      typeId,
+      types,
+    }
+  },
+}
+
+export const formatSchema = Formater.format
+
+Formater.impl(S.String, {
+  format(ctx) {
+    return ctx.addType({
+      type: 'Scalar',
+      valueType: 'string',
+      valueName: 'String',
+    })
+  },
+})
+
+Formater.impl(S.ID, {
+  format(ctx) {
+    return ctx.addType({
+      type: 'Scalar',
+      valueType: 'string',
+      valueName: 'ID',
+    })
+  },
+})
+
+Formater.impl(S.Number, {
+  format(ctx) {
+    return ctx.addType({
+      type: 'Scalar',
+      valueType: 'number',
+      valueName: 'Number',
+    })
+  },
+})
+
+Formater.impl(S.Int, {
+  format(ctx) {
+    return ctx.addType({
+      type: 'Scalar',
+      valueType: 'number',
+      valueName: 'Int',
+    })
+  },
+})
+
+Formater.impl(S.Float, {
+  format(ctx) {
+    return ctx.addType({
+      type: 'Scalar',
+      valueType: 'number',
+      valueName: 'Float',
+    })
+  },
+})
+
+Formater.impl(S.Boolean, {
+  format(ctx) {
+    return ctx.addType({
+      type: 'Scalar',
+      valueType: 'boolean',
+      valueName: 'Boolean',
+    })
+  },
+})
+
+Formater.impl(S.LiteralType, (schema) => {
   return {
-    typeId,
-    types,
-  }
-}
-
-const StrictFormaterRule: FormaterRule<Schema.StrictType> = {
-  test: (schema) => {
-    return schema instanceof Schema.StrictType
-  },
-  transform: (schema, context) => {
-    return createFormater(schema.Item, context)
-  },
-}
-
-const NonStrictFormaterRule: FormaterRule<Schema.NonStrictType> = {
-  test: (schema) => {
-    return schema instanceof Schema.NonStrictType
-  },
-  transform: (schema, context) => {
-    return createFormater(schema.Item, context)
-  },
-}
-
-const ReadOnlyFormaterRule: FormaterRule<Schema.ReadOnlyType> = {
-  test: (schema) => {
-    return schema instanceof Schema.ReadOnlyType
-  },
-  transform: (schema, context) => {
-    return createFormater(schema.Item, context)
-  },
-}
-
-const ReadOnlyDeepFormaterRule: FormaterRule<Schema.ReadOnlyDeepType> = {
-  test: (schema) => {
-    return schema instanceof Schema.ReadOnlyDeepType
-  },
-  transform: (schema, context) => {
-    return createFormater(schema.Item, context)
-  },
-}
-
-const StringFormaterRule: FormaterRule<Schema.String> = {
-  test: (schema) => {
-    return schema instanceof Schema.String
-  },
-  transform: (_, context) => {
-    return () => {
-      return context.addType({
-        type: 'String',
-      })
-    }
-  },
-}
-
-const IntFormaterRule: FormaterRule<Schema.Int> = {
-  test: (schema) => {
-    return schema instanceof Schema.Int
-  },
-  transform: (_, context) => {
-    return () => {
-      return context.addType({
-        type: 'Int',
-      })
-    }
-  },
-}
-
-const FloatFormaterRule: FormaterRule<Schema.Float> = {
-  test: (schema) => {
-    return schema instanceof Schema.Float
-  },
-  transform: (_, context) => {
-    return () => {
-      return context.addType({
-        type: 'Float',
-      })
-    }
-  },
-}
-
-const NumberFormaterRule: FormaterRule<Schema.Number> = {
-  test: (schema) => {
-    return schema instanceof Schema.Number
-  },
-  transform: (_, context) => {
-    return () => {
-      return context.addType({
-        type: 'Number',
-      })
-    }
-  },
-}
-
-const IDFormaterRule: FormaterRule<Schema.ID> = {
-  test: (schema) => {
-    return schema instanceof Schema.ID
-  },
-  transform: (_, context) => {
-    return () => {
-      return context.addType({
-        type: 'ID',
-      })
-    }
-  },
-}
-
-const BooleanFormaterRule: FormaterRule<Schema.Boolean> = {
-  test: (schema) => {
-    return schema instanceof Schema.Boolean
-  },
-  transform: (_, context) => {
-    return () => {
-      return context.addType({
-        type: 'Boolean',
-      })
-    }
-  },
-}
-
-const LiteralFormaterRule: FormaterRule<Schema.LiteralType> = {
-  test: (schema) => {
-    return schema instanceof Schema.LiteralType
-  },
-  transform: (schema, context) => {
-    return () => {
-      return context.addType({
+    format(ctx) {
+      return ctx.addType({
         type: 'Literal',
         value: schema.value,
       })
-    }
-  },
-}
-
-const ListFormaterRule: FormaterRule<Schema.ListType> = {
-  test: (schema) => {
-    return schema instanceof Schema.ListType
-  },
-  transform: (schema, context) => {
-    let formatItem = createFormater(schema.Item, context)
-
-    return () => {
-      let typeId = formatItem()
-      return context.addType({
-        type: 'List',
-        itemTypeId: typeId,
-        $ref: `#/types/${typeId}`,
-      })
-    }
-  },
-}
-
-type FieldsFormaters = {
-  [key: string]: {
-    writer: FormaterWriter
-    SchemaCtor: Schema.SchemaCtor
-    description?: string
-    deprecated?: string
+    },
   }
-}
+})
 
-const createFieldsFormaters = <T extends Schema.FieldDescriptors>(
-  descriptors: T,
-  context: TransformContext<any>,
-): FieldsFormaters => {
-  let fieldsFormaters = {} as FieldsFormaters
-
-  for (let [key, field] of Object.entries(descriptors)) {
-    if (!Schema.isFieldDescriptor(field)) {
-      if (Schema.isFieldDescriptors(field)) {
-        let SchemaCtor = Schema.Struct(field)
-        fieldsFormaters[key] = {
-          writer: createFormater(SchemaCtor, context),
-          SchemaCtor,
-        }
-      }
-      continue
-    }
-
-    if (typeof field === 'function') {
-      fieldsFormaters[key] = {
-        writer: createFormater(field, context),
-        SchemaCtor: field,
-      }
-    } else {
-      fieldsFormaters[key] = {
-        writer: createFormater(field[Schema.Type], context),
-        SchemaCtor: field[Schema.Type],
-        description: field.description,
-        deprecated: field.deprecated,
-      }
-    }
-  }
-
-  return fieldsFormaters
-}
-
-const ObjectFormaterRule: FormaterRule<Schema.ObjectType | Schema.StructType> = {
-  test: (schema) => {
-    return schema instanceof Schema.ObjectType || schema instanceof Schema.StructType
-  },
-  transform: (schema, context) => {
-    let descriptors = (schema instanceof Schema.StructType ? schema.descriptors : schema) as Schema.FieldDescriptors
-    let fieldsFormaters = createFieldsFormaters(descriptors, context)
-    let fields = {} as FormatFields
-    let hasGet = false
-    let getFields = () => {
-      if (hasGet) return fields
-      hasGet = true
-      for (let key in fieldsFormaters) {
-        let fieldFormater = fieldsFormaters[key]
-        let typeId = fieldFormater.writer()
-        fields[key] = {
-          typeId,
-          $ref: `#/types/${typeId}`,
-          description: fieldFormater.description,
-          deprecated: fieldFormater.deprecated,
-        }
-      }
-      return fields
-    }
-    let isStruct = schema.constructor.name === 'Struct'
-
-    let Constructor = schema.constructor as typeof Schema.Schema
-
-    return () => {
-      if (isStruct) {
-        if (Constructor.displayName) {
-          return context.addType({
-            type: 'Struct',
-            name: Constructor.displayName ?? '',
-            get fields() {
-              return getFields()
-            },
-          })
-        }
-        return context.addType({
-          type: 'Struct',
-          get fields() {
-            return getFields()
-          },
-        })
-      }
-
-      return context.addType({
-        type: 'Object',
-        name: Constructor.displayName ?? Constructor.name,
-        get fields() {
-          return getFields()
-        },
-      })
-    }
-  },
-}
-
-const RecordFormaterRule: FormaterRule<Schema.RecordType> = {
-  test: (schema) => {
-    return schema instanceof Schema.RecordType
-  },
-  transform: (schema, context) => {
-    let formatItem = createFormater(schema.Item, context)
-
-    return () => {
-      let typeId = formatItem()
-      return context.addType({
-        type: 'Record',
-        valueTypeId: typeId,
-        $ref: `#/types/${typeId}`,
-      })
-    }
-  },
-}
-
-const NullableFormaterRule: FormaterRule<Schema.NullableType> = {
-  test: (schema) => {
-    return schema instanceof Schema.NullableType
-  },
-  transform: (schema, context) => {
-    let formatItem = createFormater(schema.Item, context)
-
-    return () => {
-      let typeId = formatItem()
-      return context.addType({
+Formater.impl(S.NullableType, (schema) => {
+  return {
+    format(ctx) {
+      let typeId = Formater.formatSchema(schema.Item, ctx)
+      return ctx.addType({
         type: 'Nullable',
         itemTypeId: typeId,
         $ref: `#/types/${typeId}`,
       })
-    }
-  },
-}
+    },
+  }
+})
 
-const UnionFormaterRule: FormaterRule<Schema.UnionType> = {
-  test: (schema) => {
-    return schema instanceof Schema.UnionType
-  },
-  transform: (schema, context) => {
-    let itemsFormaters = (schema.Items as Schema.SchemaCtor[]).map((Item) => createFormater(Item, context))
-    let Constructor = schema.constructor as typeof Schema.Schema
-    return () => {
-      return context.addType({
+Formater.impl(S.ListType, (schema) => {
+  return {
+    format(ctx) {
+      let typeId = Formater.formatSchema(schema.Item, ctx)
+      return ctx.addType({
+        type: 'List',
+        itemTypeId: typeId,
+        $ref: `#/types/${typeId}`,
+      })
+    },
+  }
+})
+
+Formater.impl(S.StructType, (schema) => {
+  let fields = getSchemaCtorFields(schema.descriptors)
+  return {
+    format(ctx) {
+      let formatFields: FormatFields = {}
+      let hasGetFields = false
+      let getFields = () => {
+        if (hasGetFields) return formatFields
+        hasGetFields = true
+
+        for (let [key, Field] of Object.entries(fields)) {
+          let typeId = Formater.formatSchema(Field[S.Type], ctx)
+          formatFields[key] = {
+            typeId,
+            $ref: `#/types/${typeId}`,
+            description: Field.description,
+            deprecated: Field.deprecated,
+          }
+        }
+        
+        return formatFields
+      }
+      let Constructor = schema.constructor as typeof S.Schema
+
+      return ctx.addType({
+        type: 'Struct',
+        name: Constructor.displayName,
+        get fields() {
+          return getFields()
+        }
+      })
+    },
+  }
+})
+
+Formater.impl(S.ObjectType, (schema) => {
+  let fields = getSchemaCtorFields(schema as unknown as S.FieldDescriptors)
+  return {
+    format(ctx) {
+      let formatFields: FormatFields = {}
+      let hasGetFields = false
+      let getFields = () => {
+        if (hasGetFields) return formatFields
+        hasGetFields = true
+
+        for (let [key, Field] of Object.entries(fields)) {
+          let typeId = Formater.formatSchema(Field[S.Type], ctx)
+          formatFields[key] = {
+            typeId,
+            $ref: `#/types/${typeId}`,
+            description: Field.description,
+            deprecated: Field.deprecated,
+          }
+        }
+        
+        return formatFields
+      }
+      let Constructor = schema.constructor as typeof S.Schema
+
+      return ctx.addType({
+        type: 'Object',
+        name: Constructor.displayName ?? Constructor.name,
+        get fields() {
+          return getFields()
+        }
+      })
+    },
+  }
+})
+
+Formater.impl(S.UnionType, (schema) => {
+  let Constructor = schema.constructor as typeof S.Schema
+  let displayName = Constructor.displayName
+  return {
+    format(ctx) {
+      let itemTypes = schema.Items.map((Item) => {
+        let typeId = Formater.formatSchema(Item, ctx)
+        return {
+          typeId,
+          $ref: `#/types/${typeId}`,
+        }
+      })
+      return ctx.addType({
         type: 'Union',
-        name: Constructor.displayName,
-        itemTypes: itemsFormaters.map((format) => {
-          let typeId = format()
-          return {
-            typeId,
-            $ref: `#/types/${typeId}`,
-          }
-        }),
+        name: displayName,
+        itemTypes,
       })
-    }
-  },
-}
+    },
+  }
+})
 
-const IntersectFormaterRule: FormaterRule<Schema.IntersectType> = {
-  test: (schema) => {
-    return schema instanceof Schema.IntersectType
-  },
-  transform: (schema, context) => {
-    let itemsFormaters = schema.Items.map((Item) => createFormater(Item, context))
-    let Constructor = schema.constructor as typeof Schema.Schema
-    return () => {
-      return context.addType({
+Formater.impl(S.IntersectType, (schema) => {
+  let Constructor = schema.constructor as typeof S.Schema
+  let displayName = Constructor.displayName
+  return {
+    format(ctx) {
+      let itemTypes = schema.Items.map((Item) => {
+        let typeId = Formater.formatSchema(Item, ctx)
+        return {
+          typeId,
+          $ref: `#/types/${typeId}`,
+        }
+      })
+      return ctx.addType({
         type: 'Intersect',
-        name: Constructor.displayName,
-        itemTypes: itemsFormaters.map((format) => {
-          let typeId = format()
-          return {
-            typeId,
-            $ref: `#/types/${typeId}`,
-          }
-        }),
+        name: displayName,
+        itemTypes,
       })
-    }
-  },
-}
+    },
+  }
+})
 
-const JsonFormaterRule: FormaterRule<Schema.Json> = {
-  test: (schema) => {
-    return schema instanceof Schema.Json
-  },
-  transform: (_schema, context) => {
-    return () => {
-      return context.addType({
-        type: 'Json',
+Formater.impl(S.TupleType, (schema) => {
+  let Constructor = schema.constructor as typeof S.Schema
+  let displayName = Constructor.displayName
+  return {
+    format(ctx) {
+      let itemTypes = schema.Items.map((Item) => {
+        let typeId = Formater.formatSchema(Item, ctx)
+        return {
+          typeId,
+          $ref: `#/types/${typeId}`,
+        }
       })
-    }
-  },
-}
-
-const AnyFormaterRule: FormaterRule<Schema.Any> = {
-  test: (schema) => {
-    return schema instanceof Schema.Any
-  },
-  transform: (_schema, context) => {
-    return () => {
-      return context.addType({
-        type: 'Any',
+      return ctx.addType({
+        type: 'Tuple',
+        name: displayName,
+        itemTypes,
       })
-    }
-  },
-}
+    },
+  }
+})
 
-const UnknownFormaterRule: FormaterRule<Schema.Unknown> = {
-  test: (schema) => {
-    return schema instanceof Schema.Unknown
-  },
-  transform: (_schema, context) => {
-    return () => {
-      return context.addType({
-        type: 'Unknown',
+Formater.impl(S.RecordType, (schema) => {
+  return {
+    format(ctx) {
+      let typeId = Formater.formatSchema(schema.Item, ctx)
+      return ctx.addType({
+        type: 'Record',
+        valueTypeId: typeId,
+        $ref: `#/types/${typeId}`,
       })
-    }
+    },
+  }
+})
+
+Formater.impl(S.Unknown, {
+  format(ctx) {
+    return ctx.addType({
+      type: 'Scalar',
+      valueType: 'unknown',
+      valueName: 'Unknown',
+    })
   },
-}
+})
 
-export const defaultFormaterRules = {
-  String: StringFormaterRule,
-  Boolean: BooleanFormaterRule,
-  Number: NumberFormaterRule,
-  Int: IntFormaterRule,
-  Float: FloatFormaterRule,
-  ID: IDFormaterRule,
-  List: ListFormaterRule,
-  Object: ObjectFormaterRule,
-  Union: UnionFormaterRule,
-  Intersect: IntersectFormaterRule,
-  Nullable: NullableFormaterRule,
-  Json: JsonFormaterRule,
-  Any: AnyFormaterRule,
-  Literal: LiteralFormaterRule,
-  Record: RecordFormaterRule,
-  Strict: StrictFormaterRule,
-  NonStrict: NonStrictFormaterRule,
-  ReadOnly: ReadOnlyFormaterRule,
-  ReadOnlyDeep: ReadOnlyDeepFormaterRule,
-  Unknown: UnknownFormaterRule,
-}
+Formater.impl(S.Any, {
+  format(ctx) {
+    return ctx.addType({
+      type: 'Scalar',
+      valueType: 'any',
+      valueName: 'Any',
+    })
+  },
+})
 
-export type DefaultFormaterRules = typeof defaultFormaterRules
+Formater.impl(S.Json, {
+  format(ctx) {
+    return ctx.addType({
+      type: 'Scalar',
+      valueType: 'JsonType',
+      valueName: 'Json',
+    })
+  },
+})
+
+Formater.impl(S.StrictType, (schema) => {
+  return {
+    format(ctx) {
+      let typeId = Formater.formatSchema(schema.Item, ctx)
+      return ctx.addType({
+        type: 'Strict',
+        itemTypeId: typeId,
+        $ref: `#/types/${typeId}`,
+      })
+    },
+  }
+})
+
+Formater.impl(S.NonStrictType, (schema) => {
+  return {
+    format(ctx) {
+      let typeId = Formater.formatSchema(schema.Item, ctx)
+      return ctx.addType({
+        type: 'NonStrict',
+        itemTypeId: typeId,
+        $ref: `#/types/${typeId}`,
+      })
+    },
+  }
+})
+
+Formater.impl(S.ReadOnlyType, (schema) => {
+  return {
+    format(ctx) {
+      let typeId = Formater.formatSchema(schema.Item, ctx)
+      return ctx.addType({
+        type: 'ReadOnly',
+        itemTypeId: typeId,
+        $ref: `#/types/${typeId}`,
+      })
+    },
+  }
+})
+
+Formater.impl(S.ReadOnlyDeepType, (schema) => {
+  return {
+    format(ctx) {
+      let typeId = Formater.formatSchema(schema.Item, ctx)
+      return ctx.addType({
+        type: 'ReadOnlyDeep',
+        itemTypeId: typeId,
+        $ref: `#/types/${typeId}`,
+      })
+    },
+  }
+})

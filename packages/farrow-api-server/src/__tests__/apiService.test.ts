@@ -112,7 +112,9 @@ describe('ApiService', () => {
               },
             },
             '2': {
-              type: 'Int',
+              type: 'Scalar',
+              valueType: 'number',
+              valueName: 'Int',
             },
             '3': {
               type: 'Struct',

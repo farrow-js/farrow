@@ -1,5 +1,5 @@
 import { toSchemaCtor, SchemaCtorInput } from 'farrow-schema'
-import { FormatTypes, formatSchema, FormatField, FormatType } from 'farrow-schema/formater'
+import { Formater, FormatTypes, FormatField, FormatType, FormatContext } from 'farrow-schema/formater'
 import { ApiType, ApiEntries, getContentType, getTypeDescription, getTypeDeprecated, Typeable } from './api'
 
 export type FormatApi = {
@@ -38,14 +38,14 @@ export const toJSON = (apiEntries: ApiEntries): FormatResult => {
     return id
   }
 
-  let context = {
+  let context: FormatContext = {
     addType,
-    writerCache: new WeakMap(),
+    formatCache: new WeakMap(),
   }
 
   let formatTypeable = (typeable: Typeable<SchemaCtorInput>): FormatField => {
     let SchemaCtor = toSchemaCtor(getContentType(typeable))
-    let formatResult = formatSchema(SchemaCtor, context)
+    let formatResult = Formater.format(SchemaCtor, context)
 
     return {
       typeId: formatResult.typeId,

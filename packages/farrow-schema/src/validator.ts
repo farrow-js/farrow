@@ -1,6 +1,7 @@
 import * as S from './schema'
 import { SchemaCtor, TypeOf, Schema, SchemaTypeOf, getInstance } from './schema'
 
+import { getSchemaCtorFields } from './helper'
 import { Result, Err, Ok } from './result'
 
 export type ValidationError = {
@@ -236,30 +237,8 @@ Validator.impl<S.ListType>(S.ListType, (schema) => ({
   },
 }))
 
-type Fields = {
-  [key: string]: S.SchemaCtor
-}
-
-const getFieldsDescriptor = (descriptors: S.FieldDescriptors): Fields => {
-  let fields = {} as Fields
-
-  for (let [key, field] of Object.entries(descriptors)) {
-    if (S.isFieldDescriptor(field)) {
-      if (typeof field === 'function') {
-        fields[key] = field
-      } else {
-        fields[key] = field[S.Type]
-      }
-    } else if (S.isFieldDescriptors(field)) {
-      fields[key] = S.Struct(getFieldsDescriptor(field))
-    }
-  }
-
-  return fields
-}
-
 Validator.impl<S.StructType>(S.StructType, (schema) => {
-  let fields = getFieldsDescriptor(schema.descriptors)
+  let fields = getSchemaCtorFields(schema.descriptors)
 
   return {
     validate: (input, options) => {
@@ -272,7 +251,7 @@ Validator.impl<S.StructType>(S.StructType, (schema) => {
       for (let key in fields) {
         let Field = fields[key]
         let value = input[key]
-        let result = Validator.validate(Field, value, options)
+        let result = Validator.validate(Field[S.Type], value, options)
 
         if (result.isErr) {
           return SchemaErr(result.value.message, [key, ...(result.value.path ?? [])])
@@ -287,12 +266,12 @@ Validator.impl<S.StructType>(S.StructType, (schema) => {
 })
 
 Validator.impl(S.ObjectType, (schema) => {
-  let fields = getFieldsDescriptor((schema as unknown) as S.FieldDescriptors)
-  let Fields = S.Struct(fields)
+  let fields = getSchemaCtorFields((schema as unknown) as S.FieldDescriptors)
+  let Struct = S.Struct(fields)
 
   return {
     validate: (input, options) => {
-      return Validator.validate(Fields, input, options)
+      return Validator.validate(Struct, input, options)
     },
   }
 })

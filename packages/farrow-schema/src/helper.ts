@@ -11,6 +11,7 @@ import {
   FieldInfo,
   TypeOf,
 } from './schema'
+import * as S from './schema'
 
 export const field = <T extends FieldInfo>(fieldInfo: T): T => {
   return fieldInfo
@@ -153,7 +154,7 @@ export const keyofObject = <T extends ObjectType>(Ctor: new () => T): (keyof Typ
 
 export type KeyOfSchema = typeof keyofStruct & typeof keyofObject
 
-export const keyof = ((Ctor: any, keys: any) => {
+export const keyof = ((Ctor: any) => {
   if (Ctor?.prototype instanceof ObjectType) {
     return keyofObject(Ctor)
   }
@@ -164,3 +165,29 @@ export const keyof = ((Ctor: any, keys: any) => {
 
   throw new Error(`Unknown Schema Constructor: ${Ctor}`)
 }) as KeyOfSchema
+
+export type SchemaCtorFields = {
+  [key: string]: S.FieldInfo
+}
+
+export const getSchemaCtorFields = (descriptors: S.FieldDescriptors): SchemaCtorFields => {
+  let fields = {} as SchemaCtorFields
+
+  for (let [key, field] of Object.entries(descriptors)) {
+    if (S.isFieldDescriptor(field)) {
+      if (typeof field === 'function') {
+        fields[key] = {
+          [S.Type]: field,
+        }
+      } else {
+        fields[key] = field
+      }
+    } else if (S.isFieldDescriptors(field)) {
+      fields[key] = {
+        [S.Type]: S.Struct(getSchemaCtorFields(field)),
+      }
+    }
+  }
+
+  return fields
+}

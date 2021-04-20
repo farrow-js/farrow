@@ -127,6 +127,23 @@ export type FormaterMethods = {
 
 export type FormaterImpl<T extends Schema = Schema> = FormaterMethods | ((schema: T) => FormaterMethods)
 
+export type NamedFormatType = 
+  | FormatTupleType
+  | FormatStructType
+  | FormatUnionType
+  | FormatIntersectType
+  | FormatObjectType
+
+export const isNamedFormatType = (input: FormatType): input is NamedFormatType => {
+  return (
+    input.type === 'Object' || 
+    input.type === 'Struct' || 
+    input.type === 'Union' ||
+    input.type === 'Intersect' ||
+    input.type === 'Tuple'
+  )
+}
+
 const formaterWeakMap = new WeakMap<Function, FormaterImpl>()
 
 const getFormaterImpl = (input: Function): FormaterImpl | undefined => {

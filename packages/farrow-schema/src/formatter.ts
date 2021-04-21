@@ -121,11 +121,11 @@ export type FormatContext = {
   formatCache: WeakMap<Function, number>
 }
 
-export type FormaterMethods = {
+export type FormatterMethods = {
   format(context: FormatContext): number
 }
 
-export type FormaterImpl<T extends Schema = Schema> = FormaterMethods | ((schema: T) => FormaterMethods)
+export type FormatterImpl<T extends Schema = Schema> = FormatterMethods | ((schema: T) => FormatterMethods)
 
 export type NamedFormatType = 
   | FormatTupleType
@@ -144,15 +144,15 @@ export const isNamedFormatType = (input: FormatType): input is NamedFormatType =
   )
 }
 
-const formaterWeakMap = new WeakMap<Function, FormaterImpl>()
+const formatterWeakMap = new WeakMap<Function, FormatterImpl>()
 
-const getFormaterImpl = (input: Function): FormaterImpl | undefined => {
+const getFormatterImpl = (input: Function): FormatterImpl | undefined => {
   if (typeof input !== 'function') {
     return undefined
   }
 
-  if (formaterWeakMap.has(input)) {
-    return formaterWeakMap.get(input)
+  if (formatterWeakMap.has(input)) {
+    return formatterWeakMap.get(input)
   }
 
   let next = Object.getPrototypeOf(input)
@@ -161,29 +161,29 @@ const getFormaterImpl = (input: Function): FormaterImpl | undefined => {
     return undefined
   }
 
-  return getFormaterImpl(next)
+  return getFormatterImpl(next)
 }
 
-export const Formater = {
-  impl<T extends Schema>(Ctor: abstract new () => T, impl: FormaterImpl<T>) {
-    formaterWeakMap.set(Ctor, impl as FormaterImpl)
+export const Formatter = {
+  impl<T extends Schema>(Ctor: abstract new () => T, impl: FormatterImpl<T>) {
+    formatterWeakMap.set(Ctor, impl as FormatterImpl)
   },
 
-  get<T extends SchemaCtor>(Ctor: T): FormaterMethods | undefined {
+  get<T extends SchemaCtor>(Ctor: T): FormatterMethods | undefined {
     let finalCtor = S.getSchemaCtor(Ctor)
-    let FormaterImpl = getFormaterImpl(finalCtor as Function) as FormaterImpl<SchemaTypeOf<T>> | undefined
+    let FormatterImpl = getFormatterImpl(finalCtor as Function) as FormatterImpl<SchemaTypeOf<T>> | undefined
 
-    // instantiation Formater and save to weak-map
-    if (typeof FormaterImpl === 'function') {
+    // instantiation Formatter and save to weak-map
+    if (typeof FormatterImpl === 'function') {
       let schema = getInstance(Ctor) as SchemaTypeOf<T>
-      let impl = FormaterImpl(schema)
+      let impl = FormatterImpl(schema)
 
-      formaterWeakMap.set(Ctor, impl)
+      formatterWeakMap.set(Ctor, impl)
 
       return impl
     }
 
-    return FormaterImpl
+    return FormatterImpl
   },
 
   formatSchema<T extends SchemaCtor>(Ctor: T, ctx: FormatContext): number {
@@ -191,13 +191,13 @@ export const Formater = {
       return ctx.formatCache.get(Ctor)!
     }
 
-    let FormaterImpl = Formater.get(Ctor)
+    let FormatterImpl = Formatter.get(Ctor)
 
-    if (!FormaterImpl) {
-      throw new Error(`No impl found for Formater, Ctor: ${Ctor}`)
+    if (!FormatterImpl) {
+      throw new Error(`No impl found for Formatter, Ctor: ${Ctor}`)
     }
     
-    let typeId = FormaterImpl.format(ctx)
+    let typeId = FormatterImpl.format(ctx)
 
     ctx.formatCache.set(Ctor, typeId)
 
@@ -230,7 +230,7 @@ export const Formater = {
       addType,
     }
 
-    let typeId = Formater.formatSchema(Ctor, finalContext)
+    let typeId = Formatter.formatSchema(Ctor, finalContext)
 
     // trigger all lazy fields to expand formatResult.types
     while (lazyTypeList.length) {
@@ -245,9 +245,9 @@ export const Formater = {
   },
 }
 
-export const formatSchema = Formater.format
+export const formatSchema = Formatter.format
 
-Formater.impl(S.String, {
+Formatter.impl(S.String, {
   format(ctx) {
     return ctx.addType({
       type: 'Scalar',
@@ -257,7 +257,7 @@ Formater.impl(S.String, {
   },
 })
 
-Formater.impl(S.ID, {
+Formatter.impl(S.ID, {
   format(ctx) {
     return ctx.addType({
       type: 'Scalar',
@@ -267,7 +267,7 @@ Formater.impl(S.ID, {
   },
 })
 
-Formater.impl(S.Number, {
+Formatter.impl(S.Number, {
   format(ctx) {
     return ctx.addType({
       type: 'Scalar',
@@ -277,7 +277,7 @@ Formater.impl(S.Number, {
   },
 })
 
-Formater.impl(S.Int, {
+Formatter.impl(S.Int, {
   format(ctx) {
     return ctx.addType({
       type: 'Scalar',
@@ -287,7 +287,7 @@ Formater.impl(S.Int, {
   },
 })
 
-Formater.impl(S.Float, {
+Formatter.impl(S.Float, {
   format(ctx) {
     return ctx.addType({
       type: 'Scalar',
@@ -297,7 +297,7 @@ Formater.impl(S.Float, {
   },
 })
 
-Formater.impl(S.Boolean, {
+Formatter.impl(S.Boolean, {
   format(ctx) {
     return ctx.addType({
       type: 'Scalar',
@@ -307,7 +307,7 @@ Formater.impl(S.Boolean, {
   },
 })
 
-Formater.impl(S.Date, {
+Formatter.impl(S.Date, {
   format(ctx) {
     return ctx.addType({
       type: 'Scalar',
@@ -317,7 +317,7 @@ Formater.impl(S.Date, {
   },
 })
 
-Formater.impl(S.LiteralType, (schema) => {
+Formatter.impl(S.LiteralType, (schema) => {
   return {
     format(ctx) {
       return ctx.addType({
@@ -328,10 +328,10 @@ Formater.impl(S.LiteralType, (schema) => {
   }
 })
 
-Formater.impl(S.NullableType, (schema) => {
+Formatter.impl(S.NullableType, (schema) => {
   return {
     format(ctx) {
-      let typeId = Formater.formatSchema(schema.Item, ctx)
+      let typeId = Formatter.formatSchema(schema.Item, ctx)
       return ctx.addType({
         type: 'Nullable',
         itemTypeId: typeId,
@@ -341,10 +341,10 @@ Formater.impl(S.NullableType, (schema) => {
   }
 })
 
-Formater.impl(S.ListType, (schema) => {
+Formatter.impl(S.ListType, (schema) => {
   return {
     format(ctx) {
-      let typeId = Formater.formatSchema(schema.Item, ctx)
+      let typeId = Formatter.formatSchema(schema.Item, ctx)
       return ctx.addType({
         type: 'List',
         itemTypeId: typeId,
@@ -354,7 +354,7 @@ Formater.impl(S.ListType, (schema) => {
   }
 })
 
-Formater.impl(S.StructType, (schema) => {
+Formatter.impl(S.StructType, (schema) => {
   let fields = getSchemaCtorFields(schema.descriptors)
   return {
     format(ctx) {
@@ -365,7 +365,7 @@ Formater.impl(S.StructType, (schema) => {
         hasGetFields = true
 
         for (let [key, Field] of Object.entries(fields)) {
-          let typeId = Formater.formatSchema(Field[S.Type], ctx)
+          let typeId = Formatter.formatSchema(Field[S.Type], ctx)
           formatFields[key] = {
             typeId,
             $ref: `#/types/${typeId}`,
@@ -389,7 +389,7 @@ Formater.impl(S.StructType, (schema) => {
   }
 })
 
-Formater.impl(S.ObjectType, (schema) => {
+Formatter.impl(S.ObjectType, (schema) => {
   let fields = getSchemaCtorFields(schema as unknown as S.FieldDescriptors)
   return {
     format(ctx) {
@@ -400,7 +400,7 @@ Formater.impl(S.ObjectType, (schema) => {
         hasGetFields = true
 
         for (let [key, Field] of Object.entries(fields)) {
-          let typeId = Formater.formatSchema(Field[S.Type], ctx)
+          let typeId = Formatter.formatSchema(Field[S.Type], ctx)
           formatFields[key] = {
             typeId,
             $ref: `#/types/${typeId}`,
@@ -424,13 +424,13 @@ Formater.impl(S.ObjectType, (schema) => {
   }
 })
 
-Formater.impl(S.UnionType, (schema) => {
+Formatter.impl(S.UnionType, (schema) => {
   let Constructor = schema.constructor as typeof S.Schema
   let displayName = Constructor.displayName
   return {
     format(ctx) {
       let itemTypes = schema.Items.map((Item) => {
-        let typeId = Formater.formatSchema(Item, ctx)
+        let typeId = Formatter.formatSchema(Item, ctx)
         return {
           typeId,
           $ref: `#/types/${typeId}`,
@@ -445,13 +445,13 @@ Formater.impl(S.UnionType, (schema) => {
   }
 })
 
-Formater.impl(S.IntersectType, (schema) => {
+Formatter.impl(S.IntersectType, (schema) => {
   let Constructor = schema.constructor as typeof S.Schema
   let displayName = Constructor.displayName
   return {
     format(ctx) {
       let itemTypes = schema.Items.map((Item) => {
-        let typeId = Formater.formatSchema(Item, ctx)
+        let typeId = Formatter.formatSchema(Item, ctx)
         return {
           typeId,
           $ref: `#/types/${typeId}`,
@@ -466,13 +466,13 @@ Formater.impl(S.IntersectType, (schema) => {
   }
 })
 
-Formater.impl(S.TupleType, (schema) => {
+Formatter.impl(S.TupleType, (schema) => {
   let Constructor = schema.constructor as typeof S.Schema
   let displayName = Constructor.displayName
   return {
     format(ctx) {
       let itemTypes = schema.Items.map((Item) => {
-        let typeId = Formater.formatSchema(Item, ctx)
+        let typeId = Formatter.formatSchema(Item, ctx)
         return {
           typeId,
           $ref: `#/types/${typeId}`,
@@ -487,10 +487,10 @@ Formater.impl(S.TupleType, (schema) => {
   }
 })
 
-Formater.impl(S.RecordType, (schema) => {
+Formatter.impl(S.RecordType, (schema) => {
   return {
     format(ctx) {
-      let typeId = Formater.formatSchema(schema.Item, ctx)
+      let typeId = Formatter.formatSchema(schema.Item, ctx)
       return ctx.addType({
         type: 'Record',
         valueTypeId: typeId,
@@ -500,7 +500,7 @@ Formater.impl(S.RecordType, (schema) => {
   }
 })
 
-Formater.impl(S.Unknown, {
+Formatter.impl(S.Unknown, {
   format(ctx) {
     return ctx.addType({
       type: 'Scalar',
@@ -510,7 +510,7 @@ Formater.impl(S.Unknown, {
   },
 })
 
-Formater.impl(S.Any, {
+Formatter.impl(S.Any, {
   format(ctx) {
     return ctx.addType({
       type: 'Scalar',
@@ -520,7 +520,7 @@ Formater.impl(S.Any, {
   },
 })
 
-Formater.impl(S.Json, {
+Formatter.impl(S.Json, {
   format(ctx) {
     return ctx.addType({
       type: 'Scalar',
@@ -530,10 +530,10 @@ Formater.impl(S.Json, {
   },
 })
 
-Formater.impl(S.StrictType, (schema) => {
+Formatter.impl(S.StrictType, (schema) => {
   return {
     format(ctx) {
-      let typeId = Formater.formatSchema(schema.Item, ctx)
+      let typeId = Formatter.formatSchema(schema.Item, ctx)
       return ctx.addType({
         type: 'Strict',
         itemTypeId: typeId,
@@ -543,10 +543,10 @@ Formater.impl(S.StrictType, (schema) => {
   }
 })
 
-Formater.impl(S.NonStrictType, (schema) => {
+Formatter.impl(S.NonStrictType, (schema) => {
   return {
     format(ctx) {
-      let typeId = Formater.formatSchema(schema.Item, ctx)
+      let typeId = Formatter.formatSchema(schema.Item, ctx)
       return ctx.addType({
         type: 'NonStrict',
         itemTypeId: typeId,
@@ -556,10 +556,10 @@ Formater.impl(S.NonStrictType, (schema) => {
   }
 })
 
-Formater.impl(S.ReadOnlyType, (schema) => {
+Formatter.impl(S.ReadOnlyType, (schema) => {
   return {
     format(ctx) {
-      let typeId = Formater.formatSchema(schema.Item, ctx)
+      let typeId = Formatter.formatSchema(schema.Item, ctx)
       return ctx.addType({
         type: 'ReadOnly',
         itemTypeId: typeId,
@@ -569,10 +569,10 @@ Formater.impl(S.ReadOnlyType, (schema) => {
   }
 })
 
-Formater.impl(S.ReadOnlyDeepType, (schema) => {
+Formatter.impl(S.ReadOnlyDeepType, (schema) => {
   return {
     format(ctx) {
-      let typeId = Formater.formatSchema(schema.Item, ctx)
+      let typeId = Formatter.formatSchema(schema.Item, ctx)
       return ctx.addType({
         type: 'ReadOnlyDeep',
         itemTypeId: typeId,

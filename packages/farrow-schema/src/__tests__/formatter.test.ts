@@ -21,9 +21,9 @@ import {
   Tuple,
 } from '../schema'
 
-import { formatSchema } from '../formater'
+import { formatSchema } from '../formatter'
 
-describe('Formater', () => {
+describe('Formatter', () => {
   it('supports format Number', () => {
     let result = formatSchema(Number)
 

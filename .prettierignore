@@ -2,5 +2,5 @@ examples/.cache
 node_modules
 dist
 esm
-packages/farrow-schema/src/formater.ts
+packages/farrow-schema/src/formatter.ts
 packages/farrow-schema/src/validator.ts

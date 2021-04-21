@@ -1,4 +1,4 @@
-import { FormatFields, FormatType, FormatTypes, isNamedFormatType } from 'farrow-schema/formater'
+import { FormatFields, FormatType, FormatTypes, isNamedFormatType } from 'farrow-schema/formatter'
 import { FormatEntries, FormatResult, FormatApi } from './toJSON'
 
 export const isInlineType = (input: FormatType) => {
@@ -113,7 +113,7 @@ const getFieldsType = (fields: FormatFields, types: FormatTypes): string[] => {
 export type CodegenOptions = {
   /**
    * emit createApiClient or not
-   * if set to false, only types will be codegened
+   * if set to false, only types will be codegen
    */
   emitApiClient?: boolean
 

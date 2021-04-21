@@ -13,13 +13,9 @@
       "import": "./esm/validator.js",
       "require": "./dist/validator.js"
     },
-    "./transformer": {
-      "import": "./esm/transformer.js",
-      "require": "./dist/transformer.js"
-    },
-    "./formater": {
-      "import": "./esm/formater.js",
-      "require": "./dist/formater.js"
+    "./formatter": {
+      "import": "./esm/formatter.js",
+      "require": "./dist/formatter.js"
     }
   },
   "files": [
@@ -30,8 +26,8 @@
     "validator.js",
     "transformer.js",
     "transformer.d.ts",
-    "formater.d.ts",
-    "formater.js"
+    "formatter.d.ts",
+    "formatter.js"
   ],
   "scripts": {
     "start": ""

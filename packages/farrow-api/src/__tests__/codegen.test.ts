@@ -19,6 +19,7 @@ import {
   Type,
   Union,
   Unknown,
+  Date,
 } from 'farrow-schema'
 
 const NamedStruct = Struct({
@@ -55,6 +56,7 @@ class Collection extends ObjectType {
   string = String
   boolean = Boolean
   id = ID
+  date = Date
   nest = Nullable(Collection)
   list = List(Collection)
   struct = Struct({

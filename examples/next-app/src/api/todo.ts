@@ -41,6 +41,10 @@ export type Todo = {
    * @remarks Todo status
    */
   completed: boolean
+  /**
+   * @remarks Todo create time
+   */
+  createAt?: string | null | undefined
 }
 
 /**

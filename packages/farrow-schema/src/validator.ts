@@ -184,6 +184,31 @@ Validator.impl(S.Boolean, {
   },
 })
 
+
+Validator.impl(S.Date, {
+  validate(input) {
+    if (input instanceof Date) {
+      return Ok(input)
+    }
+
+    if (typeof input === 'number') {
+      return Ok(new Date(input))
+    }
+
+    if (typeof input === 'string') {
+      let timestamp = Date.parse(input)
+
+      if (Number.isNaN(timestamp)) {
+        return SchemaErr(`${input} is not a valid date input`)
+      }
+
+      return Ok(new Date(timestamp))
+    }
+
+    return SchemaErr(`${input} is not a valid date input`)
+  },
+})
+
 Validator.impl<S.LiteralType>(S.LiteralType, (schema) => ({
   validate: (input, options) => {
     let value = schema.value

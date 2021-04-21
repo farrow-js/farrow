@@ -109,6 +109,20 @@ describe('Formater', () => {
     })
   })
 
+  it('support format Date', () => {
+    let result = formatSchema(Date)
+    expect(result).toEqual({
+      typeId: 0,
+      types: {
+        '0': {
+          type: 'Scalar',
+          valueType: 'string',
+          valueName: 'Date',
+        },
+      },
+    })
+  })
+
   it('support format Literal', () => {
     let result0 = formatSchema(Literal(0))
     let result1 = formatSchema(Literal(false))

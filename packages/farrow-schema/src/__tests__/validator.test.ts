@@ -152,6 +152,29 @@ describe('Validator', () => {
     expect(() => assertOk(validate({}))).toThrow()
   })
 
+  it('supports Date validation', () => {
+    let validate = createSchemaValidator(Schema.Date)
+
+    expect(() => assertOk(validate(''))).toThrow()
+
+    let a = new Date()
+    expect(assertOk(validate(a))).toBe(a)
+
+    expect(assertOk(validate(a.getTime())).getTime()).toBe(a.getTime())
+
+    expect(assertOk(validate(a.toJSON())).getTime()).toBe(a.getTime())
+
+    expect(() => assertOk(validate(false))).toThrow()
+
+    expect(() => assertOk(validate(Number))).toThrow()
+
+    expect(() => assertOk(validate([]))).toThrow()
+
+    expect(() => assertOk(validate(null))).toThrow()
+
+    expect(() => assertOk(validate({}))).toThrow()
+  })
+
   it('supports nullable validation', () => {
     let validateNullableNumber = createSchemaValidator(Nullable(Number))
     let validateNullableString = createSchemaValidator(Nullable(String))

@@ -94,7 +94,14 @@ const getFieldType = (typeId: number, types: FormatTypes): string => {
 
 const getFieldsType = (fields: FormatFields, types: FormatTypes): string[] => {
   return Object.entries(fields).map(([key, field]) => {
-    let result = `${key}: ${getFieldType(field.typeId, types)}`
+    let fieldType = types[field.typeId]
+    let result = ''
+
+    if (fieldType.type === 'Nullable') {
+      result = `${key}?: ${getFieldType(field.typeId, types)}`
+    } else {
+      result = `${key}: ${getFieldType(field.typeId, types)}`
+    }
 
     return attachComment(result, {
       remarks: field.description,

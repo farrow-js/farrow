@@ -1,4 +1,4 @@
-import { Int, List, ObjectType, Type, TypeOf } from 'farrow-schema'
+import { Int, List, ObjectType, Type, TypeOf, Nullable } from 'farrow-schema'
 import { Api } from 'farrow-api'
 import { ApiService } from 'farrow-api-server'
 
@@ -16,6 +16,11 @@ export class Todo extends ObjectType {
   completed = {
     description: 'Todo status',
     [Type]: Boolean,
+  }
+
+  createAt? = {
+    description: 'Todo create time',
+    [Type]: Nullable(Date),
   }
 }
 
@@ -66,6 +71,7 @@ export const addTodo = Api(
       id: state.uid++,
       content: input.content,
       completed: false,
+      createAt: new Date(),
     })
     return {
       todos: state.todos,

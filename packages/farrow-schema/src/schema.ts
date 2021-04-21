@@ -1,5 +1,5 @@
-import { MarkReadOnlyDeep } from './types'
-import { isBooleanConstructor, isNumberConstructor, isStringConstructor } from './utils'
+import { DateInstanceType, MarkReadOnlyDeep } from './types'
+import { isBooleanConstructor, isNumberConstructor, isStringConstructor, isDateConstructor } from './utils'
 
 export type Prettier<T> = T extends Promise<infer U>
   ? Promise<Prettier<U>>
@@ -25,11 +25,13 @@ export abstract class Schema {
   abstract __type: unknown
 }
 
-export type Primitives = NumberConstructor | StringConstructor | BooleanConstructor
+export type Primitives = NumberConstructor | StringConstructor | BooleanConstructor | DateConstructor
 
 export type SchemaCtor<T extends Schema = Schema> = Primitives | (new () => T)
 
-export type TypeOf<T extends SchemaCtor | Schema> = T extends Primitives
+export type TypeOf<T extends SchemaCtor | Schema> = T extends DateConstructor
+  ? DateInstanceType
+  : T extends Primitives
   ? ReturnType<T>
   : T extends new () => { __type: infer U }
   ? U
@@ -59,6 +61,10 @@ export class Int extends Schema {
 
 export class Float extends Schema {
   __type!: number
+}
+
+export class Date extends Schema {
+  __type!: DateInstanceType
 }
 
 export abstract class ListType extends Schema {
@@ -279,6 +285,8 @@ export type SchemaTypeOf<T extends SchemaCtor> = T extends NumberConstructor
   ? String
   : T extends BooleanConstructor
   ? Boolean
+  : T extends DateConstructor
+  ? Date
   : T extends new () => infer S
   ? S
   : never
@@ -296,11 +304,20 @@ export const getSchemaCtor = <T extends SchemaCtor>(Ctor: T): SchemaTypeOf<T> =>
     return Boolean as SchemaTypeOf<T>
   }
 
+  if (isDateConstructor(Ctor)) {
+    return Date as SchemaTypeOf<T>
+  }
+
   return Ctor as SchemaTypeOf<T>
 }
 
 export const isSchemaCtor = (input: any): input is SchemaCtor => {
-  if (isNumberConstructor(input) || isStringConstructor(input) || isBooleanConstructor(input)) {
+  if (
+    isNumberConstructor(input) ||
+    isStringConstructor(input) ||
+    isBooleanConstructor(input) ||
+    isDateConstructor(input)
+  ) {
     return true
   }
 
@@ -372,6 +389,8 @@ export type InstanceTypeOf<T extends SchemaCtor> = T extends NumberConstructor
   ? String
   : T extends BooleanConstructor
   ? Boolean
+  : T extends DateConstructor
+  ? Date
   : T extends new () => infer R
   ? R
   : never
@@ -389,6 +408,10 @@ export const getInstance = <T extends SchemaCtor>(Ctor: T): InstanceTypeOf<T> =>
 
   if (isBooleanConstructor(Ctor)) {
     return getInstance(Boolean) as InstanceTypeOf<T>
+  }
+
+  if (isDateConstructor(Ctor)) {
+    return getInstance(Date) as InstanceTypeOf<T>
   }
 
   if (instanceWeakMap.has(Ctor)) {

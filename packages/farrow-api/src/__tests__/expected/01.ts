@@ -21,7 +21,8 @@ export type Collection = {
   string: string
   boolean: boolean
   id: string
-  nest: Collection | null | undefined
+  date: string
+  nest?: Collection | null | undefined
   list: Collection[]
   struct: {
     a: number

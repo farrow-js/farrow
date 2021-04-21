@@ -307,6 +307,16 @@ Formater.impl(S.Boolean, {
   },
 })
 
+Formater.impl(S.Date, {
+  format(ctx) {
+    return ctx.addType({
+      type: 'Scalar',
+      valueType: 'string',
+      valueName: 'Date',
+    })
+  },
+})
+
 Formater.impl(S.LiteralType, (schema) => {
   return {
     format(ctx) {

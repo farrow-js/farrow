@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## 1.10.0(2021/04/21)
+
+- refactor(farrow-schema): refactor formater, remove transformer
+- feat(farrow-schema): support DateType
+
 ## 1.9.2(2021/04/08)
 
 - fix(create-farrow-app): farrow build first to ensure the right api.src was replaced before client build)

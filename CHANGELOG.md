@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.10.1(2021/04/21)
+
+- fix(farrow-schema): fix typo, rename formater to formatter
+
 ## 1.10.0(2021/04/21)
 
 - refactor(farrow-schema): refactor formater, remove transformer

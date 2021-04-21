@@ -1,6 +1,6 @@
 {
   "name": "farrow-vite-todo-app",
-  "version": "1.9.4",
+  "version": "1.10.0",
   "private": true,
   "scripts": {
     "vite:dev": "vite",
@@ -10,11 +10,11 @@
     "serve": "vite preview"
   },
   "dependencies": {
-    "farrow-api": "^1.9.4",
-    "farrow-api-server": "^1.9.4",
-    "farrow-http": "^1.9.4",
+    "farrow-api": "^1.10.0",
+    "farrow-api-server": "^1.10.0",
+    "farrow-http": "^1.10.0",
     "farrow-pipeline": "^1.8.0",
-    "farrow-schema": "^1.9.4",
+    "farrow-schema": "^1.10.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"
   },
@@ -23,8 +23,8 @@
     "@types/react-dom": "^17.0.0",
     "@vitejs/plugin-react-refresh": "^1.1.0",
     "concurrently": "^6.0.0",
-    "farrow": "^1.9.4",
-    "farrow-vite": "^1.9.4",
+    "farrow": "^1.10.0",
+    "farrow-vite": "^1.10.0",
     "typescript": "^4.2.2",
     "vite": "^2.0.1"
   }

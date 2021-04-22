@@ -184,7 +184,7 @@ export type TypeOfFieldDescriptors<T extends FieldDescriptors> = {
 }
 
 export abstract class StructType extends Schema {
-  __type!: TypeOfFieldDescriptors<this['descriptors']>
+  __type!: ShallowPrettier<TypeOfFieldDescriptors<this['descriptors']>>
   abstract descriptors: FieldDescriptors
 }
 

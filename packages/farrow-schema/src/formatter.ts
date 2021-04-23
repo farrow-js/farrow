@@ -1,6 +1,6 @@
 import * as S from './schema'
 import { SchemaCtor, Schema, SchemaTypeOf, getInstance, Literals } from './schema'
-import { getSchemaCtorFields } from './helper'
+import { getSchemaCtorFields, PartialType } from './helper'
 
 export type FormatField = {
   typeId: number
@@ -579,5 +579,20 @@ Formatter.impl(S.ReadOnlyDeepType, (schema) => {
         $ref: `#/types/${typeId}`,
       })
     },
+  }
+})
+
+Formatter.impl(PartialType, schema => {
+  let Constructor = schema.constructor as typeof S.Schema
+  let ItemConstructor = schema.Item as unknown as typeof S.Schema
+
+  ItemConstructor.displayName = Constructor.displayName
+
+  console.log('displayName', Constructor.displayName)
+
+  return {
+    format(ctx) {
+      return Formatter.formatSchema(schema.Item, ctx)
+    }
   }
 })

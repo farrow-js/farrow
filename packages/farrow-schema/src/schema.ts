@@ -149,6 +149,10 @@ export abstract class NullableType extends Schema {
   abstract Item: SchemaCtor
 }
 
+export const isNullableType = (input: any): input is new () => NullableType => {
+  return input?.prototype instanceof NullableType
+}
+
 export const Nullable = <T extends SchemaCtorInput>(Item: T) => {
   return class Nullable extends NullableType {
     Item = toSchemaCtor(Item)

@@ -22,6 +22,7 @@ import {
 } from '../schema'
 
 import { formatSchema } from '../formatter'
+import { partial } from '../helper'
 
 describe('Formatter', () => {
   it('supports format Number', () => {
@@ -707,6 +708,116 @@ describe('Formatter', () => {
           type: 'Scalar',
           valueType: 'number',
           valueName: 'Int',
+        },
+      },
+    })
+  })
+
+  it('support format partial struct/object', () => {
+    class User extends ObjectType {
+      name = String
+      friends = List(User)
+    }
+
+    let Person = Struct({
+      name: String,
+      age: Int,
+    })
+
+    let PartialUser = partial(User)
+    let PartialPerson = partial(Person)
+
+    let result0 = formatSchema(PartialUser)
+    let result1 = formatSchema(PartialPerson)
+
+    expect(result0).toEqual({
+      typeId: 0,
+      types: {
+        '0': {
+          type: 'Struct',
+          fields: {
+            name: {
+              typeId: 2,
+              $ref: '#/types/2',
+            },
+            friends: {
+              typeId: 5,
+              $ref: '#/types/5',
+            },
+          },
+        },
+        '1': {
+          type: 'Scalar',
+          valueType: 'string',
+          valueName: 'String',
+        },
+        '2': {
+          type: 'Nullable',
+          itemTypeId: 1,
+          $ref: '#/types/1',
+        },
+        '3': {
+          type: 'Object',
+          name: 'User',
+          fields: {
+            name: {
+              typeId: 1,
+              $ref: '#/types/1',
+            },
+            friends: {
+              typeId: 4,
+              $ref: '#/types/4',
+            },
+          },
+        },
+        '4': {
+          type: 'List',
+          itemTypeId: 3,
+          $ref: '#/types/3',
+        },
+        '5': {
+          type: 'Nullable',
+          itemTypeId: 4,
+          $ref: '#/types/4',
+        },
+      },
+    })
+
+    expect(result1).toEqual({
+      typeId: 0,
+      types: {
+        '0': {
+          type: 'Struct',
+          fields: {
+            name: {
+              typeId: 2,
+              $ref: '#/types/2',
+            },
+            age: {
+              typeId: 4,
+              $ref: '#/types/4',
+            },
+          },
+        },
+        '1': {
+          type: 'Scalar',
+          valueType: 'string',
+          valueName: 'String',
+        },
+        '2': {
+          type: 'Nullable',
+          itemTypeId: 1,
+          $ref: '#/types/1',
+        },
+        '3': {
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Int',
+        },
+        '4': {
+          type: 'Nullable',
+          itemTypeId: 3,
+          $ref: '#/types/3',
         },
       },
     })

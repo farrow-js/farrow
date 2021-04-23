@@ -1,7 +1,7 @@
 import * as S from './schema'
 import { SchemaCtor, TypeOf, Schema, SchemaTypeOf, getInstance } from './schema'
 
-import { getSchemaCtorFields } from './helper'
+import { getSchemaCtorFields, PartialType } from './helper'
 import { Result, Err, Ok } from './result'
 
 export type ValidationError = {
@@ -457,6 +457,13 @@ Validator.impl<S.TupleType>(S.TupleType, schema => {
   }
 })
 
+Validator.impl(PartialType, schema => {
+  return {
+    validate(input, options): ValidationResult<any> {
+      return Validator.validate(schema.Item, input, options)
+    }
+  }
+})
 
 export const createSchemaValidator = <S extends S.SchemaCtor>(SchemaCtor: S, options?: ValidatorOptions) => {
   return (input: unknown) => {

@@ -5,7 +5,6 @@
  */
 
 import type { JsonType } from 'farrow-api-client'
-
 /**
  * {@label Collection}
  */
@@ -13,6 +12,8 @@ export type Collection = {
   namedStruct: NamedStruct
   namedUnion: NamedUnion
   namedIntersect: NamedIntersect
+  namedTuple: NamedTuple
+  partialStruct: PartialStruct
   number: number
   int: number
   float: number
@@ -66,4 +67,28 @@ export type NamedIntersect = {
   b: number
 } & {
   c: number
+}
+
+/**
+ * {@label NamedTuple}
+ */
+export type NamedTuple = [
+  {
+    a: number
+  },
+  {
+    b: number
+  },
+  {
+    c: number
+  },
+]
+
+/**
+ * {@label PartialStruct}
+ */
+export type PartialStruct = {
+  a?: number | null | undefined
+  b?: number | null | undefined
+  c?: boolean | null | undefined
 }

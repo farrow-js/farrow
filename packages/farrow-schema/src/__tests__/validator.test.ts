@@ -1,7 +1,7 @@
 import * as Schema from '../schema'
 import { ReadOnly, TypeOf, ReadOnlyDeep } from '../schema'
 import { createSchemaValidator, RegExp, ValidationResult, Validator, ValidatorType } from '../validator'
-import { pick, omit, keyof } from '../helper'
+import { pick, omit, keyof, partial } from '../helper'
 
 const {
   Type,
@@ -1119,5 +1119,51 @@ describe('Validator', () => {
 
     expect(testObjectKeys).toEqual(keys0)
     expect(testStructKeys).toEqual(keys1)
+  })
+
+  it('support partial operator', () => {
+    class User extends ObjectType {
+      name = String
+      friends = List(User)
+    }
+
+    let Person = Struct({
+      name: String,
+      age: Int,
+    })
+
+    let PartialUser = partial(User)
+    let PartialPerson = partial(Person)
+
+    type T0 = TypeOf<typeof PartialUser>
+    type T1 = TypeOf<typeof PartialPerson>
+
+    expect(assertOk(Validator.validate(PartialUser, {}))).toEqual({})
+    expect(assertOk(Validator.validate(PartialUser, { name: 'only-name' }))).toEqual({ name: 'only-name' })
+    expect(() => assertOk(Validator.validate(PartialUser, { friends: [{}, {}] }))).toThrow()
+
+    expect(
+      assertOk(
+        Validator.validate(PartialUser, {
+          friends: [
+            {
+              name: 'name',
+              friends: [],
+            },
+          ],
+        }),
+      ),
+    ).toEqual({
+      friends: [
+        {
+          name: 'name',
+          friends: [],
+        },
+      ],
+    })
+
+    expect(assertOk(Validator.validate(PartialPerson, {}))).toEqual({})
+    expect(assertOk(Validator.validate(PartialPerson, { name: 'only-name' }))).toEqual({ name: 'only-name' })
+    expect(assertOk(Validator.validate(PartialPerson, { name: 'name', age: 1 }))).toEqual({ name: 'name', age: 1 })
   })
 })

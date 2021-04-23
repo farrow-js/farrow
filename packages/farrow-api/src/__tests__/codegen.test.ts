@@ -20,6 +20,8 @@ import {
   Union,
   Unknown,
   Date,
+  Tuple,
+  partial,
 } from 'farrow-schema'
 
 const NamedStruct = Struct({
@@ -46,10 +48,26 @@ const NamedIntersect = Intersect(
 
 NamedIntersect.displayName = 'NamedIntersect'
 
+const NamedTuple = Tuple({ a: Int }, { b: Float }, { c: Number })
+
+NamedTuple.displayName = 'NamedTuple'
+
+const PartialStruct = partial(
+  Struct({
+    a: Int,
+    b: Float,
+    c: Boolean,
+  }),
+)
+
+PartialStruct.displayName = 'PartialStruct'
+
 class Collection extends ObjectType {
   namedStruct = NamedStruct
   namedUnion = NamedUnion
   namedIntersect = NamedIntersect
+  namedTuple = NamedTuple
+  partialStruct = PartialStruct
   number = Number
   int = Int
   float = Float
@@ -120,11 +138,11 @@ describe('codegen', () => {
       noCheck: 'just for testing',
     })
 
-    let formatedSource = format(source)
+    let formattedSource = format(source)
 
     let expected = await fs.readFile(`${__dirname}/expected/01.ts`)
 
-    expect(formatedSource.replace(/\r|\n/g, '')).toEqual(expected.toString().replace(/\r|\n/g, ''))
+    expect(formattedSource.replace(/\r|\n/g, '')).toEqual(expected.toString().replace(/\r|\n/g, ''))
   })
 
   it('can disable emiting api-client', async () => {

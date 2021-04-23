@@ -191,3 +191,55 @@ export const getSchemaCtorFields = (descriptors: S.FieldDescriptors): SchemaCtor
 
   return fields
 }
+
+export abstract class PartialType extends S.Schema {
+  __type!: Partial<TypeOf<this['Item']>>
+  abstract Item: S.SchemaCtor
+}
+
+const isNullableType = (input: any): input is new () => S.NullableType => {
+  return input?.prototype instanceof S.NullableType
+}
+
+const getPartialFields = (fields: FieldDescriptors) => {
+  let descriptors = {} as S.FieldDescriptors
+
+  for (let [key, value] of Object.entries(getSchemaCtorFields(fields))) {
+    descriptors[key] = {
+      ...value,
+      [S.Type]: isNullableType(value[S.Type]) ? value[S.Type] : S.Nullable(value[S.Type]),
+    }
+  }
+
+  return descriptors
+}
+
+export const partialStruct = <T extends StructType>(Ctor: new () => T) => {
+  let instance = getInstance(Ctor)
+
+  return class partial extends PartialType {
+    Item = (S.Struct(getPartialFields(instance.descriptors)) as unknown) as typeof Ctor
+  }
+}
+
+export const partialObject = <T extends ObjectType>(Ctor: new () => T) => {
+  let instance = getInstance(Ctor)
+
+  return class partial extends PartialType {
+    Item = (S.Struct(getPartialFields((instance as unknown) as S.FieldDescriptors)) as unknown) as typeof Ctor
+  }
+}
+
+export const partial: typeof partialStruct & typeof partialObject = (
+  Ctor: new () => S.ObjectType | S.StructType,
+): any => {
+  if (Ctor?.prototype instanceof ObjectType) {
+    return partialObject(Ctor as any)
+  }
+
+  if (Ctor?.prototype instanceof StructType) {
+    return partialStruct(Ctor as any)
+  }
+
+  throw new Error(`Unknown Schema Constructor: ${Ctor}`)
+}

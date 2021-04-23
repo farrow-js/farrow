@@ -89,6 +89,19 @@ const getFieldType = (typeId: number, types: FormatTypes): string => {
     }`
   }
 
+  if (
+    fieldType.type === 'Strict' ||
+    fieldType.type === 'NonStrict' ||
+    fieldType.type === 'ReadOnly' ||
+    fieldType.type === 'ReadOnlyDeep'
+  ) {
+    return getFieldType(fieldType.itemTypeId, types)
+  }
+
+  if (fieldType.type === 'Tuple') {
+    return `[${fieldType.itemTypes.map((itemType) => getFieldType(itemType.typeId, types)).join(', ')}]`
+  }
+
   throw new Error(`Unsupported field: ${JSON.stringify(fieldType, null, 2)}`)
 }
 
@@ -189,6 +202,20 @@ export const codegen = (formatResult: FormatResult, options?: CodegenOptions): s
        */
       export type ${typeName} = ${expression}
       `
+    }
+
+    if (formatType.type === 'Tuple') {
+      let typeName = formatType.name!
+      let expression = `[${formatType.itemTypes
+        .map((itemType) => getFieldType(itemType.typeId, formatResult.types))
+        .join(', ')}]`
+
+      return `
+        /**
+         * {@label ${typeName}} 
+         */
+        export type ${typeName} = ${expression}
+        `
     }
 
     throw new Error(`Unsupported type of ${JSON.stringify(formatType, null, 2)}`)

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.10.2(2021/04/27)
+
+- chore: drop esm support
+
 ## 1.10.1(2021/04/21)
 
 - fix(farrow-schema): fix typo, rename formater to formatter

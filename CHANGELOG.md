@@ -10,7 +10,7 @@
 
 ## 1.10.0(2021/04/21)
 
-- refactor(farrow-schema): refactor formater, remove transformer
+- refactor(farrow-schema): refactor formatter, remove transformer
 - feat(farrow-schema): support DateType
 
 ## 1.9.2(2021/04/08)

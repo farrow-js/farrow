@@ -1,4 +1,4 @@
-import { Module, Container, createProvider, initilize, Context, runInContext } from '../module'
+import { Module, Container, createProvider, initialize, Context, runInContext } from '../module'
 
 type PageInfo = {
   url: string
@@ -91,7 +91,7 @@ const testRoot = (root: Root, page: PageInfo) => {
 describe('Basic Usage of Module', () => {
   let app = new App()
 
-  let root = initilize(Root, {
+  let root = initialize(Root, {
     providers: [
       PageInfo.provide({
         url: '/path/for/initilize',

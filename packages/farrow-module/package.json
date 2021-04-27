@@ -3,7 +3,6 @@
   "version": "1.8.0",
   "description": "A module abstraction providing dependencies management",
   "main": "dist/index.js",
-  "module": "esm/index.js",
   "files": [
     "src",
     "dist",

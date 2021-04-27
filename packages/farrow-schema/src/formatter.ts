@@ -588,8 +588,6 @@ Formatter.impl(PartialType, schema => {
 
   ItemConstructor.displayName = Constructor.displayName
 
-  console.log('displayName', Constructor.displayName)
-
   return {
     format(ctx) {
       return Formatter.formatSchema(schema.Item, ctx)

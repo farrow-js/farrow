@@ -371,6 +371,6 @@ export class Container {
 
 export class Module extends Container {}
 
-export const initilize = <T>(Dep: ModuleCtor<T>, options?: ModuleContextOptions, ctx = new ModuleContext()) => {
+export const initialize = <T>(Dep: ModuleCtor<T>, options?: ModuleContextOptions, ctx = new ModuleContext()) => {
   return ctx.new(Dep, options)
 }

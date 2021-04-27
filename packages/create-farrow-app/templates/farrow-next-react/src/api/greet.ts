@@ -3,7 +3,7 @@
  * Don't modify it manually
  */
 
-import { createApiPipelineWithUrl } from 'farrow-api-client'
+import { createApiPipelineWithUrl, ApiInvokeOptions } from 'farrow-api-client'
 
 /**
  * {@label GreetInput}
@@ -33,5 +33,6 @@ export const api = {
   /**
    * @remarks Greeting
    */
-  greet: (input: GreetInput) => apiPipeline.invoke({ path: ['greet'], input }) as Promise<GreetOutput>,
+  greet: (input: GreetInput, options?: ApiInvokeOptions) =>
+    apiPipeline.invoke({ type: 'Single', path: ['greet'], input }, options) as Promise<GreetOutput>,
 }

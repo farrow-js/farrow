@@ -267,6 +267,16 @@ Validator.impl<S.StructType>(S.StructType, (schema) => {
 
   return {
     validate: (input, options) => {
+      if (typeof input === 'string') {
+        if (options?.strict === false) {
+          try {
+            input = JSON.parse(input)
+          } catch(e) {
+            // ignore
+          }
+        }
+      }
+
       if (typeof input !== 'object' || !input) {
         return SchemaErr(`${input} is not an object`)
       }

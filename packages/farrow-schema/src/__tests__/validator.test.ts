@@ -733,6 +733,16 @@ describe('Validator', () => {
       e: false,
     })
 
+    expect(() => assertOk(validate0(JSON.stringify(data1)))).toThrow()
+
+    expect(assertOk(validate1(JSON.stringify(data1)))).toEqual({
+      a: 1,
+      b: 1,
+      c: false,
+      d: 1,
+      e: false,
+    })
+
     expect(() => assertOk(validate0(data2))).toThrow()
 
     expect(assertOk(validate1(data2))).toEqual({

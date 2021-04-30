@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.10.3(2021/04/30)
+
+- feat(farrow-schema): support parse json for object/struct in non-strict mode
+
 ## 1.10.2(2021/04/27)
 
 - chore: drop esm support

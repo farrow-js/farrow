@@ -107,7 +107,7 @@ class Root extends Module {
  */
 class App extends Container {
   page = this.inject(
-    PageInfoProvider.provide({
+    PageInfo.provide({
       url: '/path/for/app',
       env: 'app',
     }),
@@ -124,7 +124,7 @@ class App extends Container {
    */
   root2 = this.new(Root, {
     providers: [
-      PageInfoProvider.provide({
+      PageInfo.provide({
         url: '/path/for/new',
         env: 'new',
       }),

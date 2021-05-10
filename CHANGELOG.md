@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.10.4(2021/05/10)
+
+- feat(farrow-next): Reuse latest selected state on selector re-run
+
 ## 1.10.3(2021/04/30)
 
 - feat(farrow-schema): support parse json for object/struct in non-strict mode

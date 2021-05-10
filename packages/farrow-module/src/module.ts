@@ -179,7 +179,7 @@ export class ModuleContext {
   /**
    * create a new context for Dep
    * @param Ctor
-   * @param options options for resusing deps or others
+   * @param options options for reusing deps or others
    */
   new<T>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
     let ctx = new ModuleContext()
@@ -279,7 +279,7 @@ class ModuleContextManager {
   /**
    * create a new context for Dep
    * @param Ctor
-   * @param options options for resusing deps or others
+   * @param options options for reusing deps or others
    */
   new<T>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
     if (!currentModuleContext) {
@@ -327,7 +327,7 @@ export class Container {
       /**
        * create a new context for Dep
        * @param Ctor
-       * @param options options for resusing deps or others
+       * @param options options for reusing deps or others
        */
       new<T>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
         return Context.from(this).new(Ctor, options)
@@ -362,7 +362,7 @@ export class Container {
   /**
    * create a new context for Dep
    * @param Ctor
-   * @param options options for resusing deps or others
+   * @param options options for reusing deps or others
    */
   new<T>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
     return Context.from(this).new(Ctor, options)

@@ -1,49 +1,35 @@
-# Farrow Docs
+# Farrow
 
-## [farrow](../packages/farrow/README.md)
+## Official Packages
 
-Useful tools for developing farrow app
+- [create-farrow-app](../packages/create-farrow-app/README.md): A cli-tools for scaffolding farrow project
 
-## [farrow-schema](../packages/farrow-schema/README.md)
+- [farrow](../packages/farrow/README.md): A cli-tools for developing farrow app
 
-**farrow-schema**: A powerful and extensible schema builder
+- [farrow-http](../packages/farrow-http/README.md): A type-friendly Web Framework for Node.js
 
-## [farrow-module](../packages/farrow-module/README.md)
+- [farrow-schema](../packages/farrow-schema/README.md): A powerful and extensible schema builder
 
-**farrow-module**: A module abstraction providing dependencies management
+- [farrow-pipeline](../packages/farrow-pipeline/README.md): A type-friendly middleware library
 
-## [farrow-pipeline](../packages/farrow-pipeline/README.md)
+- [farrow-react](../packages/farrow-react/README.md): React bindings for farrow-http
 
-**farrow-pipeline**: A type-friendly middleware library
+- [farrow-cors](../packages/farrow-cors/README.md): Cross-Origin Resource Sharing(CORS) for farrow-http
 
-## [farrow-http](../packages/farrow-http/README.md)
+- [farrow-api](../packages/farrow-api/README.md): Schema-based Api builder
 
-**farrow-http**: A type-friendly Web Framework
+- [farrow-api-server](../packages/farrow-api-server/README.md): farrow-api adapter for farrow-http
 
-## [farrow-react](../packages/farrow-react/README.md)
+- [farrow-api-client](../packages/farrow-api-client/README.md): farrow-api client
 
-**farrow-react**: React bindings for farrow-http
+- [farrow-vite](../packages/farrow-vite/README.md): Vite adapter for farrow-http
 
-## [farrow-cors](../packages/farrow-cors/README.md)
+- [farrow-module](../packages/farrow-module/README.md): A module abstraction providing dependencies management
 
-**farrow-cors**: Cross-Origin Resource Sharing(CORS) for farrow-http
+- [farrow-next](../packages/farrow-next/README.md): An isomorphic MVC layer runs on top of Next.js
 
-## [farrow-api](../packages/farrow-api/README.md)
+- [farrow-next-server](../packages/farrow-next-server/README.md): Run next.js in farrow
 
-**farrow-api**: Schema-based Api builder
+## Community Packages
 
-## [farrow-api-server](../packages/farrow-api-server/README.md)
-
-**farrow-api-server**: farrow-api adapter for farrow-http
-
-## [farrow-api-client](../packages/farrow-api-client/README.md)
-
-**farrow-api-client**: farrow-api client
-
-## [farrow-vite](../packages/farrow-vite/README.md)
-
-**farrow-vite**: Vite adapter for farrow-http
-
-## [farrow-next](../packages/farrow-next/README.md)
-
-**farrow-next**: A framework runs on Next.js
+- [farrow-session](https://github.com/tqma113/farrow-session): A session middleware for farrow.

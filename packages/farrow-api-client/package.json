@@ -1,6 +1,6 @@
 {
   "name": "farrow-api-client",
-  "version": "1.10.3",
+  "version": "1.10.4",
   "description": "A type-friendly BFF framework",
   "main": "dist/index.js",
   "scripts": {
@@ -26,7 +26,7 @@
     "farrow-pipeline": "^1.8.0"
   },
   "devDependencies": {
-    "farrow-api-server": "^1.10.3",
+    "farrow-api-server": "^1.10.4",
     "farrow-pipeline": "^1.10.2"
   },
   "dependencies": {

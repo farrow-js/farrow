@@ -141,7 +141,15 @@ export abstract class Controller extends Module {
         storeState !== latestStoreState.current ||
         latestSubscriptionCallbackError.current
       ) {
-        selectedState = selector(storeState)
+        let currentSelectedState = selector(storeState)
+        if (
+          latestSelectedState.current !== DefaultValue &&
+          compare(currentSelectedState, latestSelectedState.current)
+        ) {
+          selectedState = latestSelectedState.current
+        } else {
+          selectedState = currentSelectedState
+        }
       } else {
         selectedState = latestSelectedState.current
       }

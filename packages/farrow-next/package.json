@@ -1,6 +1,6 @@
 {
   "name": "farrow-next",
-  "version": "1.10.4",
+  "version": "1.10.5",
   "description": "A framework runs on Next.js",
   "main": "dist/index.js",
   "files": [

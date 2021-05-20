@@ -57,7 +57,7 @@ export const Validator = {
 
   get<T extends SchemaCtor>(Ctor: T): ValidatorMethods<SchemaTypeOf<T>> | undefined {
     let finalCtor = S.getSchemaCtor(Ctor)
-    let validatorImpl = getValidatorImpl(finalCtor as Function) as ValidatorImpl<SchemaTypeOf<T>> | undefined
+    let validatorImpl = getValidatorImpl(finalCtor as unknown as Function) as ValidatorImpl<SchemaTypeOf<T>> | undefined
 
     // instantiation validator and save to weak-map
     if (typeof validatorImpl === 'function') {

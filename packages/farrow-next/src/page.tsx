@@ -6,7 +6,7 @@ import { replaceState } from './store'
 import { ModuleContext, ModuleProviderValue } from './module'
 import { PageInfo, GetPageInfo } from './page-info'
 
-export type ConstrollerStates<T extends ControllerCtors> = InstanceType<T[keyof T]>['state']
+export type ControllerStates<T extends ControllerCtors> = InstanceType<T[keyof T]>['state']
 
 export type PageOptions<T extends ControllerCtors> = {
   View: ComponentType<{}>
@@ -65,12 +65,10 @@ export const useQueryChangedEffect = (effect: QueryChangedEffectCallback) => {
   }, [effect])
 }
 
-let currentPathname = typeof window !== 'undefined' ? window.location.pathname : null
-
-export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPage<PageProps<ConstrollerStates<T>>> => {
+export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPage<PageProps<ControllerStates<T>>> => {
   let { Controllers, preload, View } = options
-  let Page: NextPage<PageProps<ConstrollerStates<T>>> = (props) => {
-    type Props = PageProps<ConstrollerStates<T>>
+  let Page: NextPage<PageProps<ControllerStates<T>>> = (props) => {
+    type Props = PageProps<ControllerStates<T>>
     type PageRefValueType = { ctrls: Controller[]; props: Props; pageInfo: PageInfo }
     let pageInfoRef = useRef<PageRefValueType | null>(null)
 
@@ -91,7 +89,7 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
       let moduleContext = new ModuleContext().injectProviderValues([getPageInfo, ...(options.Providers ?? [])])
 
       let ctrls = Object.values(Controllers).map((Controller, index) => {
-        let ctrl = moduleContext.new(Controller)
+        let ctrl = moduleContext.use(Controller)
         let state = props.states[index]
         replaceState(ctrl.store, state)
         return ctrl
@@ -157,7 +155,6 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
           states: [],
         }
       }
-      currentPathname = pathname
     }
 
     let getPageInfo = GetPageInfo.provide(() => pageInfo)
@@ -168,7 +165,7 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
     let ctrlsKeys = Object.keys(Controllers)
 
     let ctrls = Object.values(Controllers).map((Controller, index) => {
-      let ctrl = moduleCtx.new(Controller)
+      let ctrl = moduleCtx.use(Controller)
       let key = ctrlsKeys[index] as keyof T
       ctrlsMap[key] = ctrl as ControllerInstancesType<T>[keyof T]
       return ctrl

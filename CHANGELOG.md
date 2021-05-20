@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.10.5(2021/05/20)
+
+- fix(farrow-next): moduleContext.new is wrong, use moduleContext.use for Page Component
+
 ## 1.10.4(2021/05/10)
 
 - feat(farrow-next): Reuse latest selected state on selector re-run

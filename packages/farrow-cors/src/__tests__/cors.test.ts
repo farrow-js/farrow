@@ -11,8 +11,8 @@ const createHttp = (options?: HttpPipelineOptions) => {
 
 describe('farrow-cors', () => {
   it('supports static options', async () => {
-    let http = createHttp()
-    let server = http.server()
+    const http = createHttp()
+    const server = http.server()
 
     http.use(
       cors({
@@ -42,8 +42,8 @@ describe('farrow-cors', () => {
   })
 
   it('should support function option', async () => {
-    let http = createHttp()
-    let server = http.server()
+    const http = createHttp()
+    const server = http.server()
 
     http.use(
       cors((request, callback) => {

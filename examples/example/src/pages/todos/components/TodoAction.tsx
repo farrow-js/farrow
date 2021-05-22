@@ -7,7 +7,7 @@ type TodoActionProps = {
   method?: string
 }
 export const TodoAction: React.FC<TodoActionProps> = (props) => {
-  let formId = useMemo(() => {
+  const formId = useMemo(() => {
     return Math.random().toString(32).substr(7)
   }, [])
 

@@ -77,58 +77,58 @@ export type Pipeline<I = unknown, O = unknown> = {
 }
 
 export const createPipeline = <I, O>(options?: PipelineOptions) => {
-  let config = {
+  const config = {
     ...options,
   }
 
-  let middlewares: Middlewares<I, O> = []
+  const middlewares: Middlewares<I, O> = []
 
-  let use: Pipeline<I, O>['use'] = (...inputs) => {
+  const use: Pipeline<I, O>['use'] = (...inputs) => {
     middlewares.push(...inputs.map(getMiddleware))
     return pipeline
   }
 
-  let createCurrentCounter = (hooks: Hooks, onLast?: (input: I) => O) => {
+  const createCurrentCounter = (hooks: Hooks, onLast?: (input: I) => O) => {
     return createCounter<I, O>((index, input, next) => {
       if (index >= middlewares.length) {
         if (onLast) return onLast(input)
         throw new Error(`Expect returning a value, but all middlewares just calling next()`)
       }
 
-      let middleware = middlewares[index]
-      let result = runHooks(() => middleware(input, next), hooks)
+      const middleware = middlewares[index]
+      const result = runHooks(() => middleware(input, next), hooks)
 
       return result
     })
   }
 
-  let currentContainer = createContainer(config.contexts)
-  let currentHooks = fromContainer(currentContainer)
-  let currentCounter = createCurrentCounter(currentHooks)
+  const currentContainer = createContainer(config.contexts)
+  const currentHooks = fromContainer(currentContainer)
+  const currentCounter = createCurrentCounter(currentHooks)
 
-  let run: Pipeline<I, O>['run'] = (input, options) => {
-    let container = options?.container ?? currentContainer
-    let hooks = container === currentContainer ? currentHooks : fromContainer(container)
+  const run: Pipeline<I, O>['run'] = (input, options) => {
+    const container = options?.container ?? currentContainer
+    const hooks = container === currentContainer ? currentHooks : fromContainer(container)
     let counter = container === currentContainer ? currentCounter : createCurrentCounter(hooks)
 
     if (options?.onLast) {
       counter = createCurrentCounter(hooks, options.onLast)
     }
 
-    let result = counter.start(input)
+    const result = counter.start(input)
 
     return result
   }
 
-  let middleware: Pipeline<I, O>['middleware'] = (input, next) => {
-    let container = useContainer()
+  const middleware: Pipeline<I, O>['middleware'] = (input, next) => {
+    const container = useContainer()
     return run(input, {
       container,
       onLast: next,
     })
   }
 
-  let pipeline: Pipeline<I, O> = {
+  const pipeline: Pipeline<I, O> = {
     [PipelineSymbol]: true,
     use,
     run,
@@ -142,9 +142,9 @@ export type PipelineInput<T extends Pipeline> = T extends Pipeline<infer I> ? I 
 export type PipelineOutput<T extends Pipeline> = T extends Pipeline<any, infer O> ? O : never
 
 export const usePipeline = <I, O>(pipeline: Pipeline<I, O>) => {
-  let container = useContainer()
+  const container = useContainer()
 
-  let runPipeline = (input: I, options?: RunPipelineOptions<I, O>): O => {
+  const runPipeline = (input: I, options?: RunPipelineOptions<I, O>): O => {
     return pipeline.run(input, { ...options, container })
   }
 
@@ -160,9 +160,9 @@ export type AsyncPipeline<I = unknown, O = unknown> = Pipeline<I, MaybeAsync<O>>
 }
 
 export const createAsyncPipeline = <I, O>(options?: PipelineOptions) => {
-  let pipeline = createPipeline<I, MaybeAsync<O>>(options)
+  const pipeline = createPipeline<I, MaybeAsync<O>>(options)
 
-  let useLazy: AsyncPipeline<I, O>['useLazy'] = (thunk) => {
+  const useLazy: AsyncPipeline<I, O>['useLazy'] = (thunk) => {
     let middleware: Middleware<I, MaybeAsync<O>> | null = null
     let promise: Promise<void> | null = null
 
@@ -186,7 +186,7 @@ export const createAsyncPipeline = <I, O>(options?: PipelineOptions) => {
     return asyncPipeline
   }
 
-  let asyncPipeline: AsyncPipeline<I, O> = {
+  const asyncPipeline: AsyncPipeline<I, O> = {
     ...pipeline,
     useLazy,
   }

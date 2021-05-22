@@ -4,7 +4,7 @@ import { vite } from 'farrow-vite'
 
 import { services } from './api'
 
-let http = Http()
+const http = Http()
 
 http.use(services)
 

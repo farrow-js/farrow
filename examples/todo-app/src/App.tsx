@@ -4,12 +4,12 @@ import './App.css'
 import { api as TodoApi, Todo } from './api/todo'
 
 function App() {
-  let [count, setCount] = useState(110)
-  let [todos, setTodos] = useState<Todo[]>([])
+  const [count, setCount] = useState(110)
+  const [todos, setTodos] = useState<Todo[]>([])
 
   useEffect(() => {
-    let task = async () => {
-      let result = await TodoApi.addTodo({
+    const task = async () => {
+      const result = await TodoApi.addTodo({
         content: `count:${count}`,
       })
       setTodos(result.todos)

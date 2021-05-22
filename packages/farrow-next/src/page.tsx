@@ -23,7 +23,7 @@ export type PageProps<State = any> = Pick<NextPageContext, 'pathname' | 'query' 
 export const PageInfoContext = React.createContext<PageInfo | null>(null)
 
 export const usePageInfo = (): PageInfo => {
-  let pageInfo = useContext(PageInfoContext)
+  const pageInfo = useContext(PageInfoContext)
   if (!pageInfo) {
     throw new Error(`pageInfo was not found`)
   }
@@ -37,14 +37,14 @@ export type QueryChangedEffectCallback = (curr: ParsedQs, prev: ParsedQs) => unk
  * @param effect
  */
 export const useQueryChangedEffect = (effect: QueryChangedEffectCallback) => {
-  let pageInfo = usePageInfo()
-  let effectCallbackRef = useRef<QueryChangedEffectCallback>(effect)
-  let pageInfoRef = useRef<PageInfo>(pageInfo)
+  const pageInfo = usePageInfo()
+  const effectCallbackRef = useRef<QueryChangedEffectCallback>(effect)
+  const pageInfoRef = useRef<PageInfo>(pageInfo)
 
   useEffect(() => {
     if (pageInfoRef.current !== pageInfo) {
-      let curr = pageInfo.query
-      let prev = pageInfoRef.current.query
+      const curr = pageInfo.query
+      const prev = pageInfoRef.current.query
 
       pageInfoRef.current = pageInfo
 
@@ -66,31 +66,31 @@ export const useQueryChangedEffect = (effect: QueryChangedEffectCallback) => {
 }
 
 export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPage<PageProps<ControllerStates<T>>> => {
-  let { Controllers, preload, View } = options
-  let Page: NextPage<PageProps<ControllerStates<T>>> = (props) => {
+  const { Controllers, preload, View } = options
+  const Page: NextPage<PageProps<ControllerStates<T>>> = (props) => {
     type Props = PageProps<ControllerStates<T>>
     type PageRefValueType = { ctrls: Controller[]; props: Props; pageInfo: PageInfo }
-    let pageInfoRef = useRef<PageRefValueType | null>(null)
+    const pageInfoRef = useRef<PageRefValueType | null>(null)
 
-    let pageInfo = {
+    const pageInfo = {
       userAgent: props.userAgent,
       pathname: props.pathname,
       query: props.query,
       asPath: props.asPath,
     }
 
-    let getCtrls = () => {
-      let getPageInfo = GetPageInfo.provide(() => {
+    const getCtrls = () => {
+      const getPageInfo = GetPageInfo.provide(() => {
         if (!pageInfoRef.current?.pageInfo) {
           throw new Error(`Page info is not found`)
         }
         return pageInfoRef.current.pageInfo
       })
-      let moduleContext = new ModuleContext().injectProviderValues([getPageInfo, ...(options.Providers ?? [])])
+      const moduleContext = new ModuleContext().injectProviderValues([getPageInfo, ...(options.Providers ?? [])])
 
-      let ctrls = Object.values(Controllers).map((Controller, index) => {
-        let ctrl = moduleContext.use(Controller)
-        let state = props.states[index]
+      const ctrls = Object.values(Controllers).map((Controller, index) => {
+        const ctrl = moduleContext.use(Controller)
+        const state = props.states[index]
         replaceState(ctrl.store, state)
         return ctrl
       })
@@ -133,13 +133,13 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
   }
 
   Page.getInitialProps = async (ctx) => {
-    let { pathname, query, asPath } = ctx
+    const { pathname, query, asPath } = ctx
 
-    let { AppTree, ...rest } = ctx
+    const { AppTree, ...rest } = ctx
 
-    let userAgent = getUserAgent(ctx.req)
+    const userAgent = getUserAgent(ctx.req)
 
-    let pageInfo: PageInfo = {
+    const pageInfo: PageInfo = {
       ...rest,
       userAgent,
     }
@@ -157,16 +157,16 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
       }
     }
 
-    let getPageInfo = GetPageInfo.provide(() => pageInfo)
-    let moduleCtx = new ModuleContext().injectProviderValues([getPageInfo, ...(options.Providers ?? [])])
+    const getPageInfo = GetPageInfo.provide(() => pageInfo)
+    const moduleCtx = new ModuleContext().injectProviderValues([getPageInfo, ...(options.Providers ?? [])])
 
-    let ctrlsMap = {} as ControllerInstancesType<T>
+    const ctrlsMap = {} as ControllerInstancesType<T>
 
-    let ctrlsKeys = Object.keys(Controllers)
+    const ctrlsKeys = Object.keys(Controllers)
 
-    let ctrls = Object.values(Controllers).map((Controller, index) => {
-      let ctrl = moduleCtx.use(Controller)
-      let key = ctrlsKeys[index] as keyof T
+    const ctrls = Object.values(Controllers).map((Controller, index) => {
+      const ctrl = moduleCtx.use(Controller)
+      const key = ctrlsKeys[index] as keyof T
       ctrlsMap[key] = ctrl as ControllerInstancesType<T>[keyof T]
       return ctrl
     })
@@ -174,12 +174,12 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
     /**
      * preload ctrls
      */
-    let promises = ctrls.map((ctrl) => ctrl.preload?.())
+    const promises = ctrls.map((ctrl) => ctrl.preload?.())
 
     await Promise.all(promises)
     await preload?.(ctrlsMap)
 
-    let states = ctrls.map((ctrl) => ctrl.store.getState())
+    const states = ctrls.map((ctrl) => ctrl.store.getState())
 
     return {
       userAgent,

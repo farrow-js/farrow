@@ -51,7 +51,7 @@ const getControllerStore = <T extends Controller>(ctrl: T): Store<T['initialStat
     return StoreWeakMap.get(ctrl)!
   }
 
-  let store = createStore({
+  const store = createStore({
     name: typeof ctrl.devtools === 'string' ? ctrl.devtools : ctrl.constructor.name,
     initialState: ctrl.initialState,
     reducers: ctrl.reducers,
@@ -74,7 +74,7 @@ export abstract class Controller extends Module {
       return ControllerIdWeakMap.get(this)!
     }
 
-    let id = uid
+    const id = uid
 
     uid += 1
 
@@ -89,10 +89,10 @@ export abstract class Controller extends Module {
    * @returns get Controller instance via react-hooks
    */
   static use<T extends Controller>(this: ControllerCtor<T>): T {
-    let id = this.getId()
-    let ctx = useContext(ControllerReactContext)
+    const id = this.getId()
+    const ctx = useContext(ControllerReactContext)
 
-    let ctrl = ctx ? ctx[`${id}`] : null
+    const ctrl = ctx ? ctx[`${id}`] : null
 
     if (!ctrl) {
       throw new Error('You may forget to add Controller to page({ Controllers: {} }) before using Controller.use()')
@@ -116,23 +116,23 @@ export abstract class Controller extends Module {
     selector = selector ?? identity
     compare = compare ?? shallowEqual
 
-    let ctrl = this.use()
+    const ctrl = this.use()
 
     type State = StateType<T['store']>
     type Selector = typeof selector
     type SelectedState = ReturnType<Selector>
 
-    let { store } = ctrl
+    const { store } = ctrl
 
     // modified from react-redux useSelector
-    let [_, forceRender] = useReducer((s) => s + 1, 0)
+    const [_, forceRender] = useReducer((s) => s + 1, 0)
 
-    let latestSubscriptionCallbackError = useRef<Error | null>(null)
-    let latestSelector = useRef<Selector | undefined>()
-    let latestStoreState = useRef<State | DefaultValueType>(DefaultValue)
-    let latestSelectedState = useRef<SelectedState | DefaultValueType>(DefaultValue)
+    const latestSubscriptionCallbackError = useRef<Error | null>(null)
+    const latestSelector = useRef<Selector | undefined>()
+    const latestStoreState = useRef<State | DefaultValueType>(DefaultValue)
+    const latestSelectedState = useRef<SelectedState | DefaultValueType>(DefaultValue)
 
-    let storeState = store.getState()
+    const storeState = store.getState()
     let selectedState: SelectedState | DefaultValueType = DefaultValue
 
     try {
@@ -141,7 +141,7 @@ export abstract class Controller extends Module {
         storeState !== latestStoreState.current ||
         latestSubscriptionCallbackError.current
       ) {
-        let currentSelectedState = selector(storeState)
+        const currentSelectedState = selector(storeState)
         if (
           latestSelectedState.current !== DefaultValue &&
           compare(currentSelectedState, latestSelectedState.current)
@@ -170,7 +170,7 @@ export abstract class Controller extends Module {
 
     useIsomorphicLayoutEffect(() => {
       let isUnmounted = false
-      let checkForUpdates = () => {
+      const checkForUpdates = () => {
         if (!latestSelector.current) return
         if (isUnmounted) return
 
@@ -179,8 +179,8 @@ export abstract class Controller extends Module {
         }
 
         try {
-          let storeState = store.getState()
-          let newSelectedState = latestSelector.current(storeState)
+          const storeState = store.getState()
+          const newSelectedState = latestSelector.current(storeState)
 
           if (compare!(newSelectedState, latestSelectedState.current)) {
             return
@@ -198,7 +198,7 @@ export abstract class Controller extends Module {
 
         forceRender()
       }
-      let unsubscribe = store.subscribe(checkForUpdates)
+      const unsubscribe = store.subscribe(checkForUpdates)
 
       return () => {
         isUnmounted = true
@@ -271,7 +271,7 @@ export abstract class Controller extends Module {
    * page info
    */
   get page() {
-    let getPageInfo = this.use(GetPageInfo)
+    const getPageInfo = this.use(GetPageInfo)
     return getPageInfo()
   }
 
@@ -359,7 +359,7 @@ export abstract class Controller extends Module {
    * @returns json
    */
   async getJson<Query extends {}>(url: string, query?: Query, init?: RequestInit) {
-    let options: RequestInit = {
+    const options: RequestInit = {
       ...init,
       method: 'GET',
       headers: {
@@ -369,13 +369,13 @@ export abstract class Controller extends Module {
     }
 
     if (Object.keys(query ?? {}).length) {
-      let separator = url.includes('?') ? '&' : '?'
+      const separator = url.includes('?') ? '&' : '?'
       url = url + separator + stringifyQuery(query)
     }
 
-    let response = await this.fetch(url, options)
-    let text = await response.text()
-    let json = JSON.parse(text)
+    const response = await this.fetch(url, options)
+    const text = await response.text()
+    const json = JSON.parse(text)
 
     return json
   }
@@ -388,7 +388,7 @@ export abstract class Controller extends Module {
    * @returns json
    */
   async postJson<Body extends {}>(url: string, body?: Body, init?: RequestInit) {
-    let options: RequestInit = {
+    const options: RequestInit = {
       ...init,
       method: 'POST',
       headers: {
@@ -398,9 +398,9 @@ export abstract class Controller extends Module {
       body: JSON.stringify(body),
     }
 
-    let response = await this.fetch(url, options)
-    let text = await response.text()
-    let json = JSON.parse(text)
+    const response = await this.fetch(url, options)
+    const text = await response.text()
+    const json = JSON.parse(text)
 
     return json
   }
@@ -411,7 +411,7 @@ export abstract class Controller extends Module {
    */
   async redirect(url: string) {
     if (this.page.res) {
-      let res = this.page.res
+      const res = this.page.res
       res.writeHead(302, { Location: url })
       res.end()
     } else if (url.startsWith('http') || url.startsWith('//')) {
@@ -430,14 +430,14 @@ export type ProviderProps = {
  * Provider for injecting controllers
  */
 export const Provider: React.FC<ProviderProps> = ({ controllers, children }) => {
-  let valueRef = useRef<ControllerReactContextValue | null>(null)
+  const valueRef = useRef<ControllerReactContextValue | null>(null)
 
   if (!valueRef.current) {
-    let ctrls = {} as ControllerReactContextValue
+    const ctrls = {} as ControllerReactContextValue
 
     for (let i = controllers.length - 1; i >= 0; i -= 1) {
-      let ctrl = controllers[i]
-      let ctrlId = ((ctrl.constructor as unknown) as ControllerCtor).getId()
+      const ctrl = controllers[i]
+      const ctrlId = (ctrl.constructor as unknown as ControllerCtor).getId()
       ctrls[`${ctrlId}`] = ctrl
     }
 
@@ -448,7 +448,7 @@ export const Provider: React.FC<ProviderProps> = ({ controllers, children }) => 
 }
 
 export const getUserAgent = (req?: IncomingMessage): string => {
-  let userAgent = req?.headers['user-agent'] ?? ''
+  const userAgent = req?.headers['user-agent'] ?? ''
 
   if (typeof window !== 'undefined') {
     return window.navigator.userAgent

@@ -9,20 +9,20 @@ export type NextRouterPipeline = RouterPipeline & {
 }
 
 export const next = (options?: NextServer['options']): NextRouterPipeline => {
-  let router = Router()
-  let app = createNextServer({
+  const router = Router()
+  const app = createNextServer({
     dev: process.env.NODE_ENV === 'development',
     ...options,
   })
 
   router.useLazy(async () => {
-    let handle = app.getRequestHandler()
+    const handle = app.getRequestHandler()
 
     await app.prepare()
 
     return () => {
       return Response.custom(async ({ req, res }) => {
-        let parsedUrl = parseUrl(req.url ?? '', true)
+        const parsedUrl = parseUrl(req.url ?? '', true)
         await handle(req, res, parsedUrl)
       })
     }

@@ -4,11 +4,11 @@ import './App.css'
 import { api as GreetApi } from './api/greet'
 
 function App() {
-  let [greet, setGreet] = useState('')
+  const [greet, setGreet] = useState('')
 
   useEffect(() => {
-    let task = async () => {
-      let result = await GreetApi.greet({
+    const task = async () => {
+      const result = await GreetApi.greet({
         name: `Farrow + React + Vite`,
       })
       setGreet(result.greet)

@@ -17,18 +17,18 @@ type ApiResponse = ApiErrorResponse | ApiSuccessResponse
 
 export const api = createApiClient({
   fetcher: async (input) => {
-    let options = {
+    const options = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(input),
     }
-    let response = await fetch(url, options)
-    let text = await response.text()
+    const response = await fetch(url, options)
+    const text = await response.text()
 
     try {
-      let json = JSON.parse(text) as ApiResponse
+      const json = JSON.parse(text) as ApiResponse
       if ('error' in json) {
         throw new Error(json.error.message)
       } else {

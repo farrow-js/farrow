@@ -10,15 +10,15 @@ const delay = (duration: number = 1) => {
 
 describe('createContext', () => {
   it('basic usage', () => {
-    let Context0 = createContext({
+    const Context0 = createContext({
       count: 0,
     })
 
-    let Context1 = createContext({
+    const Context1 = createContext({
       text: 'test',
     })
 
-    let container = createContainer()
+    const container = createContainer()
 
     expect(container.read(Context0)).toEqual({
       count: 0,
@@ -46,15 +46,15 @@ describe('createContext', () => {
   })
 
   it('inject new Context', () => {
-    let Context0 = createContext({
+    const Context0 = createContext({
       count: 0,
     })
 
-    let Context1 = createContext({
+    const Context1 = createContext({
       text: 'test',
     })
 
-    let container = createContainer({
+    const container = createContainer({
       count: Context0.create({
         count: 1,
       }),
@@ -80,7 +80,7 @@ describe('createPipeline', () => {
     }
     type Output = PromiseLike<number> | number
 
-    let pipeline = createPipeline<Input, Output>()
+    const pipeline = createPipeline<Input, Output>()
 
     let list: number[] = []
 
@@ -112,7 +112,7 @@ describe('createPipeline', () => {
       return input.count + 2
     })
 
-    let result0 = await pipeline.run({
+    const result0 = await pipeline.run({
       count: 0,
     })
 
@@ -121,7 +121,7 @@ describe('createPipeline', () => {
 
     list = []
 
-    let result1 = await pipeline.run({
+    const result1 = await pipeline.run({
       count: 10,
     })
 
@@ -130,13 +130,13 @@ describe('createPipeline', () => {
   })
 
   it('can change input and output', async () => {
-    let pipeline = createPipeline<number, Promise<number>>()
+    const pipeline = createPipeline<number, Promise<number>>()
 
     let list: number[] = []
 
     pipeline.use(async (input, next) => {
       list.push(input)
-      let result = await next(input + 1)
+      const result = await next(input + 1)
       list.push(result)
       return result + 1
     })
@@ -146,28 +146,28 @@ describe('createPipeline', () => {
       return Promise.resolve(input + 1)
     })
 
-    let result0 = await pipeline.run(0)
+    const result0 = await pipeline.run(0)
 
     expect(result0).toEqual(3)
     expect(list).toEqual([0, 1, 2])
 
     list = []
 
-    let result1 = await pipeline.run(11)
+    const result1 = await pipeline.run(11)
 
     expect(result1).toEqual(14)
     expect(list).toEqual([11, 12, 13])
   })
 
   it('supports hooks in sync middleware', async () => {
-    let Context0 = createContext(0)
+    const Context0 = createContext(0)
 
-    let pipeline = createPipeline<number, PromiseLike<number> | number>()
+    const pipeline = createPipeline<number, PromiseLike<number> | number>()
 
-    let list: number[] = []
+    const list: number[] = []
 
     pipeline.use((input, next) => {
-      let Context = Context0.use()
+      const Context = Context0.use()
 
       list.push(Context.value)
 
@@ -177,7 +177,7 @@ describe('createPipeline', () => {
     })
 
     pipeline.use((input, next) => {
-      let Context = Context0.use()
+      const Context = Context0.use()
 
       list.push(Context.value)
 
@@ -187,32 +187,32 @@ describe('createPipeline', () => {
     })
 
     pipeline.use((input) => {
-      let Context = Context0.use()
+      const Context = Context0.use()
       list.push(Context.value)
       return input + Context.value
     })
 
-    let result = await pipeline.run(10)
+    const result = await pipeline.run(10)
 
     expect(result).toEqual(13)
     expect(list).toEqual([0, 1, 3])
   })
 
   it('supports hooks in async middleware', async () => {
-    let Context0 = createContext(0)
+    const Context0 = createContext(0)
 
-    let pipeline = createPipeline<number, Promise<number>>()
+    const pipeline = createPipeline<number, Promise<number>>()
 
-    let list: number[] = []
+    const list: number[] = []
 
     pipeline.use(async (input, next) => {
-      let Context = Context0.use()
+      const Context = Context0.use()
 
       list.push(Context.value)
 
       Context.value += 1
 
-      let result = await next()
+      const result = await next()
 
       list.push(Context.value)
 
@@ -220,13 +220,13 @@ describe('createPipeline', () => {
     })
 
     pipeline.use(async (input, next) => {
-      let Context = Context0.use()
+      const Context = Context0.use()
 
       list.push(Context.value)
 
       Context.value += 2
 
-      let result = await next()
+      const result = await next()
 
       list.push(Context.value)
 
@@ -236,42 +236,42 @@ describe('createPipeline', () => {
     })
 
     pipeline.use((input) => {
-      let Context = Context0.use()
+      const Context = Context0.use()
       list.push(Context.value)
       Context.value += 1
       return Promise.resolve(input + Context.value)
     })
 
-    let result = await pipeline.run(10)
+    const result = await pipeline.run(10)
 
     expect(result).toEqual(14)
     expect(list).toEqual([0, 1, 3, 4, 7])
   })
 
   it('can inject context', async () => {
-    let TestContext = createContext(10)
+    const TestContext = createContext(10)
 
-    let pipeline = createPipeline<number, PromiseLike<number> | number>({
+    const pipeline = createPipeline<number, PromiseLike<number> | number>({
       contexts: {
         count: TestContext.create(100),
       },
     })
 
     pipeline.use((input) => {
-      let Context = TestContext.use()
+      const Context = TestContext.use()
       Context.value += input
       return Context.value
     })
 
-    let result0 = await pipeline.run(20)
+    const result0 = await pipeline.run(20)
 
     expect(result0).toEqual(120)
 
-    let container = createContainer({
+    const container = createContainer({
       count: TestContext.create(10),
     })
 
-    let rseult1 = await pipeline.run(30, {
+    const rseult1 = await pipeline.run(30, {
       container,
     })
 
@@ -281,7 +281,7 @@ describe('createPipeline', () => {
   })
 
   it('should throw error if there are no middlewares in pipeline', async () => {
-    let pipeline = createPipeline<number, PromiseLike<number> | number>()
+    const pipeline = createPipeline<number, PromiseLike<number> | number>()
 
     let error: Error | null = null
 
@@ -295,7 +295,7 @@ describe('createPipeline', () => {
   })
 
   it('should throw error if there are no middlewares returning value', async () => {
-    let pipeline = createPipeline<number, PromiseLike<number> | number>()
+    const pipeline = createPipeline<number, PromiseLike<number> | number>()
 
     pipeline.use((input, next) => {
       return next()
@@ -325,9 +325,9 @@ describe('createPipeline', () => {
   })
 
   it('should invoke onLast if there are no middlewares returned value', async () => {
-    let pipeline = createPipeline<number, PromiseLike<number> | number>()
+    const pipeline = createPipeline<number, PromiseLike<number> | number>()
 
-    let list: number[] = []
+    const list: number[] = []
 
     pipeline.use((input, next) => {
       list.push(1)
@@ -349,7 +349,7 @@ describe('createPipeline', () => {
       return next()
     })
 
-    let result = await pipeline.run(1, {
+    const result = await pipeline.run(1, {
       onLast: (input) => input + 4,
     })
 
@@ -358,43 +358,43 @@ describe('createPipeline', () => {
   })
 
   it('can usePipeline in another pipeline', () => {
-    let pipeline0 = createPipeline<string, string>()
-    let pipeline1 = createPipeline<string, string>()
+    const pipeline0 = createPipeline<string, string>()
+    const pipeline1 = createPipeline<string, string>()
 
     pipeline0.use((input) => {
       return `${input} from pipeline0`
     })
 
     pipeline1.use((input) => {
-      let runPipeline1 = usePipeline(pipeline0)
+      const runPipeline1 = usePipeline(pipeline0)
 
-      let text = runPipeline1(' pipeline1')
+      const text = runPipeline1(' pipeline1')
 
       return input + text
     })
 
-    let result = pipeline1.run('run')
+    const result = pipeline1.run('run')
 
     expect(result).toEqual(`run pipeline1 from pipeline0`)
   })
 
   it('can access current context in pipeline', () => {
-    let Context0 = createContext(0)
-    let Context1 = createContext(1)
+    const Context0 = createContext(0)
+    const Context1 = createContext(1)
 
-    let pipeline = createPipeline<number, number>({
+    const pipeline = createPipeline<number, number>({
       contexts: {
         count0: Context0.create(10),
         count1: Context1.create(20),
       },
     })
 
-    let list: boolean[] = []
+    const list: boolean[] = []
 
     pipeline.use((input) => {
-      let container = useContainer()
-      let count0 = Context0.use().value
-      let count1 = Context1.use().value
+      const container = useContainer()
+      const count0 = Context0.use().value
+      const count1 = Context1.use().value
 
       list.push(container.read(Context0) === count0)
       list.push(container.read(Context1) === count1)
@@ -402,14 +402,14 @@ describe('createPipeline', () => {
       return input
     })
 
-    let result = pipeline.run(0)
+    const result = pipeline.run(0)
 
     expect(result).toEqual(0)
     expect(list).toEqual([true, true])
   })
 
   it('should support multiple middlewares in pipeline.use', () => {
-    let pipeline = createPipeline<number, number>()
+    const pipeline = createPipeline<number, number>()
 
     pipeline.use(
       (input, next) => {
@@ -429,13 +429,13 @@ describe('createPipeline', () => {
       },
     )
 
-    let result = pipeline.run(0)
+    const result = pipeline.run(0)
 
     expect(result).toBe(5)
   })
 
   it('should support the shape of { middleware } as arguments in pipeline.use', () => {
-    let pipeline = createPipeline<number, number>()
+    const pipeline = createPipeline<number, number>()
 
     pipeline.use(
       {
@@ -463,35 +463,35 @@ describe('createPipeline', () => {
       },
     )
 
-    let result = pipeline.run(0)
+    const result = pipeline.run(0)
 
     expect(result).toBe(5)
   })
 
   it('should support pipeline.use(anotherPipeline) if their type is matched', () => {
-    let StepContext = createContext(1)
+    const StepContext = createContext(1)
 
-    let pipeline0 = createPipeline<number, number>()
+    const pipeline0 = createPipeline<number, number>()
 
-    let pipeline1 = createPipeline<number, number>()
+    const pipeline1 = createPipeline<number, number>()
 
-    let steps = [] as number[]
+    const steps = [] as number[]
 
     pipeline0.use((input, next) => {
-      let step = StepContext.use()
+      const step = StepContext.use()
       return next(input + step.value++)
     })
 
     pipeline0.use(pipeline1)
 
     pipeline1.use((input) => {
-      let step = StepContext.use()
+      const step = StepContext.use()
       steps.push(step.value)
       return input + step.value
     })
 
-    let result0 = pipeline1.run(0)
-    let result1 = pipeline0.run(0)
+    const result0 = pipeline1.run(0)
+    const result1 = pipeline0.run(0)
 
     expect(result0).toEqual(1)
     expect(result1).toEqual(3)
@@ -499,7 +499,7 @@ describe('createPipeline', () => {
   })
 
   it('support async pipeline', async () => {
-    let pipeline = createAsyncPipeline<number, number>()
+    const pipeline = createAsyncPipeline<number, number>()
 
     pipeline.use((input, next) => {
       return next(input + 1)
@@ -508,7 +508,7 @@ describe('createPipeline', () => {
     let i = 0
 
     pipeline.useLazy(() => {
-      let count = ++i
+      const count = ++i
       return (input, next) => {
         return next(input + count)
       }
@@ -516,7 +516,7 @@ describe('createPipeline', () => {
 
     pipeline.useLazy(async () => {
       // eslint-disable-next-line @typescript-eslint/await-thenable
-      let count = await ++i
+      const count = await ++i
       return (input, next) => {
         return next(input + count)
       }
@@ -528,40 +528,40 @@ describe('createPipeline', () => {
 
     expect(i).toBe(0)
 
-    let result0 = await pipeline.run(0)
+    const result0 = await pipeline.run(0)
 
     expect(result0).toBe(4)
     expect(i).toBe(2)
 
-    let result1 = await pipeline.run(-4)
+    const result1 = await pipeline.run(-4)
 
     expect(result1).toBe(0)
     expect(i).toBe(2)
   })
 
   it('support async hooks', async () => {
-    let pipeline = createAsyncPipeline<number, number>()
+    const pipeline = createAsyncPipeline<number, number>()
 
-    let Count = createContext({
+    const Count = createContext({
       count: 10,
     })
 
-    let incre = async () => {
+    const incre = async () => {
       await delay()
       Count.set({
         count: Count.assert().count + 1,
       })
     }
 
-    let list = [] as { count: number }[]
+    const list = [] as { count: number }[]
 
     pipeline.use(async (input, next) => {
-      let before = Count.get()
-      let result = await next(input)
+      const before = Count.get()
+      const result = await next(input)
 
       await incre()
 
-      let after = Count.get()
+      const after = Count.get()
 
       list.push(before, after)
 
@@ -575,13 +575,13 @@ describe('createPipeline', () => {
       return input + Count.get().count
     })
 
-    let container = createContainer({
+    const container = createContainer({
       count: Count,
     })
 
     asyncHooksImpl.enable()
 
-    let result0 = await pipeline.run(10, {
+    const result0 = await pipeline.run(10, {
       container,
     })
 

@@ -17,7 +17,7 @@ export const isModuleProviderValue = <T = any>(input: any): input is ModuleProvi
 }
 
 export function createProvider<T>(defaultValue?: T): ModuleProvider<T> {
-  let Provider: ModuleProvider<T> = {
+  const Provider: ModuleProvider<T> = {
     isModuleProvider: true,
     defaultValue,
     provide(value) {
@@ -60,7 +60,7 @@ export class ModuleContext {
    */
   addModule<T>(Ctor: ModuleCtor<T>, module: T, replace = false): this {
     if (this.deps.modules.has(Ctor)) {
-      let current = this.deps.modules.get(Ctor)! as T
+      const current = this.deps.modules.get(Ctor)! as T
 
       if (replace) {
         this.deps.modules.set(Ctor, module)
@@ -82,7 +82,7 @@ export class ModuleContext {
    */
   addProvider<T>(Provider: ModuleProvider<T>, value: T, replace = false): this {
     if (this.deps.providers.has(Provider)) {
-      let current = this.deps.providers.get(Provider)! as T
+      const current = this.deps.providers.get(Provider)! as T
 
       if (replace) {
         this.deps.providers.set(Provider, value)
@@ -146,7 +146,7 @@ export class ModuleContext {
    * @param providerValue
    */
   inject<T>(providerValue: ModuleProviderValue<T>): T {
-    let { Provider, value } = providerValue
+    const { Provider, value } = providerValue
     this.addProvider(Provider, value)
     return value
   }
@@ -156,7 +156,7 @@ export class ModuleContext {
    * @param modules
    */
   injectModules(modules: object[]) {
-    for (let module of modules) {
+    for (const module of modules) {
       if (module.constructor === Object || module.constructor === Array || module.constructor === Function) {
         throw new Error(`Expected module to be an instance of custom Class, instead of ${JSON.stringify(module)}`)
       }
@@ -170,7 +170,7 @@ export class ModuleContext {
    * @param providers
    */
   injectProviderValues(providers: ModuleProviderValue[]) {
-    for (let { Provider, value } of providers) {
+    for (const { Provider, value } of providers) {
       this.addProvider(Provider, value, true)
     }
     return this
@@ -182,10 +182,10 @@ export class ModuleContext {
    * @param options options for reusing deps or others
    */
   new<T>(Ctor: ModuleCtor<T>, options?: ModuleContextOptions): T {
-    let ctx = new ModuleContext()
+    const ctx = new ModuleContext()
 
     // reusing provider-values of current-context
-    for (let [Provider, value] of this.deps.providers.entries()) {
+    for (const [Provider, value] of this.deps.providers.entries()) {
       ctx.addProvider(Provider, value)
     }
 
@@ -210,15 +210,15 @@ export class ModuleContext {
 let currentModuleContext: ModuleContext | undefined
 
 export const runInContext = <T>(f: () => T, ctx = new ModuleContext()) => {
-  let prevModuleContext = currentModuleContext
+  const prevModuleContext = currentModuleContext
   try {
     currentModuleContext = ctx
-    let module = f()
+    const module = f()
     if (module && typeof module !== 'object') {
       throw new Error(`Expected function return object, but got ${module}`)
     }
-    currentModuleContext.injectModules([(module as unknown) as object])
-    Context.set((module as unknown) as object, currentModuleContext)
+    currentModuleContext.injectModules([module as unknown as object])
+    Context.set(module as unknown as object, currentModuleContext)
     return module
   } finally {
     currentModuleContext = prevModuleContext
@@ -244,7 +244,7 @@ class ModuleContextManager {
       return this.contexts.get(object)!
     }
 
-    let context = currentModuleContext ?? new ModuleContext()
+    const context = currentModuleContext ?? new ModuleContext()
 
     this.set(object, context)
     context.injectModules([object])

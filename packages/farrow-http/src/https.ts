@@ -32,39 +32,39 @@ export type HttpsPipeline = RouterPipeline & {
 }
 
 export const createHttpsPipeline = (options?: HttpsPipelineOptions): HttpsPipeline => {
-  let isNotProduction = process.env.NODE_ENV !== 'production'
-  let config: HttpsPipelineOptions = {
+  const isNotProduction = process.env.NODE_ENV !== 'production'
+  const config: HttpsPipelineOptions = {
     logger: isNotProduction,
     errorStack: isNotProduction,
     ...options,
   }
 
-  let loggerOptions: LoggerOptions = !config.logger || typeof config.logger === 'boolean' ? {} : config.logger
+  const loggerOptions: LoggerOptions = !config.logger || typeof config.logger === 'boolean' ? {} : config.logger
 
-  let logger = config.logger ? createLogger(loggerOptions) : null
+  const logger = config.logger ? createLogger(loggerOptions) : null
 
-  let router = Router()
+  const router = Router()
 
-  let handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
+  const handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
     if (typeof req.url !== 'string') {
       throw new Error(`req.url is not existed`)
     }
 
-    let { url } = req
+    const { url } = req
 
-    let [pathname = '/', search = ''] = url.split('?')
+    const [pathname = '/', search = ''] = url.split('?')
 
-    let method = req.method ?? 'GET'
+    const method = req.method ?? 'GET'
 
-    let query = (req as any).query ?? (parseQuery(search, config.query) as RequestQuery)
+    const query = (req as any).query ?? (parseQuery(search, config.query) as RequestQuery)
 
-    let body = (req as any).body ?? (await getBody(req, config.body))
+    const body = (req as any).body ?? (await getBody(req, config.body))
 
-    let headers = req.headers as RequestHeaders
+    const headers = req.headers as RequestHeaders
 
-    let cookies = parseCookies(req.headers['cookie'] ?? '', config.cookie) as RequestCookies
+    const cookies = parseCookies(req.headers['cookie'] ?? '', config.cookie) as RequestCookies
 
-    let { basename, requestInfo } = handleBasenames(config.basenames ?? [], {
+    const { basename, requestInfo } = handleBasenames(config.basenames ?? [], {
       pathname,
       method,
       query,
@@ -73,13 +73,13 @@ export const createHttpsPipeline = (options?: HttpsPipelineOptions): HttpsPipeli
       cookies,
     })
 
-    let storages = await config.contexts?.({
+    const storages = await config.contexts?.({
       req,
       requestInfo,
       basename,
     })
 
-    let container = createContainer({
+    const container = createContainer({
       ...storages,
       request: RequestContext.create(req),
       response: ResponseContext.create(res),
@@ -87,7 +87,7 @@ export const createHttpsPipeline = (options?: HttpsPipelineOptions): HttpsPipeli
       requestInfo: RequestInfoContext.create(requestInfo),
     })
 
-    let responser = await router.run(requestInfo, {
+    const responser = await router.run(requestInfo, {
       container,
       onLast: () => Response.status(404).text('404 Not Found'),
     })
@@ -101,16 +101,16 @@ export const createHttpsPipeline = (options?: HttpsPipelineOptions): HttpsPipeli
     })
   }
 
-  let handle: HttpsPipeline['handle'] = async (req, res) => {
+  const handle: HttpsPipeline['handle'] = async (req, res) => {
     if (logger) {
-      let startTime = Date.now()
-      let method = req.method ?? 'GET'
-      let url = req.url ?? ''
+      const startTime = Date.now()
+      const method = req.method ?? 'GET'
+      const url = req.url ?? ''
 
       let contentLength = 0
 
       let hasLogOut = false
-      let logOutput = (event: LoggerEvent) => {
+      const logOutput = (event: LoggerEvent) => {
         if (hasLogOut) return
         hasLogOut = true
         logger?.logOutput(method, url, res.statusCode, startTime, contentLength || getContentLength(res), event)
@@ -143,7 +143,7 @@ export const createHttpsPipeline = (options?: HttpsPipelineOptions): HttpsPipeli
     try {
       return await handleRequest(req, res)
     } catch (error) {
-      let message = (config.errorStack ? error?.stack || error?.message : error?.message) ?? ''
+      const message = (config.errorStack ? error?.stack || error?.message : error?.message) ?? ''
 
       if (!res.headersSent) {
         res.statusCode = error.statusCode ?? 500
@@ -157,11 +157,11 @@ export const createHttpsPipeline = (options?: HttpsPipelineOptions): HttpsPipeli
     }
   }
 
-  let server: HttpsPipeline['server'] = () => {
+  const server: HttpsPipeline['server'] = () => {
     return options?.tsl ? createServer(options.tsl, handle) : createServer(handle)
   }
 
-  let listen: HttpsPipeline['listen'] = (...args) => {
+  const listen: HttpsPipeline['listen'] = (...args) => {
     return server().listen(...args)
   }
 

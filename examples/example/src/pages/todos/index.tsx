@@ -20,7 +20,7 @@ router
   })
   .use(NoCache())
   .use(() => {
-    let LayoutView = useLayoutView()
+    const LayoutView = useLayoutView()
     return LayoutView.render(<Home todos={fakeData} />)
   })
 
@@ -30,7 +30,7 @@ router
   })
   .use(NoCache())
   .use(() => {
-    let LayoutView = useLayoutView()
+    const LayoutView = useLayoutView()
     return LayoutView.render(<Create />)
   })
 
@@ -43,8 +43,8 @@ router
   })
   .use(NoCache())
   .use((request) => {
-    let LayoutView = useLayoutView()
-    let todo = fakeData.find((todo) => todo.id === request.params.todoId)
+    const LayoutView = useLayoutView()
+    const todo = fakeData.find((todo) => todo.id === request.params.todoId)
 
     if (!todo) {
       return Response.status(404).text(`todo is not found, id: ${request.params.todoId}`)

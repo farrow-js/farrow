@@ -5,13 +5,13 @@ import router from 'next/router'
 import { Module, createProvider, Container, useQueryChangedEffect } from 'farrow-next'
 
 export const View = () => {
-  let indexCtrl = Index.use()
-  let [count, setCount] = useState(110)
-  let [todos, setTodos] = useState<Todo[]>([])
+  const indexCtrl = Index.use()
+  const [count, setCount] = useState(110)
+  const [todos, setTodos] = useState<Todo[]>([])
 
   useEffect(() => {
-    let task = async () => {
-      let result = await TodoApi.addTodo({
+    const task = async () => {
+      const result = await TodoApi.addTodo({
         content: `count:${count}`,
       })
       setTodos(result.todos)
@@ -22,14 +22,14 @@ export const View = () => {
   }, [count])
 
   useQueryChangedEffect(() => {
-    let page = indexCtrl.page
+    const page = indexCtrl.page
     console.log('changed', page.query)
     return () => {
       console.log('clean changed', page.query)
     }
   })
 
-  let handleJump = () => {
+  const handleJump = () => {
     router.push(`/?count=${count}`).catch((error) => {
       console.log('error', error)
     })
@@ -147,12 +147,12 @@ class Counter extends Module {
   textManager = this.use(TextManager)
 
   incre = (step = 1) => {
-    let count = this.app.state.count + step
+    const count = this.app.state.count + step
     this.app.setState({ count })
   }
 
   decre = (step = 1) => {
-    let count = this.app.state.count - step
+    const count = this.app.state.count - step
     this.app.setState({ count })
   }
 

@@ -89,9 +89,9 @@ const testRoot = (root: Root, page: PageInfo) => {
 }
 
 describe('Basic Usage of Module', () => {
-  let app = new App()
+  const app = new App()
 
-  let root = initialize(Root, {
+  const root = initialize(Root, {
     providers: [
       PageInfo.provide({
         url: '/path/for/initilize',
@@ -162,7 +162,7 @@ describe('Container', () => {
       }
     }
 
-    let root = new Root('container')
+    const root = new Root('container')
 
     // Root inherit Container
     expect(root instanceof Container).toBe(true)
@@ -209,7 +209,7 @@ describe('Container', () => {
       }
     }
 
-    let root = new Root('container/from')
+    const root = new Root('container/from')
 
     // Container.from does not inherit Container, it just mixin
     expect(root instanceof Container).toBe(false)
@@ -234,7 +234,7 @@ describe('Provider', () => {
       count: number
     }
 
-    let Data = createProvider<Data>({
+    const Data = createProvider<Data>({
       count: 10,
     })
 
@@ -260,7 +260,7 @@ describe('Provider', () => {
       })
     }
 
-    let root = new Root()
+    const root = new Root()
 
     expect(root.useA === root.newA).toBe(false)
     expect(root.newA === root.newAWithProviders).toBe(false)
@@ -286,7 +286,7 @@ describe('Provider', () => {
       count: number
     }
 
-    let Data = createProvider<Data>({
+    const Data = createProvider<Data>({
       count: 10,
     })
 
@@ -294,7 +294,7 @@ describe('Provider', () => {
       data = this.use(Data)
     }
 
-    let root = new Root()
+    const root = new Root()
 
     expect(root.data).toEqual({
       count: 10,
@@ -328,7 +328,7 @@ describe('Module', () => {
       })
     }
 
-    let root = new Root()
+    const root = new Root()
 
     expect(root.child.a === root.a).toBe(true)
     expect(root.newChild.a === root.child.a).toBe(true)
@@ -361,7 +361,7 @@ describe('Context', () => {
       b = Context.from(this).use(B)
     }
 
-    let root = new Root('Context.use')
+    const root = new Root('Context.use')
 
     expect(root.name).toBe('Context.use')
     expect(root.a instanceof A).toBe(true)
@@ -406,7 +406,7 @@ describe('Context', () => {
       b = Context.use(B)
     }
 
-    let root = runInContext(() => new Root('Context.use'))
+    const root = runInContext(() => new Root('Context.use'))
 
     expect(root.a instanceof A).toBe(true)
     expect(root.b instanceof B).toBe(true)

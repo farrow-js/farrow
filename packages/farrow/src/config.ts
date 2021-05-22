@@ -14,9 +14,9 @@ export type GetConfigOptions = {
 }
 
 export const getConfig = async (options: GetConfigOptions = {}) => {
-  let result = await (options.config ? explorer.load(options.config) : explorer.search())
+  const result = await (options.config ? explorer.load(options.config) : explorer.search())
 
-  let config = {
+  const config = {
     server: {},
     ...result?.config,
   } as Config

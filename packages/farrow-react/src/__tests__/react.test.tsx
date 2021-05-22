@@ -13,8 +13,8 @@ const createHttp = () => {
 
 describe('Farrow-React', () => {
   it('should rendering react component', async () => {
-    let http = createHttp()
-    let server = http.server()
+    const http = createHttp()
+    const server = http.server()
 
     http
       .match({
@@ -26,7 +26,7 @@ describe('Farrow-React', () => {
         },
       })
       .use((request) => {
-        let ReactView = useReactView()
+        const ReactView = useReactView()
 
         return ReactView.render(
           <div data-a={request.query.a} data-b={request.query.b} data-c={request.query.c}>
@@ -47,9 +47,9 @@ describe('Farrow-React', () => {
   })
 
   it('support use Link to auto prefix basename', async () => {
-    let http = createHttp()
-    let server = http.server()
-    let router = Router()
+    const http = createHttp()
+    const server = http.server()
+    const router = Router()
 
     http.route('/base0').use(router)
 
@@ -58,7 +58,7 @@ describe('Farrow-React', () => {
         pathname: '/test-react',
       })
       .use((request) => {
-        let ReactView = useReactView()
+        const ReactView = useReactView()
 
         return ReactView.render(<Link href={request.pathname}>{request.pathname}</Link>)
       })

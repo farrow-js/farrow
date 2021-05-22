@@ -11,12 +11,12 @@ export const createCounter = <I, O>(callback: CounterCallback<I, O>): Counter<I,
   type Dispatch = Counter<I, O>['dispatch']
   type Start = Counter<I, O>['start']
 
-  let dispatch: Dispatch = (index, input) => {
-    let next = (nextInput = input) => dispatch(index + 1, nextInput)
+  const dispatch: Dispatch = (index, input) => {
+    const next = (nextInput = input) => dispatch(index + 1, nextInput)
     return callback(index, input, next)
   }
 
-  let start: Start = (input) => {
+  const start: Start = (input) => {
     return dispatch(0, input)
   }
 

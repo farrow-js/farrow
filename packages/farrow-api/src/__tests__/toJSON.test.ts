@@ -3,22 +3,22 @@ import { toJSON } from '../toJSON'
 
 describe('toJSON', () => {
   it('work correctly', () => {
-    let incre = Api({
+    const incre = Api({
       input: Number,
       output: Number,
     })
 
-    let decre = Api({
+    const decre = Api({
       input: Number,
       output: Number,
     })
 
-    let entries = {
+    const entries = {
       incre,
       decre,
     }
 
-    let result = toJSON(entries)
+    const result = toJSON(entries)
 
     expect(result).toEqual({
       protocol: 'Farrow-API',

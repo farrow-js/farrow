@@ -37,7 +37,7 @@ describe('Farrow-Api-Client', () => {
   })
 
   it('should generate api-client correctly', async () => {
-    let client = createApiClient(apiClientOptions)
+    const client = createApiClient(apiClientOptions)
 
     shell.rm('-rf', tempDir)
 
@@ -52,19 +52,19 @@ describe('Farrow-Api-Client', () => {
   })
 
   it('should replaceUrl correctly when build', async () => {
-    let synClient = createApiClient(apiClientOptions)
+    const synClient = createApiClient(apiClientOptions)
     // depend on the correctness of `should generate api-client correctly`
     await synClient.sync()
 
-    let prevSrc = apiClientOptions.src
-    let apiClientOptionsForBuild: ApiClientOptions = {
+    const prevSrc = apiClientOptions.src
+    const apiClientOptionsForBuild: ApiClientOptions = {
       ...apiClientOptions,
       src: 'http://_#*|*#_myserver.com/api',
     }
-    let buildClient = createApiClient(apiClientOptionsForBuild)
+    const buildClient = createApiClient(apiClientOptionsForBuild)
     await buildClient.build()
 
-    let content = await fs.readFile(apiClientOptionsForBuild.dist, 'utf-8')
+    const content = await fs.readFile(apiClientOptionsForBuild.dist, 'utf-8')
     expect(content).toContain(apiClientOptionsForBuild.src)
     expect(content).not.toContain(prevSrc)
     shell.rm('-rf', tempDir)

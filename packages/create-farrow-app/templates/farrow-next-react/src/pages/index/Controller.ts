@@ -43,7 +43,7 @@ export class Index extends Controller {
    * load ssr state on preload
    */
   async preload() {
-    let result = await GreetApi.greet({
+    const result = await GreetApi.greet({
       name: `Farrow + Next.js + React`,
     })
     this.actions.updateGreet(result.greet)

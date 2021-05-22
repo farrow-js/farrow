@@ -19,7 +19,7 @@ type ExecResult = {
 
 const exec = (command: string) => {
   return new Promise<ExecResult>((resolve) => {
-    let process = shell.exec(command, (code, stdout, stderr) => {
+    const process = shell.exec(command, (code, stdout, stderr) => {
       resolve({
         code,
         stdout,
@@ -40,13 +40,13 @@ describe('Farrow', () => {
 
     expect(shell.test('-d', distPath)).toBe(false)
 
-    let result = await exec(`npm run build`)
+    const result = await exec(`npm run build`)
 
     expect(result.code).toBe(0)
 
     expect(shell.test('-d', distPath)).toBe(true)
 
-    let { server } = require(distPath).default as { http: HttpPipeline; server: Server }
+    const { server } = require(distPath).default as { http: HttpPipeline; server: Server }
 
     await request(server)
       .get('/user/123')

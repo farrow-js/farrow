@@ -3,11 +3,11 @@ import Router from 'next/router'
 import { Index } from './Controller'
 
 export const View = () => {
-  let greet = Index.useState((state) => state.greet)
-  let count = Index.useState((state) => state.count)
-  let index = Index.use()
+  const greet = Index.useState((state) => state.greet)
+  const count = Index.useState((state) => state.count)
+  const index = Index.use()
 
-  let handleJump = () => {
+  const handleJump = () => {
     Router.push(`/?count=${count}`).catch((err) => {
       console.error(err)
     })

@@ -16,24 +16,24 @@ export type ReactResponseOptions = {
 export const defaultDocType = `<!doctype html>`
 
 export const renderToString = <T extends JSX.Element>(element: T, options?: ReactResponseOptions) => {
-  let html = ReactDOMServer.renderToString(element)
-  let docType = options?.docType ?? defaultDocType
+  const html = ReactDOMServer.renderToString(element)
+  const docType = options?.docType ?? defaultDocType
 
   return Response.html(`${docType}\n${html}`)
 }
 
 export const renderToNodeStream = <T extends JSX.Element>(element: T, options?: ReactResponseOptions) => {
-  let contentStream = ReactDOMServer.renderToNodeStream(element)
-  let docType = options?.docType ?? defaultDocType
+  const contentStream = ReactDOMServer.renderToNodeStream(element)
+  const docType = options?.docType ?? defaultDocType
 
-  let docTypeStream = new Stream.Readable({
+  const docTypeStream = new Stream.Readable({
     read() {
       this.push(`${docType}\n`)
       this.push(null)
     },
   })
 
-  let stream = new (MultiStream as any)([docTypeStream, contentStream])
+  const stream = new (MultiStream as any)([docTypeStream, contentStream])
 
   return Response.type('html').stream(stream)
 }
@@ -43,19 +43,19 @@ export type ReactViewOptions = ReactResponseOptions & {
 }
 
 export const useReactView = (options?: ReactViewOptions) => {
-  let basenames = Http.useBasenames().value
+  const basenames = Http.useBasenames().value
 
-  let config = {
+  const config = {
     useStream: true,
     ...options,
   }
 
-  let render = <T extends JSX.Element>(element: T) => {
-    let context: ReactRenderContext = {
+  const render = <T extends JSX.Element>(element: T) => {
+    const context: ReactRenderContext = {
       basenames,
     }
 
-    let view = <ReactRenderContext.Provider value={context}>{element}</ReactRenderContext.Provider>
+    const view = <ReactRenderContext.Provider value={context}>{element}</ReactRenderContext.Provider>
 
     if (config.useStream) {
       return renderToNodeStream(view)

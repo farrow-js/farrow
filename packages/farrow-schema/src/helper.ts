@@ -21,12 +21,12 @@ export const pickStruct = <T extends StructType, Keys extends (keyof T['descript
   Ctor: new () => T,
   keys: Keys,
 ) => {
-  let instance = getInstance(Ctor)
-  let descriptors = {} as FieldDescriptors
+  const instance = getInstance(Ctor)
+  const descriptors = {} as FieldDescriptors
 
-  for (let key in instance.descriptors) {
+  for (const key in instance.descriptors) {
     if (keys.includes(key as keyof T['descriptors'])) {
-      let value = instance.descriptors[key]
+      const value = instance.descriptors[key]
       descriptors[key] = value
     }
   }
@@ -38,12 +38,12 @@ export const omitStruct = <T extends StructType, Keys extends (keyof T['descript
   Ctor: new () => T,
   keys: Keys,
 ) => {
-  let instance = getInstance(Ctor)
-  let descriptors = {} as FieldDescriptors
+  const instance = getInstance(Ctor)
+  const descriptors = {} as FieldDescriptors
 
-  for (let key in instance.descriptors) {
+  for (const key in instance.descriptors) {
     if (!keys.includes(key as keyof T['descriptors'])) {
-      let value = instance.descriptors[key]
+      const value = instance.descriptors[key]
       descriptors[key] = value
     }
   }
@@ -59,13 +59,13 @@ export const pickObject = <T extends ObjectType, Keys extends SchemaField<T, key
   Ctor: new () => T,
   keys: Keys,
 ) => {
-  let instance = getInstance(Ctor)
-  let descriptors = {} as FieldDescriptors
+  const instance = getInstance(Ctor)
+  const descriptors = {} as FieldDescriptors
 
   if (instance instanceof ObjectType) {
-    for (let key of Object.keys(instance)) {
+    for (const key of Object.keys(instance)) {
       if (keys.includes(key as any)) {
-        let value = instance[key]
+        const value = instance[key]
         if (isFieldDescriptor(value)) {
           descriptors[key] = value
         } else if (isFieldDescriptors(value)) {
@@ -86,13 +86,13 @@ export const omitObject = <T extends ObjectType, Keys extends SchemaField<T, key
   Ctor: new () => T,
   keys: Keys,
 ) => {
-  let instance = getInstance(Ctor)
-  let descriptors = {} as FieldDescriptors
+  const instance = getInstance(Ctor)
+  const descriptors = {} as FieldDescriptors
 
   if (instance instanceof ObjectType) {
-    for (let key of Object.keys(instance)) {
+    for (const key of Object.keys(instance)) {
       if (!keys.includes(key as any)) {
-        let value = instance[key]
+        const value = instance[key]
         if (isFieldDescriptor(value)) {
           descriptors[key] = value
         } else if (isFieldDescriptors(value)) {
@@ -138,11 +138,11 @@ export const keyofStruct = <T extends StructType>(Ctor: new () => T): (keyof T['
 }
 
 export const keyofObject = <T extends ObjectType>(Ctor: new () => T): (keyof TypeOf<T>)[] => {
-  let instance = getInstance(Ctor)
-  let keys = [] as (keyof TypeOf<T>)[]
+  const instance = getInstance(Ctor)
+  const keys = [] as (keyof TypeOf<T>)[]
 
-  for (let key of Object.keys(instance)) {
-    let value = instance[key]
+  for (const key of Object.keys(instance)) {
+    const value = instance[key]
     if (isFieldDescriptor(value)) {
       keys.push(key as keyof TypeOf<T>)
     } else if (isFieldDescriptors(value)) {
@@ -171,9 +171,9 @@ export type SchemaCtorFields = {
 }
 
 export const getSchemaCtorFields = (descriptors: S.FieldDescriptors): SchemaCtorFields => {
-  let fields = {} as SchemaCtorFields
+  const fields = {} as SchemaCtorFields
 
-  for (let [key, field] of Object.entries(descriptors)) {
+  for (const [key, field] of Object.entries(descriptors)) {
     if (S.isFieldDescriptor(field)) {
       if (typeof field === 'function') {
         fields[key] = {
@@ -202,9 +202,9 @@ const isNullableType = (input: any): input is new () => S.NullableType => {
 }
 
 const getPartialFields = (fields: FieldDescriptors) => {
-  let descriptors = {} as S.FieldDescriptors
+  const descriptors = {} as S.FieldDescriptors
 
-  for (let [key, value] of Object.entries(getSchemaCtorFields(fields))) {
+  for (const [key, value] of Object.entries(getSchemaCtorFields(fields))) {
     descriptors[key] = {
       ...value,
       [S.Type]: isNullableType(value[S.Type]) ? value[S.Type] : S.Nullable(value[S.Type]),
@@ -215,18 +215,18 @@ const getPartialFields = (fields: FieldDescriptors) => {
 }
 
 export const partialStruct = <T extends StructType>(Ctor: new () => T) => {
-  let instance = getInstance(Ctor)
+  const instance = getInstance(Ctor)
 
   return class partial extends PartialType {
-    Item = (S.Struct(getPartialFields(instance.descriptors)) as unknown) as typeof Ctor
+    Item = S.Struct(getPartialFields(instance.descriptors)) as unknown as typeof Ctor
   }
 }
 
 export const partialObject = <T extends ObjectType>(Ctor: new () => T) => {
-  let instance = getInstance(Ctor)
+  const instance = getInstance(Ctor)
 
   return class partial extends PartialType {
-    Item = (S.Struct(getPartialFields((instance as unknown) as S.FieldDescriptors)) as unknown) as typeof Ctor
+    Item = S.Struct(getPartialFields(instance as unknown as S.FieldDescriptors)) as unknown as typeof Ctor
   }
 }
 

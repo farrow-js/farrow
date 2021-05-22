@@ -3,12 +3,12 @@ import { createApiClients } from './api-client'
 import { getConfig, GetConfigOptions } from './config'
 
 export default async function dev(options: GetConfigOptions) {
-  let config = await getConfig(options)
+  const config = await getConfig(options)
 
-  let serversOptions = config.server ? (Array.isArray(config.server) ? config.server : [config.server]) : []
+  const serversOptions = config.server ? (Array.isArray(config.server) ? config.server : [config.server]) : []
 
   if (serversOptions.length > 0) {
-    let bundlers = serversOptions.map((options) => {
+    const bundlers = serversOptions.map((options) => {
       return {
         env: {
           NODE_ENV: 'development',
@@ -17,7 +17,7 @@ export default async function dev(options: GetConfigOptions) {
       }
     })
 
-    let serverBundlers = createServerBundlers({ bundlers })
+    const serverBundlers = createServerBundlers({ bundlers })
 
     await serverBundlers.start({
       build: true,
@@ -26,10 +26,10 @@ export default async function dev(options: GetConfigOptions) {
     })
   }
 
-  let apiClientsOptions = config.api ? (Array.isArray(config.api) ? config.api : [config.api]) : []
+  const apiClientsOptions = config.api ? (Array.isArray(config.api) ? config.api : [config.api]) : []
 
   if (apiClientsOptions.length > 0) {
-    let client = createApiClients({
+    const client = createApiClients({
       services: apiClientsOptions,
     })
 

@@ -12,8 +12,8 @@ function isPromise(x) {
 
 describe('Koa Compose', () => {
   it('should work', async () => {
-    let arr = []
-    let stack = []
+    const arr = []
+    const stack = []
 
     stack.push(async (context, next) => {
       arr.push(1)
@@ -44,7 +44,7 @@ describe('Koa Compose', () => {
   })
 
   it('should be able to be called twice', () => {
-    let stack = []
+    const stack = []
 
     stack.push(async (context, next) => {
       context.arr.push(1)
@@ -70,10 +70,10 @@ describe('Koa Compose', () => {
       context.arr.push(4)
     })
 
-    let fn = compose(stack)
-    let ctx1 = { arr: [] }
-    let ctx2 = { arr: [] }
-    let out = [1, 2, 3, 4, 5, 6]
+    const fn = compose(stack)
+    const ctx1 = { arr: [] }
+    const ctx2 = { arr: [] }
+    const out = [1, 2, 3, 4, 5, 6]
 
     return fn(ctx1)
       .then(() => {
@@ -96,8 +96,8 @@ describe('Koa Compose', () => {
   })
 
   it('should create next functions that return a Promise', () => {
-    let stack = []
-    let arr = []
+    const stack = []
+    const arr = []
     for (let i = 0; i < 5; i++) {
       stack.push((context, next) => {
         arr.push(next())
@@ -106,7 +106,7 @@ describe('Koa Compose', () => {
 
     compose(stack)({})
 
-    for (let next of arr) {
+    for (const next of arr) {
       assert(isPromise(next), 'one of the functions next is not a Promise')
     }
   })
@@ -126,7 +126,7 @@ describe('Koa Compose', () => {
   })
 
   it('should work when yielding at the end of the stack', async () => {
-    let stack = []
+    const stack = []
     let called = false
 
     stack.push(async (ctx, next) => {
@@ -139,23 +139,16 @@ describe('Koa Compose', () => {
   })
 
   it('should reject on errors in middleware', () => {
-    let stack = []
+    const stack = []
 
     stack.push(() => {
       throw new Error()
     })
-
-    return compose(stack)({})
-      .then(() => {
-        throw new Error('promise was not rejected')
-      })
-      .catch((e) => {
-        expect(e).toBeInstanceOf(Error)
-      })
+    return expect(() => compose(stack)({})).rejects.toThrow(Error)
   })
 
   it('should work when yielding at the end of the stack with yield*', () => {
-    let stack = []
+    const stack = []
 
     stack.push(async (ctx, next) => {
       await next
@@ -165,9 +158,9 @@ describe('Koa Compose', () => {
   })
 
   it('should keep the context', () => {
-    let ctx = {}
+    const ctx = {}
 
-    let stack = []
+    const stack = []
 
     stack.push(async (ctx2, next) => {
       await next()
@@ -188,8 +181,8 @@ describe('Koa Compose', () => {
   })
 
   it('should catch downstream errors', async () => {
-    let arr = []
-    let stack = []
+    const arr = []
+    const stack = []
 
     stack.push(async (ctx, next) => {
       arr.push(1)
@@ -223,24 +216,18 @@ describe('Koa Compose', () => {
   })
 
   it('should handle errors in wrapped non-async functions', () => {
-    let stack = []
+    const stack = []
 
     stack.push(() => {
       throw new Error()
     })
 
-    return compose(stack)({})
-      .then(() => {
-        throw new Error('promise was not rejected')
-      })
-      .catch((e) => {
-        expect(e).toBeInstanceOf(Error)
-      })
+    return expect(() => compose(stack)({})).rejects.toThrow(Error)
   })
 
   // https://github.com/koajs/compose/pull/27#issuecomment-143109739
   it('should compose w/ other compositions', () => {
-    let called = []
+    const called = []
 
     return compose([
       compose([
@@ -299,52 +286,52 @@ describe('Koa Compose', () => {
   })
 
   it('should return last return value', () => {
-    let stack = []
+    const stack = []
 
     stack.push(async (context, next) => {
-      let val = await next()
+      const val = await next()
       expect(val).toEqual(2)
       return 1
     })
 
     stack.push(async (context, next) => {
-      let val = await next()
+      const val = await next()
       expect(val).toEqual(0)
       return 2
     })
 
-    let next = () => 0
+    const next = () => 0
     return compose(stack)({}, next).then((val) => {
       expect(val).toEqual(1)
     })
   })
 
   it('should not affect the original middleware array', () => {
-    let middleware = []
-    let fn1 = (ctx, next) => {
+    const middleware = []
+    const fn1 = (ctx, next) => {
       return next()
     }
     middleware.push(fn1)
 
-    for (let fn of middleware) {
+    for (const fn of middleware) {
       assert.equal(fn, fn1)
     }
 
     compose(middleware)
 
-    for (let fn of middleware) {
+    for (const fn of middleware) {
       assert.equal(fn, fn1)
     }
   })
 
   it('should not get stuck on the passed in next', () => {
-    let middleware = [
+    const middleware = [
       (ctx, next) => {
         ctx.middleware++
         return next()
       },
     ]
-    let ctx = {
+    const ctx = {
       middleware: 0,
       next: 0,
     }

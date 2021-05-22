@@ -105,7 +105,7 @@ class Collection extends ObjectType {
   }
 }
 
-let methodA = Api(
+const methodA = Api(
   {
     input: Collection,
     output: Collection,
@@ -115,7 +115,7 @@ let methodA = Api(
   },
 )
 
-let methodB = Api(
+const methodB = Api(
   {
     input: Collection,
     output: Collection,
@@ -125,37 +125,37 @@ let methodB = Api(
   },
 )
 
-let entries = {
+const entries = {
   methodA,
   methodB,
 }
 
 describe('codegen', () => {
   it('support codegen', async () => {
-    let formatResult = toJSON(entries)
+    const formatResult = toJSON(entries)
 
-    let source = codegen(formatResult, {
+    const source = codegen(formatResult, {
       noCheck: 'just for testing',
     })
 
-    let formattedSource = format(source)
+    const formattedSource = format(source)
 
-    let expected = await fs.readFile(`${__dirname}/expected/01.ts`)
+    const expected = await fs.readFile(`${__dirname}/expected/01.ts`)
 
     expect(formattedSource.replace(/\r|\n/g, '')).toEqual(expected.toString().replace(/\r|\n/g, ''))
   })
 
   it('can disable emiting api-client', async () => {
-    let formatResult = toJSON(entries)
+    const formatResult = toJSON(entries)
 
-    let source = codegen(formatResult, {
+    const source = codegen(formatResult, {
       emitApiClient: false,
       noCheck: 'just for testing',
     })
 
-    let formatedSource = format(source)
+    const formatedSource = format(source)
 
-    let expected = await fs.readFile(`${__dirname}/expected/02.ts`)
+    const expected = await fs.readFile(`${__dirname}/expected/02.ts`)
 
     expect(formatedSource.replace(/\r|\n/g, '')).toBe(expected.toString().replace(/\r|\n/g, ''))
   })

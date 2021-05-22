@@ -5,8 +5,8 @@ import { Stream } from 'stream'
 
 describe('Router', () => {
   it('should validating pathname & method', async () => {
-    let router = Router()
-    let schema = {
+    const router = Router()
+    const schema = {
       pathname: '/test',
     }
 
@@ -20,7 +20,7 @@ describe('Router', () => {
       }),
     ).rejects.toThrow()
 
-    let result = await router.run({
+    const result = await router.run({
       pathname: '/test',
     })
 
@@ -33,9 +33,9 @@ describe('Router', () => {
   })
 
   it('should validating method & params & query & body & headers & cookies', async () => {
-    let router = Router()
+    const router = Router()
 
-    let schema = {
+    const schema = {
       pathname: '/detail/:id',
       method: 'POST',
       params: {
@@ -78,7 +78,7 @@ describe('Router', () => {
       }),
     ).rejects.toThrow()
 
-    let request0 = {
+    const request0 = {
       pathname: '/detail/123',
       method: 'POST',
       params: {
@@ -102,7 +102,7 @@ describe('Router', () => {
       },
     }
 
-    let result0 = await router.run(request0)
+    const result0 = await router.run(request0)
 
     expect(result0.info.body).toEqual({
       type: 'json',
@@ -131,7 +131,7 @@ describe('Router', () => {
       },
     })
 
-    let request1 = {
+    const request1 = {
       ...request0,
       body: {
         a: 1,
@@ -145,7 +145,7 @@ describe('Router', () => {
       },
     }
 
-    let result1 = await router.run(request1)
+    const result1 = await router.run(request1)
 
     expect(result1.info.body).toEqual({
       type: 'json',
@@ -183,7 +183,7 @@ describe('Router', () => {
       },
     })
 
-    let request2 = {
+    const request2 = {
       ...request1,
       query: {},
     }
@@ -192,9 +192,9 @@ describe('Router', () => {
   })
 
   it('can validate number | int | float | boolean strictly', async () => {
-    let router0 = Router()
+    const router0 = Router()
 
-    let router1 = Router()
+    const router1 = Router()
 
     router0
       .match({
@@ -227,7 +227,7 @@ describe('Router', () => {
       }),
     ).rejects.toThrow()
 
-    let result1 = await router1.run({
+    const result1 = await router1.run({
       pathname: '/',
       query: {
         id: '123',
@@ -246,7 +246,7 @@ describe('Router', () => {
   })
 
   it('support passing regexp to schema.pathname', async () => {
-    let router = Router()
+    const router = Router()
 
     router
       .match({
@@ -268,11 +268,11 @@ describe('Router', () => {
       }),
     ).rejects.toThrow()
 
-    let result0 = await router.run({
+    const result0 = await router.run({
       pathname: '/test/abc',
     })
 
-    let result1 = await router.run({
+    const result1 = await router.run({
       pathname: '/test/efg',
     })
 
@@ -292,14 +292,14 @@ describe('Router', () => {
   })
 
   it('support detect response body and content-type', async () => {
-    let router = Router()
+    const router = Router()
 
-    let contentTypes = [] as string[]
+    const contentTypes = [] as string[]
 
-    let bodyTypes = [] as string[]
+    const bodyTypes = [] as string[]
 
     router.use(async (request, next) => {
-      let response = await next(request)
+      const response = await next(request)
 
       if (response.is('json')) {
         contentTypes.push('json')
@@ -404,7 +404,7 @@ describe('Router', () => {
 
 describe('Router Url Pattern', () => {
   it('support dynamic params in pathname', async () => {
-    let router = Router()
+    const router = Router()
 
     router
       .match({
@@ -500,7 +500,7 @@ describe('Router Url Pattern', () => {
       }),
     ).rejects.toThrow()
 
-    let result0 = await router.run({
+    const result0 = await router.run({
       pathname: '/string/123',
     })
 
@@ -512,7 +512,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result1 = await router.run({
+    const result1 = await router.run({
       pathname: '/number/123.456',
     })
 
@@ -524,7 +524,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result2 = await router.run({
+    const result2 = await router.run({
       pathname: '/int/123.456',
     })
 
@@ -536,7 +536,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result3 = await router.run({
+    const result3 = await router.run({
       pathname: '/float/123.456',
     })
 
@@ -548,7 +548,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result4 = await router.run({
+    const result4 = await router.run({
       pathname: '/boolean/true',
     })
 
@@ -560,7 +560,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result5 = await router.run({
+    const result5 = await router.run({
       pathname: '/boolean/false',
     })
 
@@ -572,7 +572,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result6 = await router.run({
+    const result6 = await router.run({
       pathname: '/id/1234123',
     })
 
@@ -584,7 +584,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result7 = await router.run({
+    const result7 = await router.run({
       pathname: '/literal/123',
     })
 
@@ -596,7 +596,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result8 = await router.run({
+    const result8 = await router.run({
       pathname: '/literal/abc',
     })
 
@@ -608,7 +608,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result9 = await router.run({
+    const result9 = await router.run({
       pathname: '/union/abc',
     })
 
@@ -620,7 +620,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result10 = await router.run({
+    const result10 = await router.run({
       pathname: '/union/123',
     })
 
@@ -632,7 +632,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result11 = await router.run({
+    const result11 = await router.run({
       pathname: '/union/false',
     })
 
@@ -646,7 +646,7 @@ describe('Router Url Pattern', () => {
   })
 
   it('support dynamic params in querystring', async () => {
-    let router = Router()
+    const router = Router()
 
     router
       .match({
@@ -742,7 +742,7 @@ describe('Router Url Pattern', () => {
       }),
     ).rejects.toThrow()
 
-    let result0 = await router.run({
+    const result0 = await router.run({
       pathname: '/string',
       query: {
         arg: '123',
@@ -757,7 +757,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result1 = await router.run({
+    const result1 = await router.run({
       pathname: '/number',
       query: {
         arg: '123.456',
@@ -772,7 +772,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result2 = await router.run({
+    const result2 = await router.run({
       pathname: '/int',
       query: {
         arg: '123.456',
@@ -787,7 +787,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result3 = await router.run({
+    const result3 = await router.run({
       pathname: '/float',
       query: {
         arg: '123.456',
@@ -802,7 +802,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result4 = await router.run({
+    const result4 = await router.run({
       pathname: '/boolean',
       query: {
         arg: 'true',
@@ -817,7 +817,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result5 = await router.run({
+    const result5 = await router.run({
       pathname: '/boolean',
       query: {
         arg: 'false',
@@ -832,7 +832,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result6 = await router.run({
+    const result6 = await router.run({
       pathname: '/id',
       query: {
         arg: '1234123',
@@ -847,7 +847,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result7 = await router.run({
+    const result7 = await router.run({
       pathname: '/literal',
       query: {
         arg: '123',
@@ -862,7 +862,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result8 = await router.run({
+    const result8 = await router.run({
       pathname: '/literal',
       query: {
         arg: 'abc',
@@ -877,7 +877,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result9 = await router.run({
+    const result9 = await router.run({
       pathname: '/union',
       query: {
         arg: 'abc',
@@ -892,7 +892,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result10 = await router.run({
+    const result10 = await router.run({
       pathname: '/union',
       query: {
         arg: '123',
@@ -907,7 +907,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result11 = await router.run({
+    const result11 = await router.run({
       pathname: '/union',
       query: {
         arg: 'false',
@@ -924,7 +924,7 @@ describe('Router Url Pattern', () => {
   })
 
   it('support static params in querystring', async () => {
-    let router = Router()
+    const router = Router()
 
     router
       .match({
@@ -980,7 +980,7 @@ describe('Router Url Pattern', () => {
       }),
     ).rejects.toThrow()
 
-    let result0 = await router.run({
+    const result0 = await router.run({
       pathname: '/static',
       query: {
         a: '1',
@@ -999,7 +999,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result1 = await router.run({
+    const result1 = await router.run({
       pathname: '/mix0',
       query: {
         a: '1',
@@ -1020,7 +1020,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result2 = await router.run({
+    const result2 = await router.run({
       pathname: '/mix0',
       query: {
         a: '1',
@@ -1052,7 +1052,7 @@ describe('Router Url Pattern', () => {
       }),
     ).rejects.toThrow()
 
-    let result3 = await router.run({
+    const result3 = await router.run({
       pathname: '/mix1',
       query: {
         a: '1',
@@ -1084,7 +1084,7 @@ describe('Router Url Pattern', () => {
       }),
     ).rejects.toThrow()
 
-    let result4 = await router.run({
+    const result4 = await router.run({
       pathname: '/mix2',
       query: {
         a: '1',
@@ -1118,7 +1118,7 @@ describe('Router Url Pattern', () => {
   })
 
   it('support using dynamic params in pathname and querystring at the same time', async () => {
-    let router = Router()
+    const router = Router()
 
     router
       .match({
@@ -1140,7 +1140,7 @@ describe('Router Url Pattern', () => {
       }),
     ).rejects.toThrow()
 
-    let result0 = await router.run({
+    const result0 = await router.run({
       pathname: '/test0/farrow/20',
       query: {
         static: 'abc',
@@ -1166,7 +1166,7 @@ describe('Router Url Pattern', () => {
   })
 
   it('support modifier in dynamic params', async () => {
-    let router = Router()
+    const router = Router()
 
     router
       .match({
@@ -1201,7 +1201,7 @@ describe('Router Url Pattern', () => {
         })
       })
 
-    let result0 = await router.run({
+    const result0 = await router.run({
       pathname: '/optional',
     })
 
@@ -1213,7 +1213,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result1 = await router.run({
+    const result1 = await router.run({
       pathname: '/optional/abc',
     })
 
@@ -1225,7 +1225,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result2 = await router.run({
+    const result2 = await router.run({
       pathname: '/zero/or/more',
     })
 
@@ -1236,7 +1236,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result3 = await router.run({
+    const result3 = await router.run({
       pathname: '/zero/or/more/abc',
     })
 
@@ -1248,7 +1248,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result4 = await router.run({
+    const result4 = await router.run({
       pathname: '/zero/or/more/abc/efg',
     })
 
@@ -1266,7 +1266,7 @@ describe('Router Url Pattern', () => {
       }),
     ).rejects.toThrow()
 
-    let result6 = await router.run({
+    const result6 = await router.run({
       pathname: '/one/or/more/abc',
     })
 
@@ -1278,7 +1278,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result7 = await router.run({
+    const result7 = await router.run({
       pathname: '/one/or/more/abc/efg',
     })
 
@@ -1292,7 +1292,7 @@ describe('Router Url Pattern', () => {
   })
 
   it('support routing methods', async () => {
-    let router = Router()
+    const router = Router()
 
     router.get('/get0/<arg0:int>?<arg1:int>').use(
       (request: {
@@ -1423,7 +1423,7 @@ describe('Router Url Pattern', () => {
         })
       })
 
-    let result0 = await router.run({
+    const result0 = await router.run({
       pathname: '/get0/123',
       method: 'get',
       query: {
@@ -1448,7 +1448,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result1 = await router.run({
+    const result1 = await router.run({
       pathname: '/get1/123',
       method: 'get',
       query: {
@@ -1479,7 +1479,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result2 = await router.run({
+    const result2 = await router.run({
       pathname: '/post/123',
       method: 'post',
       query: {
@@ -1512,7 +1512,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result3 = await router.run({
+    const result3 = await router.run({
       pathname: '/put/123',
       method: 'put',
       query: {
@@ -1545,7 +1545,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result4 = await router.run({
+    const result4 = await router.run({
       pathname: '/patch/123',
       method: 'patch',
       query: {
@@ -1578,7 +1578,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result5 = await router.run({
+    const result5 = await router.run({
       pathname: '/head/123',
       method: 'head',
       query: {
@@ -1611,7 +1611,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result6 = await router.run({
+    const result6 = await router.run({
       pathname: '/options/123',
       method: 'options',
       query: {
@@ -1644,7 +1644,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    let result7 = await router.run({
+    const result7 = await router.run({
       pathname: '/delete/123',
       method: 'delete',
       query: {
@@ -1679,7 +1679,7 @@ describe('Router Url Pattern', () => {
   })
 
   it('support literal string unions', async () => {
-    let router = Router()
+    const router = Router()
 
     router.get('/some-service/<client:{mac}|{win}|{iphone}|{android}|{api}>/users/<id:number>').use(
       (request: {
@@ -1694,7 +1694,7 @@ describe('Router Url Pattern', () => {
       },
     )
 
-    let result0 = await router.run({
+    const result0 = await router.run({
       pathname: '/some-service/mac/users/123',
       method: 'GET',
     })

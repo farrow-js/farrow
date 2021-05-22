@@ -15,7 +15,7 @@ const colorCodes = {
 }
 
 const getColor = (str: string, code: number): string => {
-  let method = colorCodes[code] ?? 'yellow'
+  const method = colorCodes[code] ?? 'yellow'
   return chalk[method](str)
 }
 
@@ -30,23 +30,23 @@ export type LoggerOptions = {
 export type LoggerEvent = 'error' | 'close' | 'finish'
 
 export const createLogger = (options?: LoggerOptions) => {
-  let config: Required<LoggerOptions> = {
+  const config: Required<LoggerOptions> = {
     transporter: (str) => console.log(str),
     ...options,
   }
 
-  let { transporter } = config
+  const { transporter } = config
 
-  let print = (format: string, ...args: (string | number)[]) => {
-    let string = util.format(format, ...args)
+  const print = (format: string, ...args: (string | number)[]) => {
+    const string = util.format(format, ...args)
     transporter(string)
   }
 
-  let logInput = (method: string, url: string) => {
+  const logInput = (method: string, url: string) => {
     print(`  ${chalk.gray('<--')} ${chalk.bold('%s')} ${chalk.gray('%s')}`, method, url)
   }
 
-  let logOutput = (
+  const logOutput = (
     method: string,
     url: string,
     status: number,
@@ -54,9 +54,9 @@ export const createLogger = (options?: LoggerOptions) => {
     contentLength: number,
     event: LoggerEvent,
   ) => {
-    let colorCode = (status / 100) | 0
-    let length = [204, 205, 304].includes(status) ? '' : contentLength ? bytes(contentLength) : '-'
-    let upstream = event === 'error' ? chalk.red('xxx') : event === 'close' ? chalk.yellow('-x-') : chalk.gray('-->')
+    const colorCode = (status / 100) | 0
+    const length = [204, 205, 304].includes(status) ? '' : contentLength ? bytes(contentLength) : '-'
+    const upstream = event === 'error' ? chalk.red('xxx') : event === 'close' ? chalk.yellow('-x-') : chalk.gray('-->')
 
     print(
       `  ${upstream} ${chalk.bold('%s')} ${chalk.gray('%s')} ${getColor('%s', colorCode)} ${chalk.gray(

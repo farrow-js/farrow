@@ -20,7 +20,7 @@ export type BundlerOptions = {
 }
 
 const mergeList = <T>(...args: (undefined | T[])[]): T[] => {
-  let list = args.filter(Boolean) as T[][]
+  const list = args.filter(Boolean) as T[][]
   return ([] as T[]).concat(...list)
 }
 
@@ -30,16 +30,16 @@ const safeGetKeys = (input: object | undefined): string[] => {
 }
 
 export const createBundler = (options: BundlerOptions) => {
-  let config = {
+  const config = {
     autoAddExternal: true,
     ...options,
   }
 
-  let getBuilder = memo(async () => {
-    let pkgResult = await readPkgUp({
+  const getBuilder = memo(async () => {
+    const pkgResult = await readPkgUp({
       cwd: config.build.entryPoints?.[0],
     })
-    let external = config.autoAddExternal
+    const external = config.autoAddExternal
       ? mergeList(
           config.build.external,
           safeGetKeys(pkgResult?.packageJson?.devDependencies),
@@ -49,11 +49,11 @@ export const createBundler = (options: BundlerOptions) => {
         )
       : config.build.external
 
-    let plugins = config.autoAddExternal
+    const plugins = config.autoAddExternal
       ? [...(config.build.plugins ?? []), nodeExternalsPlugin()]
       : config.build.plugins ?? []
 
-    let result = await esbuild.build({
+    const result = await esbuild.build({
       ...config.build,
       external,
       plugins,
@@ -63,15 +63,15 @@ export const createBundler = (options: BundlerOptions) => {
   })
 
   let hasBuilt = false
-  let build = async () => {
+  const build = async () => {
     hasBuilt = true
-    let builder = await getBuilder()
+    const builder = await getBuilder()
     return builder()
   }
 
-  let dispose = async () => {
+  const dispose = async () => {
     if (hasBuilt) {
-      let builder = await getBuilder()
+      const builder = await getBuilder()
 
       builder.dispose()
     }
@@ -130,7 +130,7 @@ export type StartOptions = {
 }
 
 export const createServerBundler = (options: ServerBundlerOptions = {}) => {
-  let config = {
+  const config = {
     entry: 'index.ts',
     src: 'src',
     dist: 'dist',
@@ -142,9 +142,9 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
       ...options.esbuild,
     },
   }
-  let srcEntry = join(config.src, config.entry)
-  let distEntry = join(config.dist, config.entry).replace(/\.(tsx?)$/, '.js')
-  let bundler = createBundler({
+  const srcEntry = join(config.src, config.entry)
+  const distEntry = join(config.dist, config.entry).replace(/\.(tsx?)$/, '.js')
+  const bundler = createBundler({
     autoAddExternal: config.autoExternal ?? config.autoAddExternal ?? true,
     build: {
       ...config.esbuild,
@@ -159,7 +159,7 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
 
   let childProcess: ExecaChildProcess | null
 
-  let run = () => {
+  const run = () => {
     cancel()
     childProcess = execa('node', [...config.nodeArgs, distEntry], {
       stdout: 'inherit',
@@ -175,7 +175,7 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
     })
   }
 
-  let cancel = () => {
+  const cancel = () => {
     if (childProcess) {
       childProcess.cancel()
       childProcess = null
@@ -183,10 +183,10 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
   }
 
   let hasWatcher = false
-  let getWatcher = memo(async () => {
+  const getWatcher = memo(async () => {
     hasWatcher = true
 
-    let watcher = await watchFiles('.', {
+    const watcher = await watchFiles('.', {
       cwd: config.src,
       usePolling: true,
     })
@@ -203,12 +203,12 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
     return watcher
   })
 
-  let watch = async () => {
+  const watch = async () => {
     await getWatcher()
   }
 
-  let build = async () => {
-    let start = Date.now()
+  const build = async () => {
+    const start = Date.now()
     console.log('start build')
     await bundler.build()
     console.log(`finish build in ${(Date.now() - start).toFixed(2)}ms`)
@@ -216,7 +216,7 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
 
   let isStarted = false
 
-  let start = async (startOptions?: StartOptions) => {
+  const start = async (startOptions?: StartOptions) => {
     if (isStarted) {
       await stop()
     }
@@ -224,7 +224,7 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
     // eslint-disable-next-line require-atomic-updates
     isStarted = true
 
-    let startConfig = {
+    const startConfig = {
       ...startOptions,
     }
 
@@ -245,11 +245,11 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
     }
   }
 
-  let stop = async () => {
+  const stop = async () => {
     cancel()
     await bundler.dispose()
     if (hasWatcher) {
-      let watcher = await getWatcher()
+      const watcher = await getWatcher()
       await watcher.close()
     }
     isStarted = false
@@ -266,15 +266,15 @@ export type ServerBundlersOptions = {
 }
 
 export const createServerBundlers = (options: ServerBundlersOptions) => {
-  let bundlers = options.bundlers.map(createServerBundler)
+  const bundlers = options.bundlers.map(createServerBundler)
 
-  let start = async (startOptions?: StartOptions) => {
-    let promises = bundlers.map((bundler) => bundler.start(startOptions))
+  const start = async (startOptions?: StartOptions) => {
+    const promises = bundlers.map((bundler) => bundler.start(startOptions))
     await Promise.all(promises)
   }
 
-  let stop = async () => {
-    let promises = bundlers.map((bundler) => bundler.stop())
+  const stop = async () => {
+    const promises = bundlers.map((bundler) => bundler.stop())
     await Promise.all(promises)
   }
 
@@ -293,10 +293,10 @@ const createResolveDirnamePlugin = (dist: string): Plugin => {
           filter: /.*\.(j|t)sx?$/,
         },
         async (args) => {
-          let content = (await fs.readFile(args.path)).toString()
-          let dirname = path.dirname(args.path)
-          let relative = path.relative(dist, dirname)
-          let extname = path.extname(args.path)
+          const content = (await fs.readFile(args.path)).toString()
+          const dirname = path.dirname(args.path)
+          const relative = path.relative(dist, dirname)
+          const extname = path.extname(args.path)
           return {
             contents: content.replace(/__dirname/g, `require('path').join(__dirname, "${slash(relative)}")`),
             loader: extname.slice(1) as 'ts' | 'tsx' | 'js' | 'jsx',

@@ -79,21 +79,21 @@ const useContainerSafe = (): Container | undefined => {
 }
 
 export function createApi<T extends ApiDefinition>(definition: T, impl?: ApiImpl<T>): ApiType<T> {
-  let apiPipeline: ApiPipeline<T> = createAsyncPipeline()
+  const apiPipeline: ApiPipeline<T> = createAsyncPipeline()
 
-  let apiSchema: ApiSchema<T> = {
+  const apiSchema: ApiSchema<T> = {
     type: 'Api',
     definition,
   }
 
-  let apiImpl: ApiImpl<T> = (input) => {
-    let container = useContainerSafe()
+  const apiImpl: ApiImpl<T> = (input) => {
+    const container = useContainerSafe()
     return apiPipeline.run(input, {
       container,
     })
   }
 
-  let apiMethods: ApiMethods<T> = {
+  const apiMethods: ApiMethods<T> = {
     new() {
       return createApi(definition, impl)
     },

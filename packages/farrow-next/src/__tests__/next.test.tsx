@@ -36,7 +36,7 @@ class Counter extends Controller {
   }
 
   async preload() {
-    let data = (await this.getJson('/count')) as { count: number }
+    const data = (await this.getJson('/count')) as { count: number }
     this.actions.incre(data.count)
   }
 }
@@ -72,18 +72,18 @@ class TextManager extends Controller {
   env = this.use(TextEnvProvider).env
 
   async preload() {
-    let data = (await this.postJson('/text')) as { text: string }
+    const data = (await this.postJson('/text')) as { text: string }
     this.actions.updateText(data.text)
   }
 }
 
 const TestView = () => {
-  let text = TextManager.useState((state) => state.text)
-  let textManager = TextManager.use()
-  let count = Counter.useState((state) => state.count)
-  let counter = Counter.use()
+  const text = TextManager.useState((state) => state.text)
+  const textManager = TextManager.use()
+  const count = Counter.useState((state) => state.count)
+  const counter = Counter.use()
 
-  let handleIncre = () => {
+  const handleIncre = () => {
     counter.actions.incre()
   }
 
@@ -153,7 +153,7 @@ describe('farrow-next', () => {
     }) as any)
 
     // preload
-    let initialProps = await TestPage.getInitialProps?.({
+    const initialProps = await TestPage.getInitialProps?.({
       pathname: '/preload',
       query: {},
       AppTree: () => null,
@@ -163,12 +163,12 @@ describe('farrow-next', () => {
       throw new Error(`Expected initialProps to be an object, instead of ${initialProps}`)
     }
 
-    let { states, userAgent } = initialProps
+    const { states, userAgent } = initialProps
 
     let count: number | undefined
     let text: string | undefined
 
-    for (let state of states) {
+    for (const state of states) {
       if (state.type === 'counter') {
         count = state.count
       } else if (state.type === 'text-manager') {
@@ -185,10 +185,10 @@ describe('farrow-next', () => {
       ReactDOM.render(<TestPage {...initialProps!} />, container!)
     })
 
-    let envElem = document.getElementById('env')
-    let textElem = document.getElementById('text')
-    let countElem = document.getElementById('count')
-    let increElem = document.getElementById('counter-incre')
+    const envElem = document.getElementById('env')
+    const textElem = document.getElementById('text')
+    const countElem = document.getElementById('count')
+    const increElem = document.getElementById('counter-incre')
 
     expect(!!envElem).toBe(true)
     expect(!!textElem).toBe(true)

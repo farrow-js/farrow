@@ -86,7 +86,7 @@ export type TypeOfUrlSchema<T extends RouterUrlSchema> = MarkReadOnlyDeep<
 >
 
 const createRequestSchemaValidatorAndMatcher = <T extends RouterRequestSchema>(schema: T) => {
-  let descriptors: Schema.FieldDescriptors = {
+  const descriptors: Schema.FieldDescriptors = {
     pathname: Schema.String,
   }
 
@@ -114,11 +114,11 @@ const createRequestSchemaValidatorAndMatcher = <T extends RouterRequestSchema>(s
     descriptors.cookies = schema.cookies
   }
 
-  let RequestStruct = Schema.Struct(descriptors)
+  const RequestStruct = Schema.Struct(descriptors)
 
-  let validator = createSchemaValidator(Schema.NonStrict(RequestStruct) as any)
+  const validator = createSchemaValidator(Schema.NonStrict(RequestStruct) as any)
 
-  let matcher = createMatch(schema.pathname)
+  const matcher = createMatch(schema.pathname)
 
   return {
     validator: validator as Validator<TypeOfRequestSchema<T>>,
@@ -132,7 +132,7 @@ const splitUrlPattern = (url: string) => {
   let isQuerystring = false
 
   for (let i = 0; i < url.length; i++) {
-    let item = url.charAt(i)
+    const item = url.charAt(i)
 
     if (item === '?' && url.charAt(i + 1) !== ':') {
       isQuerystring = true
@@ -173,7 +173,7 @@ const createSchemaByString = (str: string): Schema.SchemaCtor => {
 
   // is literal string type
   if (str.startsWith('{') && str.endsWith('}')) {
-    let value = str.substring(1, str.length - 1)
+    const value = str.substring(1, str.length - 1)
     return Schema.Literal(value)
   }
 
@@ -181,20 +181,20 @@ const createSchemaByString = (str: string): Schema.SchemaCtor => {
 }
 
 const resolveUrlPattern = <T extends string>(input: T) => {
-  let url = splitUrlPattern(input)
-  let params = {} as RouterSchemaDescriptor
-  let query = {} as RouterSchemaDescriptor
+  const url = splitUrlPattern(input)
+  const params = {} as RouterSchemaDescriptor
+  const query = {} as RouterSchemaDescriptor
 
-  let resolve = (source: string, descriptors: RouterSchemaDescriptor) => {
+  const resolve = (source: string, descriptors: RouterSchemaDescriptor) => {
     return source.replace(/<([^>]*)>/g, (match) => {
-      let [key, value] = match.substring(1, match.length - 1).split(':')
-      let Type = createSchemaByString(value)
+      const [key, value] = match.substring(1, match.length - 1).split(':')
+      const Type = createSchemaByString(value)
 
       if (key.endsWith('?')) {
-        let name = key.substr(0, key.length - 1)
+        const name = key.substr(0, key.length - 1)
         descriptors[name] = Schema.Nullable(Type)
       } else if (key.endsWith('+') || key.endsWith('*')) {
-        let name = key.substr(0, key.length - 1)
+        const name = key.substr(0, key.length - 1)
         descriptors[name] = key.endsWith('*') ? Schema.Nullable(Schema.List(Type)) : Schema.List(Type)
       } else {
         descriptors[key] = Type
@@ -204,14 +204,14 @@ const resolveUrlPattern = <T extends string>(input: T) => {
     })
   }
 
-  let pathname = resolve(url.pathname, params)
+  const pathname = resolve(url.pathname, params)
 
-  let parsedQuery = parseQuery(url.querystring)
+  const parsedQuery = parseQuery(url.querystring)
 
   resolve(url.querystring, query)
 
-  for (let [key, item] of Object.entries(parsedQuery)) {
-    let isDynamicKey = key.startsWith('<') && key.endsWith('>')
+  for (const [key, item] of Object.entries(parsedQuery)) {
+    const isDynamicKey = key.startsWith('<') && key.endsWith('>')
     if (!isDynamicKey) {
       query[key] = Schema.Literal(`${item}`)
     }
@@ -225,10 +225,10 @@ const resolveUrlPattern = <T extends string>(input: T) => {
 }
 
 const createUrlSchemaValidatorAndMatcher = <T extends RouterUrlSchema>(schema: T) => {
-  let { url, ...rest } = schema
-  let { pathname, params, query } = resolveUrlPattern(url)
+  const { url, ...rest } = schema
+  const { pathname, params, query } = resolveUrlPattern(url)
 
-  let routerRequestSchema: RouterRequestSchema = {
+  const routerRequestSchema: RouterRequestSchema = {
     pathname,
   }
 
@@ -245,7 +245,7 @@ const createUrlSchemaValidatorAndMatcher = <T extends RouterUrlSchema>(schema: T
   // ensure pathname come from url
   routerRequestSchema.pathname = pathname
 
-  let result = createRequestSchemaValidatorAndMatcher(routerRequestSchema)
+  const result = createRequestSchemaValidatorAndMatcher(routerRequestSchema)
 
   return {
     ...result,
@@ -319,22 +319,22 @@ export type RoutingMethods = {
 export type RouterPipelineOptions = string
 
 export const createRouterPipeline = (): RouterPipeline => {
-  let pipeline = createAsyncPipeline<RequestInfo, Response>()
+  const pipeline = createAsyncPipeline<RequestInfo, Response>()
 
-  let capture: RouterPipeline['capture'] = (type, f) => {
+  const capture: RouterPipeline['capture'] = (type, f) => {
     pipeline.use(matchBodyType(type, f))
   }
 
-  let route: RouterPipeline['route'] = (name) => {
-    let routePipeline = createRoute(name)
+  const route: RouterPipeline['route'] = (name) => {
+    const routePipeline = createRoute(name)
     pipeline.use(routePipeline)
     return routePipeline
   }
 
-  let serve: RouterPipeline['serve'] = (name, dirname) => {
+  const serve: RouterPipeline['serve'] = (name, dirname) => {
     dirname = path.normalize(dirname)
 
-    let getIndexHtmlPath = (filename: string): string => {
+    const getIndexHtmlPath = (filename: string): string => {
       if (filename.endsWith('/')) {
         return `${filename}index.html`
       }
@@ -343,13 +343,13 @@ export const createRouterPipeline = (): RouterPipeline => {
 
     route(name).use(async (request, next) => {
       // prevent directory traversal attack
-      let filename = path.normalize(request.pathname)
-      let fullpath = path.join(dirname, filename)
+      const filename = path.normalize(request.pathname)
+      const fullpath = path.join(dirname, filename)
       if (fullpath.indexOf(dirname) !== 0) {
         return next(request)
       }
 
-      let stats = await getStats(fullpath)
+      const stats = await getStats(fullpath)
 
       /**
        * handle file
@@ -362,8 +362,8 @@ export const createRouterPipeline = (): RouterPipeline => {
        * handle {dirname}/index.html
        */
       if (stats?.isDirectory()) {
-        let indexHtmlPath = getIndexHtmlPath(fullpath)
-        let indexHtmlStats = await getStats(indexHtmlPath)
+        const indexHtmlPath = getIndexHtmlPath(fullpath)
+        const indexHtmlStats = await getStats(indexHtmlPath)
         if (indexHtmlStats?.isFile()) {
           return Response.file(getIndexHtmlPath(fullpath))
         }
@@ -373,7 +373,7 @@ export const createRouterPipeline = (): RouterPipeline => {
     })
   }
 
-  let createMatchedPipeline = <T>({
+  const createMatchedPipeline = <T>({
     matchedPipeline,
     method,
     options,
@@ -386,36 +386,36 @@ export const createRouterPipeline = (): RouterPipeline => {
     validator: Validator<T>
     matcher: MatchFunction<object>
   }) => {
-    let config = {
+    const config = {
       block: false,
       ...options,
     }
 
-    let methods = getMethods(method)
+    const methods = getMethods(method)
 
     pipeline.use(async (input, next) => {
-      let container = useContainer()
+      const container = useContainer()
 
       if (input.method && !methods.includes(input.method.toLowerCase())) {
         return next()
       }
 
-      let matches = matcher(input.pathname)
+      const matches = matcher(input.pathname)
 
       if (!matches) {
         return next()
       }
 
-      let { params } = matches
+      const { params } = matches
 
-      let result = validator({
+      const result = validator({
         ...input,
         params,
       })
 
       if (result.isErr) {
         if (config.onSchemaError) {
-          let response = await config.onSchemaError(result.value)
+          const response = await config.onSchemaError(result.value)
           if (response) return response
         }
 
@@ -443,10 +443,10 @@ export const createRouterPipeline = (): RouterPipeline => {
     return matchedPipeline
   }
 
-  let match: RouterPipeline['match'] = (schema: any, options: MatchOptions) => {
+  const match: RouterPipeline['match'] = (schema: any, options: MatchOptions) => {
     if (isRouterRequestSchema(schema)) {
-      let matchedPipeline = createPipeline<any, MaybeAsyncResponse>()
-      let { validator, matcher } = createRequestSchemaValidatorAndMatcher(schema)
+      const matchedPipeline = createPipeline<any, MaybeAsyncResponse>()
+      const { validator, matcher } = createRequestSchemaValidatorAndMatcher(schema)
       return createMatchedPipeline({
         matchedPipeline,
         validator,
@@ -457,8 +457,8 @@ export const createRouterPipeline = (): RouterPipeline => {
     }
 
     if (isRouterUrlSchema(schema)) {
-      let matchedPipeline = createPipeline<any, MaybeAsyncResponse>()
-      let { validator, matcher } = createUrlSchemaValidatorAndMatcher(schema)
+      const matchedPipeline = createPipeline<any, MaybeAsyncResponse>()
+      const { validator, matcher } = createUrlSchemaValidatorAndMatcher(schema)
       return createMatchedPipeline({
         matchedPipeline,
         validator,
@@ -471,8 +471,8 @@ export const createRouterPipeline = (): RouterPipeline => {
     throw new Error(`Unsupported schema: {${Object.keys(schema)}}`)
   }
 
-  let createRoutingMethod = (method: string) => {
-    return ((<U extends string, T extends Omit<RouterSharedSchema, 'method'>>(
+  const createRoutingMethod = (method: string) => {
+    return (<U extends string, T extends Omit<RouterSharedSchema, 'method'>>(
       path: U,
       schema?: T,
       options?: MatchOptions,
@@ -485,10 +485,10 @@ export const createRouterPipeline = (): RouterPipeline => {
         },
         options,
       )
-    }) as unknown) as RoutingMethod
+    }) as unknown as RoutingMethod
   }
 
-  let methods: RoutingMethods = {
+  const methods: RoutingMethods = {
     get: createRoutingMethod('GET'),
     post: createRoutingMethod('POST'),
     put: createRoutingMethod('PUT'),

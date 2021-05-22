@@ -60,7 +60,7 @@ export const createResponse = (info: ResponseInfo): Response => {
   return {
     info,
     merge: (...responsers) => {
-      let infos = responsers.map((responser) => responser.info)
+      const infos = responsers.map((responser) => responser.info)
       return createResponse(merge(info, ...infos))
     },
     is: (...types) => {
@@ -96,7 +96,7 @@ export const matchBodyType = <T extends keyof BodyMap>(
   f: (body: BodyMap[T]) => MaybeAsyncResponse,
 ): Middleware<any, MaybeAsyncResponse> => {
   return async (request, next) => {
-    let response = await next(request)
+    const response = await next(request)
 
     if (response.info.body?.type === type) {
       return response.merge(await f(response.info.body as BodyMap[T]))

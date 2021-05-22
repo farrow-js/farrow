@@ -9,14 +9,14 @@ export const compose = <T, U>(middlewares: KoaMiddleware<T, U>[]) => {
     throw new TypeError('Middleware stack must be an array!')
   }
 
-  for (let fn of middlewares) {
+  for (const fn of middlewares) {
     if (typeof fn !== 'function') {
       throw new TypeError('Middleware must be composed of functions!')
     }
   }
 
   return async (context: T, next?: KoaMiddleware<T, U>) => {
-    let pipeline = createPipeline<T, MiddlewareReturnType<U>>()
+    const pipeline = createPipeline<T, MiddlewareReturnType<U>>()
 
     pipeline.use(...middlewares.map(toKoaMiddleware))
 

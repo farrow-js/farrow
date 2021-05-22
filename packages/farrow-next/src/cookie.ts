@@ -4,7 +4,7 @@ import JSCookie, { CookieAttributes } from 'js-cookie'
 
 export const get = (name: string, req?: IncomingMessage) => {
   if (!req) return JSCookie.get(name)
-  let cookies = parse(req.headers.cookie || '') || {}
+  const cookies = parse(req.headers.cookie || '') || {}
   return cookies[name]
 }
 
@@ -23,8 +23,8 @@ const getSameSite = (opts: CookieSerializeOptions) => {
 }
 
 export const set = (name: string, value: string, options?: CookieSerializeOptions, res?: ServerResponse) => {
-  let opts: CookieSerializeOptions = { ...options }
-  let val = typeof value === 'object' ? `j:${JSON.stringify(value)}` : String(value)
+  const opts: CookieSerializeOptions = { ...options }
+  const val = typeof value === 'object' ? `j:${JSON.stringify(value)}` : String(value)
 
   if (typeof opts.maxAge === 'number') {
     opts.expires = new Date(Date.now() + opts.maxAge)
@@ -46,7 +46,7 @@ export const set = (name: string, value: string, options?: CookieSerializeOption
 }
 
 export const remove = (name: string, options?: CookieSerializeOptions, res?: ServerResponse) => {
-  let opts = { expires: new Date(1), path: '/', ...options }
+  const opts = { expires: new Date(1), path: '/', ...options }
   if (!res) {
     return JSCookie.set(name, '', {
       ...opts,

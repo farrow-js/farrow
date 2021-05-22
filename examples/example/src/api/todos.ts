@@ -39,7 +39,7 @@ router
     },
   })
   .use((request) => {
-    let todo = fakeData.find((todo) => todo.id === request.params.todoId)
+    const todo = fakeData.find((todo) => todo.id === request.params.todoId)
 
     if (!todo) {
       return err(`Todo id is not found: ${request.params.todoId}`)
@@ -57,7 +57,7 @@ router
     },
   })
   .use(async (request) => {
-    let todo: Todo = {
+    const todo: Todo = {
       id: uid++,
       content: request.body.content,
       completed: false,
@@ -77,7 +77,7 @@ router
     },
   })
   .use(async (request) => {
-    let todo = fakeData.find((todo) => todo.id === request.params.todoId)
+    const todo = fakeData.find((todo) => todo.id === request.params.todoId)
 
     if (!todo) {
       return err(`Todo id is not found: ${request.params.todoId}`)
@@ -100,7 +100,7 @@ router
     },
   })
   .use(async (request) => {
-    let todo = fakeData.find((todo) => todo.id === request.params.todoId)
+    const todo = fakeData.find((todo) => todo.id === request.params.todoId)
 
     if (!todo) {
       return err(`Todo id is not found: ${request.params.todoId}`)
@@ -120,13 +120,13 @@ router
     },
   })
   .use(async (request) => {
-    let index = fakeData.findIndex((todo) => todo.id === request.params.todoId)
+    const index = fakeData.findIndex((todo) => todo.id === request.params.todoId)
 
     if (index === -1) {
       return err(`Todo id is not found: ${request.params.todoId}`)
     }
 
-    let todo = fakeData[index]
+    const todo = fakeData[index]
 
     fakeData.splice(index, 1)
 

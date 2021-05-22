@@ -23,7 +23,7 @@ export const greet = Api(
     output: GreetOutput,
   },
   (input) => {
-    let greet = `Hello ${input.name}!`
+    const greet = `Hello ${input.name}!`
     return { greet }
   },
 )

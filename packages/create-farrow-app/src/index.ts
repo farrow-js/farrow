@@ -42,7 +42,7 @@ const validateTemplate = (template: unknown): TemplateStatus => {
     }
   }
 
-  let availableTemplates = TEMPLATES.map(stripColors)
+  const availableTemplates = TEMPLATES.map(stripColors)
 
   if (availableTemplates.includes(template)) {
     return {
@@ -61,7 +61,7 @@ async function init() {
   let targetDir = argv._[0]
 
   if (!targetDir) {
-    let { name } = await prompt<{ name: string }>({
+    const { name } = await prompt<{ name: string }>({
       type: 'input',
       name: 'name',
       message: `Project name:`,
@@ -70,15 +70,15 @@ async function init() {
     targetDir = name
   }
 
-  let root = path.join(cwd, targetDir)
+  const root = path.join(cwd, targetDir)
   console.log(`\nScaffolding project in ${root}...`)
 
   if (!fs.existsSync(root)) {
     fs.mkdirSync(root, { recursive: true })
   } else {
-    let existing = fs.readdirSync(root)
+    const existing = fs.readdirSync(root)
     if (existing.length) {
-      let { yes } = await prompt<{ yes: boolean }>({
+      const { yes } = await prompt<{ yes: boolean }>({
         type: 'confirm',
         name: 'yes',
         initial: 'Y',
@@ -95,14 +95,14 @@ async function init() {
   // determine template
   let template = argv.t || argv.template
 
-  let templateStatus = validateTemplate(template)
+  const templateStatus = validateTemplate(template)
 
   if (!templateStatus.isValid) {
-    let message = templateStatus.isEmpty
+    const message = templateStatus.isEmpty
       ? 'Select a template:'
       : `${template} isn't a valid template. Please choose from below:`
 
-    let { t } = await prompt<{ t: string }>({
+    const { t } = await prompt<{ t: string }>({
       type: 'select',
       name: 't',
       message,
@@ -111,10 +111,10 @@ async function init() {
     template = stripColors(t)
   }
 
-  let templateDir = path.join(__dirname, `../templates/${template}`)
+  const templateDir = path.join(__dirname, `../templates/${template}`)
 
-  let write = (file: string, content?: string) => {
-    let targetPath = renameFiles[file] ? path.join(root, renameFiles[file]) : path.join(root, file)
+  const write = (file: string, content?: string) => {
+    const targetPath = renameFiles[file] ? path.join(root, renameFiles[file]) : path.join(root, file)
     if (content) {
       fs.writeFileSync(targetPath, content)
     } else {
@@ -122,15 +122,15 @@ async function init() {
     }
   }
 
-  let files = fs.readdirSync(templateDir).filter((file) => {
+  const files = fs.readdirSync(templateDir).filter((file) => {
     return file !== 'package.json' && !file.includes('node_modules')
   })
 
-  for (let file of files) {
+  for (const file of files) {
     write(file)
   }
 
-  let pkg = require(path.join(templateDir, `package.json`))
+  const pkg = require(path.join(templateDir, `package.json`))
 
   pkg.name = path
     .basename(root)
@@ -142,7 +142,7 @@ async function init() {
 
   write('package.json', JSON.stringify(pkg, null, 2))
 
-  let pkgManager = /yarn/.test(process.env.npm_execpath ?? '') ? 'yarn' : 'npm'
+  const pkgManager = /yarn/.test(process.env.npm_execpath ?? '') ? 'yarn' : 'npm'
 
   console.log(`\nDone. Now run:\n`)
   if (root !== cwd) {
@@ -154,7 +154,7 @@ async function init() {
 }
 
 function copy(src: string, dest: string) {
-  let stat = fs.statSync(src)
+  const stat = fs.statSync(src)
   if (stat.isDirectory()) {
     copyDir(src, dest)
   } else {
@@ -164,9 +164,9 @@ function copy(src: string, dest: string) {
 
 function copyDir(srcDir: string, destDir: string) {
   fs.mkdirSync(destDir, { recursive: true })
-  for (let file of fs.readdirSync(srcDir)) {
-    let srcFile = path.resolve(srcDir, file)
-    let destFile = path.resolve(destDir, file)
+  for (const file of fs.readdirSync(srcDir)) {
+    const srcFile = path.resolve(srcDir, file)
+    const destFile = path.resolve(destDir, file)
     copy(srcFile, destFile)
   }
 }
@@ -175,8 +175,8 @@ function emptyDir(dir: string) {
   if (!fs.existsSync(dir)) {
     return
   }
-  for (let file of fs.readdirSync(dir)) {
-    let abs = path.resolve(dir, file)
+  for (const file of fs.readdirSync(dir)) {
+    const abs = path.resolve(dir, file)
     // baseline is Node 12 so can't use rmSync :(
     if (fs.lstatSync(abs).isDirectory()) {
       emptyDir(abs)

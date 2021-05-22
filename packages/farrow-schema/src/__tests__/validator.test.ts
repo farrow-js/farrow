@@ -3,31 +3,17 @@ import { ReadOnly, TypeOf, ReadOnlyDeep } from '../schema'
 import { createSchemaValidator, RegExp, ValidationResult, Validator, ValidatorType } from '../validator'
 import { pick, omit, keyof, partial } from '../helper'
 
-const {
-  Type,
-  ObjectType,
-  Struct,
-  Int,
-  Float,
-  Literal,
-  List,
-  Union,
-  Intersect,
-  Nullable,
-  Record,
-  Json,
-  Any,
-  Tuple,
-} = Schema
+const { Type, ObjectType, Struct, Int, Float, Literal, List, Union, Intersect, Nullable, Record, Json, Any, Tuple } =
+  Schema
 
-let assertOk = <T>(result: ValidationResult<T>): T => {
+const assertOk = <T>(result: ValidationResult<T>): T => {
   if (result.isOk) return result.value
   throw new Error(result.value.message)
 }
 
 describe('Validator', () => {
   it('supports number validation', () => {
-    let validate = createSchemaValidator(Schema.Number)
+    const validate = createSchemaValidator(Schema.Number)
 
     expect(assertOk(validate(1))).toBe(1)
 
@@ -49,7 +35,7 @@ describe('Validator', () => {
   })
 
   it('supports integer validation', () => {
-    let validate = createSchemaValidator(Int)
+    const validate = createSchemaValidator(Int)
 
     expect(assertOk(validate(1))).toBe(1)
 
@@ -71,7 +57,7 @@ describe('Validator', () => {
   })
 
   it('supports float validation', () => {
-    let validate = createSchemaValidator(Float)
+    const validate = createSchemaValidator(Float)
 
     expect(assertOk(validate(1))).toBe(1)
 
@@ -93,7 +79,7 @@ describe('Validator', () => {
   })
 
   it('supports string validation', () => {
-    let validate = createSchemaValidator(Schema.String)
+    const validate = createSchemaValidator(Schema.String)
 
     expect(assertOk(validate(''))).toBe('')
     expect(assertOk(validate('123'))).toBe('123')
@@ -112,7 +98,7 @@ describe('Validator', () => {
   })
 
   it('supports boolean validation', () => {
-    let validate = createSchemaValidator(Schema.Boolean)
+    const validate = createSchemaValidator(Schema.Boolean)
 
     expect(assertOk(validate(true))).toBe(true)
     expect(assertOk(validate(false))).toBe(false)
@@ -134,7 +120,7 @@ describe('Validator', () => {
   })
 
   it('supports ID validation', () => {
-    let validate = createSchemaValidator(Schema.ID)
+    const validate = createSchemaValidator(Schema.ID)
 
     expect(() => assertOk(validate(''))).toThrow()
     expect(assertOk(validate('123'))).toBe('123')
@@ -153,11 +139,11 @@ describe('Validator', () => {
   })
 
   it('supports Date validation', () => {
-    let validate = createSchemaValidator(Schema.Date)
+    const validate = createSchemaValidator(Schema.Date)
 
     expect(() => assertOk(validate(''))).toThrow()
 
-    let a = new Date()
+    const a = new Date()
     expect(assertOk(validate(a))).toBe(a)
 
     expect(assertOk(validate(a.getTime())).getTime()).toBe(a.getTime())
@@ -176,9 +162,9 @@ describe('Validator', () => {
   })
 
   it('supports nullable validation', () => {
-    let validateNullableNumber = createSchemaValidator(Nullable(Number))
-    let validateNullableString = createSchemaValidator(Nullable(String))
-    let validateNullableBoolean = createSchemaValidator(Nullable(Boolean))
+    const validateNullableNumber = createSchemaValidator(Nullable(Number))
+    const validateNullableString = createSchemaValidator(Nullable(String))
+    const validateNullableBoolean = createSchemaValidator(Nullable(Boolean))
 
     expect(assertOk(validateNullableNumber(null))).toBe(null)
     expect(assertOk(validateNullableNumber(undefined))).toBe(undefined)
@@ -195,9 +181,9 @@ describe('Validator', () => {
   })
 
   it('supports list validation', () => {
-    let validateNumbers = createSchemaValidator(List(Number))
-    let validateStrings = createSchemaValidator(List(String))
-    let validateBooleans = createSchemaValidator(List(Boolean))
+    const validateNumbers = createSchemaValidator(List(Number))
+    const validateStrings = createSchemaValidator(List(String))
+    const validateBooleans = createSchemaValidator(List(Boolean))
 
     expect(assertOk(validateNumbers([1, 2, 3]))).toEqual([1, 2, 3])
 
@@ -231,7 +217,7 @@ describe('Validator', () => {
       }
     }
 
-    let validate = createSchemaValidator(Obj)
+    const validate = createSchemaValidator(Obj)
 
     expect(
       assertOk(
@@ -320,7 +306,7 @@ describe('Validator', () => {
   })
 
   it('supports struct validation', () => {
-    let Struct0 = Struct({
+    const Struct0 = Struct({
       a: {
         [Type]: Number,
       },
@@ -330,15 +316,15 @@ describe('Validator', () => {
       c: Boolean,
     })
 
-    let Struct1 = Struct({
+    const Struct1 = Struct({
       struct0: {
         [Type]: Struct0,
       },
       d: List(Number),
     })
 
-    let validateStruct0 = createSchemaValidator(Struct0)
-    let validateStruct1 = createSchemaValidator(Struct1)
+    const validateStruct0 = createSchemaValidator(Struct0)
+    const validateStruct1 = createSchemaValidator(Struct1)
 
     expect(
       assertOk(
@@ -387,7 +373,7 @@ describe('Validator', () => {
   })
 
   it('supports union validation', () => {
-    let validate = createSchemaValidator(Union(Number, Boolean, String))
+    const validate = createSchemaValidator(Union(Number, Boolean, String))
 
     expect(assertOk(validate('10'))).toBe('10')
     expect(assertOk(validate(10))).toBe(10)
@@ -404,11 +390,11 @@ describe('Validator', () => {
       b = String
     }
 
-    let Obj2 = Intersect(Obj0, Obj1)
+    const Obj2 = Intersect(Obj0, Obj1)
 
-    let validateObj0 = createSchemaValidator(Obj0)
-    let validateObj1 = createSchemaValidator(Obj1)
-    let validateObj2 = createSchemaValidator(Obj2)
+    const validateObj0 = createSchemaValidator(Obj0)
+    const validateObj1 = createSchemaValidator(Obj1)
+    const validateObj2 = createSchemaValidator(Obj2)
 
     expect(assertOk(validateObj0({ a: 1 }))).toEqual({ a: 1 })
     expect(assertOk(validateObj1({ b: '1' }))).toEqual({ b: '1' })
@@ -448,10 +434,10 @@ describe('Validator', () => {
   })
 
   it('supports literal validation', () => {
-    let validateLiteralOne = createSchemaValidator(Literal(1))
-    let validateLiteralTwo = createSchemaValidator(Literal(2))
-    let validateLiteralAAA = createSchemaValidator(Literal('AAA'))
-    let validateLiteralTrue = createSchemaValidator(Literal(true))
+    const validateLiteralOne = createSchemaValidator(Literal(1))
+    const validateLiteralTwo = createSchemaValidator(Literal(2))
+    const validateLiteralAAA = createSchemaValidator(Literal('AAA'))
+    const validateLiteralTrue = createSchemaValidator(Literal(true))
 
     expect(assertOk(validateLiteralOne(1))).toBe(1)
     expect(assertOk(validateLiteralTwo(2))).toBe(2)
@@ -465,7 +451,7 @@ describe('Validator', () => {
   })
 
   it('supports json validation', () => {
-    let validateJson = createSchemaValidator(Json)
+    const validateJson = createSchemaValidator(Json)
 
     expect(assertOk(validateJson(null))).toEqual(null)
     expect(assertOk(validateJson(1))).toEqual(1)
@@ -495,8 +481,8 @@ describe('Validator', () => {
   })
 
   it('supports record validation', () => {
-    let validateNumberRecord = createSchemaValidator(Record(Number))
-    let validateStringRecord = createSchemaValidator(Record(String))
+    const validateNumberRecord = createSchemaValidator(Record(Number))
+    const validateStringRecord = createSchemaValidator(Record(String))
 
     expect(assertOk(validateNumberRecord({ a: 1, b: 1 }))).toEqual({ a: 1, b: 1 })
 
@@ -508,7 +494,7 @@ describe('Validator', () => {
   })
 
   it('supports any pattern', () => {
-    let validateAny = createSchemaValidator(Any)
+    const validateAny = createSchemaValidator(Any)
     expect(assertOk(validateAny(0))).toEqual(0)
     expect(assertOk(validateAny('1'))).toEqual('1')
     expect(assertOk(validateAny(null))).toEqual(null)
@@ -523,7 +509,7 @@ describe('Validator', () => {
       nest = Nullable(Nest)
     }
 
-    let validateNest = createSchemaValidator(Nest)
+    const validateNest = createSchemaValidator(Nest)
 
     expect(
       assertOk(
@@ -564,15 +550,15 @@ describe('Validator', () => {
   })
 
   it('should support flexible FieldDescriptors as argument', () => {
-    let list = List({
+    const list = List({
       a: Number,
     })
 
-    let nullable = Nullable({
+    const nullable = Nullable({
       a: Number,
     })
 
-    let union = Union(
+    const union = Union(
       {
         a: Number,
       },
@@ -581,7 +567,7 @@ describe('Validator', () => {
       },
     )
 
-    let intersect = Intersect(
+    const intersect = Intersect(
       {
         a: Number,
       },
@@ -590,15 +576,15 @@ describe('Validator', () => {
       },
     )
 
-    let record = Record({
+    const record = Record({
       a: Number,
     })
 
-    let validateList = createSchemaValidator(list)
-    let validateNullable = createSchemaValidator(nullable)
-    let validateUnion = createSchemaValidator(union)
-    let validateIntersect = createSchemaValidator(intersect)
-    let validateRecord = createSchemaValidator(record)
+    const validateList = createSchemaValidator(list)
+    const validateNullable = createSchemaValidator(nullable)
+    const validateUnion = createSchemaValidator(union)
+    const validateIntersect = createSchemaValidator(intersect)
+    const validateRecord = createSchemaValidator(record)
 
     expect(assertOk(validateList([]))).toEqual([])
     expect(
@@ -661,7 +647,7 @@ describe('Validator', () => {
   })
 
   it('support strict or non-strict validation', () => {
-    let struct = Struct({
+    const struct = Struct({
       a: Number,
       b: Int,
       c: Boolean,
@@ -669,12 +655,12 @@ describe('Validator', () => {
       e: Literal(false),
     })
 
-    let validate0 = createSchemaValidator(struct)
+    const validate0 = createSchemaValidator(struct)
 
-    let validate1 = createSchemaValidator(Schema.NonStrict(struct))
+    const validate1 = createSchemaValidator(Schema.NonStrict(struct))
 
     // valid data for both
-    let data0 = {
+    const data0 = {
       a: 1.23,
       b: 1,
       c: false,
@@ -683,7 +669,7 @@ describe('Validator', () => {
     }
 
     // invalid for strict mode, valid for non-strict mode
-    let data1 = {
+    const data1 = {
       a: 1,
       b: 1.1,
       c: 'false',
@@ -691,7 +677,7 @@ describe('Validator', () => {
       e: 'false',
     }
 
-    let data2 = {
+    const data2 = {
       a: '1',
       b: '1.1',
       c: true,
@@ -699,7 +685,7 @@ describe('Validator', () => {
       e: 'false',
     }
 
-    let data3 = {
+    const data3 = {
       a: '1.1',
       b: '1',
       c: 'true',
@@ -765,7 +751,7 @@ describe('Validator', () => {
   })
 
   it('supports read-only and read-only-deep', () => {
-    let Struct0 = Struct({
+    const Struct0 = Struct({
       a: Number,
       b: String,
       c: {
@@ -773,8 +759,8 @@ describe('Validator', () => {
       },
     })
 
-    let ReadOnlyStruct = ReadOnly(Struct0)
-    let ReadOnlyDeepStruct = ReadOnlyDeep(Struct0)
+    const ReadOnlyStruct = ReadOnly(Struct0)
+    const ReadOnlyDeepStruct = ReadOnlyDeep(Struct0)
 
     type T0 = TypeOf<typeof Struct0>
 
@@ -782,7 +768,7 @@ describe('Validator', () => {
 
     // type T2 = TypeOf<typeof ReadOnlyDeepStruct>
 
-    let data: T0 = {
+    const data: T0 = {
       a: 1,
       b: '1',
       c: {
@@ -790,11 +776,11 @@ describe('Validator', () => {
       },
     }
 
-    let validate0 = createSchemaValidator(Struct0)
+    const validate0 = createSchemaValidator(Struct0)
 
-    let validate1 = createSchemaValidator(ReadOnlyStruct)
+    const validate1 = createSchemaValidator(ReadOnlyStruct)
 
-    let validate2 = createSchemaValidator(ReadOnlyDeepStruct)
+    const validate2 = createSchemaValidator(ReadOnlyDeepStruct)
 
     expect(assertOk(validate0(data))).toEqual({
       a: 1,
@@ -822,11 +808,11 @@ describe('Validator', () => {
   })
 
   it('supports validate tuple', () => {
-    let Test = Tuple({ a: Literal('a') }, { b: Literal('b') })
+    const Test = Tuple({ a: Literal('a') }, { b: Literal('b') })
 
     type Test = TypeOf<typeof Test>
 
-    let test: Test = [{ a: 'a' }, { b: 'b' }]
+    const test: Test = [{ a: 'a' }, { b: 'b' }]
 
     expect(assertOk(Validator.validate(Test, test))).toEqual([{ a: 'a' }, { b: 'b' }])
 
@@ -862,15 +848,15 @@ describe('Validator', () => {
       }
     }
 
-    let User = Struct({
+    const User = Struct({
       name: String,
       email: EmailType,
       createAt: DateType,
     })
 
-    let validateUser = createSchemaValidator(User)
+    const validateUser = createSchemaValidator(User)
 
-    let result0 = assertOk(
+    const result0 = assertOk(
       validateUser({
         name: 'test',
         email: 'example@farrow.com',
@@ -894,11 +880,11 @@ describe('Validator', () => {
   })
 
   it('supports RegExp Schema', () => {
-    let Reg0 = RegExp(/123/)
-    let Reg1 = RegExp(/abc/i)
+    const Reg0 = RegExp(/123/)
+    const Reg1 = RegExp(/abc/i)
 
-    let validateReg0 = createSchemaValidator(Reg0)
-    let validateReg1 = createSchemaValidator(Reg1)
+    const validateReg0 = createSchemaValidator(Reg0)
+    const validateReg1 = createSchemaValidator(Reg1)
 
     expect(assertOk(validateReg0('123'))).toBe('123')
     expect(() => assertOk(validateReg0('12'))).toThrow()
@@ -915,8 +901,8 @@ describe('Validator', () => {
       c = Boolean
     }
 
-    let Test1 = pick(Test, ['a'])
-    let Test2 = pick(Test, ['b', 'c'])
+    const Test1 = pick(Test, ['a'])
+    const Test2 = pick(Test, ['b', 'c'])
 
     expect(
       assertOk(
@@ -965,8 +951,8 @@ describe('Validator', () => {
       c = Boolean
     }
 
-    let Test1 = omit(Test, ['b', 'c'])
-    let Test2 = omit(Test, ['a'])
+    const Test1 = omit(Test, ['b', 'c'])
+    const Test2 = omit(Test, ['a'])
 
     expect(
       assertOk(
@@ -1009,14 +995,14 @@ describe('Validator', () => {
   })
 
   it('supports pick struct schema', () => {
-    let Test = Struct({
+    const Test = Struct({
       a: String,
       b: Number,
       c: Boolean,
     })
 
-    let Test1 = pick(Test, ['a'])
-    let Test2 = pick(Test, ['b', 'c'])
+    const Test1 = pick(Test, ['a'])
+    const Test2 = pick(Test, ['b', 'c'])
 
     expect(
       assertOk(
@@ -1059,14 +1045,14 @@ describe('Validator', () => {
   })
 
   it('supports omit struct schema', () => {
-    let Test = Struct({
+    const Test = Struct({
       a: String,
       b: Number,
       c: Boolean,
     })
 
-    let Test1 = omit(Test, ['b', 'c'])
-    let Test2 = omit(Test, ['a'])
+    const Test1 = omit(Test, ['b', 'c'])
+    const Test2 = omit(Test, ['a'])
 
     expect(
       assertOk(
@@ -1115,17 +1101,17 @@ describe('Validator', () => {
       c = Int
     }
 
-    let TestStruct = Struct({
+    const TestStruct = Struct({
       d: Int,
       e: Int,
       f: Int,
     })
 
-    let testObjectKeys = keyof(TestObject)
-    let testStructKeys = keyof(TestStruct)
+    const testObjectKeys = keyof(TestObject)
+    const testStructKeys = keyof(TestStruct)
 
-    let keys0: typeof testObjectKeys = ['a', 'b', 'c']
-    let keys1: typeof testStructKeys = ['d', 'e', 'f']
+    const keys0: typeof testObjectKeys = ['a', 'b', 'c']
+    const keys1: typeof testStructKeys = ['d', 'e', 'f']
 
     expect(testObjectKeys).toEqual(keys0)
     expect(testStructKeys).toEqual(keys1)
@@ -1137,13 +1123,13 @@ describe('Validator', () => {
       friends = List(User)
     }
 
-    let Person = Struct({
+    const Person = Struct({
       name: String,
       age: Int,
     })
 
-    let PartialUser = partial(User)
-    let PartialPerson = partial(Person)
+    const PartialUser = partial(User)
+    const PartialPerson = partial(Person)
 
     type T0 = TypeOf<typeof PartialUser>
     type T1 = TypeOf<typeof PartialPerson>

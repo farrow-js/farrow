@@ -56,7 +56,7 @@ export type ApiClientOptions = {
 }
 
 export const createApiClient = (options: ApiClientOptions) => {
-  let config = {
+  const config = {
     ...options,
     pollingInterval: 3000,
   }
@@ -65,19 +65,19 @@ export const createApiClient = (options: ApiClientOptions) => {
 
   let prevText = ''
 
-  let getIntrospection = async () => {
-    let data: IntrospectionCalling = {
+  const getIntrospection = async () => {
+    const data: IntrospectionCalling = {
       type: 'Introspection',
     }
-    let options = {
+    const options = {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify(data),
     }
-    let response = await fetch(config.src, options)
-    let text = await response.text()
+    const response = await fetch(config.src, options)
+    const text = await response.text()
 
     if (text === prevText) {
       return
@@ -92,8 +92,8 @@ export const createApiClient = (options: ApiClientOptions) => {
     }
   }
 
-  let sync = async () => {
-    let result = await getIntrospection()
+  const sync = async () => {
+    const result = await getIntrospection()
 
     if (!result) {
       return
@@ -126,7 +126,7 @@ export const createApiClient = (options: ApiClientOptions) => {
     await writeFile(config.dist, source)
   }
 
-  let start = () => {
+  const start = () => {
     stop()
     tid = setInterval(async () => {
       try {
@@ -137,13 +137,13 @@ export const createApiClient = (options: ApiClientOptions) => {
     }, config.pollingInterval)
   }
 
-  let stop = () => {
+  const stop = () => {
     if (tid !== null) {
       clearInterval(tid)
     }
   }
 
-  let build = async () => {
+  const build = async () => {
     await replaceUrl(options)
   }
 
@@ -160,23 +160,23 @@ export type CreateApiClientsOptions = {
 }
 
 export const createApiClients = (options: CreateApiClientsOptions) => {
-  let clients = options.services.map(createApiClient)
+  const clients = options.services.map(createApiClient)
 
-  let sync = async () => {
-    let promises = clients.map((client) => client.sync())
+  const sync = async () => {
+    const promises = clients.map((client) => client.sync())
     await Promise.all(promises)
   }
 
-  let start = () => {
+  const start = () => {
     clients.map((client) => client.start())
   }
 
-  let stop = () => {
+  const stop = () => {
     clients.map((syncer) => syncer.stop())
   }
 
-  let build = async () => {
-    let promises = clients.map((client) => client.build())
+  const build = async () => {
+    const promises = clients.map((client) => client.build())
     await Promise.all(promises)
   }
 

@@ -10,7 +10,7 @@ export { CorsOptions, CorsOptionsDelegate, CorsRequest }
 export const cors = (
   options?: CorsOptions | CorsOptionsDelegate<IncomingMessage>,
 ): Middleware<any, MaybeAsyncResponse> => {
-  let cors = promisify(
+  const cors = promisify(
     Cors(
       typeof options === 'function'
         ? options
@@ -22,8 +22,8 @@ export const cors = (
   )
 
   return async (request, next) => {
-    let req = useReq()
-    let res = useRes()
+    const req = useReq()
+    const res = useRes()
 
     try {
       await cors(req, res)

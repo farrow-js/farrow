@@ -41,7 +41,7 @@ const getValidatorImpl = (input: Function): ValidatorImpl | undefined => {
     return validatorWeakMap.get(input)
   }
 
-  let next = Object.getPrototypeOf(input)
+  const next = Object.getPrototypeOf(input)
 
   if (next === Function.prototype) {
     return undefined
@@ -56,13 +56,13 @@ export const Validator = {
   },
 
   get<T extends SchemaCtor>(Ctor: T): ValidatorMethods<SchemaTypeOf<T>> | undefined {
-    let finalCtor = S.getSchemaCtor(Ctor)
-    let validatorImpl = getValidatorImpl(finalCtor as unknown as Function) as ValidatorImpl<SchemaTypeOf<T>> | undefined
+    const finalCtor = S.getSchemaCtor(Ctor)
+    const validatorImpl = getValidatorImpl(finalCtor as unknown as Function) as ValidatorImpl<SchemaTypeOf<T>> | undefined
 
     // instantiation validator and save to weak-map
     if (typeof validatorImpl === 'function') {
-      let schema = getInstance(Ctor) as SchemaTypeOf<T>
-      let impl = validatorImpl(schema)
+      const schema = getInstance(Ctor) as SchemaTypeOf<T>
+      const impl = validatorImpl(schema)
 
       validatorWeakMap.set(Ctor, impl)
       
@@ -73,7 +73,7 @@ export const Validator = {
   },
 
   validate<T extends SchemaCtor>(Ctor: T, input: unknown, options?: ValidatorOptions): ValidationResult<TypeOf<T>> {
-    let validatorImpl = Validator.get(Ctor)
+    const validatorImpl = Validator.get(Ctor)
 
     if (!validatorImpl) {
       throw new Error(`No impl found for Validator, Ctor: ${Ctor}`)
@@ -98,7 +98,7 @@ const isNumber = (input: unknown): input is number => {
 
 const parseNumberLiteral = (input: unknown): Result<number> => {
   if (typeof input === 'string') {
-    let value = parseFloat(input)
+    const value = parseFloat(input)
     if (isNumber(value)) {
       return Ok(value)
     }
@@ -111,7 +111,7 @@ Validator.impl(S.Number, {
     if (isNumber(input)) return Ok(input)
 
     if (options?.strict === false) {
-      let result = parseNumberLiteral(input)
+      const result = parseNumberLiteral(input)
       if (result.isOk) return result
     }
 
@@ -127,7 +127,7 @@ Validator.impl(S.Int, {
 
     if (options?.strict === false) {
       if (isNumber(input)) return Ok(Math.floor(input))
-      let result = parseNumberLiteral(input)
+      const result = parseNumberLiteral(input)
       if (result.isOk) return Ok(Math.floor(result.value))
     }
 
@@ -142,7 +142,7 @@ Validator.impl(S.Float, {
     }
 
     if (options?.strict === false) {
-      let result = parseNumberLiteral(input)
+      const result = parseNumberLiteral(input)
       if (result.isOk) return result
     }
 
@@ -176,7 +176,7 @@ Validator.impl(S.Boolean, {
     }
 
     if (options?.strict === false) {
-      let result = parseBooleanLiteral(input)
+      const result = parseBooleanLiteral(input)
       if (result.isOk) return result
     }
 
@@ -196,7 +196,7 @@ Validator.impl(S.Date, {
     }
 
     if (typeof input === 'string') {
-      let timestamp = Date.parse(input)
+      const timestamp = Date.parse(input)
 
       if (Number.isNaN(timestamp)) {
         return SchemaErr(`${input} is not a valid date input`)
@@ -211,17 +211,17 @@ Validator.impl(S.Date, {
 
 Validator.impl<S.LiteralType>(S.LiteralType, (schema) => ({
   validate: (input, options) => {
-    let value = schema.value
+    const value = schema.value
     if (input === value) {
       return Ok(input as S.Literals)
     }
 
     if (options?.strict === false && typeof value !== 'string') {
       if (typeof value === 'number') {
-        let result = parseNumberLiteral(input)
+        const result = parseNumberLiteral(input)
         if (result.isOk) return result
       } else if (typeof value === 'boolean') {
-        let result = parseBooleanLiteral(input)
+        const result = parseBooleanLiteral(input)
         if (result.isOk) return result
       }
     }
@@ -245,11 +245,11 @@ Validator.impl<S.ListType>(S.ListType, (schema) => ({
       return SchemaErr(`${input} is not a list`)
     }
 
-    let results = []
+    const results = []
 
     for (let i = 0; i < input.length; i++) {
-      let item = input[i]
-      let result = Validator.validate(schema.Item, item, options)
+      const item = input[i]
+      const result = Validator.validate(schema.Item, item, options)
 
       if (result.isErr) {
         return SchemaErr(result.value.message, [i, ...(result.value.path ?? [])])
@@ -263,7 +263,7 @@ Validator.impl<S.ListType>(S.ListType, (schema) => ({
 }))
 
 Validator.impl<S.StructType>(S.StructType, (schema) => {
-  let fields = getSchemaCtorFields(schema.descriptors)
+  const fields = getSchemaCtorFields(schema.descriptors)
 
   return {
     validate: (input, options) => {
@@ -281,12 +281,12 @@ Validator.impl<S.StructType>(S.StructType, (schema) => {
         return SchemaErr(`${input} is not an object`)
       }
 
-      let results = {}
+      const results = {}
 
-      for (let key in fields) {
-        let Field = fields[key]
-        let value = input[key]
-        let result = Validator.validate(Field[S.Type], value, options)
+      for (const key in fields) {
+        const Field = fields[key]
+        const value = input[key]
+        const result = Validator.validate(Field[S.Type], value, options)
 
         if (result.isErr) {
           return SchemaErr(result.value.message, [key, ...(result.value.path ?? [])])
@@ -301,8 +301,8 @@ Validator.impl<S.StructType>(S.StructType, (schema) => {
 })
 
 Validator.impl(S.ObjectType, (schema) => {
-  let fields = getSchemaCtorFields((schema as unknown) as S.FieldDescriptors)
-  let Struct = S.Struct(fields)
+  const fields = getSchemaCtorFields((schema as unknown) as S.FieldDescriptors)
+  const Struct = S.Struct(fields)
 
   return {
     validate: (input, options) => {
@@ -318,10 +318,10 @@ Validator.impl<S.RecordType>(S.RecordType, (schema) => {
         return SchemaErr(`${input} is not an object`)
       }
 
-      let results = {}
+      const results = {}
 
-      for (let [key, value] of Object.entries(input)) {
-        let result = Validator.validate(schema.Item, value, options)
+      for (const [key, value] of Object.entries(input)) {
+        const result = Validator.validate(schema.Item, value, options)
 
         if (result.isErr) {
           return SchemaErr(result.value.message, [key, ...(result.value.path ?? [])])
@@ -338,10 +338,10 @@ Validator.impl<S.RecordType>(S.RecordType, (schema) => {
 Validator.impl<S.UnionType>(S.UnionType, (schema) => {
   return {
     validate: (input, options) => {
-      let messages: string[] = []
+      const messages: string[] = []
 
-      for (let Item of schema.Items) {
-        let result = Validator.validate(Item, input, options)
+      for (const Item of schema.Items) {
+        const result = Validator.validate(Item, input, options)
         if (result.isOk) return result
         messages.push(result.value.message)
       }
@@ -354,10 +354,10 @@ Validator.impl<S.UnionType>(S.UnionType, (schema) => {
 Validator.impl<S.IntersectType>(S.IntersectType, (schema) => {
   return {
     validate: (input, options) => {
-      let results = {}
+      const results = {}
 
-      for (let Item of schema.Items) {
-        let result = Validator.validate(Item, input, options)
+      for (const Item of schema.Items) {
+        const result = Validator.validate(Item, input, options)
         if (result.isErr) return result
         Object.assign(results, result.value)
       }
@@ -373,8 +373,8 @@ const validateJson: Validator<S.JsonType> = (input) => {
   }
 
   if (Array.isArray(input)) {
-    for (let value of input) {
-      let result = validateJson(value)
+    for (const value of input) {
+      const result = validateJson(value)
       if (result.isErr) return result
     }
 
@@ -382,8 +382,8 @@ const validateJson: Validator<S.JsonType> = (input) => {
   }
 
   if (typeof input === 'object' && input) {
-    for (let value of Object.values(input)) {
-      let result = validateJson(value)
+    for (const value of Object.values(input)) {
+      const result = validateJson(value)
       if (result.isErr) return result
     }
 
@@ -451,11 +451,11 @@ Validator.impl<S.TupleType>(S.TupleType, schema => {
         return SchemaErr(`${input} is not an array`)
       }
 
-      let tuple = [] as unknown[]
+      const tuple = [] as unknown[]
 
       for (let i = 0; i < schema.Items.length; i++) {
-        let Item = schema.Items[i]
-        let result = Validator.validate(Item, input[i], options)
+        const Item = schema.Items[i]
+        const result = Validator.validate(Item, input[i], options)
         if (result.isErr) {
           return SchemaErr(result.value.message, [...(result.value.path ?? []), i])
         }
@@ -504,7 +504,7 @@ Validator.impl<ValidatorType>(ValidatorType, schema => {
 export const RegExp = (regexp: RegExp) => {
   return class RegExp extends ValidatorType<string> {
     validate(input: unknown) {
-      let text = `${input}`
+      const text = `${input}`
 
       if (regexp.test(text)) {
         return this.Ok(text)

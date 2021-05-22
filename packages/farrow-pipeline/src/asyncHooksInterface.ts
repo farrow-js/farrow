@@ -17,10 +17,10 @@ export type AsyncHooks =
 
 export let asyncHooks: AsyncHooks = undefined
 
-export let impl = (implimentations: AsyncHooks) => {
+export const impl = (implimentations: AsyncHooks) => {
   asyncHooks = implimentations
 }
 
-export let reset = () => {
+export const reset = () => {
   asyncHooks = undefined
 }

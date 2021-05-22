@@ -2,7 +2,7 @@ import React from 'react'
 import { page, Controller } from 'farrow-next'
 
 const View = () => {
-  let redirectCtrl = RedirectCtrl.use()
+  const redirectCtrl = RedirectCtrl.use()
 
   React.useEffect(() => {
     redirectCtrl.redirect(`${redirectCtrl.page.query.back ?? '/'}`)

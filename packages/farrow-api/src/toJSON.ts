@@ -28,24 +28,24 @@ const isApiType = (input: any): input is ApiType => {
 }
 
 export const toJSON = (apiEntries: ApiEntries): FormatResult => {
-  let types: FormatTypes = {}
+  const types: FormatTypes = {}
 
   let uid = 0
 
-  let addType = (type: FormatType): number => {
-    let id = uid++
+  const addType = (type: FormatType): number => {
+    const id = uid++
     types[`${id}`] = type
     return id
   }
 
-  let context: FormatContext = {
+  const context: FormatContext = {
     addType,
     formatCache: new WeakMap(),
   }
 
-  let formatTypeable = (typeable: Typeable<SchemaCtorInput>): FormatField => {
-    let SchemaCtor = toSchemaCtor(getContentType(typeable))
-    let formatResult = Formatter.format(SchemaCtor, context)
+  const formatTypeable = (typeable: Typeable<SchemaCtorInput>): FormatField => {
+    const SchemaCtor = toSchemaCtor(getContentType(typeable))
+    const formatResult = Formatter.format(SchemaCtor, context)
 
     return {
       typeId: formatResult.typeId,
@@ -55,8 +55,8 @@ export const toJSON = (apiEntries: ApiEntries): FormatResult => {
     }
   }
 
-  let formatApiType = (apiType: ApiType): FormatApi => {
-    let formatEntry: FormatApi = {
+  const formatApiType = (apiType: ApiType): FormatApi => {
+    const formatEntry: FormatApi = {
       type: 'Api' as const,
       input: formatTypeable(apiType.definition.input),
       output: formatTypeable(apiType.definition.output),
@@ -67,15 +67,15 @@ export const toJSON = (apiEntries: ApiEntries): FormatResult => {
     return formatEntry
   }
 
-  let formatApiEntries = (apiEntries: ApiEntries): FormatEntries => {
-    let entries: FormatEntries['entries'] = {}
-    let formatEntries: FormatEntries = {
+  const formatApiEntries = (apiEntries: ApiEntries): FormatEntries => {
+    const entries: FormatEntries['entries'] = {}
+    const formatEntries: FormatEntries = {
       type: 'Entries',
       entries,
     }
 
-    for (let key in apiEntries) {
-      let item = apiEntries[key]
+    for (const key in apiEntries) {
+      const item = apiEntries[key]
       if (isApiType(item)) {
         entries[key] = formatApiType(item)
       } else {
@@ -86,7 +86,7 @@ export const toJSON = (apiEntries: ApiEntries): FormatResult => {
     return formatEntries
   }
 
-  let formatResult: FormatResult = {
+  const formatResult: FormatResult = {
     protocol: 'Farrow-API',
     types,
     entries: formatApiEntries(apiEntries),

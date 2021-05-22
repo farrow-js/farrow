@@ -15,19 +15,19 @@ export const defaultPrettyNumberOptions: Required<PrettyNumberOptions> = {
 }
 
 export const prettyNumber = function (number: number | string, options?: PrettyNumberOptions) {
-  let config = {
+  const config = {
     ...defaultPrettyNumberOptions,
     ...options,
   }
-  let { delimiter, separator } = config
-  let [first, ...rest] = number.toString().split('.')
-  let text = first.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, `$1${delimiter}`)
+  const { delimiter, separator } = config
+  const [first, ...rest] = number.toString().split('.')
+  const text = first.replace(/(\d)(?=(\d\d\d)+(?!\d))/g, `$1${delimiter}`)
 
   return [text, ...rest].join(separator)
 }
 
 export const prettyTime = (start: number): string => {
-  let delta = Date.now() - start
+  const delta = Date.now() - start
   return prettyNumber(delta < 10000 ? `${delta}ms` : `${Math.round(delta / 1000)}s`)
 }
 
@@ -42,9 +42,9 @@ export const getStats = (filename: string) => {
 }
 
 export const getContentLength = (res: ServerResponse) => {
-  let contentLength = res.getHeader('Content-Length')
+  const contentLength = res.getHeader('Content-Length')
   if (typeof contentLength === 'string') {
-    let length = parseFloat(contentLength)
+    const length = parseFloat(contentLength)
     return isNaN(length) ? 0 : length
   }
   if (typeof contentLength !== 'number') {
@@ -58,10 +58,10 @@ const formTypes = ['urlencoded']
 const textTypes = ['text']
 
 export const getBody = async (req: IncomingMessage, options?: BodyOptions) => {
-  let type = typeis(req, jsonTypes) || typeis(req, formTypes) || typeis(req, textTypes)
+  const type = typeis(req, jsonTypes) || typeis(req, formTypes) || typeis(req, textTypes)
 
   if (type) {
-    let body = await parseBody(req, options)
+    const body = await parseBody(req, options)
     return body
   }
 

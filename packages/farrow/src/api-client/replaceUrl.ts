@@ -3,12 +3,16 @@ import { ApiClientOptions } from './index'
 
 export const urlToReplaceRegex = /export const url = ('.*?'|".*?")/
 export const replaceUrl = async (options: ApiClientOptions) => {
-  let { src, dist } = options
+  const { src, dist } = options
   try {
-    let results = await replaceInFile({ files: dist, from: urlToReplaceRegex, to: `export const url = '${src ?? ''}'` })
+    const results = await replaceInFile({
+      files: dist,
+      from: urlToReplaceRegex,
+      to: `export const url = '${src ?? ''}'`,
+    })
     // only one file pass to replaceInFile, so one length array result is excepted
     if (results.length === 1) {
-      let result = results[0]
+      const result = results[0]
       if (result.hasChanged) {
         console.log(`replacement: ${dist} success`)
       } else {

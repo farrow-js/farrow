@@ -32,11 +32,11 @@ export const assertContext: AssertContext = (input) => {
 }
 
 export const createContext = <T>(value: T) => {
-  let id = Symbol('ContextID')
+  const id = Symbol('ContextID')
 
-  let create = (value: T): Context<T> => {
-    let use = () => {
-      let container = useContainer()
+  const create = (value: T): Context<T> => {
+    const use = () => {
+      const container = useContainer()
       return Object.seal({
         get value() {
           return container.read(Context)
@@ -46,22 +46,22 @@ export const createContext = <T>(value: T) => {
         },
       })
     }
-    let get = () => {
-      let container = useContainer()
+    const get = () => {
+      const container = useContainer()
       return container.read(Context)
     }
-    let set = (v: T) => {
-      let container = useContainer()
+    const set = (v: T) => {
+      const container = useContainer()
       container.write(Context, v)
     }
-    let assert = () => {
-      let value = get()
+    const assert = () => {
+      const value = get()
       if (value === null || value === undefined) {
         throw new Error(`Expected value is not null or undefined, but got: ${value}`)
       }
       return value as Exclude<T, null | undefined>
     }
-    let Context: Context<T> = {
+    const Context: Context<T> = {
       id,
       [ContextSymbol]: value,
       create,
@@ -103,7 +103,7 @@ export type Container = {
 }
 
 const createContextMap = (storage: ContextStorage) => {
-  let contextMap = new Map<symbol, Context>()
+  const contextMap = new Map<symbol, Context>()
 
   Object.values(storage).forEach((context) => {
     contextMap.set(context.id, context)
@@ -113,21 +113,21 @@ const createContextMap = (storage: ContextStorage) => {
 }
 
 export const createContainer = (ContextStorage: ContextStorage = {}): Container => {
-  let contextMap = createContextMap(ContextStorage)
+  const contextMap = createContextMap(ContextStorage)
 
-  let read: Container['read'] = (context) => {
-    let target = contextMap.get(context.id)
+  const read: Container['read'] = (context) => {
+    const target = contextMap.get(context.id)
     if (target) {
       return target[ContextSymbol]
     }
     return context[ContextSymbol]
   }
 
-  let write: Container['write'] = (context, value) => {
+  const write: Container['write'] = (context, value) => {
     contextMap.set(context.id, context.create(value))
   }
 
-  let container: Container = Object.freeze({
+  const container: Container = Object.freeze({
     [ContainerSymbol]: true,
     read,
     write,

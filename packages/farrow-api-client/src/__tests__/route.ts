@@ -2,12 +2,12 @@ import { ApiError, ApiSuccess } from 'farrow-api-server'
 import { apiPipeline } from '../index'
 
 apiPipeline.use(async (request, next) => {
-  let calling = {
+  const calling = {
     ...request.calling,
     fromUseForBody: true,
   }
 
-  let options: RequestInit = {
+  const options: RequestInit = {
     ...request.options,
     headers: {
       ...request.options?.headers,
@@ -15,7 +15,7 @@ apiPipeline.use(async (request, next) => {
     },
   }
 
-  let response = await next({
+  const response = await next({
     ...request,
     calling,
     options,
@@ -28,12 +28,12 @@ apiPipeline.use(async (request, next) => {
 })
 
 apiPipeline.match('/match/success', async (request, next) => {
-  let calling = {
+  const calling = {
     ...request.calling,
     fromMatchStringForBody: true,
   }
 
-  let options: RequestInit = {
+  const options: RequestInit = {
     ...request.options,
     headers: {
       ...request.options?.headers,
@@ -41,7 +41,7 @@ apiPipeline.match('/match/success', async (request, next) => {
     },
   }
 
-  let response = await next({
+  const response = await next({
     ...request,
     calling,
     options,
@@ -54,12 +54,12 @@ apiPipeline.match('/match/success', async (request, next) => {
 })
 
 apiPipeline.match(/regexp/i, async (request, next) => {
-  let calling = {
+  const calling = {
     ...request.calling,
     fromMatchRegexpForBody: true,
   }
 
-  let options: RequestInit = {
+  const options: RequestInit = {
     ...request.options,
     headers: {
       ...request.options?.headers,
@@ -67,7 +67,7 @@ apiPipeline.match(/regexp/i, async (request, next) => {
     },
   }
 
-  let response = await next({
+  const response = await next({
     ...request,
     calling,
     options,
@@ -80,7 +80,7 @@ apiPipeline.match(/regexp/i, async (request, next) => {
 })
 
 apiPipeline.use((input) => {
-  let data = {
+  const data = {
     url: input.url,
     body: input.calling as any,
     headers: input.options?.headers as Record<string, string>,

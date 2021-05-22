@@ -3,7 +3,7 @@ import { Api, isApi, getContentType, getTypeDescription, getTypeDeprecated } fro
 
 describe('Api', () => {
   it('supports Typeable', async () => {
-    let definition = {
+    const definition = {
       input: {
         [Type]: Int,
       },
@@ -11,7 +11,7 @@ describe('Api', () => {
         [Type]: Int,
       },
     }
-    let incre = Api(definition, (input: number): number => {
+    const incre = Api(definition, (input: number): number => {
       return input + 1
     })
 
@@ -23,7 +23,7 @@ describe('Api', () => {
   })
 
   it('should get type from typeable', () => {
-    let TargetType = getContentType({
+    const TargetType = getContentType({
       [Type]: Int,
     })
 
@@ -31,7 +31,7 @@ describe('Api', () => {
   })
 
   it('should get type description', () => {
-    let description = getTypeDescription({
+    const description = getTypeDescription({
       [Type]: Int,
       description: 'test',
     })
@@ -40,7 +40,7 @@ describe('Api', () => {
   })
 
   it('should get type deprecated', () => {
-    let deprecated = getTypeDeprecated({
+    const deprecated = getTypeDeprecated({
       [Type]: Int,
       description: 'test',
       deprecated: 'test deprecated',

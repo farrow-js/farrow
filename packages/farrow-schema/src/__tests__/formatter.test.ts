@@ -26,7 +26,7 @@ import { partial } from '../helper'
 
 describe('Formatter', () => {
   it('supports format Number', () => {
-    let result = formatSchema(Number)
+    const result = formatSchema(Number)
 
     expect(result).toEqual({
       typeId: 0,
@@ -41,7 +41,7 @@ describe('Formatter', () => {
   })
 
   it('support format Int', () => {
-    let result = formatSchema(Int)
+    const result = formatSchema(Int)
     expect(result).toEqual({
       typeId: 0,
       types: {
@@ -55,7 +55,7 @@ describe('Formatter', () => {
   })
 
   it('support format Float', () => {
-    let result = formatSchema(Float)
+    const result = formatSchema(Float)
     expect(result).toEqual({
       typeId: 0,
       types: {
@@ -69,7 +69,7 @@ describe('Formatter', () => {
   })
 
   it('support format String', () => {
-    let result = formatSchema(String)
+    const result = formatSchema(String)
     expect(result).toEqual({
       typeId: 0,
       types: {
@@ -83,7 +83,7 @@ describe('Formatter', () => {
   })
 
   it('support format Boolean', () => {
-    let result = formatSchema(Boolean)
+    const result = formatSchema(Boolean)
     expect(result).toEqual({
       typeId: 0,
       types: {
@@ -97,7 +97,7 @@ describe('Formatter', () => {
   })
 
   it('support format ID', () => {
-    let result = formatSchema(ID)
+    const result = formatSchema(ID)
     expect(result).toEqual({
       typeId: 0,
       types: {
@@ -111,7 +111,7 @@ describe('Formatter', () => {
   })
 
   it('support format Date', () => {
-    let result = formatSchema(Date)
+    const result = formatSchema(Date)
     expect(result).toEqual({
       typeId: 0,
       types: {
@@ -125,10 +125,10 @@ describe('Formatter', () => {
   })
 
   it('support format Literal', () => {
-    let result0 = formatSchema(Literal(0))
-    let result1 = formatSchema(Literal(false))
-    let result2 = formatSchema(Literal('abc'))
-    let result3 = formatSchema(Literal(null))
+    const result0 = formatSchema(Literal(0))
+    const result1 = formatSchema(Literal(false))
+    const result2 = formatSchema(Literal('abc'))
+    const result3 = formatSchema(Literal(null))
 
     expect(result0).toEqual({
       typeId: 0,
@@ -172,7 +172,7 @@ describe('Formatter', () => {
   })
 
   it('support format Json', () => {
-    let result = formatSchema(Json)
+    const result = formatSchema(Json)
     expect(result).toEqual({
       typeId: 0,
       types: {
@@ -186,7 +186,7 @@ describe('Formatter', () => {
   })
 
   it('support format Any', () => {
-    let result = formatSchema(Any)
+    const result = formatSchema(Any)
     expect(result).toEqual({
       typeId: 0,
       types: {
@@ -200,7 +200,7 @@ describe('Formatter', () => {
   })
 
   it('support format Unknown', () => {
-    let result = formatSchema(Unknown)
+    const result = formatSchema(Unknown)
     expect(result).toEqual({
       typeId: 0,
       types: {
@@ -214,7 +214,7 @@ describe('Formatter', () => {
   })
 
   it('support format Record', () => {
-    let result = formatSchema(Record(Int))
+    const result = formatSchema(Record(Int))
 
     expect(result).toEqual({
       typeId: 1,
@@ -234,7 +234,7 @@ describe('Formatter', () => {
   })
 
   it('support format Nullable', () => {
-    let result = formatSchema(Nullable(Int))
+    const result = formatSchema(Nullable(Int))
 
     expect(result).toEqual({
       typeId: 1,
@@ -254,7 +254,7 @@ describe('Formatter', () => {
   })
 
   it('support format Tuple', () => {
-    let result = formatSchema(Tuple(Int, String))
+    const result = formatSchema(Tuple(Int, String))
 
     expect(result).toEqual({
       typeId: 2,
@@ -287,7 +287,7 @@ describe('Formatter', () => {
   })
 
   it('support format List', () => {
-    let result = formatSchema(List(Int))
+    const result = formatSchema(List(Int))
 
     expect(result).toEqual({
       typeId: 1,
@@ -307,7 +307,7 @@ describe('Formatter', () => {
   })
 
   it('support format Union', () => {
-    let result = formatSchema(Union(Int, Float, Boolean))
+    const result = formatSchema(Union(Int, Float, Boolean))
 
     expect(result).toEqual({
       typeId: 3,
@@ -350,7 +350,7 @@ describe('Formatter', () => {
   })
 
   it('support format Intersect', () => {
-    let result = formatSchema(Intersect(Int, Float, Boolean))
+    const result = formatSchema(Intersect(Int, Float, Boolean))
 
     expect(result).toEqual({
       typeId: 3,
@@ -392,7 +392,7 @@ describe('Formatter', () => {
   })
 
   it('supports format Struct', () => {
-    let result = formatSchema(
+    const result = formatSchema(
       Struct({
         a: Int,
         b: Number,
@@ -466,7 +466,7 @@ describe('Formatter', () => {
       f = List(Test)
     }
 
-    let result = formatSchema(Test)
+    const result = formatSchema(Test)
 
     expect(result).toEqual({
       typeId: 0,
@@ -543,7 +543,7 @@ describe('Formatter', () => {
       }
     }
 
-    let result = formatSchema(Test)
+    const result = formatSchema(Test)
 
     expect(result).toEqual({
       typeId: 0,
@@ -580,7 +580,7 @@ describe('Formatter', () => {
   })
 
   it('supports format Strict/NonStrict/ReadOnly/ReadOnlyDeep', () => {
-    let result0 = formatSchema(
+    const result0 = formatSchema(
       Strict(
         Struct({
           a: Int,
@@ -588,7 +588,7 @@ describe('Formatter', () => {
       ),
     )
 
-    let result1 = formatSchema(
+    const result1 = formatSchema(
       NonStrict(
         Struct({
           a: Int,
@@ -596,7 +596,7 @@ describe('Formatter', () => {
       ),
     )
 
-    let result2 = formatSchema(
+    const result2 = formatSchema(
       ReadOnly(
         Struct({
           a: Int,
@@ -604,7 +604,7 @@ describe('Formatter', () => {
       ),
     )
 
-    let result3 = formatSchema(
+    const result3 = formatSchema(
       ReadOnlyDeep(
         Struct({
           a: Int,
@@ -719,16 +719,16 @@ describe('Formatter', () => {
       friends = List(User)
     }
 
-    let Person = Struct({
+    const Person = Struct({
       name: String,
       age: Int,
     })
 
-    let PartialUser = partial(User)
-    let PartialPerson = partial(Person)
+    const PartialUser = partial(User)
+    const PartialPerson = partial(Person)
 
-    let result0 = formatSchema(PartialUser)
-    let result1 = formatSchema(PartialPerson)
+    const result0 = formatSchema(PartialUser)
+    const result1 = formatSchema(PartialPerson)
 
     expect(result0).toEqual({
       typeId: 0,

@@ -8,7 +8,7 @@ router.serve('/static/react-dom', path.join(__dirname, '../../node_modules/react
 router.serve('/static/react-server-dom-webpack', path.join(__dirname, '../../node_modules/react-server-dom-webpack'))
 
 router.get('/src/<filename:string>').use(async (request) => {
-  let filename = path.join(__dirname, 'src', request.params.filename)
+  const filename = path.join(__dirname, 'src', request.params.filename)
   return Response.type('js').file(filename)
 })
 

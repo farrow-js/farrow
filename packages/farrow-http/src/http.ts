@@ -57,39 +57,39 @@ export type HttpPipeline = RouterPipeline & {
 }
 
 export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline => {
-  let isNotProduction = process.env.NODE_ENV !== 'production'
-  let config: HttpPipelineOptions = {
+  const isNotProduction = process.env.NODE_ENV !== 'production'
+  const config: HttpPipelineOptions = {
     logger: isNotProduction,
     errorStack: isNotProduction,
     ...options,
   }
 
-  let loggerOptions: LoggerOptions = !config.logger || typeof config.logger === 'boolean' ? {} : config.logger
+  const loggerOptions: LoggerOptions = !config.logger || typeof config.logger === 'boolean' ? {} : config.logger
 
-  let logger = config.logger ? createLogger(loggerOptions) : null
+  const logger = config.logger ? createLogger(loggerOptions) : null
 
-  let router = Router()
+  const router = Router()
 
-  let handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
+  const handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
     if (typeof req.url !== 'string') {
       throw new Error(`req.url is not existed`)
     }
 
-    let { url } = req
+    const { url } = req
 
-    let [pathname = '/', search = ''] = url.split('?')
+    const [pathname = '/', search = ''] = url.split('?')
 
-    let method = req.method ?? 'GET'
+    const method = req.method ?? 'GET'
 
-    let query = (req as any).query ?? (parseQuery(search, config.query) as RequestQuery)
+    const query = (req as any).query ?? (parseQuery(search, config.query) as RequestQuery)
 
-    let body = (req as any).body ?? (await getBody(req, config.body))
+    const body = (req as any).body ?? (await getBody(req, config.body))
 
-    let headers = req.headers as RequestHeaders
+    const headers = req.headers as RequestHeaders
 
-    let cookies = parseCookies(req.headers['cookie'] ?? '', config.cookie) as RequestCookies
+    const cookies = parseCookies(req.headers['cookie'] ?? '', config.cookie) as RequestCookies
 
-    let { basename, requestInfo } = handleBasenames(config.basenames ?? [], {
+    const { basename, requestInfo } = handleBasenames(config.basenames ?? [], {
       pathname,
       method,
       query,
@@ -98,13 +98,13 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
       cookies,
     })
 
-    let storages = await config.contexts?.({
+    const storages = await config.contexts?.({
       req,
       requestInfo,
       basename,
     })
 
-    let container = createContainer({
+    const container = createContainer({
       ...storages,
       request: RequestContext.create(req),
       response: ResponseContext.create(res),
@@ -112,7 +112,7 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
       requestInfo: RequestInfoContext.create(requestInfo),
     })
 
-    let responser = await router.run(requestInfo, {
+    const responser = await router.run(requestInfo, {
       container,
       onLast: () => Response.status(404).text('404 Not Found'),
     })
@@ -126,16 +126,16 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
     })
   }
 
-  let handle: HttpPipeline['handle'] = async (req, res) => {
+  const handle: HttpPipeline['handle'] = async (req, res) => {
     if (logger) {
-      let startTime = Date.now()
-      let method = req.method ?? 'GET'
-      let url = req.url ?? ''
+      const startTime = Date.now()
+      const method = req.method ?? 'GET'
+      const url = req.url ?? ''
 
       let contentLength = 0
 
       let hasLogOut = false
-      let logOutput = (event: LoggerEvent) => {
+      const logOutput = (event: LoggerEvent) => {
         if (hasLogOut) return
         hasLogOut = true
         logger?.logOutput(method, url, res.statusCode, startTime, contentLength || getContentLength(res), event)
@@ -168,7 +168,7 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
     try {
       return await handleRequest(req, res)
     } catch (error) {
-      let message = (config.errorStack ? error?.stack || error?.message : error?.message) ?? ''
+      const message = (config.errorStack ? error?.stack || error?.message : error?.message) ?? ''
 
       if (!res.headersSent) {
         res.statusCode = error.statusCode ?? 500
@@ -182,11 +182,11 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
     }
   }
 
-  let server: HttpPipeline['server'] = () => {
+  const server: HttpPipeline['server'] = () => {
     return createServer(handle)
   }
 
-  let listen: HttpPipeline['listen'] = (...args) => {
+  const listen: HttpPipeline['listen'] = (...args) => {
     return server().listen(...args)
   }
 
@@ -209,21 +209,21 @@ export type ResponseParams = {
 }
 
 export const handleResponse = (params: ResponseParams) => {
-  let { req, res, requestInfo, responseInfo, container } = params
-  let basenames = container.read(BasenamesContext)
-  let prefix = basenames.join('')
-  let accept = accepts(req)
+  const { req, res, requestInfo, responseInfo, container } = params
+  const basenames = container.read(BasenamesContext)
+  const prefix = basenames.join('')
+  const accept = accepts(req)
 
   // handle response status
-  let handleStatus = (status: Status = { code: 200 }) => {
-    let { code, message } = status
+  const handleStatus = (status: Status = { code: 200 }) => {
+    const { code, message } = status
 
     res.statusCode = code
     res.statusMessage = message || (statuses.message[code] ?? '')
   }
 
   // handle response headers
-  let handleHeaders = (headers: Headers) => {
+  const handleHeaders = (headers: Headers) => {
     Object.entries(headers).forEach(([name, value]) => {
       if (value) {
         res.setHeader(name, value)
@@ -232,8 +232,8 @@ export const handleResponse = (params: ResponseParams) => {
   }
 
   // handle response cookies
-  let handleCookies = (cookies: Cookies) => {
-    let cookiesInstance = new CookiesClass(req, res)
+  const handleCookies = (cookies: Cookies) => {
+    const cookiesInstance = new CookiesClass(req, res)
 
     Object.entries(cookies).forEach(([name, cookie]) => {
       if (cookie.value !== null) {
@@ -244,8 +244,8 @@ export const handleResponse = (params: ResponseParams) => {
     })
   }
 
-  let handleEmpty = () => {
-    let code = responseInfo.status?.code ?? 204
+  const handleEmpty = () => {
+    const code = responseInfo.status?.code ?? 204
 
     handleStatus({ code })
 
@@ -255,25 +255,25 @@ export const handleResponse = (params: ResponseParams) => {
     res.end()
   }
 
-  let handleString = (content: string) => {
-    let length = Buffer.byteLength(content)
+  const handleString = (content: string) => {
+    const length = Buffer.byteLength(content)
 
     res.setHeader('Content-Length', length)
     res.end(content)
   }
 
-  let handleJson = (json: JsonType) => {
-    let content = JSON.stringify(json)
-    let length = Buffer.byteLength(content)
+  const handleJson = (json: JsonType) => {
+    const content = JSON.stringify(json)
+    const length = Buffer.byteLength(content)
     res.setHeader('Content-Length', length)
     res.end(content)
   }
 
-  let handleRedirect = (body: RedirectBody) => {
+  const handleRedirect = (body: RedirectBody) => {
     let url = body.value
 
     if (url === 'back') {
-      let referrer = `${req.headers['referer']}` || '/'
+      const referrer = `${req.headers['referer']}` || '/'
       url = referrer
     }
 
@@ -282,7 +282,7 @@ export const handleResponse = (params: ResponseParams) => {
       url = prefix + url
     }
 
-    let code = responseInfo.status?.code ?? 302
+    const code = responseInfo.status?.code ?? 302
 
     handleStatus({
       code: statuses.redirect[code] ? code : 302,
@@ -302,12 +302,12 @@ export const handleResponse = (params: ResponseParams) => {
     }
   }
 
-  let handleBuffer = (buffer: Buffer) => {
+  const handleBuffer = (buffer: Buffer) => {
     res.setHeader('Content-Length', buffer.length)
     res.end(buffer)
   }
 
-  let handleFile = async (filename: string, options?: FileBodyOptions) => {
+  const handleFile = async (filename: string, options?: FileBodyOptions) => {
     try {
       await access(filename, fs.constants.F_OK | fs.constants.R_OK)
     } catch (error) {
@@ -318,11 +318,11 @@ export const handleResponse = (params: ResponseParams) => {
       return
     }
 
-    let stream = fs.createReadStream(filename, options)
+    const stream = fs.createReadStream(filename, options)
 
     if (!res.getHeader('Content-Type')) {
-      let ext = path.extname(filename)
-      let contentType = mime.contentType(ext)
+      const ext = path.extname(filename)
+      const contentType = mime.contentType(ext)
 
       if (contentType) {
         res.setHeader('Content-Type', contentType)
@@ -332,7 +332,7 @@ export const handleResponse = (params: ResponseParams) => {
     return handleStream(res, stream)
   }
 
-  let { body } = responseInfo
+  const { body } = responseInfo
 
   handleStatus(responseInfo.status)
 
@@ -377,8 +377,8 @@ export const handleResponse = (params: ResponseParams) => {
   }
 
   if (body.type === 'custom') {
-    let { handler } = body
-    let handleResponse = () => {
+    const { handler } = body
+    const handleResponse = () => {
       return handler({
         req,
         res,
@@ -393,7 +393,7 @@ export const handleResponse = (params: ResponseParams) => {
 }
 
 const omitBody = <T extends { body?: any }>(obj: T): Omit<T, 'body'> => {
-  let { body, ...rest } = obj
+  const { body, ...rest } = obj
   return rest
 }
 

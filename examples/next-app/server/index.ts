@@ -4,18 +4,18 @@ import next from 'next'
 
 import { services } from './api'
 
-let http = Http()
-let app = next({
+const http = Http()
+const app = next({
   dev: process.env.NODE_ENV === 'development',
 })
 
 http.use(services)
 http.useLazy(async () => {
-  let handle = app.getRequestHandler()
+  const handle = app.getRequestHandler()
   await app.prepare()
   return () => {
     return Response.custom(async ({ req, res }) => {
-      let parsedUrl = parseUrl(req.url, true)
+      const parsedUrl = parseUrl(req.url, true)
       await handle(req, res, parsedUrl)
     })
   }

@@ -27,7 +27,7 @@ process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0'
 
 describe('Https', () => {
   it('Response', async () => {
-    let https = createHttps()
+    const https = createHttps()
 
     https
       .match({
@@ -55,11 +55,11 @@ describe('Https', () => {
   })
 
   it('Request', async () => {
-    let https = createHttps()
+    const https = createHttps()
 
     https.use(() => {
-      let req = useReq()
-      let res = useRes()
+      const req = useReq()
+      const res = useRes()
 
       res.statusCode = 200
       res.end(req.url)
@@ -71,9 +71,9 @@ describe('Https', () => {
   })
 
   it('Router', async () => {
-    let https = createHttps()
-    let router = Router()
-    let server = https.server()
+    const https = createHttps()
+    const router = Router()
+    const server = https.server()
 
     router
       .match({

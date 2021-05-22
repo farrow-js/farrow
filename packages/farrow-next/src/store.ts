@@ -53,7 +53,7 @@ export type Store<S = any, RS extends Reducers<S> = Reducers<S>> = ReduxStore<S,
 const PRELOAD = '@__Preloaded__'
 
 export const createStore = <S, RS extends Reducers<S>>(options: CreateStoreOptions<S, RS>): Store<S, RS> => {
-  let { reducers, initialState, preloadedState } = options
+  const { reducers, initialState, preloadedState } = options
 
   /**
    * check initial state in non-production env
@@ -62,7 +62,7 @@ export const createStore = <S, RS extends Reducers<S>>(options: CreateStoreOptio
     forcePlainDataCheck(initialState)
   }
 
-  let reducer = (state: S = initialState, action: ActionObject) => {
+  const reducer = (state: S = initialState, action: ActionObject) => {
     /**
      * check action in non-production env
      */
@@ -77,15 +77,15 @@ export const createStore = <S, RS extends Reducers<S>>(options: CreateStoreOptio
       return action.payload
     }
 
-    let actionType = action.type
+    const actionType = action.type
 
     if (!Object.prototype.hasOwnProperty.call(reducers, actionType)) {
       return state
     }
 
-    let update = reducers[actionType]
+    const update = reducers[actionType]
 
-    let nextState = update(state, action.payload)
+    const nextState = update(state, action.payload)
 
     /**
      * check next state in non-production env
@@ -97,11 +97,11 @@ export const createStore = <S, RS extends Reducers<S>>(options: CreateStoreOptio
     return nextState
   }
 
-  let enhancer = createReduxDevtoolsEnhancer(options.devtools, options.name, options.logger)
+  const enhancer = createReduxDevtoolsEnhancer(options.devtools, options.name, options.logger)
 
-  let store = createReduxStore(reducer, preloadedState, enhancer)
+  const store = createReduxStore(reducer, preloadedState, enhancer)
 
-  let actions = createActions(reducers, store.dispatch)
+  const actions = createActions(reducers, store.dispatch)
 
   return {
     ...store,
@@ -117,7 +117,7 @@ export const replaceState = <State>(store: ReduxStore<State>, state: State) => {
 }
 
 const createReduxDevtoolsEnhancer = (devtools: boolean = true, name?: string, enableLogger = false) => {
-  let composeEnhancers =
+  const composeEnhancers =
     // tslint:disable-next-line: strict-type-predicates
     devtools && typeof window === 'object' && (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
       ? (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
@@ -125,7 +125,7 @@ const createReduxDevtoolsEnhancer = (devtools: boolean = true, name?: string, en
         })
       : compose
 
-  let enhancer = enableLogger ? composeEnhancers(applyMiddleware(createLogger())) : composeEnhancers()
+  const enhancer = enableLogger ? composeEnhancers(applyMiddleware(createLogger())) : composeEnhancers()
 
   return enhancer
 }
@@ -133,11 +133,11 @@ const createReduxDevtoolsEnhancer = (devtools: boolean = true, name?: string, en
 type Dispatch = (action: ActionObject) => ActionObject
 
 const createActions = <RS extends Reducers>(reducers: RS, dispatch: Dispatch): ReducersToActions<RS> => {
-  let actions = {} as ReducersToActions<RS>
+  const actions = {} as ReducersToActions<RS>
 
-  for (let actionType in reducers) {
-    let reducer = reducers[actionType]
-    let action = ((payload: any) => {
+  for (const actionType in reducers) {
+    const reducer = reducers[actionType]
+    const action = ((payload: any) => {
       dispatch({
         type: actionType,
         payload,

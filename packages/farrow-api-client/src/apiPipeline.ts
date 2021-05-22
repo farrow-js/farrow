@@ -31,7 +31,7 @@ export type ApiPipeline = AsyncPipeline<ApiRequest, ApiResponse> & {
 }
 
 export const createApiPipeline = (): ApiPipeline => {
-  let pipeline = createAsyncPipeline<ApiRequest, ApiResponse>()
+  const pipeline = createAsyncPipeline<ApiRequest, ApiResponse>()
 
   function run(
     request: ApiRequest,
@@ -43,8 +43,8 @@ export const createApiPipeline = (): ApiPipeline => {
     })
   }
 
-  let match: ApiPipeline['match'] = (pattern, middlewareInput) => {
-    let middleware = getMiddleware(middlewareInput)
+  const match: ApiPipeline['match'] = (pattern, middlewareInput) => {
+    const middleware = getMiddleware(middlewareInput)
     pipeline.use((request, next) => {
       if (pattern instanceof RegExp) {
         if (pattern.test(request.url)) {
@@ -64,9 +64,9 @@ export const createApiPipeline = (): ApiPipeline => {
   async function invoke(url: string, calling: SingleCalling): Promise<JsonType | Error>
   async function invoke(url: string, calling: BatchCalling): Promise<(JsonType | Error)[]>
   async function invoke(url: string, calling: Calling): Promise<JsonType | Error | (JsonType | Error)[]> {
-    let result = await run({ url, calling })
+    const result = await run({ url, calling })
 
-    let handleResult = (apiResponse: ApiResponseSingle) => {
+    const handleResult = (apiResponse: ApiResponseSingle) => {
       if (apiResponse.type === 'ApiErrorResponse') {
         return new Error(apiResponse.error.message)
       }
@@ -91,8 +91,8 @@ export const createApiPipeline = (): ApiPipeline => {
 export const apiPipeline = createApiPipeline()
 
 export const fetcher = async (request: ApiRequest): Promise<ApiResponse> => {
-  let { url, calling, options: init } = request
-  let options: RequestInit = {
+  const { url, calling, options: init } = request
+  const options: RequestInit = {
     method: 'POST',
     credentials: 'include',
     ...init,
@@ -102,9 +102,9 @@ export const fetcher = async (request: ApiRequest): Promise<ApiResponse> => {
     },
     body: JSON.stringify(calling),
   }
-  let response = await fetch(url, options)
-  let text = await response.text()
-  let json = JSON.parse(text) as ApiResponse
+  const response = await fetch(url, options)
+  const text = await response.text()
+  const json = JSON.parse(text) as ApiResponse
 
   return json
 }
@@ -118,24 +118,24 @@ export type ApiPipelineWithUrl = AsyncPipeline<ApiRequest, ApiResponse> & {
 }
 
 export const createApiPipelineWithUrl = (url: string): ApiPipelineWithUrl => {
-  let pipeline = createAsyncPipeline<ApiRequest, ApiResponse>()
+  const pipeline = createAsyncPipeline<ApiRequest, ApiResponse>()
 
-  let batchInvoke = (callings: Readonly<SingleCalling[]>) => {
-    let calling: BatchCalling = {
+  const batchInvoke = (callings: Readonly<SingleCalling[]>) => {
+    const calling: BatchCalling = {
       type: 'Batch',
       callings,
     }
     return apiPipeline.invoke(url, calling)
   }
 
-  let dataLoader = new DataLoader(batchInvoke)
+  const dataLoader = new DataLoader(batchInvoke)
 
-  let invoke: ApiPipelineWithUrl['invoke'] = async (calling, options) => {
+  const invoke: ApiPipelineWithUrl['invoke'] = async (calling, options) => {
     if (options?.batch) {
       return dataLoader.load(calling)
     }
 
-    let result = await apiPipeline.invoke(url, calling)
+    const result = await apiPipeline.invoke(url, calling)
     dataLoader.prime(calling, result)
 
     if (result instanceof Error) {

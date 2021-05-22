@@ -4,7 +4,7 @@ import { cors } from '../index'
 
 /* -------------------------------------------------------------------------- */
 
-let simpleApp = Http({
+const simpleApp = Http({
   logger: false,
 })
 
@@ -40,7 +40,7 @@ simpleApp
 
 /* -------------------------------------------------------------------------- */
 
-let complexApp = Http({
+const complexApp = Http({
   logger: false,
 })
 
@@ -64,8 +64,8 @@ complexApp
     return Response.text('Hello World (Delete)')
   })
 
-let simpleServer = simpleApp.server()
-let complexServer = complexApp.server()
+const simpleServer = simpleApp.server()
+const complexServer = complexApp.server()
 
 /* -------------------------------------------------------------------------- */
 

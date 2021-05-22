@@ -15,7 +15,7 @@ export type Ok<T = any> = {
 export type Result<T = any, E = string> = Err<E> | Ok<T>
 
 export const Err = <E = string>(value: E): Err<E> => {
-  let err: Err = {
+  const err: Err = {
     kind: 'Err',
     value,
     isErr: true,
@@ -25,7 +25,7 @@ export const Err = <E = string>(value: E): Err<E> => {
 }
 
 export const Ok = <T, E = string>(value: T): Result<T, E> => {
-  let ok: Ok<T> = {
+  const ok: Ok<T> = {
     kind: 'Ok',
     value,
     isErr: false,

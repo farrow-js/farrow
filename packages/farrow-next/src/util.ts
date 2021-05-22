@@ -20,8 +20,8 @@ export const shallowEqual = (objA: any, objB: any) => {
     return false
   }
 
-  let keysA = Object.keys(objA)
-  let keysB = Object.keys(objB)
+  const keysA = Object.keys(objA)
+  const keysB = Object.keys(objB)
 
   if (keysA.length !== keysB.length) {
     return false
@@ -42,7 +42,7 @@ export const isThenble = (input: any): boolean => !!(input && typeof input.then 
 export const forcePlainDataCheck = (input: any, path = ''): void => {
   if (input === null) return
 
-  let type = typeof input
+  const type = typeof input
 
   if (type === 'function') {
     throw new Error(`Expected plain data, but found a function in ${path}: ${input}`)
@@ -59,16 +59,18 @@ export const forcePlainDataCheck = (input: any, path = ''): void => {
     if (!isPlainObject(input)) {
       throw new Error(`Expected plain object, but found an instance of ${input.constructor} in path ${path}: ${input}`)
     }
-    for (let key in input) {
+    for (const key in input) {
       forcePlainDataCheck(input[key], `${path}.${key}`)
     }
   }
 }
 
-const wrapFunctionForChecking = (f: (...args: any) => any) => (...args: any) => {
-  forcePlainDataCheck(args)
-  return f(...args)
-}
+const wrapFunctionForChecking =
+  (f: (...args: any) => any) =>
+  (...args: any) => {
+    forcePlainDataCheck(args)
+    return f(...args)
+  }
 
 export const forceCheckValue = (value: any): any => {
   if (typeof value === 'function') {
@@ -87,15 +89,15 @@ export const forceCheckValue = (value: any): any => {
 }
 
 const forceCheckObject = <T extends object>(object: T): T => {
-  let result = {} as any
-  for (let key in object) {
+  const result = {} as any
+  for (const key in object) {
     result[key] = forceCheckValue(object[key])
   }
   return result as T
 }
 
 const forceCheckArray = <T extends any[]>(array: T): T => {
-  let result = [] as any
+  const result = [] as any
   for (let i = 0; i < array.length; i += 1) {
     result[i] = forceCheckValue(array[i])
   }

@@ -2,11 +2,11 @@ import { Http, Response } from 'farrow-http'
 import supertest from 'supertest'
 import { cors } from '../index'
 
-let http = Http({
+const http = Http({
   logger: false,
 })
 
-let app = http.server()
+const app = http.server()
 
 http.use(cors())
 

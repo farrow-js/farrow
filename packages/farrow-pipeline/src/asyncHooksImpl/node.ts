@@ -2,12 +2,12 @@ import NodeAsyncHooks from 'async_hooks'
 import * as asyncHooksInterface from '../asyncHooksInterface'
 
 const createAsyncHooks = <T>() => {
-  let store = new Map<number, T>()
+  const store = new Map<number, T>()
 
-  let hooks = NodeAsyncHooks.createHook({
+  const hooks = NodeAsyncHooks.createHook({
     init: (asyncId, _, triggerAsyncId) => {
       if (store.has(triggerAsyncId)) {
-        let value = store.get(triggerAsyncId)
+        const value = store.get(triggerAsyncId)
         if (value) {
           store.set(asyncId, value)
         }
@@ -20,28 +20,28 @@ const createAsyncHooks = <T>() => {
     },
   })
 
-  let set = (value: T) => {
+  const set = (value: T) => {
     store.set(NodeAsyncHooks.executionAsyncId(), value)
   }
 
-  let get = () => {
+  const get = () => {
     return store.get(NodeAsyncHooks.executionAsyncId())
   }
 
-  let clear = () => {
+  const clear = () => {
     store.clear()
   }
 
-  let enable = () => {
+  const enable = () => {
     hooks.enable()
   }
 
-  let disable = () => {
+  const disable = () => {
     hooks.disable()
     store.clear()
   }
 
-  let entries = () => {
+  const entries = () => {
     return store.entries()
   }
 
@@ -56,7 +56,7 @@ const createAsyncHooks = <T>() => {
 }
 
 export const enable = () => {
-  let hooks = createAsyncHooks<asyncHooksInterface.Hooks>()
+  const hooks = createAsyncHooks<asyncHooksInterface.Hooks>()
   disable()
   asyncHooksInterface.impl(hooks)
   hooks.enable()

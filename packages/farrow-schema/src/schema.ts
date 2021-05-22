@@ -364,7 +364,7 @@ export const toSchemaCtor = <T extends SchemaCtorInput>(Item: T) => {
   if (isSchemaCtor(Item)) {
     return Item as ToSchemaCtor<T>
   }
-  return (Struct(Item as FieldDescriptors) as unknown) as ToSchemaCtor<T>
+  return Struct(Item as FieldDescriptors) as unknown as ToSchemaCtor<T>
 }
 
 export const toSchemaCtors = <T extends SchemaCtorInputs>(Inputs: T): ToSchemaCtors<T> => {
@@ -374,9 +374,9 @@ export const toSchemaCtors = <T extends SchemaCtorInputs>(Inputs: T): ToSchemaCt
   }
 
   if (Inputs && typeof Inputs === 'object') {
-    let result = {} as ToSchemaCtors<T>
+    const result = {} as ToSchemaCtors<T>
 
-    for (let key in Inputs) {
+    for (const key in Inputs) {
       // @ts-ignore: ignore
       result[key] = toSchemaCtor(Inputs[key])
     }
@@ -422,7 +422,7 @@ export const getInstance = <T extends SchemaCtor>(Ctor: T): InstanceTypeOf<T> =>
     return instanceWeakMap.get(Ctor)! as InstanceTypeOf<T>
   }
 
-  let instance = new Ctor()
+  const instance = new Ctor()
 
   instanceWeakMap.set(Ctor, instance as Schema)
 

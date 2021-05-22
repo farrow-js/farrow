@@ -3,7 +3,7 @@ import './route'
 
 describe('ApiPipeline', () => {
   it('can attach extra body/headers/response fields', async () => {
-    let result = await apiPipeline.run({
+    const result = await apiPipeline.run({
       url: '/use/success',
       calling: {
         type: 'Single' as const,
@@ -38,7 +38,7 @@ describe('ApiPipeline', () => {
   })
 
   it('can attach extra body/headers/response fields via .match(string)', async () => {
-    let result = await apiPipeline.run({
+    const result = await apiPipeline.run({
       url: '/match/success',
       calling: {
         type: 'Single' as const,
@@ -76,7 +76,7 @@ describe('ApiPipeline', () => {
   })
 
   it('can attach extra body/headers/response fields via .match(regexp)', async () => {
-    let result = await apiPipeline.run({
+    const result = await apiPipeline.run({
       url: '/regexp/success',
       calling: {
         type: 'Single' as const,
@@ -114,7 +114,7 @@ describe('ApiPipeline', () => {
   })
 
   it('may response error', async () => {
-    let request0 = {
+    const request0 = {
       url: '/match/error',
       calling: {
         type: 'Single' as const,
@@ -122,9 +122,9 @@ describe('ApiPipeline', () => {
         input: {},
       },
     }
-    let result0 = await apiPipeline.run(request0)
+    const result0 = await apiPipeline.run(request0)
 
-    let request1 = {
+    const request1 = {
       url: '/regexp/error',
       calling: {
         type: 'Single' as const,
@@ -132,9 +132,9 @@ describe('ApiPipeline', () => {
         input: {},
       },
     }
-    let result1 = await apiPipeline.run(request1)
+    const result1 = await apiPipeline.run(request1)
 
-    let request2 = {
+    const request2 = {
       url: '/non-existed',
       calling: {
         type: 'Single' as const,
@@ -142,7 +142,7 @@ describe('ApiPipeline', () => {
         input: {},
       },
     }
-    let result2 = await apiPipeline.run(request2)
+    const result2 = await apiPipeline.run(request2)
 
     expect(result0).toEqual({
       fromUseForResponse: true,
@@ -177,7 +177,7 @@ describe('ApiPipeline', () => {
   })
 
   it('can send batch request', async () => {
-    let result = await apiPipeline.run({
+    const result = await apiPipeline.run({
       url: '/use/success',
       calling: {
         type: 'Batch',

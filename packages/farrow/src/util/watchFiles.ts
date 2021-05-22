@@ -5,7 +5,7 @@ export const watchFiles = (
   options?: chokidar.WatchOptions,
 ): Promise<chokidar.FSWatcher> => {
   return new Promise((resolve, reject) => {
-    let watcher = chokidar
+    const watcher = chokidar
       .watch(paths, options)
       .on('ready', () => {
         resolve(watcher)

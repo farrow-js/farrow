@@ -10,16 +10,16 @@ export type ViteRouterPipeline = RouterPipeline & {
 }
 
 export const vite = (options?: InlineConfig): ViteRouterPipeline => {
-  let router = Router()
+  const router = Router()
 
-  let config = {
+  const config = {
     ...options,
   }
 
   let viteDevServers: ViteDevServer[] = []
 
   router.useLazy(async () => {
-    let viteServer = await createViteServer({
+    const viteServer = await createViteServer({
       server: {
         ...config.server,
         middlewareMode: true,
@@ -27,14 +27,14 @@ export const vite = (options?: InlineConfig): ViteRouterPipeline => {
       ...config,
     })
 
-    let getHtmlPath = async (url: string): Promise<string> => {
-      let filename = path.join(viteServer.config.root, url.slice(1))
+    const getHtmlPath = async (url: string): Promise<string> => {
+      const filename = path.join(viteServer.config.root, url.slice(1))
 
       if (filename.endsWith('.html')) {
         return filename
       }
 
-      let maybeHtmlPath = `${filename}/index.html`
+      const maybeHtmlPath = `${filename}/index.html`
       try {
         await fs.access(maybeHtmlPath, constants.R_OK)
         return `${filename}/index.html`
@@ -44,13 +44,13 @@ export const vite = (options?: InlineConfig): ViteRouterPipeline => {
       }
     }
 
-    let handler = ({ req, res }: { req: IncomingMessage; res: ServerResponse }) => {
+    const handler = ({ req, res }: { req: IncomingMessage; res: ServerResponse }) => {
       viteServer.middlewares(req, res, async () => {
         try {
-          let url = req.url ?? '/'
-          let htmlPath = await getHtmlPath(url)
-          let fileContent = await fs.readFile(htmlPath, 'utf-8')
-          let html = await viteServer.transformIndexHtml(url, fileContent)
+          const url = req.url ?? '/'
+          const htmlPath = await getHtmlPath(url)
+          const fileContent = await fs.readFile(htmlPath, 'utf-8')
+          const html = await viteServer.transformIndexHtml(url, fileContent)
 
           res.statusCode = 200
           res.setHeader('Content-Type', 'text/html')
@@ -60,7 +60,7 @@ export const vite = (options?: InlineConfig): ViteRouterPipeline => {
             res.setHeader('Content-Type', 'text/plain')
           }
 
-          let message = process.env.NODE_ENV === 'production' ? error.message : error.stack ?? error.message
+          const message = process.env.NODE_ENV === 'production' ? error.message : error.stack ?? error.message
 
           res.statusCode = 500
           res.end(message ?? '')
@@ -78,7 +78,7 @@ export const vite = (options?: InlineConfig): ViteRouterPipeline => {
   return {
     ...router,
     async close() {
-      let servers = [...viteDevServers]
+      const servers = [...viteDevServers]
 
       viteDevServers = []
 

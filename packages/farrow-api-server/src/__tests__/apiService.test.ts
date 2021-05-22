@@ -78,8 +78,8 @@ describe('ApiService', () => {
   })
 
   it('supports introspecting', async () => {
-    let http = createHttp()
-    let server = http.server()
+    const http = createHttp()
+    const server = http.server()
 
     http.route('/counter').use(CounterService)
 
@@ -178,8 +178,8 @@ describe('ApiService', () => {
   })
 
   it('supports calling api', async () => {
-    let http = createHttp()
-    let server = http.server()
+    const http = createHttp()
+    const server = http.server()
 
     http.route('/counter').use(CounterService)
 
@@ -226,8 +226,8 @@ describe('ApiService', () => {
   })
 
   it('should response error if api throwed', async () => {
-    let http = createHttp()
-    let server = http.server()
+    const http = createHttp()
+    const server = http.server()
 
     http.route('/counter').use(CounterService)
 
@@ -246,8 +246,8 @@ describe('ApiService', () => {
   })
 
   it('should response error if api was not existed', async () => {
-    let http = createHttp()
-    let server = http.server()
+    const http = createHttp()
+    const server = http.server()
 
     http.route('/counter').use(CounterService)
 
@@ -266,8 +266,8 @@ describe('ApiService', () => {
   })
 
   it('should response error if input is not valid', async () => {
-    let http = createHttp()
-    let server = http.server()
+    const http = createHttp()
+    const server = http.server()
 
     http.route('/counter').use(CounterService)
 
@@ -288,8 +288,8 @@ describe('ApiService', () => {
   })
 
   it('supports batch calling api', async () => {
-    let http = createHttp()
-    let server = http.server()
+    const http = createHttp()
+    const server = http.server()
 
     http.route('/counter').use(CounterService)
 

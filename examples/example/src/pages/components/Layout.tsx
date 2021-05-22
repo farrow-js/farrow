@@ -24,9 +24,9 @@ export const Layout: React.FC<LayoutProps> = (props) => {
 }
 
 export const useLayoutView = () => {
-  let ReactView = useReactView()
+  const ReactView = useReactView()
 
-  let render = <T extends JSX.Element>(element: T, props?: LayoutProps) => {
+  const render = <T extends JSX.Element>(element: T, props?: LayoutProps) => {
     return ReactView.render(<Layout {...props}>{element}</Layout>)
   }
 

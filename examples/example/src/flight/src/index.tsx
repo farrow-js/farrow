@@ -19,7 +19,7 @@ function HTML() {
 }
 
 let resolved = false
-let promise = new Promise((resolve) => {
+const promise = new Promise((resolve) => {
   setTimeout(() => {
     resolved = true
     resolve(null)
@@ -36,28 +36,28 @@ function Title() {
   return <>Title</>
 }
 
-let model = {
+const model = {
   title: <Title />,
   content: <HTML />,
 }
 
-let stream = ReactServerDOMWriter.renderToReadableStream(model)
-let response = new Response(stream, {
+const stream = ReactServerDOMWriter.renderToReadableStream(model)
+const response = new Response(stream, {
   headers: { 'Content-Type': 'text/html' },
 })
 
 void display(response)
 
 async function display(responseToDisplay: Response) {
-  let blob = await responseToDisplay.blob()
-  let url = URL.createObjectURL(blob)
-  let data = ReactServerDOMReader.createFromFetch(fetch(url))
+  const blob = await responseToDisplay.blob()
+  const url = URL.createObjectURL(blob)
+  const data = ReactServerDOMReader.createFromFetch(fetch(url))
 
   renderResult(data)
 }
 
 function Shell({ data }: { data: any }) {
-  let model = data.readRoot()
+  const model = data.readRoot()
   return (
     <div>
       <Suspense fallback="...">
@@ -69,9 +69,9 @@ function Shell({ data }: { data: any }) {
 }
 
 function renderResult(data: any) {
-  let container = document.getElementById('container')
+  const container = document.getElementById('container')
   // @ts-ignore untyped
-  let root = ReactDOM.unstable_createRoot(container)
+  const root = ReactDOM.unstable_createRoot(container)
   root.render(
     <Suspense fallback="Loading...">
       <Shell data={data} />

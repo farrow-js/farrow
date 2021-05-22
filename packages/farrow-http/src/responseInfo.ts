@@ -208,7 +208,7 @@ export const header = (name: string, value: Value): ResponseInfo => {
 }
 
 export const cookies = (config: { [key: string]: Value | null }, options?: CookieOptions): ResponseInfo => {
-  let cookies = {} as Cookies
+  const cookies = {} as Cookies
 
   Object.entries(config).forEach(([name, value]) => {
     cookies[name] = {
@@ -233,7 +233,7 @@ export const vary = (...fileds: string[]): ResponseInfo => {
 }
 
 export const merge = (...responses: ResponseInfo[]) => {
-  let result = {} as ResponseInfo
+  const result = {} as ResponseInfo
 
   responses.forEach((response) => {
     if (response.body) {
@@ -261,7 +261,7 @@ export const merge = (...responses: ResponseInfo[]) => {
 }
 
 export const type = (type: string): ResponseInfo => {
-  let contentType = mime.contentType(type)
+  const contentType = mime.contentType(type)
 
   if (contentType === false) {
     return headers({})
@@ -273,7 +273,7 @@ export const type = (type: string): ResponseInfo => {
 }
 
 export const is = (info: ResponseInfo, ...types: string[]) => {
-  let contentType = info.headers?.['content-type'] ?? info.headers?.['Content-Type']
+  const contentType = info.headers?.['content-type'] ?? info.headers?.['Content-Type']
 
   if (!contentType) {
     return false

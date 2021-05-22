@@ -25,7 +25,7 @@ export const Todos = List(Todo)
 
 export type TodosType = TypeOf<typeof Todos>
 
-let state: { uid: number; todos: TodosType } = {
+const state: { uid: number; todos: TodosType } = {
   uid: 0,
   todos: [
     {

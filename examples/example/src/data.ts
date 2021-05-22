@@ -6,7 +6,7 @@ export type Todo = {
 
 export type Todos = Todo[]
 
-export let fakeData: Todos = [
+export const fakeData: Todos = [
   {
     id: -1,
     content: 'Learn Farrow',

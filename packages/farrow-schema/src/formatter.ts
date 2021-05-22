@@ -155,7 +155,7 @@ const getFormatterImpl = (input: Function): FormatterImpl | undefined => {
     return formatterWeakMap.get(input)
   }
 
-  let next = Object.getPrototypeOf(input)
+  const next = Object.getPrototypeOf(input)
 
   if (next === Function.prototype) {
     return undefined
@@ -170,13 +170,13 @@ export const Formatter = {
   },
 
   get<T extends SchemaCtor>(Ctor: T): FormatterMethods | undefined {
-    let finalCtor = S.getSchemaCtor(Ctor)
-    let FormatterImpl = getFormatterImpl(finalCtor as Function) as FormatterImpl<SchemaTypeOf<T>> | undefined
+    const finalCtor = S.getSchemaCtor(Ctor)
+    const FormatterImpl = getFormatterImpl(finalCtor as Function) as FormatterImpl<SchemaTypeOf<T>> | undefined
 
     // instantiation Formatter and save to weak-map
     if (typeof FormatterImpl === 'function') {
-      let schema = getInstance(Ctor) as SchemaTypeOf<T>
-      let impl = FormatterImpl(schema)
+      const schema = getInstance(Ctor) as SchemaTypeOf<T>
+      const impl = FormatterImpl(schema)
 
       formatterWeakMap.set(Ctor, impl)
 
@@ -191,13 +191,13 @@ export const Formatter = {
       return ctx.formatCache.get(Ctor)!
     }
 
-    let FormatterImpl = Formatter.get(Ctor)
+    const FormatterImpl = Formatter.get(Ctor)
 
     if (!FormatterImpl) {
       throw new Error(`No impl found for Formatter, Ctor: ${Ctor}`)
     }
     
-    let typeId = FormatterImpl.format(ctx)
+    const typeId = FormatterImpl.format(ctx)
 
     ctx.formatCache.set(Ctor, typeId)
 
@@ -205,12 +205,12 @@ export const Formatter = {
   },
 
   format<T extends SchemaCtor>(Ctor: T, context?: FormatContext) {
-    let types: FormatTypes = {}
+    const types: FormatTypes = {}
     let uid = 0
 
-    let lazyTypeList = [] as (FormatStructType | FormatObjectType)[]
+    const lazyTypeList = [] as (FormatStructType | FormatObjectType)[]
 
-    let addType = (type: FormatType): number => {
+    const addType = (type: FormatType): number => {
       if (type.type === 'Object' || type.type === 'Struct') {
         lazyTypeList.push(type)
       }
@@ -219,22 +219,22 @@ export const Formatter = {
         return context.addType(type)
       }
 
-      let id = uid++
+      const id = uid++
       types[`${id}`] = type
       return id
     }
 
-    let finalContext: FormatContext = {
+    const finalContext: FormatContext = {
       formatCache: new WeakMap(),
       ...context,
       addType,
     }
 
-    let typeId = Formatter.formatSchema(Ctor, finalContext)
+    const typeId = Formatter.formatSchema(Ctor, finalContext)
 
     // trigger all lazy fields to expand formatResult.types
     while (lazyTypeList.length) {
-      let objectType = lazyTypeList.shift()
+      const objectType = lazyTypeList.shift()
       objectType?.fields
     }
 
@@ -331,7 +331,7 @@ Formatter.impl(S.LiteralType, (schema) => {
 Formatter.impl(S.NullableType, (schema) => {
   return {
     format(ctx) {
-      let typeId = Formatter.formatSchema(schema.Item, ctx)
+      const typeId = Formatter.formatSchema(schema.Item, ctx)
       return ctx.addType({
         type: 'Nullable',
         itemTypeId: typeId,
@@ -344,7 +344,7 @@ Formatter.impl(S.NullableType, (schema) => {
 Formatter.impl(S.ListType, (schema) => {
   return {
     format(ctx) {
-      let typeId = Formatter.formatSchema(schema.Item, ctx)
+      const typeId = Formatter.formatSchema(schema.Item, ctx)
       return ctx.addType({
         type: 'List',
         itemTypeId: typeId,
@@ -355,17 +355,17 @@ Formatter.impl(S.ListType, (schema) => {
 })
 
 Formatter.impl(S.StructType, (schema) => {
-  let fields = getSchemaCtorFields(schema.descriptors)
+  const fields = getSchemaCtorFields(schema.descriptors)
   return {
     format(ctx) {
-      let formatFields: FormatFields = {}
+      const formatFields: FormatFields = {}
       let hasGetFields = false
-      let getFields = () => {
+      const getFields = () => {
         if (hasGetFields) return formatFields
         hasGetFields = true
 
-        for (let [key, Field] of Object.entries(fields)) {
-          let typeId = Formatter.formatSchema(Field[S.Type], ctx)
+        for (const [key, Field] of Object.entries(fields)) {
+          const typeId = Formatter.formatSchema(Field[S.Type], ctx)
           formatFields[key] = {
             typeId,
             $ref: `#/types/${typeId}`,
@@ -376,7 +376,7 @@ Formatter.impl(S.StructType, (schema) => {
         
         return formatFields
       }
-      let Constructor = schema.constructor as typeof S.Schema
+      const Constructor = schema.constructor as typeof S.Schema
 
       return ctx.addType({
         type: 'Struct',
@@ -390,17 +390,17 @@ Formatter.impl(S.StructType, (schema) => {
 })
 
 Formatter.impl(S.ObjectType, (schema) => {
-  let fields = getSchemaCtorFields(schema as unknown as S.FieldDescriptors)
+  const fields = getSchemaCtorFields(schema as unknown as S.FieldDescriptors)
   return {
     format(ctx) {
-      let formatFields: FormatFields = {}
+      const formatFields: FormatFields = {}
       let hasGetFields = false
-      let getFields = () => {
+      const getFields = () => {
         if (hasGetFields) return formatFields
         hasGetFields = true
 
-        for (let [key, Field] of Object.entries(fields)) {
-          let typeId = Formatter.formatSchema(Field[S.Type], ctx)
+        for (const [key, Field] of Object.entries(fields)) {
+          const typeId = Formatter.formatSchema(Field[S.Type], ctx)
           formatFields[key] = {
             typeId,
             $ref: `#/types/${typeId}`,
@@ -411,7 +411,7 @@ Formatter.impl(S.ObjectType, (schema) => {
         
         return formatFields
       }
-      let Constructor = schema.constructor as typeof S.Schema
+      const Constructor = schema.constructor as typeof S.Schema
 
       return ctx.addType({
         type: 'Object',
@@ -425,12 +425,12 @@ Formatter.impl(S.ObjectType, (schema) => {
 })
 
 Formatter.impl(S.UnionType, (schema) => {
-  let Constructor = schema.constructor as typeof S.Schema
-  let displayName = Constructor.displayName
+  const Constructor = schema.constructor as typeof S.Schema
+  const displayName = Constructor.displayName
   return {
     format(ctx) {
-      let itemTypes = schema.Items.map((Item) => {
-        let typeId = Formatter.formatSchema(Item, ctx)
+      const itemTypes = schema.Items.map((Item) => {
+        const typeId = Formatter.formatSchema(Item, ctx)
         return {
           typeId,
           $ref: `#/types/${typeId}`,
@@ -446,12 +446,12 @@ Formatter.impl(S.UnionType, (schema) => {
 })
 
 Formatter.impl(S.IntersectType, (schema) => {
-  let Constructor = schema.constructor as typeof S.Schema
-  let displayName = Constructor.displayName
+  const Constructor = schema.constructor as typeof S.Schema
+  const displayName = Constructor.displayName
   return {
     format(ctx) {
-      let itemTypes = schema.Items.map((Item) => {
-        let typeId = Formatter.formatSchema(Item, ctx)
+      const itemTypes = schema.Items.map((Item) => {
+        const typeId = Formatter.formatSchema(Item, ctx)
         return {
           typeId,
           $ref: `#/types/${typeId}`,
@@ -467,12 +467,12 @@ Formatter.impl(S.IntersectType, (schema) => {
 })
 
 Formatter.impl(S.TupleType, (schema) => {
-  let Constructor = schema.constructor as typeof S.Schema
-  let displayName = Constructor.displayName
+  const Constructor = schema.constructor as typeof S.Schema
+  const displayName = Constructor.displayName
   return {
     format(ctx) {
-      let itemTypes = schema.Items.map((Item) => {
-        let typeId = Formatter.formatSchema(Item, ctx)
+      const itemTypes = schema.Items.map((Item) => {
+        const typeId = Formatter.formatSchema(Item, ctx)
         return {
           typeId,
           $ref: `#/types/${typeId}`,
@@ -490,7 +490,7 @@ Formatter.impl(S.TupleType, (schema) => {
 Formatter.impl(S.RecordType, (schema) => {
   return {
     format(ctx) {
-      let typeId = Formatter.formatSchema(schema.Item, ctx)
+      const typeId = Formatter.formatSchema(schema.Item, ctx)
       return ctx.addType({
         type: 'Record',
         valueTypeId: typeId,
@@ -533,7 +533,7 @@ Formatter.impl(S.Json, {
 Formatter.impl(S.StrictType, (schema) => {
   return {
     format(ctx) {
-      let typeId = Formatter.formatSchema(schema.Item, ctx)
+      const typeId = Formatter.formatSchema(schema.Item, ctx)
       return ctx.addType({
         type: 'Strict',
         itemTypeId: typeId,
@@ -546,7 +546,7 @@ Formatter.impl(S.StrictType, (schema) => {
 Formatter.impl(S.NonStrictType, (schema) => {
   return {
     format(ctx) {
-      let typeId = Formatter.formatSchema(schema.Item, ctx)
+      const typeId = Formatter.formatSchema(schema.Item, ctx)
       return ctx.addType({
         type: 'NonStrict',
         itemTypeId: typeId,
@@ -559,7 +559,7 @@ Formatter.impl(S.NonStrictType, (schema) => {
 Formatter.impl(S.ReadOnlyType, (schema) => {
   return {
     format(ctx) {
-      let typeId = Formatter.formatSchema(schema.Item, ctx)
+      const typeId = Formatter.formatSchema(schema.Item, ctx)
       return ctx.addType({
         type: 'ReadOnly',
         itemTypeId: typeId,
@@ -572,7 +572,7 @@ Formatter.impl(S.ReadOnlyType, (schema) => {
 Formatter.impl(S.ReadOnlyDeepType, (schema) => {
   return {
     format(ctx) {
-      let typeId = Formatter.formatSchema(schema.Item, ctx)
+      const typeId = Formatter.formatSchema(schema.Item, ctx)
       return ctx.addType({
         type: 'ReadOnlyDeep',
         itemTypeId: typeId,
@@ -583,8 +583,8 @@ Formatter.impl(S.ReadOnlyDeepType, (schema) => {
 })
 
 Formatter.impl(PartialType, schema => {
-  let Constructor = schema.constructor as typeof S.Schema
-  let ItemConstructor = schema.Item as unknown as typeof S.Schema
+  const Constructor = schema.constructor as typeof S.Schema
+  const ItemConstructor = schema.Item as unknown as typeof S.Schema
 
   ItemConstructor.displayName = Constructor.displayName
 

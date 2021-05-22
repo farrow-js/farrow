@@ -35,7 +35,7 @@ const createHttp = (options?: HttpPipelineOptions) => {
 describe('Http', () => {
   describe('Response', () => {
     it('support text response', async () => {
-      let http = createHttp()
+      const http = createHttp()
 
       http
         .match({
@@ -63,7 +63,7 @@ describe('Http', () => {
     })
 
     it('support html response', async () => {
-      let http = createHttp()
+      const http = createHttp()
 
       http
         .match({
@@ -91,7 +91,7 @@ describe('Http', () => {
     })
 
     it('support json response', async () => {
-      let http = createHttp()
+      const http = createHttp()
 
       http
         .match({
@@ -111,7 +111,7 @@ describe('Http', () => {
     })
 
     it('support empty response', async () => {
-      let http = createHttp()
+      const http = createHttp()
 
       http
         .match({
@@ -125,7 +125,7 @@ describe('Http', () => {
     })
 
     it('support redirecting', async () => {
-      let http = createHttp()
+      const http = createHttp()
 
       http
         .match({
@@ -139,14 +139,14 @@ describe('Http', () => {
     })
 
     it('support stream response', async () => {
-      let http = createHttp()
+      const http = createHttp()
 
       http
         .match({
           pathname: '/test',
         })
         .use(() => {
-          let stream = new Stream.Readable({
+          const stream = new Stream.Readable({
             read() {
               this.push('test stream')
               this.push(null)
@@ -159,7 +159,7 @@ describe('Http', () => {
     })
 
     it('support buffer response', async () => {
-      let http = createHttp()
+      const http = createHttp()
 
       http
         .match({
@@ -173,11 +173,11 @@ describe('Http', () => {
     })
 
     it('support file response', async () => {
-      let http = createHttp()
+      const http = createHttp()
 
-      let filename = path.join(__dirname, 'http.test.ts')
+      const filename = path.join(__dirname, 'http.test.ts')
 
-      let content = await fs.promises.readFile(filename)
+      const content = await fs.promises.readFile(filename)
 
       http
         .match({
@@ -191,7 +191,7 @@ describe('Http', () => {
     })
 
     it('support string response', async () => {
-      let http = createHttp()
+      const http = createHttp()
 
       http
         .match({
@@ -205,7 +205,7 @@ describe('Http', () => {
     })
 
     it('support custom response', async () => {
-      let http = createHttp()
+      const http = createHttp()
 
       http
         .match({
@@ -244,8 +244,8 @@ describe('Http', () => {
     })
 
     it('should not be matched when pathname or method failed to match', async () => {
-      let http = createHttp()
-      let server = http.server()
+      const http = createHttp()
+      const server = http.server()
 
       http
         .match({
@@ -265,7 +265,7 @@ describe('Http', () => {
     })
 
     it('should respond 500 in block mode when there are no middlewares handling request', async () => {
-      let http = createHttp()
+      const http = createHttp()
 
       http.match(
         {
@@ -280,7 +280,7 @@ describe('Http', () => {
     })
 
     it('should not respond 404 if matchOptions.bloack = false when there are no middlewares handling request', async () => {
-      let http = createHttp()
+      const http = createHttp()
 
       http.match(
         {
@@ -295,7 +295,7 @@ describe('Http', () => {
     })
 
     it('should responding 500 when middleware throwed error', async () => {
-      let http = createHttp()
+      const http = createHttp()
 
       http.use((request, next) => {
         if (request.pathname === '/sync') {
@@ -326,8 +326,8 @@ describe('Http', () => {
     })
 
     it('support set response status', async () => {
-      let http = createHttp()
-      let server = http.server()
+      const http = createHttp()
+      const server = http.server()
 
       http
         .match({
@@ -341,8 +341,8 @@ describe('Http', () => {
     })
 
     it('support set response headers', async () => {
-      let http = createHttp()
-      let server = http.server()
+      const http = createHttp()
+      const server = http.server()
 
       http
         .match({
@@ -372,8 +372,8 @@ describe('Http', () => {
     })
 
     it('support set response cookies', async () => {
-      let http = createHttp()
-      let server = http.server()
+      const http = createHttp()
+      const server = http.server()
 
       http
         .match({
@@ -411,8 +411,8 @@ describe('Http', () => {
     })
 
     it('support set response vary', async () => {
-      let http = createHttp()
-      let server = http.server()
+      const http = createHttp()
+      const server = http.server()
 
       http
         .match({
@@ -426,8 +426,8 @@ describe('Http', () => {
     })
 
     it('support set attachment', async () => {
-      let http = createHttp()
-      let server = http.server()
+      const http = createHttp()
+      const server = http.server()
 
       http
         .match({
@@ -444,8 +444,8 @@ describe('Http', () => {
     })
 
     it('support set content-type via mime-type', async () => {
-      let http = createHttp()
-      let server = http.server()
+      const http = createHttp()
+      const server = http.server()
 
       http
         .match({
@@ -510,15 +510,15 @@ describe('Http', () => {
     })
 
     it('support merging response in two directions', async () => {
-      let http = createHttp()
-      let server = http.server()
+      const http = createHttp()
+      const server = http.server()
 
       http
         .match({
           pathname: '/test-merge-01',
         })
         .use(async (request, next) => {
-          let response = await next(request)
+          const response = await next(request)
           return response.merge(Response.text('one'))
         })
         .use(() => {
@@ -530,7 +530,7 @@ describe('Http', () => {
           pathname: '/test-merge-02',
         })
         .use(async (request, next) => {
-          let response = await next(request)
+          const response = await next(request)
           return Response.text('one').merge(response)
         })
         .use(() => {
@@ -543,13 +543,13 @@ describe('Http', () => {
     })
 
     it('support serving static files', async () => {
-      let http = createHttp()
-      let server = http.server()
+      const http = createHttp()
+      const server = http.server()
 
-      let dirname = path.join(__dirname, '../../')
+      const dirname = path.join(__dirname, '../../')
 
-      let read = async (filename: string) => {
-        let buffer = await fs.promises.readFile(path.join(dirname, filename))
+      const read = async (filename: string) => {
+        const buffer = await fs.promises.readFile(path.join(dirname, filename))
         return buffer.toString()
       }
 
@@ -573,10 +573,10 @@ describe('Http', () => {
     })
 
     it('should go through when the file does not exist in router.serve', async () => {
-      let http = createHttp()
-      let server = http.server()
-      let dirname = path.join(__dirname, '../../fixtures/static')
-      let content = await fs.promises.readFile(path.join(dirname, 'foo.js'))
+      const http = createHttp()
+      const server = http.server()
+      const dirname = path.join(__dirname, '../../fixtures/static')
+      const content = await fs.promises.readFile(path.join(dirname, 'foo.js'))
 
       http.serve('/static', dirname)
 
@@ -592,10 +592,10 @@ describe('Http', () => {
     })
 
     it('should only serve files under argument.dirname', async () => {
-      let http = createHttp()
-      let server = http.server()
-      let dirname = path.join(__dirname, '../../fixtures/static')
-      let content = await fs.promises.readFile(path.join(dirname, 'foo.js'))
+      const http = createHttp()
+      const server = http.server()
+      const dirname = path.join(__dirname, '../../fixtures/static')
+      const content = await fs.promises.readFile(path.join(dirname, 'foo.js'))
 
       http.serve('/static', dirname)
 
@@ -605,8 +605,8 @@ describe('Http', () => {
     })
 
     it('support capturing response by type', async () => {
-      let http = createHttp()
-      let server = http.server()
+      const http = createHttp()
+      const server = http.server()
 
       http.capture('string', (stringBody) => {
         return Response.text(`capture: ${stringBody.value}`)
@@ -651,9 +651,9 @@ describe('Http', () => {
     })
 
     it('support injecting context', async () => {
-      let TestContext = createContext(0)
+      const TestContext = createContext(0)
 
-      let http = createHttp({
+      const http = createHttp({
         contexts: () => {
           return {
             test: TestContext.create(10),
@@ -661,11 +661,11 @@ describe('Http', () => {
         },
       })
 
-      let server = http.server()
+      const server = http.server()
 
       http.use(() => {
-        let ctx = TestContext.use()
-        let { value } = ctx
+        const ctx = TestContext.use()
+        const { value } = ctx
         ctx.value += 1
         return Response.text(value.toString())
       })
@@ -675,9 +675,9 @@ describe('Http', () => {
     })
 
     it('support async hooks', async () => {
-      let TestContext = createContext(0)
+      const TestContext = createContext(0)
 
-      let http = createHttp({
+      const http = createHttp({
         contexts: () => {
           return {
             test: TestContext.create(10),
@@ -685,11 +685,11 @@ describe('Http', () => {
         },
       })
 
-      let server = http.server()
+      const server = http.server()
 
       http.use(async (request, next) => {
         await delay(1)
-        let response = await next(request)
+        const response = await next(request)
         expect(TestContext.get()).toBe(11)
         return response
       })
@@ -704,8 +704,8 @@ describe('Http', () => {
     })
 
     it('should only handle GET method by default', async () => {
-      let http = createHttp()
-      let server = http.server()
+      const http = createHttp()
+      const server = http.server()
 
       http
         .match({
@@ -723,8 +723,8 @@ describe('Http', () => {
     })
 
     it('support match multiple methods', async () => {
-      let http = createHttp()
-      let server = http.server()
+      const http = createHttp()
+      const server = http.server()
 
       http
         .match({
@@ -743,8 +743,8 @@ describe('Http', () => {
     })
 
     it('should respond 400 if request schema was not matched', async () => {
-      let http = createHttp()
-      let server = http.server()
+      const http = createHttp()
+      const server = http.server()
 
       http.get('/<name:string>/<age:int>').use((request) => {
         return Response.json({
@@ -762,8 +762,8 @@ describe('Http', () => {
     })
 
     it('should handle schema-error if options.onSchemaError is used', async () => {
-      let http = createHttp()
-      let server = http.server()
+      const http = createHttp()
+      const server = http.server()
 
       http
         .get(
@@ -830,11 +830,11 @@ describe('Http', () => {
 
   describe('Request', () => {
     it('support access native req/res via useReq/useRes', async () => {
-      let http = createHttp()
+      const http = createHttp()
 
       http.use(() => {
-        let req = useReq()
-        let res = useRes()
+        const req = useReq()
+        const res = useRes()
 
         res.statusCode = 200
         res.end(req.url)
@@ -846,10 +846,10 @@ describe('Http', () => {
     })
 
     it('support accessing request info via useRequestInfo', async () => {
-      let http = createHttp()
+      const http = createHttp()
 
       http.use(() => {
-        let info = useRequestInfo()
+        const info = useRequestInfo()
 
         return Response.json({
           ...info,
@@ -886,8 +886,8 @@ describe('Http', () => {
     })
 
     it('support passing new request info to downstream', async () => {
-      let http = createHttp()
-      let server = http.server()
+      const http = createHttp()
+      const server = http.server()
 
       http.use((request, next) => {
         if (request.pathname.startsWith('/new')) {
@@ -938,9 +938,9 @@ describe('Http', () => {
 
   describe('Router', () => {
     it('should support add router', async () => {
-      let http = createHttp()
-      let router = Router()
-      let server = http.server()
+      const http = createHttp()
+      const router = Router()
+      const server = http.server()
 
       router
         .match({
@@ -958,17 +958,17 @@ describe('Http', () => {
     })
 
     it('should support using router in another router', async () => {
-      let http = createHttp()
-      let router0 = Router()
-      let router1 = Router()
-      let router2 = Router()
-      let server = http.server()
+      const http = createHttp()
+      const router0 = Router()
+      const router1 = Router()
+      const router2 = Router()
+      const server = http.server()
 
       http.use(async (request, next) => {
-        let basenames = useBasenames()
-        let before = basenames.value
-        let response = await next(request)
-        let after = basenames.value
+        const basenames = useBasenames()
+        const before = basenames.value
+        const response = await next(request)
+        const after = basenames.value
 
         // should reset basenames after next(...)
         expect(before).toEqual(after)
@@ -984,7 +984,7 @@ describe('Http', () => {
           pathname: '/abc',
         })
         .use((request) => {
-          let prefix = usePrefix()
+          const prefix = usePrefix()
           return Response.json({
             from: 'http',
             prefix,
@@ -997,7 +997,7 @@ describe('Http', () => {
           pathname: '/abc',
         })
         .use((request) => {
-          let prefix = usePrefix()
+          const prefix = usePrefix()
           return Response.json({
             from: 'router0',
             prefix,
@@ -1010,7 +1010,7 @@ describe('Http', () => {
           pathname: '/abc',
         })
         .use((request) => {
-          let prefix = usePrefix()
+          const prefix = usePrefix()
           return Response.json({
             from: 'router1',
             prefix,
@@ -1019,7 +1019,7 @@ describe('Http', () => {
         })
 
       router2.use((request) => {
-        let prefix = usePrefix()
+        const prefix = usePrefix()
         return Response.json({
           from: 'router2',
           prefix,
@@ -1053,10 +1053,10 @@ describe('Http', () => {
     })
 
     it('support setting custom content-type for Response.file', async () => {
-      let http = createHttp()
-      let server = http.server()
-      let filename = path.join(__dirname, '../../fixtures/static/foo.js')
-      let content = await fs.promises.readFile(filename)
+      const http = createHttp()
+      const server = http.server()
+      const filename = path.join(__dirname, '../../fixtures/static/foo.js')
+      const content = await fs.promises.readFile(filename)
 
       http.get('/raw').use(async () => {
         return Response.file(filename)
@@ -1075,8 +1075,8 @@ describe('Http', () => {
     })
 
     it('support remove cookies or headers', async () => {
-      let http = createHttp()
-      let server = http.server()
+      const http = createHttp()
+      const server = http.server()
 
       http
         .get(
@@ -1087,7 +1087,7 @@ describe('Http', () => {
           },
         )
         .use(async (request, next) => {
-          let response = await next(request)
+          const response = await next(request)
 
           return response
             .cookies({

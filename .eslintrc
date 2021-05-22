@@ -117,7 +117,7 @@
     "prefer-template": "warn",
     "require-yield": "error",
     "symbol-description": "error",
-    "prefer-let/prefer-let": "error",
+    "prefer-const": "error",
     "prettier/prettier": "error"
   },
   "overrides": [

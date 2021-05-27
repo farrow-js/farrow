@@ -65,6 +65,8 @@ export const useQueryChangedEffect = (effect: QueryChangedEffectCallback) => {
   }, [effect])
 }
 
+let currentPathname = typeof window !== 'undefined' ? window.location.pathname : null
+
 export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPage<PageProps<ControllerStates<T>>> => {
   const { Controllers, preload, View } = options
   const Page: NextPage<PageProps<ControllerStates<T>>> = (props) => {
@@ -146,7 +148,7 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
 
     if (typeof window !== 'undefined') {
       // detect query changed
-      if (window.location.pathname === pathname) {
+      if (currentPathname === pathname) {
         return {
           userAgent,
           pathname,
@@ -155,6 +157,8 @@ export const page = <T extends ControllerCtors>(options: PageOptions<T>): NextPa
           states: [],
         }
       }
+
+      currentPathname = pathname
     }
 
     const getPageInfo = GetPageInfo.provide(() => pageInfo)

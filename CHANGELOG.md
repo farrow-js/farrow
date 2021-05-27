@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.10.6
+
+- fix(farrow-next): should detect pathname changed in browser correctly
+
 ## 1.10.5(2021/05/20)
 
 - fix(farrow-next): moduleContext.new is wrong, use moduleContext.use for Page Component

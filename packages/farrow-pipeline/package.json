@@ -1,6 +1,6 @@
 {
   "name": "farrow-pipeline",
-  "version": "1.10.2",
+  "version": "1.10.6",
   "description": "Type-Friendly middleware library",
   "main": "dist/index.js",
   "files": [

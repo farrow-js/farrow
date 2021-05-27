@@ -1,6 +1,6 @@
 {
   "name": "farrow",
-  "version": "1.10.4",
+  "version": "1.10.6",
   "description": "Useful modules for developing Farrow App",
   "main": "dist/index.js",
   "bin": {
@@ -30,9 +30,9 @@
     "@types/fs-extra": "^9.0.6",
     "@types/node-fetch": "^2.5.8",
     "@types/supertest": "^2.0.10",
-    "farrow-api-server": "^1.10.4",
-    "farrow-http": "^1.10.4",
-    "farrow-pipeline": "^1.10.2",
+    "farrow-api-server": "^1.10.6",
+    "farrow-http": "^1.10.6",
+    "farrow-pipeline": "^1.10.6",
     "supertest": "^6.0.1"
   },
   "dependencies": {
@@ -42,8 +42,8 @@
     "esbuild": "^0.11.0",
     "esbuild-node-externals": "^1.2.0",
     "execa": "^5.0.0",
-    "farrow-api": "^1.10.3",
-    "farrow-schema": "^1.10.3",
+    "farrow-api": "^1.10.6",
+    "farrow-schema": "^1.10.6",
     "fs-extra": "^9.1.0",
     "node-fetch": "^2.6.1",
     "read-pkg-up": "^7.0.1",

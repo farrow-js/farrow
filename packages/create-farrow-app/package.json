@@ -1,6 +1,6 @@
 {
   "name": "create-farrow-app",
-  "version": "1.10.2",
+  "version": "1.10.6",
   "description": "A cli-tools for scaffolding farrow project",
   "main": "dist/index.js",
   "bin": {

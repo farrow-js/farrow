@@ -30,6 +30,8 @@
 
 - [farrow-next-server](../packages/farrow-next-server/README.md): Run next.js in farrow
 
+- [farrow-deno-server](../packages/farrow-deno-server/README.md): Server services for deno.
+
 ## Community Packages
 
 - [farrow-session](https://github.com/tqma113/farrow-session): A session middleware for farrow.

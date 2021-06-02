@@ -289,8 +289,8 @@ export const codegen = (formatResult: FormatResult, options?: CodegenOptions): s
     
     
     export const fetcher = async (request: ApiRequest): Promise<ApiResponse> => {
-      let { url, calling, options: init } = request
-      let options: RequestInit = {
+      const { url, calling, options: init } = request
+      const options: RequestInit = {
         method: 'POST',
         credentials: 'include',
         ...init,
@@ -300,9 +300,9 @@ export const codegen = (formatResult: FormatResult, options?: CodegenOptions): s
         },
         body: JSON.stringify(calling),
       }
-      let response = await fetch(url, options)
-      let text = await response.text()
-      let json = JSON.parse(text) as ApiResponse
+      const response = await fetch(url, options)
+      const text = await response.text()
+      const json = JSON.parse(text) as ApiResponse
     
       return json
     }
@@ -312,7 +312,7 @@ export const codegen = (formatResult: FormatResult, options?: CodegenOptions): s
         throw err
       })
     
-      let handleResult = (apiResponse: ApiResponse): JsonType => {
+      const handleResult = (apiResponse: ApiResponse): JsonType => {
         if (apiResponse.type === 'ApiErrorResponse') {
           throw new Error(apiResponse.error.message)
         }

@@ -1,6 +1,6 @@
 {
   "name": "farrow-api-server",
-  "version": "1.10.6",
+  "version": "1.10.7",
   "description": "A type-friendly BFF framework",
   "main": "dist/index.js",
   "scripts": {
@@ -30,10 +30,10 @@
   "devDependencies": {
     "@types/lodash.get": "^4.4.6",
     "@types/supertest": "^2.0.10",
-    "farrow-api": "^1.10.6",
-    "farrow-http": "^1.10.6",
+    "farrow-api": "^1.10.7",
+    "farrow-http": "^1.10.7",
     "farrow-pipeline": "^1.10.6",
-    "farrow-schema": "^1.10.6",
+    "farrow-schema": "^1.10.7",
     "supertest": "^6.0.1"
   },
   "dependencies": {

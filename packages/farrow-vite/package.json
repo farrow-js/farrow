@@ -1,6 +1,6 @@
 {
   "name": "farrow-vite",
-  "version": "1.10.6",
+  "version": "1.10.7",
   "description": "Vite adapter for farrow",
   "main": "dist/index.js",
   "files": [
@@ -23,7 +23,7 @@
     "vite": "^2.0.1"
   },
   "devDependencies": {
-    "farrow-http": "^1.10.6",
+    "farrow-http": "^1.10.7",
     "vite": "^2.0.1"
   },
   "dependencies": {

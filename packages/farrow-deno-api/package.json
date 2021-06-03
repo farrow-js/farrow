@@ -1,6 +1,6 @@
 {
   "name": "farrow-deno-api",
-  "version": "1.0.0",
+  "version": "1.10.7",
   "description": "A Type-Friendly Web Framework",
   "main": "dist/index.js",
   "files": [
@@ -26,10 +26,10 @@
     "farrow-schema": "^1.8.0"
   },
   "devDependencies": {
-    "farrow-api": "^1.8.0",
-    "farrow-api-server": "^1.10.3",
-    "farrow-http": "^1.8.0",
+    "farrow-api": "^1.10.7",
+    "farrow-api-server": "^1.10.7",
+    "farrow-http": "^1.10.7",
     "farrow-pipeline": "^1.8.0",
-    "farrow-schema": "^1.8.0"
+    "farrow-schema": "^1.10.7"
   }
 }

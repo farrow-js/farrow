@@ -8,7 +8,7 @@ import { codegen } from './codegen'
 
 export type CreateDenoServiceOptions = {
   entries: ApiEntries
-  namesapce?: string
+  namespace?: string
   codegen?: CodegenOptions
   /**
    * transform source code received from server
@@ -22,8 +22,8 @@ export type CreateDenoServiceOptions = {
 }
 
 export const createDenoService = (options: CreateDenoServiceOptions): RouterPipeline => {
-  const { entries, namesapce = 'client' } = options
-  const path = `/${namesapce}.ts`
+  const { entries, namespace = 'client' } = options
+  const path = `/${namespace}.ts`
 
   const service = ApiService({ entries })
 

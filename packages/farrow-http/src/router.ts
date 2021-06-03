@@ -472,7 +472,7 @@ export const createRouterPipeline = (): RouterPipeline => {
   }
 
   const createRoutingMethod = (method: string) => {
-    return (<U extends string, T extends Omit<RouterSharedSchema, 'method'>>(
+    return ((<U extends string, T extends Omit<RouterSharedSchema, 'method'>>(
       path: U,
       schema?: T,
       options?: MatchOptions,
@@ -485,7 +485,7 @@ export const createRouterPipeline = (): RouterPipeline => {
         },
         options,
       )
-    }) as unknown as RoutingMethod
+    }) as unknown) as RoutingMethod
   }
 
   const methods: RoutingMethods = {

@@ -437,7 +437,7 @@ export const Provider: React.FC<ProviderProps> = ({ controllers, children }) => 
 
     for (let i = controllers.length - 1; i >= 0; i -= 1) {
       const ctrl = controllers[i]
-      const ctrlId = (ctrl.constructor as unknown as ControllerCtor).getId()
+      const ctrlId = ((ctrl.constructor as unknown) as ControllerCtor).getId()
       ctrls[`${ctrlId}`] = ctrl
     }
 

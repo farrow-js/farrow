@@ -217,8 +217,8 @@ export const runInContext = <T>(f: () => T, ctx = new ModuleContext()) => {
     if (module && typeof module !== 'object') {
       throw new Error(`Expected function return object, but got ${module}`)
     }
-    currentModuleContext.injectModules([module as unknown as object])
-    Context.set(module as unknown as object, currentModuleContext)
+    currentModuleContext.injectModules([(module as unknown) as object])
+    Context.set((module as unknown) as object, currentModuleContext)
     return module
   } finally {
     currentModuleContext = prevModuleContext

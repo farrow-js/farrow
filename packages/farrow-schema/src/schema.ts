@@ -364,7 +364,7 @@ export const toSchemaCtor = <T extends SchemaCtorInput>(Item: T) => {
   if (isSchemaCtor(Item)) {
     return Item as ToSchemaCtor<T>
   }
-  return Struct(Item as FieldDescriptors) as unknown as ToSchemaCtor<T>
+  return (Struct(Item as FieldDescriptors) as unknown) as ToSchemaCtor<T>
 }
 
 export const toSchemaCtors = <T extends SchemaCtorInputs>(Inputs: T): ToSchemaCtors<T> => {

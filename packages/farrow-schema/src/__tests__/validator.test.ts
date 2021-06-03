@@ -3,8 +3,22 @@ import { ReadOnly, TypeOf, ReadOnlyDeep } from '../schema'
 import { createSchemaValidator, RegExp, ValidationResult, Validator, ValidatorType } from '../validator'
 import { pick, omit, keyof, partial } from '../helper'
 
-const { Type, ObjectType, Struct, Int, Float, Literal, List, Union, Intersect, Nullable, Record, Json, Any, Tuple } =
-  Schema
+const {
+  Type,
+  ObjectType,
+  Struct,
+  Int,
+  Float,
+  Literal,
+  List,
+  Union,
+  Intersect,
+  Nullable,
+  Record,
+  Json,
+  Any,
+  Tuple,
+} = Schema
 
 const assertOk = <T>(result: ValidationResult<T>): T => {
   if (result.isOk) return result.value

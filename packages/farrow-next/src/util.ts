@@ -65,12 +65,10 @@ export const forcePlainDataCheck = (input: any, path = ''): void => {
   }
 }
 
-const wrapFunctionForChecking =
-  (f: (...args: any) => any) =>
-  (...args: any) => {
-    forcePlainDataCheck(args)
-    return f(...args)
-  }
+const wrapFunctionForChecking = (f: (...args: any) => any) => (...args: any) => {
+  forcePlainDataCheck(args)
+  return f(...args)
+}
 
 export const forceCheckValue = (value: any): any => {
   if (typeof value === 'function') {

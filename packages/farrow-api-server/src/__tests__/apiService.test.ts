@@ -225,7 +225,7 @@ describe('ApiService', () => {
       })
   })
 
-  it('should response error if api throwed', async () => {
+  it('should response error if api thrown', async () => {
     const http = createHttp()
     const server = http.server()
 

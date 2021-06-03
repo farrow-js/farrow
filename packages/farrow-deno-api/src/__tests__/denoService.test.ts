@@ -71,7 +71,7 @@ const CounterService = DenoService({
   entries,
 })
 
-describe('deno-server', () => {
+describe('deno-api', () => {
   it('client in server services', async () => {
     const http = createHttp()
 

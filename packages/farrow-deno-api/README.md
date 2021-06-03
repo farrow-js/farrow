@@ -1,23 +1,23 @@
-# farrow-deno-server
+# farrow-deno-api
 
 A deno server middleware.
 
 ## Install
 
 ```sh
-npm install farrow-deno-server
+npm install farrow-deno-api
 
-yarn add farrow-deno-server
+yarn add farrow-deno-api
 ```
 
-## Frist Look
+## First Look
 
 ```ts
 // server
 import { Http } from 'farrow-http'
-import { DenoService } from from 'farrow-deno-server'
+import { DenoService } from from 'farrow-deno-api'
 
-// api defination
+// api definition
 ...
 
 const entries = {
@@ -54,10 +54,10 @@ entries: ApiEntries
 
 [ApiEntries](https://github.com/Lucifier129/farrow/blob/master/packages/farrow-api/src/api.ts#L111)
 
-### namesapce
+### namespace
 
 ```ts
-namesapce: string = 'client'
+namespace: string = 'client'
 ```
 
 it affect the path of file:

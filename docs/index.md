@@ -30,7 +30,7 @@
 
 - [farrow-next-server](../packages/farrow-next-server/README.md): Run next.js in farrow
 
-- [farrow-deno-server](../packages/farrow-deno-server/README.md): Server services for deno.
+- [farrow-deno-api](../packages/farrow-deno-api/README.md): Server services api for deno.
 
 ## Community Packages
 

@@ -1,5 +1,5 @@
 {
-  "name": "farrow-deno-server",
+  "name": "farrow-deno-api",
   "version": "1.0.0",
   "description": "A Type-Friendly Web Framework",
   "main": "dist/index.js",

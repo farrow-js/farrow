@@ -7,10 +7,16 @@
   },
   "references": [
     {
-      "path": "../farrow-pipeline/tsconfig.json"
+      "path": "../farrow-api/tsconfig.json"
     },
     {
       "path": "../farrow-schema/tsconfig.json"
+    },
+    {
+      "path": "../farrow-http/tsconfig.json"
+    },
+    {
+      "path": "../farrow-api-server/tsconfig.json"
     }
   ],
   "include": ["src"]

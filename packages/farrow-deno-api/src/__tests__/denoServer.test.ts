@@ -1,9 +1,11 @@
 import fs from 'fs'
+import fetch from 'node-fetch'
 import { agent } from 'supertest'
 import { Int, ObjectType, Type } from 'farrow-schema'
 import { Http, HttpPipelineOptions } from 'farrow-http'
 import { Api } from 'farrow-api'
 import { DenoService } from '../index'
+import { api } from './client'
 
 const createHttp = (options?: HttpPipelineOptions) => {
   return Http({
@@ -84,5 +86,22 @@ describe('deno-server', () => {
     server.close()
 
     expect(JSON.stringify(test.text)).toBe(JSON.stringify(source))
+  })
+
+  it('should work', async () => {
+    global.fetch = fetch as any
+    const http = createHttp()
+
+    http.route('/counter').use(CounterService)
+
+    const server = http.listen(3000)
+
+    expect(await api.getCount({})).toStrictEqual({ count: 0 })
+
+    expect(await api.setCount({ newCount: 1 })).toStrictEqual({ count: 1 })
+
+    expect(await api.getCount({})).toStrictEqual({ count: 1 })
+
+    server.close()
   })
 })

@@ -1,0 +1,35 @@
+{
+  "name": "farrow-deno-server",
+  "version": "1.0.0",
+  "description": "A Type-Friendly Web Framework",
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "keywords": [
+    "Web Framework",
+    "TypeScript",
+    "Functional Programming"
+  ],
+  "author": "Jade Gu",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lucifier129/farrow.git"
+  },
+  "peerDependencies": {
+    "farrow-api": "^1.8.0",
+    "farrow-api-server": "^1.10.3",
+    "farrow-http": "^1.8.0",
+    "farrow-pipeline": "^1.8.0",
+    "farrow-schema": "^1.8.0"
+  },
+  "devDependencies": {
+    "farrow-api": "^1.8.0",
+    "farrow-api-server": "^1.10.3",
+    "farrow-http": "^1.8.0",
+    "farrow-pipeline": "^1.8.0",
+    "farrow-schema": "^1.8.0"
+  }
+}

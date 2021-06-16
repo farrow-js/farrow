@@ -171,7 +171,7 @@ export const Formatter = {
 
   get<T extends SchemaCtor>(Ctor: T): FormatterMethods | undefined {
     const finalCtor = S.getSchemaCtor(Ctor)
-    const FormatterImpl = getFormatterImpl(finalCtor as Function) as FormatterImpl<SchemaTypeOf<T>> | undefined
+    const FormatterImpl = getFormatterImpl(finalCtor as unknown as Function) as FormatterImpl<SchemaTypeOf<T>> | undefined
 
     // instantiation Formatter and save to weak-map
     if (typeof FormatterImpl === 'function') {

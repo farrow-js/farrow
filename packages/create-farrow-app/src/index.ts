@@ -1,9 +1,8 @@
-// modify from https://github.com/vitejs/vite/blob/main/packages/create-app/index.js
 import fs from 'fs'
 import path from 'path'
 import minimist from 'minimist'
 import { prompt } from 'enquirer'
-import { green, blue, stripColors, magenta } from 'kolorist'
+import { green, blue, stripColors, cyan } from 'kolorist'
 
 const argv = minimist(process.argv.slice(2))
 
@@ -13,7 +12,7 @@ const cwd = process.cwd()
 const TEMPLATES = [
   blue('farrow-only'),
   green('farrow-vite-react'),
-  magenta('farrow-next-react')
+  cyan('farrow-next-react')
 ]
 
 const renameFiles = {
@@ -134,7 +133,7 @@ async function init() {
 
   pkg.name = path
     .basename(root)
-    // #2360 ensure packgae.json name is valid
+    // #2360 ensure package.json name is valid
     .trim()
     .replace(/\s+/g, '-')
     .replace(/^[._]/, '')

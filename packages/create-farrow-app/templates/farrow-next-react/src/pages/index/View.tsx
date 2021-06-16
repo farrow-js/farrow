@@ -34,16 +34,16 @@ export const View = () => {
             Learn React
           </a>
           {' | '}
-          <a className="App-link" href="https://nextjs.org/" target="_blank" rel="noopener noreferrer">
-            Learn Farrow
-          </a>
-          {' | '}
           <a
             className="App-link"
             href="https://github.com/Lucifier129/farrow"
             target="_blank"
             rel="noopener noreferrer"
           >
+            Learn Farrow
+          </a>
+          {' | '}
+          <a className="App-link" href="https://nextjs.org/" target="_blank" rel="noopener noreferrer">
             Learn Next.js
           </a>
         </p>

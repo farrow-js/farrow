@@ -48,11 +48,4 @@ export class Index extends Controller {
     })
     this.actions.updateGreet(result.greet)
   }
-
-  /**
-   * sync prev ctrl.state.count on reload
-   */
-  reload(prevCtrl: this) {
-    this.actions.setCount(prevCtrl.state.count)
-  }
 }

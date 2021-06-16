@@ -260,14 +260,6 @@ export abstract class Controller extends Module {
   preload?(): Promise<void> | void
 
   /**
-   *
-   * @param ctrl
-   * when query-changed controller will be re-created
-   * reload(ctrl) received the previous controller
-   */
-  reload?(prevCtrl: this): unknown
-
-  /**
    * page info
    */
   get page() {

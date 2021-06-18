@@ -21,19 +21,20 @@
   "peerDependencies": {
     "express": "^4.17.1",
     "farrow-api": "^1.8.0",
-    "farrow-schema": "^1.8.0"
+    "farrow-schema": "^1.8.0",
+    "farrow-pipeline": "^1.8.0"
   },
   "devDependencies": {
     "@types/express": "^4.17.12",
     "@types/lodash.get": "^4.4.6",
     "@types/supertest": "^2.0.10",
+    "express": "^4.17.1",
     "farrow-api": "^1.10.8",
-    "farrow-schema": "^1.10.8",
     "farrow-pipeline": "^1.8.0",
+    "farrow-schema": "^1.10.8",
     "supertest": "^6.0.1"
   },
   "dependencies": {
-    "lodash.get": "^4.4.2",
     "tslib": "^2.1.0"
   }
 }

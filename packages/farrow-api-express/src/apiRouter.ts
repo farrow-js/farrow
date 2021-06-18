@@ -1,5 +1,5 @@
-import { Router, RouterOptions } from 'express'
-import { List, SchemaCtor, SchemaCtorInput, Struct, toSchemaCtor, Any } from 'farrow-schema'
+import { Router, RouterOptions, RequestHandler } from 'express'
+import { SchemaCtorInput, toSchemaCtor } from 'farrow-schema'
 import { createSchemaValidator, ValidationError, Validator } from 'farrow-schema/validator'
 import { ApiDefinition, ApiType, ApiEntries, getContentType, isApi } from 'farrow-api'
 import { createContainer } from 'farrow-pipeline'
@@ -16,7 +16,7 @@ export type ApiRouterMatcher = (path: string, api: ApiType) => void
 
 type Method = 'use' | 'get' | 'post' | 'put' | 'delete' | 'patch' | 'options' | 'head'
 
-export type ApiRouter = Omit<Router, Method> & {
+export type ApiRouter = {
   use: ApiRouterMatcher
   get: ApiRouterMatcher
   post: ApiRouterMatcher
@@ -25,9 +25,10 @@ export type ApiRouter = Omit<Router, Method> & {
   patch: ApiRouterMatcher
   options: ApiRouterMatcher
   head: ApiRouterMatcher
+  router: Router
 }
 
-const INTROSPECTION_ROUTE_PATH = '__introspection__'
+const INTROSPECTION_ROUTE_PATH = '/__introspection__'
 
 export const createApiRouter = (options: ApiRouterOptions = {}): ApiRouter => {
   options = {
@@ -40,7 +41,9 @@ export const createApiRouter = (options: ApiRouterOptions = {}): ApiRouter => {
     return (path, api) => {
       if (!isApi(api)) {
         throw new Error(
-          `The object passed in is not Farrow API(defined at https://github.com/farrow-js/farrow/blob/master/packages/farrow-api/src/api.ts#L65).`,
+          `The object passed:${Object.toString.apply(
+            api,
+          )} in is not Farrow API(defined at https://github.com/farrow-js/farrow/blob/master/packages/farrow-api/src/api.ts#L65).`,
         )
       }
 
@@ -82,20 +85,19 @@ export const createApiRouter = (options: ApiRouterOptions = {}): ApiRouter => {
           const output = api.run(input, { container })
 
           const outputResult = validateApiOutput(output)
-
           if (outputResult.isErr) {
             if (options.errorStatus) {
-              response.status(502)
+              response.status(500)
             }
 
             const message = getErrorMessage(outputResult.value)
-            return OutputValidationError(message)
+            return response.json(OutputValidationError(message))
           }
 
           return response.json(output)
         } catch (error) {
           if (options.errorStatus) {
-            response.status(502)
+            response.status(500)
           }
 
           const message = (options.errorStack ? error?.stack || error?.message : error?.message) ?? ''
@@ -111,7 +113,6 @@ export const createApiRouter = (options: ApiRouterOptions = {}): ApiRouter => {
   })
 
   return {
-    ...router,
     use: createMatcher('use'),
     get: createMatcher('get'),
     post: createMatcher('post'),
@@ -120,8 +121,11 @@ export const createApiRouter = (options: ApiRouterOptions = {}): ApiRouter => {
     patch: createMatcher('patch'),
     options: createMatcher('options'),
     head: createMatcher('head'),
+    router,
   }
 }
+
+export const ApiRouter = createApiRouter
 
 const InputValidationError = (message: string) => {
   return {

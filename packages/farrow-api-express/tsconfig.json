@@ -1,0 +1,17 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "composite": true
+  },
+  "references": [
+    {
+      "path": "../farrow-schema/tsconfig.json"
+    },
+    {
+      "path": "../farrow-api/tsconfig.json"
+    }
+  ],
+  "include": ["src"]
+}

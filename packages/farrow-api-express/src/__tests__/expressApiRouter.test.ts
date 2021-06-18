@@ -3,6 +3,7 @@ import express from 'express'
 import { Int, ObjectType, Type } from 'farrow-schema'
 import { Api } from 'farrow-api'
 import { ApiRouter } from '../apiRouter'
+import { useRequest, useResponse, useNext } from '../context'
 
 class CountState extends ObjectType {
   count = {
@@ -225,5 +226,29 @@ describe('expressApiRotuer', () => {
     const server = createServer()
 
     await request(server).post('/triggerError').send({}).expect(200)
+  })
+
+  it('should get request, response, next by hook', async () => {
+    const hook = Api(
+      {
+        input: {},
+        output: {},
+      },
+      () => {
+        const request = useRequest()
+        const response = useResponse()
+        const next = useNext()
+
+        return {}
+      },
+    )
+
+    const apiRouter = ApiRouter()
+    apiRouter.use('/hook', hook)
+    const app = express()
+    app.use(express.json())
+    app.use(apiRouter.router)
+
+    await request(app).post('/hook').send({}).expect(200, {})
   })
 })

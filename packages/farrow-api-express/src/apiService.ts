@@ -54,7 +54,7 @@ export const createApiRouter = (options: ApiRouterOptions = {}): ApiRouter => {
       const OutputSchema = toSchemaCtor(getContentType(definition.output))
       const validateApiOutput = createSchemaValidator(OutputSchema)
 
-      router.use((request, response, next) => {
+      router[method](path, (request, response, next) => {
         const container = createContainer({
           request: RequestContext.create(request),
           response: ResponseContext.create(response),

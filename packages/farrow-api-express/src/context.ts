@@ -19,7 +19,7 @@ export const useResponse = () => {
 export const NextContext = createContext<NextFunction | null>(null)
 
 export const useNext = () => {
-  const response = ResponseContext.use().value
+  const response = NextContext.use().value
 
   return response
 }

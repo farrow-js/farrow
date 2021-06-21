@@ -1,0 +1,36 @@
+{
+  "name": "farrow-express",
+  "version": "1.10.8",
+  "description": "A Type-Friendly Web Framework",
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "keywords": [
+    "Web Framework",
+    "TypeScript",
+    "Functional Programming"
+  ],
+  "author": "Jade Gu",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lucifier129/farrow.git"
+  },
+  "peerDependencies": {
+    "express": "^4.17.1",
+    "farrow-http": "^1.10.8",
+    "farrow-pipeline": "^1.8.0"
+  },
+  "devDependencies": {
+    "express": "^4.17.1",
+    "farrow-http": "^1.10.8",
+    "farrow-pipeline": "^1.8.0",
+    "farrow-schema": "^1.8.0",
+    "supertest": "^6.0.1"
+  },
+  "dependencies": {
+    "tslib": "^2.1.0"
+  }
+}

@@ -1,6 +1,6 @@
-# farrow-express
+# farrow-koa
 
-Adapter for `farrow-http` in [express](https://github.com/expressjs/express) app.
+Adapter for `farrow-http` in [koa](https://github.com/koajs/koa) app.
 
 ## Setup
 
@@ -8,10 +8,10 @@ Install via npm or yarn
 
 ```sh
 # via npm
-npm install --save farrow-express
+npm install --save farrow-koa
 
 # via yarn
-yarn add farrow-express
+yarn add farrow-koa
 ```
 
 Usage
@@ -35,14 +35,14 @@ http
 And then create a express app:
 
 ```ts
-import express from 'express'
+import Koa from 'koa'
 
 const PORT = 3000
 
-const app = express()
+const app = new Koa()
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
+app.use(async (ctx) => {
+  ctx.body = 'Hello World'
 })
 
 app.listen(PORT, () => {
@@ -53,7 +53,7 @@ app.listen(PORT, () => {
 and combine them:
 
 ```ts
-import express from 'express'
+import Koa from 'koa'
 import { Http } from 'farrow-http'
 import { adapter } from 'farrow-express'
 
@@ -69,17 +69,15 @@ http
     return Response.text(JSON.stringify(data))
   })
 
-const app = express()
+const app = nwe Koa()
 
-app.get('/', (req, res) => {
-  res.send('Hello World!')
-})
-
-app.use('/farrow', adapter(http))
+app.use(adapter(http))
 
 app.listen(PORT, () => {
   console.log(`Example app listening at http://localhost:${PORT}`)
 })
 ```
 
-Then, you can use work with farrow stack under route path `/farrow` in a express app.
+Then, you can use work with farrow stack in a koa app.
+
+Or, you can combine them by `koa-router` to a specifical route path in koa app.

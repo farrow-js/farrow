@@ -35,6 +35,9 @@
       "path": "./packages/farrow-express/tsconfig.json"
     },
     {
+      "path": "./packages/farrow-koa/tsconfig.json"
+    },
+    {
       "path": "./packages/farrow/tsconfig.json"
     },
     {

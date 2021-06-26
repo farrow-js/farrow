@@ -1,7 +1,7 @@
 import { Int, Type } from 'farrow-schema'
 import { Api, ApiEntries } from '../api'
 import { toJSON } from '../toJSON'
-import { controvert } from '../controvert'
+import { controvertEntries } from '../controvert'
 
 describe('controvert', () => {
   it('work', () => {
@@ -18,10 +18,10 @@ describe('controvert', () => {
     })
 
     const entries: ApiEntries = {
-      incre
+      incre,
     }
 
-    const newEntries = controvert(toJSON(entries))
+    const newEntries = controvertEntries(toJSON(entries))
 
     expect('incre' in newEntries).toBeTruthy()
   })

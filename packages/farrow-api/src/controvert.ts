@@ -24,7 +24,7 @@ import {
   Strict,
   NonStrict,
   ReadOnly,
-  ReadOnlyDeep
+  ReadOnlyDeep,
 } from 'farrow-schema'
 import { Api, ApiEntries, ApiType } from './api'
 import type {
@@ -45,12 +45,11 @@ import type {
   FormatStrictType,
   FormatNonStrictType,
   FormatReadOnlyType,
-  FormatReadonlyDeepType
+  FormatReadonlyDeepType,
 } from 'farrow-schema/formatter'
 import type { FormatResult, FormatEntries, FormatApi } from './toJSON'
 
-
-export const controvert = (input: FormatResult): ApiEntries => {
+export const controvertEntries = (input: FormatResult): ApiEntries => {
   const types = controvertTypes(input.types)
 
   const findType = (typeId: number): SchemaCtor => {
@@ -76,7 +75,7 @@ export const controvert = (input: FormatResult): ApiEntries => {
       input: controvertFieldType(input.input),
       output: controvertFieldType(input.output),
       description: input.description,
-      deprecated: input.deprecated
+      deprecated: input.deprecated,
     })
   }
 
@@ -97,7 +96,6 @@ export const controvert = (input: FormatResult): ApiEntries => {
 
   return controvertEntries(input.entries)
 }
-
 
 export const controvertTypes = (input: FormatTypes): Map<string, SchemaCtor> => {
   const controvertType = (input: FormatType): SchemaCtor => {
@@ -144,6 +142,10 @@ export const controvertTypes = (input: FormatTypes): Map<string, SchemaCtor> => 
       case 'ReadOnlyDeep': {
         return controvertReadOnlyDeepType(input)
       }
+      // for eslint
+      default: {
+        throw new Error(`Unknown format type: ${input}`)
+      }
     }
   }
 
@@ -182,7 +184,6 @@ export const controvertTypes = (input: FormatTypes): Map<string, SchemaCtor> => 
         super()
 
         for (const name in fields) {
-          // @ts-ignore
           this[name] = fields[name]
         }
       }

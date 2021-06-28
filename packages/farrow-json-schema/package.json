@@ -1,0 +1,35 @@
+{
+  "name": "farrow-json-schema",
+  "version": "1.10.8",
+  "description": "A type-friendly BFF framework",
+  "main": "dist/index.js",
+  "scripts": {
+    "start": ""
+  },
+  "files": [
+    "src",
+    "dist"
+  ],
+  "keywords": [
+    "Web Framework",
+    "TypeScript",
+    "Functional Programming"
+  ],
+  "author": "Jade Gu",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lucifier129/farrow.git"
+  },
+  "peerDependencies": {
+    "farrow-schema": "^1.10.8"
+  },
+  "devDependencies": {
+    "farrow-api": "^1.10.8",
+    "farrow-pipeline": "^1.10.6",
+    "farrow-schema": "^1.10.8"
+  },
+  "dependencies": {
+    "@types/json-schema": "^7.0.7"
+  }
+}

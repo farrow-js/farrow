@@ -20,7 +20,7 @@ import {
   useBasenames,
   HttpPipeline,
 } from 'farrow-http'
-import { adapte } from '../adapter'
+import { adapter } from '../adapter'
 
 const delay = (time: number) => {
   return new Promise((resolve) => {
@@ -37,7 +37,7 @@ const createHttp = (options?: HttpPipelineOptions) => {
 
 const createApp = (http: HttpPipeline) => {
   const app = express()
-  app.use(adapte(http))
+  app.use(adapter(http))
   return app
 }
 
@@ -575,8 +575,8 @@ describe('Http', () => {
         .expect(200, await read('README.md'))
 
       await request(server)
-        .get('/static/dist/index.js')
-        .expect(200, await read('dist/index.js'))
+        .get('/static/tsconfig.json')
+        .expect(200, await read('tsconfig.json'))
 
       await request(server).get('/static/abc').expect(404)
     })
@@ -610,7 +610,7 @@ describe('Http', () => {
 
       await request(server).get('/static/foo.js').expect(200, content.toString())
 
-      await request(server).get('/static/../bar.js').expect(404, '404 Not Found')
+      await request(server).get('/static/../bar.js').expect(404)
     })
 
     it('support capturing response by type', async () => {

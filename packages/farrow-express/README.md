@@ -16,7 +16,7 @@ yarn add farrow-express
 
 Usage
 
-Create a `farrow-http` app frist:
+Create a `farrow-http` app first:
 
 ```ts
 import { Http } from 'farrow-http'

@@ -22,7 +22,15 @@ import { JsonType } from 'farrow-schema'
 
 import { RequestCookies, RequestHeaders, RequestQuery, RequestInfo } from './requestInfo'
 
-import { ResponseInfo, Status, Headers, Cookies, RedirectBody, FileBodyOptions } from './responseInfo'
+import {
+  ResponseInfo,
+  Status,
+  Headers,
+  Cookies,
+  RedirectBody,
+  FileBodyOptions,
+  CustomBodyHandler,
+} from './responseInfo'
 
 import { Response } from './response'
 
@@ -50,8 +58,12 @@ export type HttpPipelineOptions = {
   errorStack?: boolean
 }
 
+export type HttpHandlerOptions = {
+  onLast?: CustomBodyHandler
+}
+
 export type HttpPipeline = RouterPipeline & {
-  handle: (req: IncomingMessage, res: ServerResponse) => Promise<void>
+  handle: (req: IncomingMessage, res: ServerResponse, options?: HttpHandlerOptions) => Promise<void>
   listen: (...args: Parameters<Server['listen']>) => Server
   server: () => Server
 }
@@ -70,7 +82,7 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
 
   const router = Router()
 
-  const handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
+  const handleRequest: HttpPipeline['handle'] = async (req, res, options) => {
     if (typeof req.url !== 'string') {
       throw new Error(`req.url is not existed`)
     }
@@ -114,7 +126,12 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
 
     const responser = await router.run(requestInfo, {
       container,
-      onLast: () => Response.status(404).text('404 Not Found'),
+      onLast: () => {
+        if (options?.onLast) {
+          return Response.custom(options.onLast)
+        }
+        return Response.status(404).text('404 Not Found')
+      },
     })
 
     await handleResponse({
@@ -126,7 +143,7 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
     })
   }
 
-  const handle: HttpPipeline['handle'] = async (req, res) => {
+  const handle: HttpPipeline['handle'] = async (req, res, options) => {
     if (logger) {
       const startTime = Date.now()
       const method = req.method ?? 'GET'
@@ -166,7 +183,7 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
     }
 
     try {
-      return await handleRequest(req, res)
+      return await handleRequest(req, res, options)
     } catch (error) {
       const message = (config.errorStack ? error?.stack || error?.message : error?.message) ?? ''
 
@@ -277,7 +294,7 @@ export const handleResponse = (params: ResponseParams) => {
       url = referrer
     }
 
-    // handle routename and basename
+    // handle route name and basename
     if (body.usePrefix && !url.startsWith('//') && url.startsWith('/')) {
       url = prefix + url
     }

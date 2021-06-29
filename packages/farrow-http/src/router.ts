@@ -12,8 +12,6 @@ import {
   createAsyncPipeline,
 } from 'farrow-pipeline'
 
-import * as asyncHooksNode from 'farrow-pipeline/asyncHooks.node'
-
 import * as Schema from 'farrow-schema'
 import { ValidationError } from 'farrow-schema/validator'
 
@@ -26,9 +24,6 @@ import { MaybeAsyncResponse, matchBodyType, Response } from './response'
 import { MarkReadOnlyDeep, ParseUrl } from './types'
 import { HttpError } from './HttpError'
 import { getStats } from './util'
-
-// enable async hooks
-asyncHooksNode.enable()
 
 export { Pathname }
 

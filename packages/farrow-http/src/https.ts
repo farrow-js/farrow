@@ -4,7 +4,7 @@ import { parse as parseQuery } from 'qs'
 
 import { createContainer } from 'farrow-pipeline'
 
-import { handleResponse } from './http'
+import { handleResponse, HttpHandlerOptions } from './http'
 import { Router } from './router'
 import { Response } from './response'
 import { createLogger } from './logger'
@@ -26,7 +26,7 @@ export type HttpsPipelineOptions = HttpPipelineOptions & {
 }
 
 export type HttpsPipeline = RouterPipeline & {
-  handle: (req: IncomingMessage, res: ServerResponse) => Promise<void>
+  handle: (req: IncomingMessage, res: ServerResponse, options?: HttpHandlerOptions) => Promise<void>
   listen: (...args: Parameters<Server['listen']>) => Server
   server: () => Server
 }
@@ -45,7 +45,7 @@ export const createHttpsPipeline = (options?: HttpsPipelineOptions): HttpsPipeli
 
   const router = Router()
 
-  const handleRequest = async (req: IncomingMessage, res: ServerResponse) => {
+  const handleRequest: HttpsPipeline['handle'] = async (req, res, options) => {
     if (typeof req.url !== 'string') {
       throw new Error(`req.url is not existed`)
     }
@@ -89,7 +89,12 @@ export const createHttpsPipeline = (options?: HttpsPipelineOptions): HttpsPipeli
 
     const responser = await router.run(requestInfo, {
       container,
-      onLast: () => Response.status(404).text('404 Not Found'),
+      onLast: () => {
+        if (options?.onLast) {
+          return Response.custom(options.onLast)
+        }
+        return Response.status(404).text('404 Not Found')
+      },
     })
 
     await handleResponse({
@@ -101,7 +106,7 @@ export const createHttpsPipeline = (options?: HttpsPipelineOptions): HttpsPipeli
     })
   }
 
-  const handle: HttpsPipeline['handle'] = async (req, res) => {
+  const handle: HttpsPipeline['handle'] = async (req, res, options) => {
     if (logger) {
       const startTime = Date.now()
       const method = req.method ?? 'GET'
@@ -141,7 +146,7 @@ export const createHttpsPipeline = (options?: HttpsPipelineOptions): HttpsPipeli
     }
 
     try {
-      return await handleRequest(req, res)
+      return await handleRequest(req, res, options)
     } catch (error) {
       const message = (config.errorStack ? error?.stack || error?.message : error?.message) ?? ''
 

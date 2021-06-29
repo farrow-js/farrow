@@ -1,3 +1,8 @@
+import * as asyncHooksNode from 'farrow-pipeline/asyncHooks.node'
+
+// enable async hooks
+asyncHooksNode.enable()
+
 export * from './http'
 export * from './https'
 export * from './router'

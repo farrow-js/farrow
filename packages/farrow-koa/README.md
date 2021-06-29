@@ -16,7 +16,7 @@ yarn add farrow-koa
 
 Usage
 
-Create a `farrow-http` app frist:
+Create a `farrow-http` app first:
 
 ```ts
 import { Http } from 'farrow-http'
@@ -55,7 +55,7 @@ and combine them:
 ```ts
 import Koa from 'koa'
 import { Http } from 'farrow-http'
-import { adapter } from 'farrow-express'
+import { adapter } from 'farrow-koa'
 
 const PORT = 3000
 
@@ -80,4 +80,4 @@ app.listen(PORT, () => {
 
 Then, you can use work with farrow stack in a koa app.
 
-Or, you can combine them by `koa-router` to a specifical route path in koa app.
+Or, you can combine them by `koa-router` to a specific route path in koa app.

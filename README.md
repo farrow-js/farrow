@@ -92,7 +92,7 @@ and then:
 
 - `npm run dev` for developing
 - `npm run build` for bundling the source code
-- `npm run start` for runing the output code of bundler
+- `npm run start` for running the output code of bundler
 
 `farrow` assumes that your source code is in `src` folder, and the output code is in `dist` folder.
 

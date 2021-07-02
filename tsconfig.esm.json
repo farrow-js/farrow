@@ -14,6 +14,9 @@
       "path": "./packages/farrow-schema/tsconfig.esm.json"
     },
     {
+      "path": "./packages/farrow-json-schema/tsconfig.esm.json"
+    },
+    {
       "path": "./packages/farrow-module/tsconfig.esm.json"
     },
     {

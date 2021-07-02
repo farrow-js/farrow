@@ -32,6 +32,9 @@
       "path": "./packages/farrow-api-client/tsconfig.json"
     },
     {
+      "path": "./packages/farrow-json-schema/tsconfig.json"
+    },
+    {
       "path": "./packages/farrow-express/tsconfig.json"
     },
     {

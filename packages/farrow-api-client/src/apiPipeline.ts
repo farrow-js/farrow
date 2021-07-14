@@ -23,6 +23,12 @@ import type {
 
 export { ApiRequest, ApiResponse, JsonType, ApiErrorResponse, ApiSuccessResponse }
 
+export type Fetcher = (request: ApiRequest) => Promise<ApiResponse>
+
+export type ApiPipelineOptions = {
+  fetcher?: Fetcher
+}
+
 export type ApiPipeline = AsyncPipeline<ApiRequest, ApiResponse> & {
   match(pattern: string | RegExp, middleware: MiddlewareInput<ApiRequest, MaybeAsync<ApiResponse>>): void
   invoke(url: string, calling: SingleCalling): Promise<JsonType | Error>
@@ -30,7 +36,7 @@ export type ApiPipeline = AsyncPipeline<ApiRequest, ApiResponse> & {
   invoke(url: string, calling: Calling): Promise<JsonType | Error | (JsonType | Error)[]>
 }
 
-export const createApiPipeline = (): ApiPipeline => {
+export const createApiPipeline = ({ fetcher = defaultFetcher }: ApiPipelineOptions = {}): ApiPipeline => {
   const pipeline = createAsyncPipeline<ApiRequest, ApiResponse>()
 
   function run(
@@ -90,7 +96,7 @@ export const createApiPipeline = (): ApiPipeline => {
 
 export const apiPipeline = createApiPipeline()
 
-export const fetcher = async (request: ApiRequest): Promise<ApiResponse> => {
+export const defaultFetcher = async (request: ApiRequest): Promise<ApiResponse> => {
   const { url, calling, options: init } = request
   const options: RequestInit = {
     method: 'POST',

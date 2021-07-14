@@ -148,3 +148,29 @@ export type ApiPipelineWithUrl = AsyncPipeline<ApiRequest, ApiResponse> & {
   invoke(body: ApiRequest['body']): Promise<JsonType>
 }
 ```
+
+## createApiPipeline
+
+You can create new `ApiPipeline`, not use the global and default `ApiPipeline`.
+
+```ts
+const myApiPipeline = createApiPipeline({ fetcher })
+```
+
+### Options
+
+```ts
+export type Fetcher = (request: ApiRequest) => Promise<ApiResponse>
+
+export type ApiPipelineOptions = {
+  fetcher?: Fetcher
+}
+```
+
+#### fetcher
+
+Create new `ApiPipeline` by custom `fetcher`:
+
+```ts
+const myApiPipeline = createApiPipeline({ fetcher })
+```

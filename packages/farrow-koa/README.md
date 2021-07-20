@@ -69,7 +69,7 @@ http
     return Response.text(JSON.stringify(data))
   })
 
-const app = nwe Koa()
+const app = new Koa()
 
 app.use(adapter(http))
 

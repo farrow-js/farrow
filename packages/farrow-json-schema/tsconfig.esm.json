@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "module": "ES2020",
+    "target": "ES2018",
+    "outDir": "./esm"
+  },
+  "references": [
+    {
+      "path": "../farrow-api-server/tsconfig.json"
+    }
+  ],
+  "include": ["src"]
+}

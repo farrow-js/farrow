@@ -149,7 +149,6 @@ async function init() {
   }
   console.log(`  ${pkgManager === 'yarn' ? `yarn` : `npm install`}`)
   console.log(`  ${pkgManager === 'yarn' ? `yarn dev` : `npm run dev`}`)
-  console.log()
 }
 
 function copy(src: string, dest: string) {

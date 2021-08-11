@@ -61,9 +61,9 @@ export type RemoveTodoInput = {
 }
 
 /**
- * {@label RemoveTodoOuput}
+ * {@label RemoveTodoOutput}
  */
-export type RemoveTodoOuput = {
+export type RemoveTodoOutput = {
   /**
    * @remarks Remain todo list
    */
@@ -87,6 +87,6 @@ export const createApiClient = (options: CreateApiClientOptions) => {
      * @remarks remove todo
      */
     removeTodo: (input: RemoveTodoInput) =>
-      options.fetcher({ path: ['removeTodo'], input }) as Promise<RemoveTodoOuput>,
+      options.fetcher({ path: ['removeTodo'], input }) as Promise<RemoveTodoOutput>,
   }
 }

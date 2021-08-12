@@ -54,9 +54,9 @@ export type RemoveTodoInput = {
 }
 
 /**
- * {@label RemoveTodoOuput}
+ * {@label RemoveTodoOutput}
  */
-export type RemoveTodoOuput = {
+export type RemoveTodoOutput = {
   /**
    * @remarks Remain todo list
    */
@@ -74,5 +74,5 @@ export const api = {
    * @remarks remove todo
    */
   removeTodo: (input: RemoveTodoInput) =>
-    apiPipeline.invoke(url, { path: ['removeTodo'], input }) as Promise<RemoveTodoOuput>,
+    apiPipeline.invoke(url, { path: ['removeTodo'], input }) as Promise<RemoveTodoOutput>,
 }

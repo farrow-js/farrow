@@ -52,6 +52,7 @@ export type PipelineOptions = {
 export type RunPipelineOptions<I = unknown, O = unknown> = {
   container?: Container
   onLast?: (input: I) => O
+  onLastWithContext?: boolean
 }
 
 export type MiddlewareInput<I = unknown, O = unknown> = Middleware<I, O> | { middleware: Middleware<I, O> }
@@ -88,10 +89,15 @@ export const createPipeline = <I, O>(options?: PipelineOptions) => {
     return pipeline
   }
 
-  const createCurrentCounter = (hooks: Hooks, onLast?: (input: I) => O) => {
+  const createCurrentCounter = (hooks: Hooks, onLast?: (input: I) => O, onLastWithContext?: boolean) => {
     return createCounter<I, O>((index, input, next) => {
       if (index >= middlewares.length) {
-        if (onLast) return onLast(input)
+        if (onLast) {
+          if (onLastWithContext) {
+            return runHooks(() => onLast(input), hooks)
+          }
+          return onLast(input)
+        }
         throw new Error(`Expect returning a value, but all middlewares just calling next()`)
       }
 
@@ -112,7 +118,8 @@ export const createPipeline = <I, O>(options?: PipelineOptions) => {
     let counter = container === currentContainer ? currentCounter : createCurrentCounter(hooks)
 
     if (options?.onLast) {
-      counter = createCurrentCounter(hooks, options.onLast)
+      const onLastWithContext = typeof options.onLastWithContext === 'boolean' ? options.onLastWithContext : true
+      counter = createCurrentCounter(hooks, options.onLast, onLastWithContext)
     }
 
     const result = counter.start(input)

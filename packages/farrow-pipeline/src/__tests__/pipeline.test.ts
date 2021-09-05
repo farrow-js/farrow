@@ -597,4 +597,33 @@ describe('createPipeline', () => {
       },
     ])
   })
+
+  it('onLast with context', async () => {
+    const pipeline = createAsyncPipeline<void, number>()
+
+    const CountContext = createContext(0)
+
+    pipeline.use(async (_, next) => {
+      CountContext.set(1)
+      await delay(0)
+      return next()
+    })
+
+    const result = await pipeline.run(void 0, {
+      onLast: () => {
+        return CountContext.get()
+      },
+    })
+
+    expect(result).toBe(1)
+
+    await expect(
+      pipeline.run(void 0, {
+        onLast: () => {
+          return CountContext.get()
+        },
+        onLastWithContext: false,
+      }),
+    ).rejects.toThrow()
+  })
 })

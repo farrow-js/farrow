@@ -87,8 +87,8 @@ export class RemoveTodoInput extends ObjectType {
   }
 }
 
-// define RemoveTodoOuput
-export class RemoveTodoOuput extends ObjectType {
+// define RemoveTodoOutput
+export class RemoveTodoOutput extends ObjectType {
   todos = {
     description: 'Remain todo list',
     [Type]: Todos,
@@ -99,7 +99,7 @@ export class RemoveTodoOuput extends ObjectType {
 export const removeTodo = Api({
   description: 'remove todo',
   input: RemoveTodoInput,
-  output: RemoveTodoOuput,
+  output: RemoveTodoOutput,
 })
 
 // an api is also a pipeline

@@ -80,7 +80,7 @@ export class RemoveTodoInput extends ObjectType {
   }
 }
 
-export class RemoveTodoOuput extends ObjectType {
+export class RemoveTodoOutput extends ObjectType {
   todos = {
     description: 'Remain todo list',
     [Type]: Todos,
@@ -91,7 +91,7 @@ export const removeTodo = Api(
   {
     description: 'remove todo',
     input: RemoveTodoInput,
-    output: RemoveTodoOuput,
+    output: RemoveTodoOutput,
   },
   (input) => {
     state.todos = state.todos.filter((todo) => todo.id !== input.id)

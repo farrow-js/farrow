@@ -36,7 +36,7 @@ export const cors = (
         return Response.status(204).string('')
       }
       return next(request)
-    } catch (error) {
+    } catch (error: any) {
       return Response.status(500).text(error.message)
     }
   }

@@ -288,7 +288,7 @@ describe('createPipeline', () => {
     try {
       await pipeline.run(1)
     } catch (e) {
-      error = e
+      error = e as Error
     }
 
     expect(error === null).toBe(false)
@@ -318,7 +318,7 @@ describe('createPipeline', () => {
     try {
       await pipeline.run(1)
     } catch (e) {
-      error = e
+      error = e as Error
     }
 
     expect(error === null).toBe(false)

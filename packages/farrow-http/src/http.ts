@@ -184,7 +184,7 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
 
     try {
       return await handleRequest(req, res, options)
-    } catch (error) {
+    } catch (error: any) {
       const message = (config.errorStack ? error?.stack || error?.message : error?.message) ?? ''
 
       if (!res.headersSent) {
@@ -327,7 +327,7 @@ export const handleResponse = (params: ResponseParams) => {
   const handleFile = async (filename: string, options?: FileBodyOptions) => {
     try {
       await access(filename, fs.constants.F_OK | fs.constants.R_OK)
-    } catch (error) {
+    } catch (error: any) {
       await handleResponse({
         ...params,
         responseInfo: Response.status(404).text(error.message).info,

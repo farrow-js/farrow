@@ -55,7 +55,7 @@ export const vite = (options?: InlineConfig): ViteRouterPipeline => {
           res.statusCode = 200
           res.setHeader('Content-Type', 'text/html')
           res.end(html)
-        } catch (error) {
+        } catch (error: any) {
           if (!res.headersSent) {
             res.setHeader('Content-Type', 'text/plain')
           }

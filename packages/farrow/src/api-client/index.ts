@@ -87,7 +87,7 @@ export const createApiClient = (options: ApiClientOptions) => {
 
     try {
       return JSON.parse(text) as { output: FormatResult }
-    } catch (error) {
+    } catch (error: any) {
       console.log(`Failed to fetch ${config.src}\nerror: ${error.message}\nresponse:${text}`)
     }
   }
@@ -131,7 +131,7 @@ export const createApiClient = (options: ApiClientOptions) => {
     tid = setInterval(async () => {
       try {
         await sync()
-      } catch (error) {
+      } catch (error: any) {
         console.log(error.stack)
       }
     }, config.pollingInterval)

@@ -147,7 +147,7 @@ export const createHttpsPipeline = (options?: HttpsPipelineOptions): HttpsPipeli
 
     try {
       return await handleRequest(req, res, options)
-    } catch (error) {
+    } catch (error: any) {
       const message = (config.errorStack ? error?.stack || error?.message : error?.message) ?? ''
 
       if (!res.headersSent) {

@@ -195,7 +195,7 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
       try {
         await build()
         run()
-      } catch (error) {
+      } catch (error: any) {
         console.log('watcher:', error.stack)
       }
     })

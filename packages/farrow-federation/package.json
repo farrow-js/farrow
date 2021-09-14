@@ -1,0 +1,42 @@
+{
+  "name": "farrow-federation",
+  "version": "1.10.9",
+  "description": "A Type-Friendly Web Framework",
+  "main": "dist/index.js",
+  "files": [
+    "dist",
+    "src"
+  ],
+  "keywords": [
+    "Web Framework",
+    "TypeScript",
+    "Functional Programming"
+  ],
+  "author": "Jade Gu",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Lucifier129/farrow.git"
+  },
+  "peerDependencies": {
+    "farrow-api": "^1.10.9",
+    "farrow-api-server": "^1.10.9",
+    "farrow-http": "^1.10.9",
+    "farrow-schema": "^1.10.8"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.1",
+    "@types/lodash.get": "^4.4.6",
+    "@types/node": "^16.7.10",
+    "@types/supertest": "^2.0.11",
+    "farrow-api": "^1.10.9",
+    "farrow-api-server": "^1.10.9",
+    "farrow-http": "^1.10.9",
+    "farrow-schema": "^1.10.8",
+    "farrow-cors": "^1.10.8",
+    "supertest": "^6.0.1"
+  },
+  "dependencies": {
+    "node-fetch": "^2.6.2"
+  }
+}

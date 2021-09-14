@@ -154,7 +154,7 @@ export abstract class Controller extends Module {
         selectedState = latestSelectedState.current
       }
     } catch (err) {
-      if (latestSubscriptionCallbackError.current) {
+      if (err instanceof Error && latestSubscriptionCallbackError.current) {
         err.message += `\nThe error may be correlated with this previous error:\n${latestSubscriptionCallbackError.current.stack}\n\n`
       }
 
@@ -193,7 +193,7 @@ export abstract class Controller extends Module {
           // is re-rendered, the selectors are called again, and
           // will throw again, if neither props nor store state
           // changed
-          latestSubscriptionCallbackError.current = err
+          latestSubscriptionCallbackError.current = err as Error
         }
 
         forceRender()

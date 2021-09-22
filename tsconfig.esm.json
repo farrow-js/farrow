@@ -22,5 +22,6 @@
     {
       "path": "./packages/farrow-next/tsconfig.esm.json"
     }
-  ]
+  ],
+  "exclude": ["./packages/create-farrow-app/templates"]
 }

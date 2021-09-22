@@ -67,19 +67,17 @@ export type RedirectBody = {
   value: string
 }
 
-export type FileBodyOptions =
-  | string
-  | {
-      flags?: string
-      encoding?: BufferEncoding
-      fd?: number
-      mode?: number
-      autoClose?: boolean
-      emitClose?: boolean
-      start?: number
-      end?: number
-      highWaterMark?: number
-    }
+export type FileBodyOptions = {
+  flags?: string
+  encoding?: BufferEncoding
+  fd?: number
+  mode?: number
+  autoClose?: boolean
+  emitClose?: boolean
+  start?: number
+  end?: number
+  highWaterMark?: number
+}
 
 export type FileBody = {
   type: 'file'

@@ -1,5 +1,4 @@
 import { Router, Response } from 'farrow-http'
-import { FormatResult } from 'farrow-api/dist/toJSON'
 import nodeFetch from 'node-fetch'
 import {
   ApiError,
@@ -150,7 +149,4 @@ export const createFederationServices = async (services: ApiServices, customOpti
   return router
 }
 
-export type FederationInfo = {
-  schema: FormatResult
-  entryMap: ApiEntryMap
-}
+export const Federation = createFederationServices

@@ -3,7 +3,12 @@ import { FormatType, FormatTypes } from 'farrow-schema/formatter'
 import { updateApi, updateType } from './helpers'
 import { getIntrospection } from './introspection'
 
-import type { ApiService, ApiServices, FederationOptions, FederationInfo, ApiEntry, ApiEntryMap } from './federation'
+import { ApiService, ApiServices, FederationOptions, ApiEntry, ApiEntryMap } from './federation'
+
+export type FederationInfo = {
+  schema: FormatResult
+  entryMap: ApiEntryMap
+}
 
 export const getFederationInfo = async (
   services: ApiServices,

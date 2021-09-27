@@ -7,7 +7,9 @@
     "farrow": "./bin/scripts.js"
   },
   "scripts": {
-    "build": "tsc -b"
+    "build": "tsc -b",
+    "test": "jest",
+    "test:coverage": "jest --collectCoverage --coverage"
   },
   "files": [
     "dist",
@@ -28,12 +30,17 @@
   },
   "devDependencies": {
     "@types/fs-extra": "^9.0.6",
+    "@types/jest": "^27.0.1",
     "@types/node-fetch": "^2.5.8",
+    "@types/shelljs": "^0.8.9",
     "@types/supertest": "^2.0.10",
     "farrow-api-server": "^1.10.9",
     "farrow-http": "^1.10.9",
     "farrow-pipeline": "^1.10.6",
-    "supertest": "^6.0.1"
+    "jest": "^27.2.2",
+    "shelljs": "^0.8.4",
+    "supertest": "^6.0.1",
+    "ts-jest": "^27.0.5"
   },
   "dependencies": {
     "chokidar": "^3.4.1",

@@ -7,6 +7,9 @@
     "src",
     "dist"
   ],
+  "scripts": {
+    "build": "tsc -b"
+  },
   "keywords": [
     "Next.js",
     "Web Framework",

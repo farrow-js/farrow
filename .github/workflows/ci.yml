@@ -32,7 +32,7 @@ jobs:
         uses: actions/checkout@v2
 
       - name: Init
-        run: npm install -g lerna && npm install && npm run bootstrap
+        run: npm install -g pnpm && pnpm run init
 
       - name: Format & Lint & Build & Test
-        run: npm run format && npm run lint && npm run build && npm run test
+        run: pnpm run format && pnpm run lint && pnpm run build && pnpm run test

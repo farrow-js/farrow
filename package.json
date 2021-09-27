@@ -20,7 +20,7 @@
     "format": "run-p format:source format:other",
     "format:other": "prettier ./**/*.{md,yml,json,html} --write",
     "format:source": "prettier ./**/*.{ts,tsx,js} --write",
-    "init": "pnpm install & pnpm run build",
+    "init": "pnpm install && pnpm run build",
     "test": "pnpm run test --filter ./packages",
     "test:coverage": "pnpm run test:coverage --filter ./packages",
     "release": "lerna publish",

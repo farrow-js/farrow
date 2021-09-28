@@ -218,7 +218,7 @@ export const partialStruct = <T extends StructType>(Ctor: new () => T) => {
   const instance = getInstance(Ctor)
 
   return class partial extends PartialType {
-    Item = (S.Struct(getPartialFields(instance.descriptors)) as unknown) as typeof Ctor
+    Item = S.Struct(getPartialFields(instance.descriptors)) as unknown as typeof Ctor
   }
 }
 
@@ -226,7 +226,7 @@ export const partialObject = <T extends ObjectType>(Ctor: new () => T) => {
   const instance = getInstance(Ctor)
 
   return class partial extends PartialType {
-    Item = (S.Struct(getPartialFields((instance as unknown) as S.FieldDescriptors)) as unknown) as typeof Ctor
+    Item = S.Struct(getPartialFields(instance as unknown as S.FieldDescriptors)) as unknown as typeof Ctor
   }
 }
 

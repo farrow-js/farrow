@@ -26,5 +26,8 @@
     "minimist": "^1.2.5",
     "tslib": "^2.1.0",
     "yargs": "^15.3.1"
+  },
+  "devDependencies": {
+    "@types/minimist": "^1.2.2"
   }
 }

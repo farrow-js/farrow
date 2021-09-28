@@ -5,31 +5,28 @@
   "author": "https://github.com/Lucifier129",
   "private": true,
   "engines": {
-    "node": "14.x"
+    "node": ">=14.x"
   },
   "scripts": {
-    "build": "run-s clean build:source clean:tests",
+    "build": "run-s clean:build build:source clean:tests",
     "build:dist": "tsc -b ./tsconfig.dist.json",
     "build:esm": "tsc -b ./tsconfig.esm.json",
     "build:source": "run-p build:dist build:esm",
-    "clean": "shx rm -rf ./packages/*/*.tsbuildinfo && shx rm -rf ./packages/*/{dist,esm}",
+    "clean": "run-p clean:build clean:deps",
+    "clean:build": "shx rm -rf ./packages/*/*.tsbuildinfo && shx rm -rf ./packages/*/{dist,esm}",
+    "clean:deps": "shx rm -rf ./{packages,examples}/*/node_modules && rm -rf node_modules",
     "clean:tests": "shx rm -rf ./packages/*/{dist,esm}/**/__tests__",
     "lint": "eslint --report-unused-disable-directives ./packages",
     "format": "run-p format:source format:other",
     "format:other": "prettier ./**/*.{md,yml,json,html} --write",
     "format:source": "prettier ./**/*.{ts,tsx,js} --write",
-    "test": "jest",
-    "test:coverage": "jest --collectCoverage --coverage",
-    "bootstrap": "lerna bootstrap --hoist",
-    "init": "npm install && npm run bootstrap && npm run build",
+    "init": "pnpm install && pnpm run build",
+    "test": "pnpm run test --filter ./packages",
+    "test:coverage": "pnpm run test:coverage --filter ./packages",
     "release": "lerna publish",
-    "prerelease": "npm run format && git add -A && npm run build && npm run test"
+    "prerelease": "pnpm run format && git add -A && pnpm run build && pnpm run test"
   },
   "devDependencies": {
-    "@types/jest": "^26.0.24",
-    "@types/node": "^14.17.15",
-    "@types/shelljs": "^0.7.9",
-    "@types/supertest": "^2.0.11",
     "@typescript-eslint/eslint-plugin": "^4.11.0",
     "@typescript-eslint/parser": "^4.11.0",
     "codecov": "^3.8.0",
@@ -40,16 +37,9 @@
     "eslint-plugin-prettier": "^3.3.0",
     "eslint-plugin-react": "^7.22.0",
     "husky": "^4.3.6",
-    "jest": "^26.6.0",
-    "lerna": "^3.22.1",
     "lint-staged": "^10.5.3",
     "npm-run-all": "^4.1.5",
     "prettier": "^2.2.1",
-    "shelljs": "^0.8.4",
-    "shx": "^0.3.2",
-    "ts-jest": "^26.4.1",
-    "ts-node": "^9.1.1",
-    "tslib": "^2.1.0",
-    "typescript": "^4.4.3"
+    "shx": "^0.3.2"
   }
 }

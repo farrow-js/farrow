@@ -8,6 +8,13 @@
     "dist",
     "esm"
   ],
+  "scripts": {
+    "build": "pnpm run build:dist && pnpm run build:esm",
+    "build:dist": "tsc -b ./tsconfig.json",
+    "build:esm": "tsc -b ./tsconfig.esm.json",
+    "test": "jest",
+    "test:coverage": "jest --collectCoverage --coverage"
+  },
   "keywords": [
     "Next.js",
     "Web Framework",
@@ -27,14 +34,17 @@
   },
   "devDependencies": {
     "@types/cookie": "^0.4.0",
+    "@types/jest": "^27.0.2",
     "@types/js-cookie": "^2.2.6",
     "@types/qs": "^6.9.5",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/redux-logger": "^3.0.7",
-    "next": "^11.1.1",
+    "jest": "^27.2.2",
+    "next": "^11.1.2",
     "react": "^17.0.0",
-    "react-dom": "^17.0.0"
+    "react-dom": "^17.0.0",
+    "ts-jest": "^27.0.5"
   },
   "dependencies": {
     "cookie": "^0.4.1",

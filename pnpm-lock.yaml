@@ -338,7 +338,7 @@ importers:
       '@types/jest': ^27.0.1
       dataloader: ^2.0.0
       farrow-api-server: ^1.10.9
-      farrow-pipeline: ^1.10.6
+      farrow-pipeline: ^1.10.7
       isomorphic-unfetch: ^3.1.0
       jest: ^27.2.2
       setimmediate: ^1.0.5
@@ -582,7 +582,7 @@ importers:
       '@types/jest': ^27.0.2
       '@types/json-schema': ^7.0.7
       farrow-api: ^1.10.9
-      farrow-pipeline: ^1.10.6
+      farrow-pipeline: ^1.10.7
       farrow-schema: ^1.10.8
       jest: ^27.2.2
       ts-jest: ^27.0.5

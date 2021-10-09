@@ -123,7 +123,8 @@ export type ApiPipelineWithUrl = AsyncPipeline<ApiRequest, ApiResponse> & {
   invoke(calling: SingleCalling, options?: ApiInvokeOptions): Promise<JsonType>
 }
 
-export const createApiPipelineWithUrl = (url: string): ApiPipelineWithUrl => {
+export const createApiPipelineWithUrl = (url: string, options: ApiPipelineOptions = {}): ApiPipelineWithUrl => {
+  const apiPipeline = createApiPipeline(options)
   const pipeline = createAsyncPipeline<ApiRequest, ApiResponse>()
 
   const batchInvoke = (callings: Readonly<SingleCalling[]>) => {
@@ -154,7 +155,7 @@ export const createApiPipelineWithUrl = (url: string): ApiPipelineWithUrl => {
   apiPipeline.match(url, pipeline)
 
   return {
-    ...pipeline,
+    ...apiPipeline,
     invoke,
   }
 }

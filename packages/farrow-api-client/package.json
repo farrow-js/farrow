@@ -1,10 +1,12 @@
 {
   "name": "farrow-api-client",
-  "version": "1.10.9",
+  "version": "1.10.11",
   "description": "A type-friendly BFF framework",
   "main": "dist/index.js",
   "scripts": {
-    "start": "ts-node src/example"
+    "build": "tsc -b",
+    "test": "jest",
+    "test:coverage": "jest --collectCoverage --coverage"
   },
   "files": [
     "src",
@@ -23,11 +25,14 @@
     "url": "git+https://github.com/Lucifier129/farrow.git"
   },
   "peerDependencies": {
-    "farrow-pipeline": "^1.8.0"
+    "farrow-pipeline": "^1.10.7"
   },
   "devDependencies": {
+    "@types/jest": "^27.0.1",
     "farrow-api-server": "^1.10.9",
-    "farrow-pipeline": "^1.10.6"
+    "farrow-pipeline": "^1.10.7",
+    "jest": "^27.2.2",
+    "ts-jest": "^27.0.5"
   },
   "dependencies": {
     "dataloader": "^2.0.0",

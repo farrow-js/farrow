@@ -2,7 +2,7 @@ import { api as PetStore, Pet } from './pet-store'
 
 const test = async () => {
   const result = await PetStore.pet.updatePet({
-    body: (1 as unknown) as Pet,
+    body: 1 as unknown as Pet,
   })
 
   if (result.type === 'InvalidIDSupplied') {

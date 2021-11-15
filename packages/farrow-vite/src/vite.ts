@@ -1,8 +1,7 @@
 import path from 'path'
 import fs from 'fs/promises'
 import { constants } from 'fs'
-import type { IncomingMessage, ServerResponse } from 'http'
-import { Response, Router, RouterPipeline } from 'farrow-http'
+import { Response, Router, RouterPipeline, CustomBodyHandler } from 'farrow-http'
 import { createServer as createViteServer, ViteDevServer, InlineConfig } from 'vite'
 
 export type ViteRouterPipeline = RouterPipeline & {
@@ -44,7 +43,7 @@ export const vite = (options?: InlineConfig): ViteRouterPipeline => {
       }
     }
 
-    const handler = ({ req, res }: { req: IncomingMessage; res: ServerResponse }) => {
+    const handler: CustomBodyHandler = ({ req, res }) => {
       viteServer.middlewares(req, res, async () => {
         try {
           const url = req.url ?? '/'
@@ -55,7 +54,7 @@ export const vite = (options?: InlineConfig): ViteRouterPipeline => {
           res.statusCode = 200
           res.setHeader('Content-Type', 'text/html')
           res.end(html)
-        } catch (error) {
+        } catch (error: any) {
           if (!res.headersSent) {
             res.setHeader('Content-Type', 'text/plain')
           }

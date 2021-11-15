@@ -67,17 +67,14 @@ export type TypeOfRouterRequestField<T> = T extends string | string[]
   ? Schema.TypeOfFieldDescriptors<T>
   : never
 
-export type TypeOfRequestSchema<T extends RouterRequestSchema> = MarkReadOnlyDeep<
-  {
-    [key in keyof T]: TypeOfRouterRequestField<T[key]>
-  }
->
+export type TypeOfRequestSchema<T extends RouterRequestSchema> = MarkReadOnlyDeep<{
+  [key in keyof T]: TypeOfRouterRequestField<T[key]>
+}>
 
 export type TypeOfUrlSchema<T extends RouterUrlSchema> = MarkReadOnlyDeep<
-  ParseUrl<T['url']> &
-    {
-      [key in keyof Omit<T, 'url'>]: TypeOfRouterRequestField<Omit<T, 'url'>[key]>
-    }
+  ParseUrl<T['url']> & {
+    [key in keyof Omit<T, 'url'>]: TypeOfRouterRequestField<Omit<T, 'url'>[key]>
+  }
 >
 
 const createRequestSchemaValidatorAndMatcher = <T extends RouterRequestSchema>(schema: T) => {
@@ -467,7 +464,7 @@ export const createRouterPipeline = (): RouterPipeline => {
   }
 
   const createRoutingMethod = (method: string) => {
-    return ((<U extends string, T extends Omit<RouterSharedSchema, 'method'>>(
+    return (<U extends string, T extends Omit<RouterSharedSchema, 'method'>>(
       path: U,
       schema?: T,
       options?: MatchOptions,
@@ -480,7 +477,7 @@ export const createRouterPipeline = (): RouterPipeline => {
         },
         options,
       )
-    }) as unknown) as RoutingMethod
+    }) as unknown as RoutingMethod
   }
 
   const methods: RoutingMethods = {

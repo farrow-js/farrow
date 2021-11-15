@@ -1,0 +1,28 @@
+{
+  "compilerOptions": {
+    "jsx": "react",
+    "allowSyntheticDefaultImports": true,
+    "declaration": false,
+    "downlevelIteration": true,
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "newLine": "LF",
+    "allowJs": true,
+    "strict": true,
+    "noEmit": true,
+    "skipLibCheck": true,
+    "suppressImplicitAnyIndexErrors": true,
+    "suppressExcessPropertyErrors": true,
+    "forceConsistentCasingInFileNames": true,
+    "target": "es5",
+    "sourceMap": true,
+    "esModuleInterop": true,
+    "stripInternal": true,
+    "lib": ["ESNext"],
+    "types": ["node", "jest"]
+  },
+  "include": ["."]
+}

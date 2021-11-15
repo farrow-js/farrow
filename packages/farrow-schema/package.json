@@ -13,7 +13,11 @@
     "formatter.js"
   ],
   "scripts": {
-    "start": ""
+    "build": "pnpm run build:dist && pnpm run build:esm",
+    "build:dist": "tsc -b ./tsconfig.json",
+    "build:esm": "tsc -b ./tsconfig.esm.json",
+    "test": "jest",
+    "test:coverage": "jest --collectCoverage --coverage"
   },
   "keywords": [
     "Web Framework",
@@ -28,5 +32,10 @@
   },
   "dependencies": {
     "tslib": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/jest": "^27.0.2",
+    "jest": "^27.2.2",
+    "ts-jest": "^27.0.5"
   }
 }

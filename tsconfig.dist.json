@@ -57,7 +57,10 @@
     },
     {
       "path": "./packages/farrow-deno-api/tsconfig.json"
+    },
+    {
+      "path": "./packages/farrow-federation/tsconfig.json"
     }
   ],
-  "exclude": ["./examples/*", "./packages/create-farrow-app/templates/**/*"]
+  "exclude": ["./packages/create-farrow-app/templates"]
 }

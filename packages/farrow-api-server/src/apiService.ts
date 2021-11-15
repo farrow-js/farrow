@@ -118,7 +118,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
        * response output
        */
       return ApiSuccess(outputResult.value)
-    } catch (error) {
+    } catch (error: any) {
       const message = (config.errorStack ? error?.stack || error?.message : error?.message) ?? ''
       return ApiError(message)
     }

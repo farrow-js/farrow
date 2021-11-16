@@ -1,5 +1,3 @@
-// import { MarkReadOnlyDeep } from './types'
-
 export type ReadOnlyRecord = {
   readonly [key: string]: any
 }

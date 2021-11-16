@@ -57,7 +57,7 @@ type HttpPipelineOptions = {
     basename: string
   }) => ContextStorage | Promise<ContextStorage>
   // enable log or not
-  logger?: boolean | LoggerOptions
+  logger?: boolean | HttpLoggerOptions
 }
 
 // learn more about RouterPipeline below.
@@ -74,6 +74,14 @@ type HttpPipeline = RouterPipeline & {
 type LoggerOptions = {
   // handle logger result string
   transporter?: (str: string) => void
+}
+
+type HttpLoggerOptions = LoggerOptions & {
+  /**
+   * it should ignore the introspection request log or not
+   * default is true
+   */
+  ignoreIntrospectionRequestOfFarrowApi?: boolean
 }
 ```
 

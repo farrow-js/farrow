@@ -44,6 +44,14 @@ import { access, getBody, getContentLength } from './util'
 
 import { RequestContext, RequestInfoContext, ResponseContext } from './context'
 
+export type HttpLoggerOptions = LoggerOptions & {
+  /**
+   * it should ignore the introspection request log or not
+   * default is true
+   */
+  ignoreIntrospectionRequestOfFarrowApi?: boolean
+}
+
 export type HttpPipelineOptions = {
   basenames?: string[]
   body?: BodyOptions
@@ -54,7 +62,7 @@ export type HttpPipelineOptions = {
     requestInfo: RequestInfo
     basename: string
   }) => ContextStorage | Promise<ContextStorage>
-  logger?: boolean | LoggerOptions
+  logger?: boolean | HttpLoggerOptions
   errorStack?: boolean
 }
 
@@ -76,7 +84,10 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
     ...options,
   }
 
-  const loggerOptions: LoggerOptions = !config.logger || typeof config.logger === 'boolean' ? {} : config.logger
+  const loggerOptions: HttpLoggerOptions = {
+    ignoreIntrospectionRequestOfFarrowApi: true,
+    ...(!config.logger || typeof config.logger === 'boolean' ? {} : config.logger),
+  }
 
   const logger = config.logger ? createLogger(loggerOptions) : null
 
@@ -134,19 +145,12 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
       },
     })
 
-    await handleResponse({
-      req,
-      res,
-      requestInfo,
-      responseInfo: responser.info,
-      container,
-    })
-  }
+    const isIntrospectionRequest =
+      method.toLowerCase() === 'post' && typeof body === 'object' && body && body.type === 'Introspection'
+    const shouldLog = logger && !(loggerOptions.ignoreIntrospectionRequestOfFarrowApi && isIntrospectionRequest)
 
-  const handle: HttpPipeline['handle'] = async (req, res, options) => {
-    if (logger) {
+    if (shouldLog) {
       const startTime = Date.now()
-      const method = req.method ?? 'GET'
       const url = req.url ?? ''
 
       let contentLength = 0
@@ -182,6 +186,16 @@ export const createHttpPipeline = (options?: HttpPipelineOptions): HttpPipeline 
       })
     }
 
+    await handleResponse({
+      req,
+      res,
+      requestInfo,
+      responseInfo: responser.info,
+      container,
+    })
+  }
+
+  const handle: HttpPipeline['handle'] = async (req, res, options) => {
     try {
       return await handleRequest(req, res, options)
     } catch (error: any) {

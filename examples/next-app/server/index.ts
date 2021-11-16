@@ -4,7 +4,12 @@ import next from 'next'
 
 import { services } from './api'
 
-const http = Http()
+const http = Http({
+  logger: {
+    ignoreIntrospectionRequestOfFarrowApi: false
+  }
+})
+
 const app = next({
   dev: process.env.NODE_ENV === 'development',
 })

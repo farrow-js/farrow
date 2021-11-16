@@ -17,7 +17,7 @@ const createHttps = (options?: HttpsPipelineOptions) => {
       ca: CA,
       key: KEY,
       rejectUnauthorized: false,
-      agent: false,
+      // agent: false,
     },
     ...options,
   })

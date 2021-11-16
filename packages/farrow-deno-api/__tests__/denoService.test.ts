@@ -85,7 +85,7 @@ describe('deno-api', () => {
 
     server.close()
 
-    expect(JSON.stringify(test.text)).toBe(JSON.stringify(source))
+    expect(test.text.replace(/\r|\n/g, '')).toBe(source.replace(/\r|\n/g, ''))
   })
 
   it('should work', async () => {

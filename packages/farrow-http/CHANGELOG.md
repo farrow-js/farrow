@@ -2,7 +2,7 @@
 
 ## 1.10.10(2021/11/06)
 
-- support ignoring the log of introspection request of farrow-apio
+- support ignoring the log of introspection request of farrow-api
 
 ```ts
 type HttpLoggerOptions = LoggerOptions & {

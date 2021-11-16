@@ -24,7 +24,7 @@
     "test": "pnpm run test --filter ./packages",
     "test:coverage": "pnpm run test:coverage --filter ./packages",
     "release": "pnpm changeset version && pnpm changeset publish",
-    "prerelease": "pnpm run format && git add -A && pnpm run build && pnpm run test"
+    "prerelease": "pnpm run format && git add -A && pnpm run build"
   },
   "devDependencies": {
     "@changesets/cli": "^2.17.0",

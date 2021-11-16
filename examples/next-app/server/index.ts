@@ -6,8 +6,8 @@ import { services } from './api'
 
 const http = Http({
   logger: {
-    ignoreIntrospectionRequestOfFarrowApi: false
-  }
+    ignoreIntrospectionRequestOfFarrowApi: false,
+  },
 })
 
 const app = next({

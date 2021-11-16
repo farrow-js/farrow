@@ -46,7 +46,7 @@ import { RequestContext, RequestInfoContext, ResponseContext } from './context'
 
 export type HttpLoggerOptions = LoggerOptions & {
   /**
-   * it should ignore the introspection request log or not
+   * it should ignore the introspection request log of farrow-api or not
    * default is true
    */
   ignoreIntrospectionRequestOfFarrowApi?: boolean

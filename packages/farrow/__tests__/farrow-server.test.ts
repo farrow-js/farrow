@@ -40,7 +40,7 @@ describe('Farrow', () => {
 
     expect(shell.test('-d', distPath)).toBe(false)
 
-    const result = await exec(`npm run build`)
+    const result = await exec(`pnpm run build`)
 
     console.log('result.stderr', {
       stderr: result.stderr,

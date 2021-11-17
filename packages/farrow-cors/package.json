@@ -4,8 +4,12 @@
   "description": "Cross-Origin Resource Sharing(CORS) for farrow-http",
   "main": "dist/index.js",
   "exports": {
-    "import": "./esm/index.js",
-    "require": "./dist/index.js"
+    ".": {
+      "import": "./esm/index.js",
+      "require": "./dist/index.js"
+    },
+    "./dist/*": "./dist/*.js",
+    "./esm/*": "./dist/*.js"
   },
   "files": [
     "dist",

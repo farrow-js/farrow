@@ -4,8 +4,24 @@
   "description": "React bindings for farrow-http",
   "main": "dist/index.js",
   "exports": {
-    "import": "./esm/index.js",
-    "require": "./dist/index.js"
+    ".": {
+      "import": "./esm/index.js",
+      "require": "./dist/index.js"
+    },
+    "./Context": {
+      "import": "./esm/Context.js",
+      "require": "./dist/Context.js"
+    },
+    "./hook": {
+      "import": "./esm/hook.js",
+      "require": "./dist/hook.js"
+    },
+    "./Link": {
+      "import": "./esm/Link.js",
+      "require": "./dist/Link.js"
+    },
+    "./dist/*": "./dist/*.js",
+    "./esm/*": "./dist/*.js"
   },
   "files": [
     "src",

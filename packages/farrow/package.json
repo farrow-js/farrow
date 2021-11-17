@@ -4,8 +4,12 @@
   "description": "Useful modules for developing Farrow App",
   "main": "dist/index.js",
   "exports": {
-    "import": "./esm/index.js",
-    "require": "./dist/index.js"
+    ".": {
+      "import": "./esm/index.js",
+      "require": "./dist/index.js"
+    },
+    "./dist/*": "./dist/*.js",
+    "./esm/*": "./dist/*.js"
   },
   "bin": {
     "farrow": "./bin/scripts.js"

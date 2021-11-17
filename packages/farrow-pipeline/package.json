@@ -4,8 +4,16 @@
   "description": "Type-Friendly middleware library",
   "main": "dist/index.js",
   "exports": {
-    "import": "./esm/index.js",
-    "require": "./dist/index.js"
+    ".": {
+      "import": "./esm/index.js",
+      "require": "./dist/index.js"
+    },
+    "./asyncHooks.node": {
+      "import": "./esm/asyncHooksImpl/node.js",
+      "require": "./dist/asyncHooksImpl/node.js"
+    },
+    "./dist/*": "./dist/*.js",
+    "./esm/*": "./dist/*.js"
   },
   "files": [
     "src",

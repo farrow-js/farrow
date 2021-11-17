@@ -5,22 +5,58 @@
   },
   "references": [
     {
-      "path": "./packages/farrow-api-client/tsconfig.esm.json"
-    },
-    {
       "path": "./packages/farrow-pipeline/tsconfig.esm.json"
-    },
-    {
-      "path": "./packages/farrow-schema/tsconfig.esm.json"
-    },
-    {
-      "path": "./packages/farrow-json-schema/tsconfig.esm.json"
     },
     {
       "path": "./packages/farrow-module/tsconfig.esm.json"
     },
     {
+      "path": "./packages/farrow-schema/tsconfig.esm.json"
+    },
+    {
+      "path": "./packages/farrow-http/tsconfig.esm.json"
+    },
+    {
+      "path": "./packages/farrow-react/tsconfig.esm.json"
+    },
+    {
+      "path": "./packages/farrow-cors/tsconfig.esm.json"
+    },
+    {
+      "path": "./packages/farrow-api/tsconfig.esm.json"
+    },
+    {
+      "path": "./packages/farrow-api-server/tsconfig.esm.json"
+    },
+    {
+      "path": "./packages/farrow-api-client/tsconfig.esm.json"
+    },
+    {
+      "path": "./packages/farrow-json-schema/tsconfig.esm.json"
+    },
+    {
+      "path": "./packages/farrow-express/tsconfig.esm.json"
+    },
+    {
+      "path": "./packages/farrow-koa/tsconfig.esm.json"
+    },
+    {
+      "path": "./packages/farrow/tsconfig.esm.json"
+    },
+    {
+      "path": "./packages/farrow-vite/tsconfig.esm.json"
+    },
+    {
       "path": "./packages/farrow-next/tsconfig.esm.json"
+    },
+    {
+      "path": "./packages/farrow-next-server/tsconfig.esm.json"
+    },
+    {
+      "path": "./packages/farrow-deno-api/tsconfig.esm.json"
+    },
+    {
+      "path": "./packages/farrow-federation/tsconfig.esm.json"
     }
   ],
   "exclude": ["./packages/create-farrow-app/templates"]

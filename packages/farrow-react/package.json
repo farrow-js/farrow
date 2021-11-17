@@ -3,6 +3,11 @@
   "version": "1.10.9",
   "description": "React bindings for farrow-http",
   "main": "dist/index.js",
+  "exports": {
+    "import": "./esm/index.js",
+    "require": "./dist/index.js"
+  },
+  "type": "module",
   "files": [
     "src",
     "dist",

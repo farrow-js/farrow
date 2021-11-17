@@ -3,6 +3,11 @@
   "version": "1.10.7",
   "description": "A module abstraction providing dependencies management",
   "main": "dist/index.js",
+  "exports": {
+    "import": "./esm/index.js",
+    "require": "./dist/index.js"
+  },
+  "type": "module",
   "files": [
     "src",
     "dist",

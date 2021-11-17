@@ -7,7 +7,7 @@
   },
   "references": [
     {
-      "path": "../farrow-schema/tsconfig.json"
+      "path": "../farrow-http/tsconfig.json"
     }
   ],
   "include": ["src"]

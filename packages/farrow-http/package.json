@@ -3,6 +3,11 @@
   "version": "1.10.10",
   "description": "A Type-Friendly Web Framework",
   "main": "dist/index.js",
+  "exports": {
+    "import": "./esm/index.js",
+    "require": "./dist/index.js"
+  },
+  "type": "module",
   "files": [
     "dist",
     "src"

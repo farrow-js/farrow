@@ -3,6 +3,11 @@
   "version": "1.10.9",
   "description": "Vite adapter for farrow",
   "main": "dist/index.js",
+  "exports": {
+    "import": "./esm/index.js",
+    "require": "./dist/index.js"
+  },
+  "type": "module",
   "files": [
     "src",
     "dist"

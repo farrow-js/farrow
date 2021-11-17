@@ -7,6 +7,9 @@
   },
   "references": [
     {
+      "path": "../farrow-pipeline/tsconfig.json"
+    },
+    {
       "path": "../farrow-schema/tsconfig.json"
     }
   ],

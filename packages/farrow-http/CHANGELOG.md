@@ -1,5 +1,11 @@
 # farrow-http
 
+## 1.10.11
+
+### Patch Changes
+
+- 56ef151: Fix `router.route` match error
+
 ## 1.10.10
 
 ### Patch Changes

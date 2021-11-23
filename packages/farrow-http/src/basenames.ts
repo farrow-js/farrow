@@ -21,7 +21,7 @@ export const route = (name: string): Pipeline<RequestInfo, MaybeAsyncResponse> =
     const container = useContainer()
     const basenames = BasenamesContext.use()
 
-    if (!request.pathname.startsWith(name)) {
+    if (!matchBasename(name, request.pathname)) {
       return next()
     }
 
@@ -66,7 +66,7 @@ export const handleBasenames = <T extends { pathname: string }>(basenames: strin
 
 const findBasename = (basenames: string[], pathname: string) => {
   for (const basename of basenames) {
-    if (!pathname.startsWith(basename)) continue
+    if (!matchBasename(basename, pathname)) continue
 
     let newPathname = pathname.replace(basename, '')
 
@@ -84,4 +84,17 @@ const findBasename = (basenames: string[], pathname: string) => {
     basename: '',
     pathname,
   }
+}
+
+const matchBasename = (basename: string, pathname: string): boolean => {
+  const baseSnippets = basename.split('/')
+  const pathSnippets = pathname.split('/')
+
+  for (let i = 0; i < baseSnippets.length; i++) {
+    if (baseSnippets[i] !== pathSnippets[i]) {
+      return false
+    }
+  }
+
+  return true
 }

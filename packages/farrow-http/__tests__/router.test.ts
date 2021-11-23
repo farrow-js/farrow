@@ -1711,4 +1711,21 @@ describe('Router Url Pattern', () => {
       },
     })
   })
+
+  it('should route work well', async () => {
+    const router = Router()
+
+    router.route('/foo').use(() => {
+      return Response.text('foo')
+    })
+    router.route('/foobar').use(() => {
+      return Response.text('foobar')
+    })
+
+    const result0 = await router.run({ pathname: '/foo' })
+    expect(result0.info.body).toMatchObject({ type: 'string', value: 'foo' })
+
+    const result1 = await router.run({ pathname: '/foobar' })
+    expect(result1.info.body).toMatchObject({ type: 'string', value: 'foobar' })
+  })
 })

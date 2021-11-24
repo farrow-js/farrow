@@ -45,24 +45,33 @@
 
 ## Usage
 
-- [How to install](#how-to-install)
-- [How to setup a development environment](#how-to-setup-a-development-environment)
-- [How to setup a server](#how-to-setup-a-server)
-- [How to setup a https server](#how-to-setup-a-https-server)
-- [How to serve static assets](#how-to-serve-static-assets)
-- [How to respond text or json or html or file](#how-to-respond-text-or-json-or-html-or-file)
-- [How to access request info](#how-to-access-request-info)
-- [How to match specific request](#how-to-match-specific-request)
-- [How to pass new request info for downstream middleware](#how-to-pass-new-request-info-for-downstream-middleware)
-- [How to filter and manipulate response in upstream middleware](#how-to-filter-and-manipulate-response-in-upstream-middleware)
-- [How to set response headers](#how-to-set-response-headers)
-- [How to set response cookies](#how-to-set-response-cookies)
-- [How to set response status](#how-to-set-response-status)
-- [How to redirect](#how-to-redirect)
-- [How to merge responses](#how-to-merge-responses)
-- [How to add router](#how-to-add-router)
-- [How to add view-engine](#how-to-add-view-engine)
-- [How to write a farrow hooks](#how-to-write-a-farrow-hooks)
+- [𝓕𝓪𝓻𝓻𝓸𝔀](#𝓕𝓪𝓻𝓻𝓸𝔀)
+  - [Benefits](#benefits)
+  - [Environment Requirement](#environment-requirement)
+  - [Usage](#usage)
+    - [How to install](#how-to-install)
+    - [How to setup a development environment](#how-to-setup-a-development-environment)
+    - [How to setup a server](#how-to-setup-a-server)
+    - [How to setup a https server](#how-to-setup-a-https-server)
+    - [How to serve static assets](#how-to-serve-static-assets)
+    - [How to respond text or json or html or file](#how-to-respond-text-or-json-or-html-or-file)
+    - [How to access request info](#how-to-access-request-info)
+    - [How to match specific request](#how-to-match-specific-request)
+    - [How to pass new request info for downstream middleware](#how-to-pass-new-request-info-for-downstream-middleware)
+    - [How to filter and manipulate response in upstream middleware](#how-to-filter-and-manipulate-response-in-upstream-middleware)
+    - [How to set response headers](#how-to-set-response-headers)
+    - [How to set response cookies](#how-to-set-response-cookies)
+    - [How to set response status](#how-to-set-response-status)
+    - [How to redirect](#how-to-redirect)
+    - [How to merge responses](#how-to-merge-responses)
+    - [How to add router](#how-to-add-router)
+    - [How to add view-engine](#how-to-add-view-engine)
+    - [How to write a farrow hooks](#how-to-write-a-farrow-hooks)
+  - [Development](#development)
+  - [Author](#author)
+  - [🤝 Contributing](#-contributing)
+  - [Show your support](#show-your-support)
+  - [📝 License](#-license)
 
 ### How to install
 
@@ -495,6 +504,8 @@ npm run test
 ## 🤝 Contributing
 
 Contributions, issues and feature requests are welcome!
+
+[Contributing Guide](https://github.com/farrow-js/farrow/blob/main/CONTRIBUTING.md)
 
 Feel free to check [issues page](https://github.com/Lucifier129/farrow/issues).
 

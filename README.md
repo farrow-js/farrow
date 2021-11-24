@@ -505,7 +505,7 @@ npm run test
 
 Contributions, issues and feature requests are welcome!
 
-[Contributing Guide](https://github.com/farrow-js/farrow/blob/main/CONTRIBUTING.md)
+[Contributing Guide](https://github.com/farrow-js/farrow/blob/master/CONTRIBUTING.md)
 
 Feel free to check [issues page](https://github.com/Lucifier129/farrow/issues).
 

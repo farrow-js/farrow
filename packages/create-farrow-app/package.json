@@ -4,7 +4,7 @@
   "description": "A cli-tools for scaffolding farrow project",
   "main": "dist/index.js",
   "bin": {
-    "farrow": "./bin/scripts.js"
+    "create-farrow-app": "./bin/scripts.js"
   },
   "scripts": {
     "build": "tsc -b"

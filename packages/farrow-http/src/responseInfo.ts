@@ -5,8 +5,8 @@ import mime from 'mime-types'
 import typeis from 'type-is'
 import contentDisposition, { Options as ContentDispositionOptions } from 'content-disposition'
 
-import { RequestInfo } from './requestInfo'
-import { JsonType } from 'farrow-schema'
+import type { RequestInfo } from './requestInfo'
+import type { JsonType } from 'farrow-schema'
 
 export type Value = string | number
 

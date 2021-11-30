@@ -1,9 +1,9 @@
-import { Middleware } from 'farrow-pipeline'
 import { Response, useReq, useRes, MaybeAsyncResponse } from 'farrow-http'
-import { promisify } from 'util'
+import type { IncomingMessage } from 'http'
+import type { Middleware } from 'farrow-pipeline'
 
 import Cors, { CorsOptions, CorsOptionsDelegate, CorsRequest } from 'cors'
-import { IncomingMessage } from 'http'
+import { promisify } from 'util'
 
 export { CorsOptions, CorsOptionsDelegate, CorsRequest }
 

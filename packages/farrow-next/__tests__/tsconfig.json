@@ -1,6 +1,7 @@
 {
   "extends": "../../../tsconfig.json",
   "compilerOptions": {
+    "lib": ["DOM"],
     "rootDir": "../",
     "noEmit": true,
     "types": ["node", "jest"]

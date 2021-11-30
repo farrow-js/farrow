@@ -1,5 +1,5 @@
-import { FormatResult } from 'farrow-api/dist/toJSON'
 import nodeFetch from 'node-fetch'
+import type { FormatResult } from 'farrow-api/dist/toJSON'
 import type { IntrospectionCalling, ApiResponseSingle } from 'farrow-api-server'
 import { Result, Ok, Err } from './result'
 import type { Fetch } from './federation'

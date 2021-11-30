@@ -9,7 +9,6 @@ import { Router } from './router'
 import { Response } from './response'
 import { createLogger } from './logger'
 import { handleBasenames, BasenamesContext } from './basenames'
-import { RequestCookies, RequestHeaders, RequestQuery } from './requestInfo'
 import { RequestContext, RequestInfoContext, ResponseContext } from './context'
 import { getBody, getContentLength } from './util'
 
@@ -17,6 +16,7 @@ import type { IncomingMessage, ServerResponse } from 'http'
 import type { SecureContextOptions, TlsOptions } from 'tls'
 import type { HttpPipelineOptions } from './http'
 import type { RouterPipeline } from './router'
+import type { RequestCookies, RequestHeaders, RequestQuery } from './requestInfo'
 import type { LoggerEvent, LoggerOptions } from './logger'
 
 export type HttpsOptions = SecureContextOptions & TlsOptions

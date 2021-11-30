@@ -1,4 +1,4 @@
-import { apiPipeline } from '../index'
+import { apiPipeline } from '../src/index'
 import './route'
 
 describe('ApiPipeline', () => {

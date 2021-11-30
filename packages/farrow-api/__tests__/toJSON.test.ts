@@ -1,5 +1,5 @@
-import { Api } from '../api'
-import { toJSON } from '../toJSON'
+import { Api } from '../src/api'
+import { toJSON } from '../src/toJSON'
 
 describe('toJSON', () => {
   it('work correctly', () => {

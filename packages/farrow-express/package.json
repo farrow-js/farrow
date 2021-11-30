@@ -25,8 +25,7 @@
   },
   "peerDependencies": {
     "express": "^4.17.1",
-    "farrow-http": "^1.10.8",
-    "farrow-pipeline": "^1.8.0"
+    "farrow-http": "^1.10.8"
   },
   "devDependencies": {
     "@types/jest": "^27.0.1",

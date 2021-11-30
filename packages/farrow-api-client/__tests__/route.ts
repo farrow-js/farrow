@@ -1,5 +1,5 @@
 import { ApiError, ApiSuccess } from 'farrow-api-server'
-import { apiPipeline } from '../index'
+import { apiPipeline } from '../src/index'
 
 apiPipeline.use(async (request, next) => {
   const calling = {

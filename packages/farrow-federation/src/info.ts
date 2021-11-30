@@ -1,5 +1,5 @@
-import { FormatResult, FormatEntries } from 'farrow-api/dist/toJSON'
-import { FormatType, FormatTypes } from 'farrow-schema/formatter'
+import type { FormatResult, FormatEntries } from 'farrow-api/dist/toJSON'
+import type { FormatType, FormatTypes } from 'farrow-schema/formatter'
 import { updateApi, updateType } from './helpers'
 import { getIntrospection } from './introspection'
 

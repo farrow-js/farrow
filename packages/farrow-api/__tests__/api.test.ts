@@ -1,5 +1,5 @@
 import { Int, Type } from 'farrow-schema'
-import { Api, isApi, getContentType, getTypeDescription, getTypeDeprecated } from '../api'
+import { Api, isApi, getContentType, getTypeDescription, getTypeDeprecated } from '../src/api'
 
 describe('Api', () => {
   it('supports Typeable', async () => {

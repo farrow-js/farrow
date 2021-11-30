@@ -1728,4 +1728,68 @@ describe('Router Url Pattern', () => {
     const result1 = await router.run({ pathname: '/foobar' })
     expect(result1.info.body).toMatchObject({ type: 'string', value: 'foobar' })
   })
+
+  it('should work well with route with single slash basename', async () => {
+    const router = Router()
+
+    router.route('/foo').use(() => {
+      return Response.text('foo')
+    })
+
+    router.route('/').use(() => {
+      return Response.text('slash')
+    })
+
+    const result0 = await router.run(
+      { pathname: '/foo' },
+      {
+        onLast: () => {
+          return Response.text('error')
+        },
+      },
+    )
+    expect(result0.info.body).toMatchObject({ type: 'string', value: 'foo' })
+
+    const result1 = await router.run(
+      { pathname: '/foobar' },
+      {
+        onLast: () => {
+          return Response.text('error')
+        },
+      },
+    )
+    expect(result1.info.body).toMatchObject({ type: 'string', value: 'slash' })
+
+    const result2 = await router.run(
+      { pathname: '/' },
+      {
+        onLast: () => {
+          return Response.text('error')
+        },
+      },
+    )
+    expect(result2.info.body).toMatchObject({ type: 'string', value: 'slash' })
+
+    const result3 = await router.run(
+      { pathname: '/test' },
+      {
+        onLast: () => {
+          return Response.text('error')
+        },
+      },
+    )
+    expect(result3.info.body).toMatchObject({ type: 'string', value: 'slash' })
+  })
+
+  it('should throw error with route with empty basename', async () => {
+    const router = Router()
+
+    router.route('/foo').use(() => {
+      return Response.text('foo')
+    })
+
+    expect(() => router.route('')).toThrowError(
+      `expect the basename passed to 'http.route' should be absolute, accept \`\``,
+    )
+  })
 })

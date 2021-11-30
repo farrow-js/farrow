@@ -1,3 +1,4 @@
+import path from 'path'
 import { createContext, Middleware, createPipeline, Pipeline, useContainer } from 'farrow-pipeline'
 import { MaybeAsyncResponse } from './response'
 import { RequestInfo } from './requestInfo'
@@ -16,6 +17,8 @@ export const usePrefix = () => {
 
 export const route = (name: string): Pipeline<RequestInfo, MaybeAsyncResponse> => {
   const pipeline = createPipeline<RequestInfo, MaybeAsyncResponse>()
+
+  assertRoutePath(name, `expect the basename passed to 'http.route' should be absolute, accept \`${name}\``)
 
   const middleware: Middleware<RequestInfo, MaybeAsyncResponse> = async (request, next) => {
     const container = useContainer()
@@ -86,9 +89,9 @@ const findBasename = (basenames: string[], pathname: string) => {
   }
 }
 
-const matchBasename = (basename: string, pathname: string): boolean => {
-  const baseSnippets = basename.split('/')
-  const pathSnippets = pathname.split('/')
+export const matchBasename = (basename: string, pathname: string): boolean => {
+  const baseSnippets = getPathSnippets(basename)
+  const pathSnippets = getPathSnippets(pathname)
 
   for (let i = 0; i < baseSnippets.length; i++) {
     if (baseSnippets[i] !== pathSnippets[i]) {
@@ -97,4 +100,32 @@ const matchBasename = (basename: string, pathname: string): boolean => {
   }
 
   return true
+}
+
+export const getPathSnippets = (pathname: string): string[] => {
+  const normalized = normalizePath(pathname)
+
+  if (normalized === '/') return []
+
+  return normalized.split('/').slice(1)
+}
+
+const normalizePath = (pathname: string): string => {
+  let result = path.posix.normalize(pathname)
+
+  if (result.endsWith('/')) {
+    result = result.substring(0, result.length - 1)
+  }
+
+  if (!result.startsWith('/')) {
+    result = `/${result}`
+  }
+
+  return result
+}
+
+const assertRoutePath = (pathname: string, message: string) => {
+  if (!path.posix.isAbsolute(pathname)) {
+    throw new Error(message)
+  }
 }

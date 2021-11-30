@@ -1,5 +1,11 @@
 # farrow-http
 
+## 1.10.12
+
+### Patch Changes
+
+- 79b05cf: Fix http route match basename bug
+
 ## 1.10.11
 
 ### Patch Changes

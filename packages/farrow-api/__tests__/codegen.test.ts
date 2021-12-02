@@ -1,8 +1,8 @@
 import fs from 'fs/promises'
-import { Api } from '../api'
-import { toJSON } from '../toJSON'
-import { codegen } from '../codegen'
-import { format } from '../prettier'
+import { Api } from '../src/api'
+import { toJSON } from '../src/toJSON'
+import { codegen } from '../src/codegen'
+import { format } from '../src/prettier'
 import {
   Any,
   Float,

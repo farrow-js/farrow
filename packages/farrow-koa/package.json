@@ -25,7 +25,6 @@
   },
   "peerDependencies": {
     "farrow-http": "^1.10.8",
-    "farrow-pipeline": "^1.8.0",
     "koa": "^2.13.1"
   },
   "devDependencies": {

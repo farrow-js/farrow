@@ -1,6 +1,6 @@
-import { FormatApi } from 'farrow-api/dist/toJSON'
-import { FormatType, FormatField, FormatFields } from 'farrow-schema/formatter'
 import nodeFetch from 'node-fetch'
+import type { FormatApi } from 'farrow-api/dist/toJSON'
+import type { FormatType, FormatField, FormatFields } from 'farrow-schema/formatter'
 import type { Fetch, Fetcher } from './federation'
 
 export const createFetcher = (fetch: Fetch = nodeFetch as any): Fetcher => {

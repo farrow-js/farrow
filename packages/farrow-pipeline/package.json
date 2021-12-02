@@ -22,6 +22,9 @@
     "TypeScript",
     "Functional Programming"
   ],
+  "engines": {
+    "node": ">=14.18.1"
+  },
   "author": "Jade Gu",
   "license": "MIT",
   "repository": {

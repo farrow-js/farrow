@@ -25,8 +25,7 @@
     "url": "git+https://github.com/Lucifier129/farrow.git"
   },
   "peerDependencies": {
-    "farrow-http": "^1.8.0",
-    "farrow-pipeline": "^1.8.0"
+    "farrow-http": "^1.8.0"
   },
   "devDependencies": {
     "@types/cors": "^2.8.9",
@@ -39,6 +38,7 @@
     "ts-jest": "^27.0.5"
   },
   "dependencies": {
+    "farrow-pipeline": "^1.10.6",
     "cors": "^2.8.5",
     "tslib": "^2.1.0"
   }

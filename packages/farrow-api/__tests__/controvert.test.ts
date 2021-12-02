@@ -1,7 +1,7 @@
 import { Int, Type } from 'farrow-schema'
-import { Api, ApiEntries } from '../api'
-import { toJSON } from '../toJSON'
-import { controvertEntries } from '../controvert'
+import { Api, ApiEntries } from '../src/api'
+import { toJSON } from '../src/toJSON'
+import { controvertEntries } from '../src/controvert'
 
 describe('controvert', () => {
   it('work', () => {

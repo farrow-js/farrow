@@ -1,5 +1,5 @@
-import { DateInstanceType, MarkReadOnlyDeep } from './types'
 import { isBooleanConstructor, isNumberConstructor, isStringConstructor, isDateConstructor } from './utils'
+import type { DateInstanceType, MarkReadOnlyDeep } from './types'
 
 export type Prettier<T> = T extends Promise<infer U>
   ? Promise<Prettier<U>>

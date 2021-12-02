@@ -11,19 +11,18 @@ import {
   AsyncPipeline,
   createAsyncPipeline,
 } from 'farrow-pipeline'
-
 import * as Schema from 'farrow-schema'
-import { ValidationError } from 'farrow-schema/validator'
-
+import type { ValidationError } from 'farrow-schema/validator'
 import { Validator, createSchemaValidator } from 'farrow-schema/validator'
 
-import { RequestInfo } from './requestInfo'
-import { BodyMap } from './responseInfo'
 import { route as createRoute } from './basenames'
 import { MaybeAsyncResponse, matchBodyType, Response } from './response'
-import { MarkReadOnlyDeep, ParseUrl } from './types'
 import { HttpError } from './HttpError'
 import { getStats } from './util'
+
+import type { RequestInfo } from './requestInfo'
+import type { BodyMap } from './responseInfo'
+import type { MarkReadOnlyDeep, ParseUrl } from './types'
 
 export { Pathname }
 

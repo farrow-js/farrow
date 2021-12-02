@@ -1,5 +1,11 @@
 # farrow-vite
 
+## 1.11.1
+
+### Patch Changes
+
+- da4d3c4: fix(farrow-pipeline): node version
+
 ## 1.11.0
 
 ### Minor Changes

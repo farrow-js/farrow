@@ -1,6 +1,6 @@
 {
   "name": "farrow-express",
-  "version": "1.10.9",
+  "version": "1.11.0",
   "description": "A Type-Friendly Web Framework",
   "main": "dist/index.js",
   "files": [
@@ -31,7 +31,6 @@
     "@types/jest": "^27.0.1",
     "express": "^4.17.1",
     "farrow-http": "^1.11.0",
-    "farrow-pipeline": "^1.11.0",
     "farrow-schema": "^1.11.0",
     "jest": "^27.2.2",
     "supertest": "^6.1.6",

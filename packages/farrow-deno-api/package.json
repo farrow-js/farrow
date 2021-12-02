@@ -1,6 +1,6 @@
 {
   "name": "farrow-deno-api",
-  "version": "1.10.9",
+  "version": "1.11.0",
   "description": "A Type-Friendly Web Framework",
   "main": "dist/index.js",
   "files": [

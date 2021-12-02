@@ -1,6 +1,6 @@
 {
   "name": "farrow-vite-react-template",
-  "version": "1.10.9",
+  "version": "1.11.0",
   "private": true,
   "scripts": {
     "dev": "farrow dev",
@@ -8,7 +8,6 @@
     "start": "farrow start"
   },
   "dependencies": {
-    "farrow": "^1.11.0",
     "farrow-api": "^1.11.0",
     "farrow-api-client": "^1.11.0",
     "farrow-api-server": "^1.11.0",
@@ -23,7 +22,8 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@vitejs/plugin-react-refresh": "^1.1.0",
-    "farrow-vite": "^1.10.9",
+    "farrow": "^1.11.0",
+    "farrow-vite": "^1.11.0",
     "typescript": "^4.2.2",
     "vite": "^2.0.1"
   }

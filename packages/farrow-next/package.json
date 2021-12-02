@@ -1,6 +1,6 @@
 {
   "name": "farrow-next",
-  "version": "1.10.8",
+  "version": "1.11.0",
   "description": "A framework runs on Next.js",
   "main": "dist/index.js",
   "files": [
@@ -48,7 +48,7 @@
   },
   "dependencies": {
     "cookie": "^0.4.1",
-    "farrow-module": "^1.10.7",
+    "farrow-module": "^1.11.0",
     "isomorphic-unfetch": "^3.1.0",
     "js-cookie": "^2.2.1",
     "qs": "^6.9.6",

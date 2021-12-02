@@ -1,6 +1,6 @@
 {
   "name": "farrow-next-server",
-  "version": "1.10.9",
+  "version": "1.11.0",
   "description": "A next.js adapter for farrow-http",
   "main": "dist/index.js",
   "files": [
@@ -23,7 +23,7 @@
     "url": "git+https://github.com/Lucifier129/farrow.git"
   },
   "peerDependencies": {
-    "farrow-http": "^1.10.9",
+    "farrow-http": "^1.11.0",
     "next": ">=10.0.5",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"
@@ -31,7 +31,7 @@
   "devDependencies": {
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
-    "farrow-http": "^1.10.9",
+    "farrow-http": "^1.11.0",
     "next": "^12.0.4",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"

@@ -38,20 +38,19 @@ importers:
 
   examples/example:
     specifiers:
-      farrow: ^1.10.9
-      farrow-api: ^1.10.9
-      farrow-api-client: ^1.10.9
-      farrow-api-server: ^1.10.9
-      farrow-http: ^1.10.9
-      farrow-pipeline: ^1.10.6
-      farrow-react: ^1.10.9
-      farrow-schema: ^1.10.8
+      farrow: ^1.11.0
+      farrow-api: ^1.11.0
+      farrow-api-client: ^1.11.0
+      farrow-api-server: ^1.11.0
+      farrow-http: ^1.11.0
+      farrow-pipeline: ^1.11.0
+      farrow-react: ^1.11.0
+      farrow-schema: ^1.11.0
       react: ^17.0.0
       react-dom: ^17.0.0
       ts-node: ^9.1.1
       tslib: ^2.1.0
     dependencies:
-      farrow: link:../../packages/farrow
       farrow-api: link:../../packages/farrow-api
       farrow-api-client: link:../../packages/farrow-api-client
       farrow-api-server: link:../../packages/farrow-api-server
@@ -63,6 +62,7 @@ importers:
       react-dom: 17.0.2_react@17.0.2
       tslib: 2.3.1
     devDependencies:
+      farrow: link:../../packages/farrow
       ts-node: 9.1.1
 
   examples/next-app:
@@ -71,20 +71,19 @@ importers:
       '@types/react-dom': ^17.0.0
       '@vitejs/plugin-react-refresh': ^1.1.0
       concurrently: ^6.0.0
-      farrow: ^1.10.9
-      farrow-api: ^1.10.9
-      farrow-api-client: ^1.10.9
-      farrow-api-server: ^1.10.9
-      farrow-http: ^1.10.9
-      farrow-next: ^1.10.8
-      farrow-pipeline: ^1.10.6
-      farrow-schema: ^1.10.8
+      farrow: ^1.11.0
+      farrow-api: ^1.11.0
+      farrow-api-client: ^1.11.0
+      farrow-api-server: ^1.11.0
+      farrow-http: ^1.11.0
+      farrow-next: ^1.11.0
+      farrow-pipeline: ^1.11.0
+      farrow-schema: ^1.11.0
       next: ^11.1.1
       react: ^17.0.0
       react-dom: ^17.0.0
       typescript: ^4.2.2
     dependencies:
-      farrow: link:../../packages/farrow
       farrow-api: link:../../packages/farrow-api
       farrow-api-client: link:../../packages/farrow-api-client
       farrow-api-server: link:../../packages/farrow-api-server
@@ -100,6 +99,7 @@ importers:
       '@types/react-dom': 17.0.9
       '@vitejs/plugin-react-refresh': 1.3.6
       concurrently: 6.2.1
+      farrow: link:../../packages/farrow
       typescript: 4.4.3
 
   examples/todo-app:
@@ -108,13 +108,13 @@ importers:
       '@types/react-dom': ^17.0.0
       '@vitejs/plugin-react-refresh': ^1.1.0
       concurrently: ^6.0.0
-      farrow: ^1.10.9
-      farrow-api: ^1.10.9
-      farrow-api-server: ^1.10.9
-      farrow-http: ^1.10.9
-      farrow-pipeline: ^1.10.6
-      farrow-schema: ^1.10.8
-      farrow-vite: ^1.10.9
+      farrow: ^1.11.0
+      farrow-api: ^1.11.0
+      farrow-api-server: ^1.11.0
+      farrow-http: ^1.11.0
+      farrow-pipeline: ^1.11.0
+      farrow-schema: ^1.11.0
+      farrow-vite: ^1.11.0
       react: ^17.0.0
       react-dom: ^17.0.0
       typescript: ^4.2.2
@@ -159,28 +159,25 @@ importers:
       '@types/node': ^14.14.35
       '@types/react': ^17.0.0
       '@types/react-dom': ^17.0.0
-      farrow: ^1.10.9
-      farrow-api: ^1.10.9
-      farrow-api-client: ^1.10.9
-      farrow-api-server: ^1.10.9
-      farrow-http: ^1.10.9
-      farrow-next: ^1.10.8
-      farrow-next-server: ^1.10.9
-      farrow-pipeline: ^1.10.6
-      farrow-schema: ^1.10.8
+      farrow: ^1.11.0
+      farrow-api: ^1.11.0
+      farrow-api-client: ^1.11.0
+      farrow-api-server: ^1.11.0
+      farrow-http: ^1.11.0
+      farrow-next: ^1.11.0
+      farrow-next-server: ^1.11.0
+      farrow-schema: ^1.11.0
       next: ^11.1.1
       react: ^17.0.0
       react-dom: ^17.0.0
       typescript: ^4.2.2
     dependencies:
-      farrow: link:../../../farrow
       farrow-api: link:../../../farrow-api
       farrow-api-client: link:../../../farrow-api-client
       farrow-api-server: link:../../../farrow-api-server
       farrow-http: link:../../../farrow-http
       farrow-next: link:../../../farrow-next
       farrow-next-server: link:../../../farrow-next-server
-      farrow-pipeline: link:../../../farrow-pipeline
       farrow-schema: link:../../../farrow-schema
       next: 11.1.2_bd7797d63db473de6e2318609a63c933
       react: 17.0.2
@@ -189,29 +186,28 @@ importers:
       '@types/node': 14.17.19
       '@types/react': 17.0.24
       '@types/react-dom': 17.0.9
+      farrow: link:../../../farrow
       typescript: 4.4.3
 
   packages/create-farrow-app/templates/farrow-only:
     specifiers:
       '@types/node': ^14.14.35
-      farrow: ^1.10.9
-      farrow-api: ^1.10.9
-      farrow-api-client: ^1.10.9
-      farrow-api-server: ^1.10.9
-      farrow-http: ^1.10.9
-      farrow-pipeline: ^1.10.6
+      farrow: ^1.11.0
+      farrow-api: ^1.11.0
+      farrow-api-client: ^1.11.0
+      farrow-api-server: ^1.11.0
+      farrow-http: ^1.11.0
       farrow-schema: ^1.10.8
       typescript: ^4.2.2
     dependencies:
-      farrow: link:../../../farrow
       farrow-api: link:../../../farrow-api
       farrow-api-client: link:../../../farrow-api-client
       farrow-api-server: link:../../../farrow-api-server
       farrow-http: link:../../../farrow-http
-      farrow-pipeline: link:../../../farrow-pipeline
       farrow-schema: link:../../../farrow-schema
     devDependencies:
       '@types/node': 14.17.19
+      farrow: link:../../../farrow
       typescript: 4.4.3
 
   packages/create-farrow-app/templates/farrow-vite-react:
@@ -220,20 +216,19 @@ importers:
       '@types/react': ^17.0.0
       '@types/react-dom': ^17.0.0
       '@vitejs/plugin-react-refresh': ^1.1.0
-      farrow: ^1.10.9
-      farrow-api: ^1.10.9
-      farrow-api-client: ^1.10.9
-      farrow-api-server: ^1.10.9
-      farrow-http: ^1.10.9
-      farrow-pipeline: ^1.10.6
-      farrow-schema: ^1.10.8
-      farrow-vite: ^1.10.9
+      farrow: ^1.11.0
+      farrow-api: ^1.11.0
+      farrow-api-client: ^1.11.0
+      farrow-api-server: ^1.11.0
+      farrow-http: ^1.11.0
+      farrow-pipeline: ^1.11.0
+      farrow-schema: ^1.11.0
+      farrow-vite: ^1.11.0
       react: ^17.0.0
       react-dom: ^17.0.0
       typescript: ^4.2.2
       vite: ^2.0.1
     dependencies:
-      farrow: link:../../../farrow
       farrow-api: link:../../../farrow-api
       farrow-api-client: link:../../../farrow-api-client
       farrow-api-server: link:../../../farrow-api-server
@@ -247,6 +242,7 @@ importers:
       '@types/react': 17.0.24
       '@types/react-dom': 17.0.9
       '@vitejs/plugin-react-refresh': 1.3.6
+      farrow: link:../../../farrow
       farrow-vite: link:../../../farrow-vite
       typescript: 4.4.3
       vite: 2.5.10
@@ -264,10 +260,10 @@ importers:
       esbuild: ^0.12.12
       esbuild-node-externals: ^1.3.0
       execa: ^5.0.0
-      farrow-api: ^1.10.9
-      farrow-api-server: ^1.10.9
-      farrow-http: ^1.10.9
-      farrow-schema: ^1.10.8
+      farrow-api: ^1.11.0
+      farrow-api-server: ^1.11.0
+      farrow-http: ^1.11.0
+      farrow-schema: ^1.11.0
       fs-extra: ^9.1.0
       jest: ^27.2.2
       node-fetch: ^2.6.1
@@ -313,8 +309,8 @@ importers:
       '@types/jest': ^27.0.1
       '@types/prettier': ^2.4.0
       cosmiconfig: ^7.0.0
-      farrow-pipeline: ^1.10.6
-      farrow-schema: ^1.10.8
+      farrow-pipeline: ^1.11.0
+      farrow-schema: ^1.11.0
       jest: ^27.2.2
       prettier: ^2.4.1
       ts-jest: ^27.0.5
@@ -335,8 +331,8 @@ importers:
     specifiers:
       '@types/jest': ^27.0.1
       dataloader: ^2.0.0
-      farrow-api-server: ^1.10.9
-      farrow-pipeline: ^1.10.7
+      farrow-api-server: ^1.11.0
+      farrow-pipeline: ^1.11.0
       isomorphic-unfetch: ^3.1.0
       jest: ^27.2.2
       setimmediate: ^1.0.5
@@ -359,9 +355,9 @@ importers:
       '@types/jest': ^27.0.1
       '@types/lodash.get': ^4.4.6
       '@types/supertest': ^2.0.10
-      farrow-api: ^1.10.9
-      farrow-http: ^1.10.9
-      farrow-schema: ^1.10.8
+      farrow-api: ^1.11.0
+      farrow-http: ^1.11.0
+      farrow-schema: ^1.11.0
       jest: ^27.2.2
       lodash.get: ^4.4.2
       supertest: ^6.1.6
@@ -387,8 +383,8 @@ importers:
       '@types/jest': ^27.0.1
       '@types/supertest': ^2.0.10
       cors: ^2.8.5
-      farrow-http: ^1.10.9
-      farrow-pipeline: ^1.10.6
+      farrow-http: ^1.11.0
+      farrow-pipeline: ^1.11.0
       jest: ^27.2.2
       supertest: ^6.1.6
       ts-jest: ^27.0.5
@@ -409,10 +405,10 @@ importers:
   packages/farrow-deno-api:
     specifiers:
       '@types/jest': ^27.0.1
-      farrow-api: ^1.8.0
-      farrow-api-server: ^1.10.3
-      farrow-http: ^1.10.9
-      farrow-schema: ^1.8.0
+      farrow-api: ^1.11.0
+      farrow-api-server: ^1.11.0
+      farrow-http: ^1.11.0
+      farrow-schema: ^1.11.0
       jest: ^27.2.2
       node-fetch: '2'
       supertest: ^6.1.6
@@ -435,9 +431,9 @@ importers:
     specifiers:
       '@types/jest': ^27.0.1
       express: ^4.17.1
-      farrow-http: ^1.10.9
-      farrow-pipeline: ^1.8.0
-      farrow-schema: ^1.8.0
+      farrow-http: ^1.11.0
+      farrow-pipeline: ^1.11.0
+      farrow-schema: ^1.11.0
       jest: ^27.2.2
       supertest: ^6.1.6
       ts-jest: ^27.0.5
@@ -460,11 +456,11 @@ importers:
       '@types/lodash.get': ^4.4.6
       '@types/node': ^16.7.10
       '@types/supertest': ^2.0.11
-      farrow-api: ^1.10.9
-      farrow-api-server: ^1.10.9
-      farrow-cors: ^1.10.8
-      farrow-http: ^1.10.9
-      farrow-schema: ^1.10.8
+      farrow-api: ^1.11.0
+      farrow-api-server: ^1.11.0
+      farrow-cors: ^1.11.0
+      farrow-http: ^1.11.0
+      farrow-schema: ^1.11.0
       jest: ^27.2.2
       node-fetch: ^2.6.2
       supertest: ^6.1.6
@@ -516,8 +512,8 @@ importers:
       destroy: ^1.0.4
       encodeurl: ^1.0.2
       escape-html: ^1.0.3
-      farrow-pipeline: ^1.10.6
-      farrow-schema: ^1.10.8
+      farrow-pipeline: ^1.11.0
+      farrow-schema: ^1.11.0
       jest: ^27.2.2
       mime-types: ^2.1.27
       on-finished: ^2.3.0
@@ -576,8 +572,8 @@ importers:
     specifiers:
       '@types/jest': ^27.0.2
       '@types/json-schema': ^7.0.7
-      farrow-api: ^1.10.9
-      farrow-schema: ^1.10.8
+      farrow-api: ^1.11.0
+      farrow-schema: ^1.11.0
       jest: ^27.2.2
       ts-jest: ^27.0.5
       tslib: ^2.1.0
@@ -596,9 +592,9 @@ importers:
       '@types/jest': ^27.0.2
       '@types/koa': ^2.13.3
       '@types/supertest': ^2.0.11
-      farrow-http: ^1.10.9
-      farrow-pipeline: ^1.8.0
-      farrow-schema: ^1.8.0
+      farrow-http: ^1.11.0
+      farrow-pipeline: ^1.11.0
+      farrow-schema: ^1.11.0
       jest: ^27.2.2
       koa: ^2.13.1
       supertest: ^6.1.6
@@ -641,7 +637,7 @@ importers:
       '@types/react-dom': ^17.0.0
       '@types/redux-logger': ^3.0.7
       cookie: ^0.4.1
-      farrow-module: ^1.10.7
+      farrow-module: ^1.11.0
       isomorphic-unfetch: ^3.1.0
       jest: ^27.2.2
       js-cookie: ^2.2.1
@@ -680,7 +676,7 @@ importers:
     specifiers:
       '@types/react': ^17.0.0
       '@types/react-dom': ^17.0.0
-      farrow-http: ^1.10.9
+      farrow-http: ^1.11.0
       next: ^12.0.4
       react: ^17.0.0
       react-dom: ^17.0.0
@@ -715,7 +711,7 @@ importers:
       '@types/react': ^17.0.0
       '@types/react-dom': ^17.0.0
       '@types/supertest': ^2.0.11
-      farrow-http: ^1.10.9
+      farrow-http: ^1.11.0
       jest: ^27.2.2
       multistream: ^4.0.0
       react: ^17.0.0
@@ -756,7 +752,7 @@ importers:
     specifiers:
       '@types/jest': ^27.0.2
       '@types/supertest': ^2.0.11
-      farrow-http: ^1.10.9
+      farrow-http: ^1.11.0
       jest: ^27.2.2
       supertest: ^6.1.6
       ts-jest: ^27.0.5

@@ -1,5 +1,17 @@
 # farrow-pipeline
 
+## 1.11.1
+
+### Patch Changes
+
+- 59fad53: fix(farrow-pipeline): node version
+
+## 1.11.0
+
+### Minor Changes
+
+- 8c8f010: Update the dependency for DX
+
 ## 1.10.7
 
 ### Patch Changes

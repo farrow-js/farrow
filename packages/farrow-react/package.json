@@ -1,6 +1,6 @@
 {
   "name": "farrow-react",
-  "version": "2.0.0",
+  "version": "1.10.9",
   "description": "React bindings for farrow-http",
   "main": "dist/index.js",
   "files": [

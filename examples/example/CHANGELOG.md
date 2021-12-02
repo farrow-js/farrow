@@ -11,5 +11,4 @@
   - farrow-api-server@1.11.0
   - farrow-http@1.11.0
   - farrow-pipeline@1.11.0
-  - farrow-react@2.0.0
   - farrow-schema@1.11.0

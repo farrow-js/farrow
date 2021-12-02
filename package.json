@@ -23,7 +23,9 @@
     "init": "pnpm install && pnpm run build",
     "test": "pnpm run test --filter ./packages",
     "test:coverage": "pnpm run test:coverage --filter ./packages",
-    "release": "pnpm changeset version && pnpm changeset publish",
+    "publish": "pnpm changeset publish",
+    "version": "pnpm changeset version",
+    "release": "pnpm run version && pnpm run publish",
     "prerelease": "pnpm run format && git add -A && pnpm run build",
     "change": "pnpm changeset"
   },

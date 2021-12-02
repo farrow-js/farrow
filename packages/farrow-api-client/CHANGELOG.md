@@ -1,5 +1,17 @@
 # farrow-api-client
 
+## 1.11.0
+
+### Minor Changes
+
+- 8c8f010: Update the dependency for DX
+
+### Patch Changes
+
+- Updated dependencies [8c8f010]
+  - farrow-api-server@1.11.0
+  - farrow-pipeline@1.11.0
+
 ## 1.10.11
 
 ### Patch Changes

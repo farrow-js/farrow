@@ -1,6 +1,6 @@
 {
   "name": "farrow-http",
-  "version": "1.10.12",
+  "version": "1.11.0",
   "description": "A Type-Friendly Web Framework",
   "main": "dist/index.js",
   "files": [
@@ -56,8 +56,8 @@
     "destroy": "^1.0.4",
     "encodeurl": "^1.0.2",
     "escape-html": "^1.0.3",
-    "farrow-pipeline": "^1.10.6",
-    "farrow-schema": "^1.10.8",
+    "farrow-pipeline": "^1.11.0",
+    "farrow-schema": "^1.11.0",
     "mime-types": "^2.1.27",
     "on-finished": "^2.3.0",
     "path-to-regexp": "^6.1.0",

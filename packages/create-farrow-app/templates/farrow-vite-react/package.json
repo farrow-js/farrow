@@ -8,13 +8,13 @@
     "start": "farrow start"
   },
   "dependencies": {
-    "farrow": "^1.10.9",
-    "farrow-api": "^1.10.9",
-    "farrow-api-client": "^1.10.9",
-    "farrow-api-server": "^1.10.9",
-    "farrow-http": "^1.10.9",
-    "farrow-pipeline": "^1.10.6",
-    "farrow-schema": "^1.10.8",
+    "farrow": "^1.11.0",
+    "farrow-api": "^1.11.0",
+    "farrow-api-client": "^1.11.0",
+    "farrow-api-server": "^1.11.0",
+    "farrow-http": "^1.11.0",
+    "farrow-pipeline": "^1.11.0",
+    "farrow-schema": "^1.11.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"
   },
@@ -23,7 +23,7 @@
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@vitejs/plugin-react-refresh": "^1.1.0",
-    "farrow-vite": "^1.10.9",
+    "farrow-vite": "^2.0.0",
     "typescript": "^4.2.2",
     "vite": "^2.0.1"
   }

@@ -1,6 +1,6 @@
 {
   "name": "farrow-pipeline",
-  "version": "1.11.0",
+  "version": "1.11.1",
   "description": "Type-Friendly middleware library",
   "main": "dist/index.js",
   "files": [
@@ -22,9 +22,6 @@
     "TypeScript",
     "Functional Programming"
   ],
-  "engines": {
-    "node": ">=14.18.1"
-  },
   "author": "Jade Gu",
   "license": "MIT",
   "repository": {

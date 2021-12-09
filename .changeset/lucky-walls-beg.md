@@ -1,5 +1,0 @@
----
-'farrow': patch
----
-
-Feat defineConfig

@@ -1,5 +1,11 @@
 # farrow
 
+## 1.11.1
+
+### Patch Changes
+
+- 0a14c2f: Feat defineConfig
+
 ## 1.11.0
 
 ### Minor Changes

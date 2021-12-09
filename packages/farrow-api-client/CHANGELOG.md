@@ -1,5 +1,11 @@
 # farrow-api-client
 
+## 1.11.1
+
+### Patch Changes
+
+- 2402dbb: Feat: api.setFetcher && api.invoke with fetcher
+
 ## 1.11.0
 
 ### Minor Changes

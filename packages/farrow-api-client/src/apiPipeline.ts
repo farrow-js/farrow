@@ -29,11 +29,16 @@ export type ApiPipelineOptions = {
   fetcher?: Fetcher
 }
 
+export type ApiInvokeOptions = {
+  fetcher?: Fetcher
+}
+
 export type ApiPipeline = AsyncPipeline<ApiRequest, ApiResponse> & {
   match(pattern: string | RegExp, middleware: MiddlewareInput<ApiRequest, MaybeAsync<ApiResponse>>): void
-  invoke(url: string, calling: SingleCalling): Promise<JsonType | Error>
-  invoke(url: string, calling: BatchCalling): Promise<(JsonType | Error)[]>
-  invoke(url: string, calling: Calling): Promise<JsonType | Error | (JsonType | Error)[]>
+  invoke(url: string, calling: SingleCalling, options?: ApiInvokeOptions): Promise<JsonType | Error>
+  invoke(url: string, calling: BatchCalling, options?: ApiInvokeOptions): Promise<(JsonType | Error)[]>
+  invoke(url: string, calling: Calling, options?: ApiInvokeOptions): Promise<JsonType | Error | (JsonType | Error)[]>
+  setFetcher(newFetcher: Fetcher): void
 }
 
 export const createApiPipeline = ({ fetcher = defaultFetcher }: ApiPipelineOptions = {}): ApiPipeline => {
@@ -44,8 +49,8 @@ export const createApiPipeline = ({ fetcher = defaultFetcher }: ApiPipelineOptio
     options?: RunPipelineOptions<ApiRequest, MaybeAsync<ApiResponse>>,
   ): MaybeAsync<ApiResponse> {
     return pipeline.run(request, {
-      ...options,
       onLast: fetcher,
+      ...options,
     })
   }
 
@@ -67,10 +72,19 @@ export const createApiPipeline = ({ fetcher = defaultFetcher }: ApiPipelineOptio
     })
   }
 
-  async function invoke(url: string, calling: SingleCalling): Promise<JsonType | Error>
-  async function invoke(url: string, calling: BatchCalling): Promise<(JsonType | Error)[]>
-  async function invoke(url: string, calling: Calling): Promise<JsonType | Error | (JsonType | Error)[]> {
-    const result = await run({ url, calling })
+  async function invoke(url: string, calling: SingleCalling, options?: ApiInvokeOptions): Promise<JsonType | Error>
+  async function invoke(url: string, calling: BatchCalling, options?: ApiInvokeOptions): Promise<(JsonType | Error)[]>
+  async function invoke(
+    url: string,
+    calling: Calling,
+    options?: ApiInvokeOptions,
+  ): Promise<JsonType | Error | (JsonType | Error)[]> {
+    const runOptions: RunPipelineOptions<ApiRequest, MaybeAsync<ApiResponse>> = {}
+    if (options?.fetcher) {
+      runOptions.onLast = options.fetcher
+    }
+
+    const result = await run({ url, calling }, runOptions)
 
     const handleResult = (apiResponse: ApiResponseSingle) => {
       if (apiResponse.type === 'ApiErrorResponse') {
@@ -86,11 +100,16 @@ export const createApiPipeline = ({ fetcher = defaultFetcher }: ApiPipelineOptio
     return handleResult(result)
   }
 
+  const setFetcher: ApiPipeline['setFetcher'] = (newFetcher) => {
+    fetcher = newFetcher
+  }
+
   return {
     ...pipeline,
     run,
     match,
     invoke,
+    setFetcher,
   }
 }
 
@@ -115,12 +134,12 @@ export const defaultFetcher = async (request: ApiRequest): Promise<ApiResponse> 
   return json
 }
 
-export type ApiInvokeOptions = {
-  batch: boolean
+export type ApiWithUrlInvokeOptions = ApiInvokeOptions & {
+  batch?: boolean
 }
 
 export type ApiPipelineWithUrl = AsyncPipeline<ApiRequest, ApiResponse> & {
-  invoke(calling: SingleCalling, options?: ApiInvokeOptions): Promise<JsonType>
+  invoke(calling: SingleCalling, options?: ApiWithUrlInvokeOptions): Promise<JsonType>
 }
 
 export const createApiPipelineWithUrl = (url: string, options: ApiPipelineOptions = {}): ApiPipelineWithUrl => {
@@ -142,7 +161,7 @@ export const createApiPipelineWithUrl = (url: string, options: ApiPipelineOption
       return dataLoader.load(calling)
     }
 
-    const result = await apiPipeline.invoke(url, calling)
+    const result = await apiPipeline.invoke(url, calling, options)
     dataLoader.prime(calling, result)
 
     if (result instanceof Error) {

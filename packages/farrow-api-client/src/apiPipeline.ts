@@ -29,6 +29,10 @@ export type ApiPipelineOptions = {
   fetcher?: Fetcher
 }
 
+export type ApiInvokeOptions = {
+  fetcher?: Fetcher
+}
+
 export type ApiPipeline = AsyncPipeline<ApiRequest, ApiResponse> & {
   match(pattern: string | RegExp, middleware: MiddlewareInput<ApiRequest, MaybeAsync<ApiResponse>>): void
   invoke(url: string, calling: SingleCalling, options?: ApiInvokeOptions): Promise<JsonType | Error>
@@ -130,13 +134,8 @@ export const defaultFetcher = async (request: ApiRequest): Promise<ApiResponse> 
   return json
 }
 
-export type ApiInvokeOptions = {
-  fetcher?: Fetcher
-}
-
-export type ApiWithUrlInvokeOptions = {
+export type ApiWithUrlInvokeOptions = ApiInvokeOptions & {
   batch?: boolean
-  fetcher?: Fetcher
 }
 
 export type ApiPipelineWithUrl = AsyncPipeline<ApiRequest, ApiResponse> & {

@@ -1,5 +1,11 @@
 # farrow-vite
 
+## 1.11.3
+
+### Patch Changes
+
+- 90bfad9: fix but when getHtmlPath(url) meet querystring
+
 ## 1.11.1
 
 ### Patch Changes

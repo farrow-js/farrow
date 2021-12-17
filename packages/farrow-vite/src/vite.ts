@@ -27,7 +27,13 @@ export const vite = (options?: InlineConfig): ViteRouterPipeline => {
     })
 
     const getHtmlPath = async (url: string): Promise<string> => {
-      const filename = path.join(viteServer.config.root, url.slice(1))
+      const pathname = url.split('?')[0]
+      /**
+       * pathname.slice(1) is to remove the first '/'
+       * /dir/file.html => dir/file.html
+       * path.join('/root', 'dir/file.html') => /root/dir/file.html
+       */
+      const filename = path.join(viteServer.config.root, pathname.slice(1))
 
       if (filename.endsWith('.html')) {
         return filename

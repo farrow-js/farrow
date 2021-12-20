@@ -11,7 +11,7 @@ export default async function start(options: GetConfigOptions) {
       return {
         env: {
           NODE_ENV: 'production',
-        },
+        } as NodeJS.ProcessEnv,
         ...options,
       }
     })

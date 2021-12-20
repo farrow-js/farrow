@@ -2,6 +2,7 @@ import path from 'path'
 import { createContext, Middleware, createPipeline, Pipeline, useContainer } from 'farrow-pipeline'
 import { MaybeAsyncResponse } from './response'
 import { RequestInfo } from './requestInfo'
+import { isPromise } from './util'
 
 export const BasenamesContext = createContext([] as string[])
 
@@ -20,7 +21,7 @@ export const route = (name: string): Pipeline<RequestInfo, MaybeAsyncResponse> =
 
   assertRoutePath(name, `expect the basename passed to 'http.route' should be absolute, accept \`${name}\``)
 
-  const middleware: Middleware<RequestInfo, MaybeAsyncResponse> = async (request, next) => {
+  const middleware: Middleware<RequestInfo, MaybeAsyncResponse> = (request, next) => {
     const container = useContainer()
     const basenames = BasenamesContext.use()
 
@@ -34,7 +35,7 @@ export const route = (name: string): Pipeline<RequestInfo, MaybeAsyncResponse> =
 
     basenames.value = [...currentBasenames, basename]
 
-    const response = await pipeline.run(requestInfo, {
+    const maybeAsyncResponse = pipeline.run(requestInfo, {
       container,
       onLast: () => {
         basenames.value = currentBasenames
@@ -42,9 +43,16 @@ export const route = (name: string): Pipeline<RequestInfo, MaybeAsyncResponse> =
       },
     })
 
-    basenames.value = currentBasenames
+    if (isPromise(maybeAsyncResponse)) {
+      return maybeAsyncResponse.then((response) => {
+        basenames.value = currentBasenames
 
-    return response
+        return response
+      })
+    }
+
+    basenames.value = currentBasenames
+    return maybeAsyncResponse
   }
 
   return {

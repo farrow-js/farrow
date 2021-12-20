@@ -5,6 +5,8 @@ import { HttpPipeline } from 'farrow-http'
 import { Server } from 'http'
 import request from 'supertest'
 
+jest.setTimeout(10000)
+
 const projectPath = path.join(__dirname, '../fixtures/project0')
 
 const srcPath = path.join(projectPath, 'src')

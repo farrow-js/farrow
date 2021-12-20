@@ -4,13 +4,13 @@ import { parse as parseQuery } from 'qs'
 
 import { createContainer } from 'farrow-pipeline'
 
-import { handleResponse, HttpHandlerOptions } from './http'
+import { handleResponse, HttpHandlerOptions, NOT_FOUND_RESPONSE } from './http'
 import { Router } from './router'
 import { Response } from './response'
 import { createLogger } from './logger'
 import { handleBasenames, BasenamesContext } from './basenames'
 import { RequestContext, RequestInfoContext, ResponseContext } from './context'
-import { getBody, getContentLength } from './util'
+import { getBody, getContentLength, isPromise } from './util'
 
 import type { IncomingMessage, ServerResponse } from 'http'
 import type { SecureContextOptions, TlsOptions } from 'tls'
@@ -26,7 +26,7 @@ export type HttpsPipelineOptions = HttpPipelineOptions & {
 }
 
 export type HttpsPipeline = RouterPipeline & {
-  handle: (req: IncomingMessage, res: ServerResponse, options?: HttpHandlerOptions) => Promise<void>
+  handle: (req: IncomingMessage, res: ServerResponse, options?: HttpHandlerOptions) => void
   listen: (...args: Parameters<Server['listen']>) => Server
   server: () => Server
 }
@@ -45,7 +45,7 @@ export const createHttpsPipeline = (options?: HttpsPipelineOptions): HttpsPipeli
 
   const router = Router()
 
-  const handleRequest: HttpsPipeline['handle'] = async (req, res, options) => {
+  const handleRequest: HttpsPipeline['handle'] = (req, res, options) => {
     if (typeof req.url !== 'string') {
       throw new Error(`req.url is not existed`)
     }
@@ -58,55 +58,79 @@ export const createHttpsPipeline = (options?: HttpsPipelineOptions): HttpsPipeli
 
     const query = (req as any).query ?? (parseQuery(search, config.query) as RequestQuery)
 
-    const body = (req as any).body ?? (await getBody(req, config.body))
-
     const headers = req.headers as RequestHeaders
 
     const cookies = parseCookies(req.headers['cookie'] ?? '', config.cookie) as RequestCookies
 
-    const { basename, requestInfo } = handleBasenames(config.basenames ?? [], {
-      pathname,
-      method,
-      query,
-      body,
-      headers,
-      cookies,
-    })
+    const handleBody = (body: any) => {
+      const { basename, requestInfo } = handleBasenames(config.basenames ?? [], {
+        pathname,
+        method,
+        query,
+        body,
+        headers,
+        cookies,
+      })
 
-    const storages = await config.contexts?.({
-      req,
-      requestInfo,
-      basename,
-    })
+      const storages = config.contexts?.({
+        req,
+        requestInfo,
+        basename,
+      })
 
-    const container = createContainer({
-      ...storages,
-      request: RequestContext.create(req),
-      response: ResponseContext.create(res),
-      basenames: BasenamesContext.create([basename]),
-      requestInfo: RequestInfoContext.create(requestInfo),
-    })
+      const container = createContainer({
+        ...storages,
+        request: RequestContext.create(req),
+        response: ResponseContext.create(res),
+        basenames: BasenamesContext.create([basename]),
+        requestInfo: RequestInfoContext.create(requestInfo),
+      })
 
-    const responser = await router.run(requestInfo, {
-      container,
-      onLast: () => {
-        if (options?.onLast) {
-          return Response.custom(options.onLast)
-        }
-        return Response.status(404).text('404 Not Found')
-      },
-    })
+      const maybeAsyncResponse = router.run(requestInfo, {
+        container,
+        onLast: () => {
+          if (options?.onLast) {
+            return Response.custom(options.onLast)
+          }
+          return NOT_FOUND_RESPONSE
+        },
+      })
 
-    await handleResponse({
-      req,
-      res,
-      requestInfo,
-      responseInfo: responser.info,
-      container,
-    })
+      if (isPromise(maybeAsyncResponse)) {
+        return maybeAsyncResponse.then((response) =>
+          handleResponse({
+            req,
+            res,
+            requestInfo,
+            responseInfo: response.info,
+            container,
+          }),
+        )
+      }
+      return handleResponse({
+        req,
+        res,
+        requestInfo,
+        responseInfo: maybeAsyncResponse.info,
+        container,
+      })
+    }
+
+    if ((req as any).body) {
+      return handleBody((req as any).body)
+    }
+    const maybeAsyncBody = getBody(req, config.body)
+    if (maybeAsyncBody) {
+      return maybeAsyncBody
+        .then((body) => handleBody(body))
+        .catch((err) => {
+          throw err
+        })
+    }
+    return handleBody(maybeAsyncBody)
   }
 
-  const handle: HttpsPipeline['handle'] = async (req, res, options) => {
+  const handle: HttpsPipeline['handle'] = (req, res, options) => {
     if (logger) {
       const startTime = Date.now()
       const method = req.method ?? 'GET'
@@ -146,7 +170,7 @@ export const createHttpsPipeline = (options?: HttpsPipelineOptions): HttpsPipeli
     }
 
     try {
-      return await handleRequest(req, res, options)
+      return handleRequest(req, res, options)
     } catch (error: any) {
       const message = (config.errorStack ? error?.stack || error?.message : error?.message) ?? ''
 

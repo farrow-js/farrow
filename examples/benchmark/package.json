@@ -1,0 +1,39 @@
+{
+  "name": "benchmarks",
+  "private": true,
+  "repository": "git@github.com:tqma113/benchmarks.git",
+  "author": "Ma Tianqi <mtq1997@126.com>",
+  "license": "MIT",
+  "scripts": {
+    "dev": "farrow dev",
+    "dev:sample": "farrow dev --config=farrow.sample.config.js",
+    "dev:schema": "farrow dev --config=farrow.schema.config.js",
+    "build": "farrow build",
+    "build:sample": "farrow build --config=farrow.sample.config.js",
+    "build:schema": "farrow build --config=farrow.schema.config.js",
+    "start": "farrow start",
+    "start:sample": "farrow start --config=farrow.sample.config.js",
+    "start:schema": "farrow start --config=farrow.schema.config.js",
+    "doctor": "clinic doctor -- node ./dist/simple/index.js",
+    "bubbleprof": "clinic bubbleprof -- node ./dist/simple/index.js",
+    "flame": "clinic flame -- node ./dist/simple/index.js",
+    "bench": "branchcmp -r 2 -g -s \"npm run benchmark\"",
+    "benchmark": "npx concurrently -k -s first \"node ./dist/simple/index.js\" \"npx autocannon -c 100 -d 30 -p 10 localhost:3000/\"",
+    "native": "npx concurrently -k -s first \"node ./index.js\" \"npx autocannon -c 100 -d 30 -p 10 localhost:3000/\"",
+    "doctor:native": "clinic doctor -- node ./index.js"
+  },
+  "dependencies": {
+    "farrow-api": "^1.11.0",
+    "farrow-api-server": "^1.11.0",
+    "farrow-http": "^1.11.0",
+    "farrow-schema": "^1.11.0"
+  },
+  "devDependencies": {
+    "@types/node": "^16.11.12",
+    "autocannon": "^7.5.0",
+    "branch-comparer": "^1.1.0",
+    "concurrently": "^6.4.0",
+    "farrow": "^1.11.1",
+    "typescript": "^4.5.3"
+  }
+}

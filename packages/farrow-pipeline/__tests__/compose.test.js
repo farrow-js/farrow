@@ -144,7 +144,7 @@ describe('Koa Compose', () => {
     stack.push(() => {
       throw new Error()
     })
-    return expect(() => compose(stack)({})).rejects.toThrow(Error)
+    return expect(() => compose(stack)({})).toThrow(Error)
   })
 
   it('should work when yielding at the end of the stack with yield*', () => {
@@ -222,7 +222,7 @@ describe('Koa Compose', () => {
       throw new Error()
     })
 
-    return expect(() => compose(stack)({})).rejects.toThrow(Error)
+    return expect(() => compose(stack)({})).toThrow(Error)
   })
 
   // https://github.com/koajs/compose/pull/27#issuecomment-143109739

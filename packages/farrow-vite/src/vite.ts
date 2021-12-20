@@ -9,7 +9,7 @@ export type ViteRouterPipeline = RouterPipeline & {
 }
 
 export type FarrowViteOptions = InlineConfig & {
-  onBeforeSendHtml?: (html: string) => string
+  onBeforeSendHtml?: (html: string) => string | Promise<string>
 }
 
 export const vite = (options?: FarrowViteOptions): ViteRouterPipeline => {
@@ -63,7 +63,12 @@ export const vite = (options?: FarrowViteOptions): ViteRouterPipeline => {
 
           res.statusCode = 200
           res.setHeader('Content-Type', 'text/html')
-          res.end(options?.onBeforeSendHtml?.(html) ?? html)
+
+          if (options?.onBeforeSendHtml) {
+            res.end(await options.onBeforeSendHtml(html))
+          } else {
+            res.end(html)
+          }
         } catch (error: any) {
           if (!res.headersSent) {
             res.setHeader('Content-Type', 'text/plain')

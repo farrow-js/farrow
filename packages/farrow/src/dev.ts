@@ -12,7 +12,7 @@ export default async function dev(options: GetConfigOptions) {
       return {
         env: {
           NODE_ENV: 'development',
-        },
+        } as NodeJS.ProcessEnv,
         ...options,
       }
     })

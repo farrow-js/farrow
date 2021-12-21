@@ -13,7 +13,7 @@ export default async function build(options: GetConfigOptions) {
         minify: true,
         env: {
           NODE_ENV: 'production',
-        },
+        } as NodeJS.ProcessEnv,
         ...options,
       }
     })

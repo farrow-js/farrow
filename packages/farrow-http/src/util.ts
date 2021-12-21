@@ -3,6 +3,7 @@ import typeis from 'type-is'
 import parseBody, { Options as BodyOptions } from 'co-body'
 
 import type { IncomingMessage, ServerResponse } from 'http'
+import type { MaybeAsync } from 'farrow-pipeline'
 
 export type PrettyNumberOptions = {
   delimiter?: string
@@ -31,9 +32,7 @@ export const prettyTime = (start: number): string => {
   return prettyNumber(delta < 10000 ? `${delta}ms` : `${Math.round(delta / 1000)}s`)
 }
 
-export const { access } = fs.promises
-
-export const { stat } = fs.promises
+export const { access, stat } = fs.promises
 
 export const getStats = (filename: string) => {
   return stat(filename)
@@ -57,13 +56,16 @@ const jsonTypes = ['json', 'application/*+json', 'application/csp-report']
 const formTypes = ['urlencoded']
 const textTypes = ['text']
 
-export const getBody = async (req: IncomingMessage, options?: BodyOptions) => {
+export const getBody = (req: IncomingMessage, options?: BodyOptions) => {
   const type = typeis(req, jsonTypes) || typeis(req, formTypes) || typeis(req, textTypes)
 
   if (type) {
-    const body = await parseBody(req, options)
-    return body
+    return parseBody(req, options)
   }
 
   return null
+}
+
+export const isPromise = <Input>(input: MaybeAsync<Input>): input is Promise<Input> => {
+  return input && 'then' in input && typeof input.then === 'function'
 }

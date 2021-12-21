@@ -14,11 +14,11 @@ describe('Router', () => {
       return Response.json(request)
     })
 
-    await expect(
+    expect(() =>
       router.run({
         pathname: '/abc',
       }),
-    ).rejects.toThrow()
+    ).toThrow()
 
     const result = await router.run({
       pathname: '/test',
@@ -72,11 +72,11 @@ describe('Router', () => {
       return Response.json(request)
     })
 
-    await expect(
+    expect(() =>
       router.run({
         pathname: '/detail/abc',
       }),
-    ).rejects.toThrow()
+    ).toThrow()
 
     const request0 = {
       pathname: '/detail/123',
@@ -188,7 +188,7 @@ describe('Router', () => {
       query: {},
     }
 
-    await expect(router.run(request2)).rejects.toThrow()
+    expect(() => router.run(request2)).toThrow()
   })
 
   it('can validate number | int | float | boolean strictly', async () => {
@@ -218,14 +218,14 @@ describe('Router', () => {
         return Response.json(request)
       })
 
-    await expect(
+    expect(() =>
       router0.run({
         pathname: '/',
         query: {
           id: '123',
         },
       }),
-    ).rejects.toThrow()
+    ).toThrow()
 
     const result1 = await router1.run({
       pathname: '/',
@@ -256,17 +256,17 @@ describe('Router', () => {
         return Response.json(request)
       })
 
-    await expect(
+    expect(() =>
       router.run({
         pathname: '/abc',
       }),
-    ).rejects.toThrow()
+    ).toThrow()
 
-    await expect(
+    expect(() =>
       router.run({
         pathname: '/abc/test',
       }),
-    ).rejects.toThrow()
+    ).toThrow()
 
     const result0 = await router.run({
       pathname: '/test/abc',
@@ -494,11 +494,11 @@ describe('Router Url Pattern', () => {
         })
       })
 
-    await expect(
+    expect(() =>
       router.run({
         pathname: '/abc',
       }),
-    ).rejects.toThrow()
+    ).toThrow()
 
     const result0 = await router.run({
       pathname: '/string/123',
@@ -736,11 +736,11 @@ describe('Router Url Pattern', () => {
         })
       })
 
-    await expect(
+    expect(() =>
       router.run({
         pathname: '/abc',
       }),
-    ).rejects.toThrow()
+    ).toThrow()
 
     const result0 = await router.run({
       pathname: '/string',
@@ -970,7 +970,7 @@ describe('Router Url Pattern', () => {
         })
       })
 
-    await expect(
+    expect(() =>
       router.run({
         pathname: '/static',
         query: {
@@ -978,7 +978,7 @@ describe('Router Url Pattern', () => {
           b: 'b',
         },
       }),
-    ).rejects.toThrow()
+    ).toThrow()
 
     const result0 = await router.run({
       pathname: '/static',
@@ -1041,7 +1041,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    await expect(
+    expect(() =>
       router.run({
         pathname: '/mix0',
         query: {
@@ -1050,7 +1050,7 @@ describe('Router Url Pattern', () => {
           c: 'abc',
         },
       }),
-    ).rejects.toThrow()
+    ).toThrow()
 
     const result3 = await router.run({
       pathname: '/mix1',
@@ -1073,7 +1073,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    await expect(
+    expect(() =>
       router.run({
         pathname: '/mix1',
         query: {
@@ -1082,7 +1082,7 @@ describe('Router Url Pattern', () => {
           c: 30000,
         },
       }),
-    ).rejects.toThrow()
+    ).toThrow()
 
     const result4 = await router.run({
       pathname: '/mix2',
@@ -1105,7 +1105,7 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    await expect(
+    expect(() =>
       router.run({
         pathname: '/mix1',
         query: {
@@ -1114,7 +1114,7 @@ describe('Router Url Pattern', () => {
           c: 'abc',
         },
       }),
-    ).rejects.toThrow()
+    ).toThrow()
   })
 
   it('support using dynamic params in pathname and querystring at the same time', async () => {
@@ -1131,14 +1131,14 @@ describe('Router Url Pattern', () => {
         })
       })
 
-    await expect(
+    expect(() =>
       router.run({
         pathname: '/test0/farrow/20',
         query: {
           static: 'abc',
         },
       }),
-    ).rejects.toThrow()
+    ).toThrow()
 
     const result0 = await router.run({
       pathname: '/test0/farrow/20',
@@ -1260,11 +1260,11 @@ describe('Router Url Pattern', () => {
       },
     })
 
-    await expect(
+    expect(() =>
       router.run({
         pathname: '/one/or/more',
       }),
-    ).rejects.toThrow()
+    ).toThrow()
 
     const result6 = await router.run({
       pathname: '/one/or/more/abc',

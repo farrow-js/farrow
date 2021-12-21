@@ -45,7 +45,8 @@
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "supertest": "^6.1.6",
-    "ts-jest": "^27.0.5"
+    "ts-jest": "^27.0.5",
+    "typescript": "^4.5.4"
   },
   "dependencies": {
     "multistream": "^4.0.0",

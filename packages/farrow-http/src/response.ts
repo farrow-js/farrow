@@ -23,6 +23,7 @@ import {
   is,
   BodyMap,
 } from './responseInfo'
+import { isPromise } from './util'
 
 type ResponseInfoCreator = (...args: any) => ResponseInfo
 
@@ -95,11 +96,29 @@ export const matchBodyType = <T extends keyof BodyMap>(
   type: T,
   f: (body: BodyMap[T]) => MaybeAsyncResponse,
 ): Middleware<any, MaybeAsyncResponse> => {
-  return async (request, next) => {
-    const response = await next(request)
+  return (request, next) => {
+    const response = next(request)
+
+    if (isPromise(response)) {
+      return response.then((response) => {
+        if (response.info.body?.type === type) {
+          const fResult = f(response.info.body as BodyMap[T])
+          if (isPromise(fResult)) {
+            return fResult.then(response.merge)
+          }
+          return fResult
+        }
+
+        return response
+      })
+    }
 
     if (response.info.body?.type === type) {
-      return response.merge(await f(response.info.body as BodyMap[T]))
+      const fResult = f(response.info.body as BodyMap[T])
+      if (isPromise(fResult)) {
+        return fResult.then(response.merge)
+      }
+      return fResult
     }
 
     return response

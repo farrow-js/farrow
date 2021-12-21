@@ -105,9 +105,10 @@ export type Container = {
 const createContextMap = (storage: ContextStorage) => {
   const contextMap = new Map<symbol, Context>()
 
-  Object.values(storage).forEach((context) => {
-    contextMap.set(context.id, context)
-  })
+  const contexts = Object.values(storage)
+  for (let i = 0; i < contexts.length; i++) {
+    contextMap.set(contexts[i].id, contexts[i])
+  }
 
   return contextMap
 }
@@ -127,13 +128,11 @@ export const createContainer = (ContextStorage: ContextStorage = {}): Container 
     contextMap.set(context.id, context.create(value))
   }
 
-  const container: Container = Object.freeze({
+  return Object.freeze({
     [ContainerSymbol]: true,
     read,
     write,
   })
-
-  return container
 }
 
 export type Hooks = {

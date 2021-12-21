@@ -15,7 +15,7 @@ export const compose = <T, U>(middlewares: KoaMiddleware<T, U>[]) => {
     }
   }
 
-  return async (context: T, next?: KoaMiddleware<T, U>) => {
+  return (context: T, next?: KoaMiddleware<T, U>) => {
     const pipeline = createPipeline<T, MiddlewareReturnType<U>>()
 
     pipeline.use(...middlewares.map(toKoaMiddleware))

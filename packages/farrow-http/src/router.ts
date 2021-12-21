@@ -1,16 +1,8 @@
 import path from 'path'
 import { match as createMatch, MatchFunction, Path as Pathname } from 'path-to-regexp'
-import { parse as parseQuery } from 'qs'
+import { parse as parseQuery } from 'querystring'
 
-import {
-  createPipeline,
-  useContainer,
-  MiddlewareInput,
-  Pipeline,
-  Middleware,
-  AsyncPipeline,
-  createAsyncPipeline,
-} from 'farrow-pipeline'
+import { createPipeline, useContainer, MiddlewareInput, Pipeline, Middleware } from 'farrow-pipeline'
 import * as Schema from 'farrow-schema'
 import type { ValidationError } from 'farrow-schema/validator'
 import { Validator, createSchemaValidator } from 'farrow-schema/validator'
@@ -250,7 +242,7 @@ export type HttpMiddlewareInput = MiddlewareInput<RequestInfo, MaybeAsyncRespons
 
 export type MatchOptions = {
   block?: boolean
-  onSchemaError?(error: ValidationError): Response | void | Promise<Response | void>
+  onSchemaError?(error: ValidationError): Response | void
 }
 
 export type RouterSchema = RouterRequestSchema | RouterUrlSchema
@@ -267,7 +259,7 @@ export type MatchedPipeline<T extends RouterSchema> = T extends RouterRequestSch
   ? Pipeline<TypeOfUrlSchema<T>, MaybeAsyncResponse>
   : never
 
-export type RouterPipeline = AsyncPipeline<RequestInfo, Response> & {
+export type RouterPipeline = Pipeline<RequestInfo, MaybeAsyncResponse> & {
   capture: <T extends keyof BodyMap>(type: T, f: (body: BodyMap[T]) => MaybeAsyncResponse) => void
   route: (name: string) => Pipeline<RequestInfo, MaybeAsyncResponse>
   serve: (name: string, dirname: string) => void
@@ -310,7 +302,7 @@ export type RoutingMethods = {
 export type RouterPipelineOptions = string
 
 export const createRouterPipeline = (): RouterPipeline => {
-  const pipeline = createAsyncPipeline<RequestInfo, Response>()
+  const pipeline = createPipeline<RequestInfo, MaybeAsyncResponse>()
 
   const capture: RouterPipeline['capture'] = (type, f) => {
     pipeline.use(matchBodyType(type, f))
@@ -332,7 +324,7 @@ export const createRouterPipeline = (): RouterPipeline => {
       return `${filename}/index.html`
     }
 
-    route(name).use(async (request, next) => {
+    route(name).use((request, next) => {
       // prevent directory traversal attack
       const filename = path.normalize(request.pathname)
       const fullpath = path.join(dirname, filename)
@@ -340,27 +332,29 @@ export const createRouterPipeline = (): RouterPipeline => {
         return next(request)
       }
 
-      const stats = await getStats(fullpath)
-
-      /**
-       * handle file
-       */
-      if (stats?.isFile()) {
-        return Response.file(fullpath)
-      }
-
-      /**
-       * handle {dirname}/index.html
-       */
-      if (stats?.isDirectory()) {
-        const indexHtmlPath = getIndexHtmlPath(fullpath)
-        const indexHtmlStats = await getStats(indexHtmlPath)
-        if (indexHtmlStats?.isFile()) {
-          return Response.file(getIndexHtmlPath(fullpath))
+      return getStats(fullpath).then((stats) => {
+        /**
+         * handle file
+         */
+        if (stats?.isFile()) {
+          return Response.file(fullpath)
         }
-      }
 
-      return next(request)
+        /**
+         * handle {dirname}/index.html
+         */
+        if (stats?.isDirectory()) {
+          const indexHtmlPath = getIndexHtmlPath(fullpath)
+          return getStats(indexHtmlPath).then((indexHtmlStats) => {
+            if (indexHtmlStats?.isFile()) {
+              return Response.file(getIndexHtmlPath(fullpath))
+            }
+            return next(request)
+          })
+        }
+
+        return next(request)
+      })
     })
   }
 
@@ -384,7 +378,7 @@ export const createRouterPipeline = (): RouterPipeline => {
 
     const methods = getMethods(method)
 
-    pipeline.use(async (input, next) => {
+    pipeline.use((input, next) => {
       const container = useContainer()
 
       if (input.method && !methods.includes(input.method.toLowerCase())) {
@@ -406,7 +400,7 @@ export const createRouterPipeline = (): RouterPipeline => {
 
       if (result.isErr) {
         if (config.onSchemaError) {
-          const response = await config.onSchemaError(result.value)
+          const response = config.onSchemaError(result.value)
           if (response) return response
         }
 

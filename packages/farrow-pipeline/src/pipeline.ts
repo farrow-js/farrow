@@ -101,10 +101,7 @@ export const createPipeline = <I, O>(options?: PipelineOptions) => {
         throw new Error(`Expect returning a value, but all middlewares just calling next()`)
       }
 
-      const middleware = middlewares[index]
-      const result = runHooks(() => middleware(input, next), hooks)
-
-      return result
+      return runHooks(() => middlewares[index](input, next), hooks)
     })
   }
 
@@ -112,19 +109,31 @@ export const createPipeline = <I, O>(options?: PipelineOptions) => {
   const currentHooks = fromContainer(currentContainer)
   const currentCounter = createCurrentCounter(currentHooks)
 
-  const run: Pipeline<I, O>['run'] = (input, options) => {
-    const container = options?.container ?? currentContainer
-    const hooks = container === currentContainer ? currentHooks : fromContainer(container)
-    let counter = container === currentContainer ? currentCounter : createCurrentCounter(hooks)
+  const getCounter = (options?: RunPipelineOptions<I, O>) => {
+    if (!options) return currentCounter
 
-    if (options?.onLast) {
-      const onLastWithContext = typeof options.onLastWithContext === 'boolean' ? options.onLastWithContext : true
-      counter = createCurrentCounter(hooks, options.onLast, onLastWithContext)
+    if (options?.container) {
+      const hooks = fromContainer(options?.container)
+      return options?.onLast
+        ? createCurrentCounter(
+            hooks,
+            options.onLast,
+            typeof options.onLastWithContext === 'boolean' ? options.onLastWithContext : true,
+          )
+        : createCurrentCounter(hooks)
     }
 
-    const result = counter.start(input)
+    return options?.onLast
+      ? createCurrentCounter(
+          currentHooks,
+          options.onLast,
+          typeof options.onLastWithContext === 'boolean' ? options.onLastWithContext : true,
+        )
+      : createCurrentCounter(currentHooks)
+  }
 
-    return result
+  const run: Pipeline<I, O>['run'] = (input, options) => {
+    return getCounter(options).start(input)
   }
 
   const middleware: Pipeline<I, O>['middleware'] = (input, next) => {
@@ -151,11 +160,9 @@ export type PipelineOutput<T extends Pipeline> = T extends Pipeline<any, infer O
 export const usePipeline = <I, O>(pipeline: Pipeline<I, O>) => {
   const container = useContainer()
 
-  const runPipeline = (input: I, options?: RunPipelineOptions<I, O>): O => {
+  return (input: I, options?: RunPipelineOptions<I, O>): O => {
     return pipeline.run(input, { ...options, container })
   }
-
-  return runPipeline
 }
 
 export type MaybeAsync<T> = T | Promise<T>

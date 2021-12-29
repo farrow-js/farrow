@@ -133,7 +133,7 @@ const KEY = fs.readFileSync(path.join(__dirname, './keys/https-key.pem'))
 const CA = fs.readFileSync(path.join(__dirname, 'keys/https-csr.pem'))
 
 const https = Https({
-  tsl: {
+  tls: {
     cert: CERT,
     ca: CA,
     key: KEY,

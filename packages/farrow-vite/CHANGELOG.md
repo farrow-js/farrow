@@ -1,8 +1,8 @@
 # farrow-vite
 
-## 2.0.0
+## 1.11.5
 
-### Major Changes
+### Patch Changes
 
 - feat: support handling html before it is sent
 

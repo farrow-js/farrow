@@ -22,7 +22,7 @@ import type { LoggerEvent, LoggerOptions } from './logger'
 export type HttpsOptions = SecureContextOptions & TlsOptions
 
 export type HttpsPipelineOptions = HttpPipelineOptions & {
-  tsl?: HttpsOptions
+  tls?: HttpsOptions
 }
 
 export type HttpsPipeline = RouterPipeline & {
@@ -187,7 +187,7 @@ export const createHttpsPipeline = (options?: HttpsPipelineOptions): HttpsPipeli
   }
 
   const server: HttpsPipeline['server'] = () => {
-    return options?.tsl ? createServer(options.tsl, handle) : createServer(handle)
+    return options?.tls ? createServer(options.tls, handle) : createServer(handle)
   }
 
   const listen: HttpsPipeline['listen'] = (...args) => {

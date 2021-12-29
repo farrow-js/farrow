@@ -12,7 +12,7 @@ const CA = fs.readFileSync(path.join(__dirname, 'keys/https-csr.pem'))
 const createHttps = (options?: HttpsPipelineOptions) => {
   return Https({
     logger: false,
-    tsl: {
+    tls: {
       cert: CERT,
       ca: CA,
       key: KEY,

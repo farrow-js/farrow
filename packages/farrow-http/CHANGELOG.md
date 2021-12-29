@@ -1,5 +1,14 @@
 # farrow-http
 
+## 1.11.1
+
+### Patch Changes
+
+- 7d469aa: Fix https typo
+- 5052544: Performance Optimize
+- Updated dependencies [5052544]
+  - farrow-pipeline@1.11.2
+
 ## 1.11.0
 
 ### Minor Changes

@@ -1,5 +1,13 @@
 # farrow-http
 
+## 1.11.2
+
+### Patch Changes
+
+- 2eb1d69: Performance Optimize
+- Updated dependencies [2eb1d69]
+  - farrow-pipeline@1.11.3
+
 ## 1.11.1
 
 ### Patch Changes

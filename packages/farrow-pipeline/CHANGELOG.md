@@ -1,5 +1,11 @@
 # farrow-pipeline
 
+## 1.11.3
+
+### Patch Changes
+
+- 2eb1d69: Performance Optimize
+
 ## 1.11.2
 
 ### Patch Changes

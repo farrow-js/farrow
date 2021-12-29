@@ -24,6 +24,7 @@
     "test": "pnpm run test --filter ./packages",
     "test:coverage": "pnpm run test:coverage --filter ./packages",
     "publish": "pnpm changeset publish",
+    "prepublish": "pnpm run format && git add -A && pnpm run build",
     "version": "pnpm changeset version",
     "release": "pnpm run version && pnpm run publish",
     "prerelease": "pnpm run format && git add -A && pnpm run build",

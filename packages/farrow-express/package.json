@@ -1,6 +1,6 @@
 {
   "name": "farrow-express",
-  "version": "1.11.0",
+  "version": "1.11.2",
   "description": "A Type-Friendly Web Framework",
   "main": "dist/index.js",
   "files": [
@@ -25,13 +25,13 @@
   },
   "peerDependencies": {
     "express": "^4.17.1",
-    "farrow-http": "^1.11.0"
+    "farrow-http": "^1.11.2"
   },
   "devDependencies": {
     "@types/jest": "^27.0.1",
     "express": "^4.17.1",
-    "farrow-http": "^1.11.0",
-    "farrow-pipeline": "^1.11.0",
+    "farrow-http": "^1.11.2",
+    "farrow-pipeline": "^1.11.3",
     "farrow-schema": "^1.11.0",
     "jest": "^27.2.2",
     "supertest": "^6.1.6",

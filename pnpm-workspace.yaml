@@ -2,3 +2,5 @@ packages:
  - 'packages/*'
  - 'examples/*'
  - 'packages/create-farrow-app/templates/*'
+ - 'packages/farrow/fixtures/*'
+ 

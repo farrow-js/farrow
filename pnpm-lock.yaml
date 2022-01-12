@@ -849,8 +849,16 @@ importers:
   packages/farrow/fixtures/project0:
     specifiers:
       farrow: workspace:^1.11.2
+      farrow-api: workspace:^1.11.0
+      farrow-api-server: workspace:^1.11.0
+      farrow-http: workspace:^1.11.2
+      farrow-schema: workspace:^1.11.0
     dependencies:
       farrow: link:../..
+      farrow-api: link:../../../farrow-api
+      farrow-api-server: link:../../../farrow-api-server
+      farrow-http: link:../../../farrow-http
+      farrow-schema: link:../../../farrow-schema
 
 packages:
 

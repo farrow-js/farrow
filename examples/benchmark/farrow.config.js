@@ -10,5 +10,5 @@ module.exports = defineConfig({
       src: './src/schema',
       dist: './dist/schema',
     },
-  ]
+  ],
 })

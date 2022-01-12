@@ -13,7 +13,6 @@
   },
   "files": [
     "dist",
-    "scripts",
     "bin",
     "src"
   ],
@@ -43,20 +42,21 @@
     "typescript": "^4.5.4"
   },
   "dependencies": {
+    "chalk": "^4.1.2",
     "chokidar": "^3.4.1",
+    "commander": "^8.3.0",
     "cosmiconfig": "^7.0.0",
-    "cross-spawn": "^7.0.3",
     "esbuild": "^0.14.5",
     "esbuild-node-externals": "^1.4.1",
     "execa": "^5.0.0",
     "farrow-api": "^1.11.0",
     "farrow-schema": "^1.11.0",
     "fs-extra": "^9.1.0",
+    "leven": "3",
     "node-fetch": "^2.6.1",
     "read-pkg-up": "^7.0.1",
     "replace-in-file": "^6.2.0",
     "slash": "^3.0.0",
-    "tslib": "^2.1.0",
-    "yargs": "^15.3.1"
+    "tslib": "^2.1.0"
   }
 }

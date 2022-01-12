@@ -1,8 +1,11 @@
 {
   "name": "project0",
   "scripts": {
-    "dev": "node ../../bin/scripts dev",
-    "build": "node ../../bin/scripts build",
-    "start": "node ../../bin/scripts start"
+    "dev": "farrow dev",
+    "build": "farrow build",
+    "start": "farrow start"
+  },
+  "dependencies": {
+    "farrow": "workspace:^1.11.2"
   }
 }

@@ -6,5 +6,5 @@ module.exports = defineConfig({
       src: './src/simple',
       dist: './dist/simple',
     },
-  ]
+  ],
 })

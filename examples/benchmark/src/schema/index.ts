@@ -5,21 +5,24 @@ import { ApiService } from 'farrow-api-server'
 
 const http = Http()
 
-const Greeting = Api({
-  input: Unknown,
-  output: Struct({
-    message: String
-  })
-}, () => {
-  return {
-    message: 'Hello Farrow.'
-  }
-})
+const Greeting = Api(
+  {
+    input: Unknown,
+    output: Struct({
+      message: String,
+    }),
+  },
+  () => {
+    return {
+      message: 'Hello Farrow.',
+    }
+  },
+)
 
 const GreetingService = ApiService({
   entries: {
-    Greeting
-  }
+    Greeting,
+  },
 })
 
 http.use(GreetingService)

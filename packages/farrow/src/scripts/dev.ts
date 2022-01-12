@@ -1,6 +1,6 @@
-import { createServerBundlers } from './bundler/server'
-import { createApiClients } from './api-client'
-import { getConfig, GetConfigOptions } from './config'
+import { createServerBundlers } from '../bundler/server'
+import { createApiClients } from '../api-client'
+import { getConfig, GetConfigOptions } from '../config'
 
 export default async function dev(options: GetConfigOptions) {
   const config = await getConfig(options)

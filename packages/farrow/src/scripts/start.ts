@@ -1,8 +1,7 @@
-import { createServerBundler, createServerBundlers } from './bundler/server'
-import { getConfig, GetConfigOptions } from './config'
-import { createApiClients } from './api-client'
+import { createServerBundler, createServerBundlers } from '../bundler/server'
+import { getConfig, GetConfigOptions } from '../config'
 
-export default async function build(options: GetConfigOptions) {
+export default async function start(options: GetConfigOptions) {
   const config = await getConfig(options)
 
   const serversOptions = config.server ? (Array.isArray(config.server) ? config.server : [config.server]) : []
@@ -10,7 +9,6 @@ export default async function build(options: GetConfigOptions) {
   if (serversOptions.length > 0) {
     const bundlers = serversOptions.map((options) => {
       return {
-        minify: true,
         env: {
           NODE_ENV: 'production',
         } as NodeJS.ProcessEnv,
@@ -20,11 +18,7 @@ export default async function build(options: GetConfigOptions) {
     const serverBundlers = createServerBundlers({ bundlers })
 
     await serverBundlers.start({
-      build: true,
+      run: true,
     })
   }
-
-  const clientsOptions = config.api ? (Array.isArray(config.api) ? config.api : [config.api]) : []
-  const apiClients = createApiClients({ services: clientsOptions })
-  await apiClients.build()
 }

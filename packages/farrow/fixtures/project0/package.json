@@ -1,8 +1,16 @@
 {
   "name": "project0",
+  "private": true,
   "scripts": {
-    "dev": "node ../../bin/scripts dev",
-    "build": "node ../../bin/scripts build",
-    "start": "node ../../bin/scripts start"
+    "dev": "farrow dev",
+    "build": "farrow build",
+    "start": "farrow start"
+  },
+  "dependencies": {
+    "farrow": "workspace:^1.11.2",
+    "farrow-api": "workspace:^1.11.0",
+    "farrow-api-server": "workspace:^1.11.0",
+    "farrow-http": "workspace:^1.11.2",
+    "farrow-schema": "workspace:^1.11.0"
   }
 }

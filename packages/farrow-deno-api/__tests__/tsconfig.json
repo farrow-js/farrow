@@ -3,6 +3,7 @@
   "compilerOptions": {
     "rootDir": "../",
     "noEmit": true,
+    "lib": ["DOM"],
     "types": ["node", "jest"]
   },
   "include": ["./"]

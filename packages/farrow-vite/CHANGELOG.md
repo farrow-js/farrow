@@ -1,5 +1,13 @@
 # farrow-vite
 
+## 1.11.6
+
+### Patch Changes
+
+- 797144c: Fix http async pipeline
+- Updated dependencies [797144c]
+  - farrow-http@1.11.3
+
 ## 1.11.5
 
 ### Patch Changes

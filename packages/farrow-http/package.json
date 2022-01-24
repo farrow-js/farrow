@@ -1,6 +1,6 @@
 {
   "name": "farrow-http",
-  "version": "1.11.2",
+  "version": "1.11.3",
   "description": "A Type-Friendly Web Framework",
   "main": "dist/index.js",
   "files": [

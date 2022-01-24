@@ -1,5 +1,11 @@
 # farrow-http
 
+## 1.11.3
+
+### Patch Changes
+
+- 797144c: Fix http async pipeline
+
 ## 1.11.2
 
 ### Patch Changes

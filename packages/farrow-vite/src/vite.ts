@@ -21,7 +21,7 @@ export const vite = (options?: FarrowViteOptions): ViteRouterPipeline => {
 
   let viteDevServers: ViteDevServer[] = []
 
-  router.use(async () => {
+  router.useLazy(async () => {
     const viteServer = await createViteServer({
       server: {
         ...config.server,
@@ -84,7 +84,9 @@ export const vite = (options?: FarrowViteOptions): ViteRouterPipeline => {
 
     viteDevServers.push(viteServer)
 
-    return Response.custom(handler)
+    return () => {
+      return Response.custom(handler)
+    }
   })
 
   return {

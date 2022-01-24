@@ -2,7 +2,15 @@ import path from 'path'
 import { match as createMatch, MatchFunction, Path as Pathname } from 'path-to-regexp'
 import { parse as parseQuery } from 'querystring'
 
-import { createPipeline, useContainer, MiddlewareInput, Pipeline, Middleware } from 'farrow-pipeline'
+import {
+  createPipeline,
+  createAsyncPipeline,
+  useContainer,
+  MiddlewareInput,
+  Pipeline,
+  AsyncPipeline,
+  Middleware,
+} from 'farrow-pipeline'
 import * as Schema from 'farrow-schema'
 import type { ValidationError } from 'farrow-schema/validator'
 import { Validator, createSchemaValidator } from 'farrow-schema/validator'
@@ -259,7 +267,7 @@ export type MatchedPipeline<T extends RouterSchema> = T extends RouterRequestSch
   ? Pipeline<TypeOfUrlSchema<T>, MaybeAsyncResponse>
   : never
 
-export type RouterPipeline = Pipeline<RequestInfo, MaybeAsyncResponse> & {
+export type RouterPipeline = AsyncPipeline<RequestInfo, Response> & {
   capture: <T extends keyof BodyMap>(type: T, f: (body: BodyMap[T]) => MaybeAsyncResponse) => void
   route: (name: string) => Pipeline<RequestInfo, MaybeAsyncResponse>
   serve: (name: string, dirname: string) => void
@@ -302,7 +310,7 @@ export type RoutingMethods = {
 export type RouterPipelineOptions = string
 
 export const createRouterPipeline = (): RouterPipeline => {
-  const pipeline = createPipeline<RequestInfo, MaybeAsyncResponse>()
+  const pipeline = createAsyncPipeline<RequestInfo, Response>()
 
   const capture: RouterPipeline['capture'] = (type, f) => {
     pipeline.use(matchBodyType(type, f))

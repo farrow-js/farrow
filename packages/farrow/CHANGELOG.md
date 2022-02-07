@@ -1,5 +1,14 @@
 # farrow
 
+## 1.11.4
+
+### Patch Changes
+
+- 8db4ea6: set compile option: `target` to es5
+- Updated dependencies [8db4ea6]
+  - farrow-api@1.11.1
+  - farrow-schema@1.11.1
+
 ## 1.11.3
 
 ### Patch Changes

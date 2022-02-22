@@ -35,12 +35,14 @@ const getErrorMessage = (error: ValidationError) => {
 export type CreateApiServiceOptions = {
   entries: ApiEntries
   errorStack?: boolean
+  introspection?: boolean
 }
 
 export const createApiService = (options: CreateApiServiceOptions): ApiServiceType => {
   const isNotProduction = process.env.NODE_ENV !== 'production'
   const config = {
     errorStack: isNotProduction,
+    introspection: isNotProduction,
     ...options,
   }
   const { entries } = options
@@ -64,7 +66,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
     /**
      * capture introspection request
      */
-    if (calling.type === 'Introspection') {
+    if (config.introspection && calling.type === 'Introspection') {
       const output = (formatResult = formatResult ?? toJSON(entries))
       return ApiSuccess(output)
     }

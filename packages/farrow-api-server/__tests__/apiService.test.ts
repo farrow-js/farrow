@@ -177,6 +177,29 @@ describe('ApiService', () => {
       })
   })
 
+  it('supports introspecting optional', async () => {
+    const http = createHttp()
+    const server = http.server()
+
+    http.route('/counter').use(
+      ApiService({
+        entries,
+        errorStack: false,
+        introspection: false,
+      }),
+    )
+
+    await request(server)
+      .post('/counter')
+      .send({
+        type: 'Introspection',
+      })
+      .expect(200, {
+        type: 'ApiErrorResponse',
+        error: { message: 'path: ["path"]\nundefined is not a list' },
+      })
+  })
+
   it('supports calling api', async () => {
     const http = createHttp()
     const server = http.server()

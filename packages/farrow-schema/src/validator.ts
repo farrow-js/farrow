@@ -65,7 +65,7 @@ export const Validator = {
       const impl = validatorImpl(schema)
 
       validatorWeakMap.set(Ctor, impl)
-      
+
       return impl
     }
 
@@ -219,10 +219,10 @@ Validator.impl<S.LiteralType>(S.LiteralType, (schema) => ({
     if (options?.strict === false && typeof value !== 'string') {
       if (typeof value === 'number') {
         const result = parseNumberLiteral(input)
-        if (result.isOk) return result
+        if (result.isOk && result.value === value) return result
       } else if (typeof value === 'boolean') {
         const result = parseBooleanLiteral(input)
-        if (result.isOk) return result
+        if (result.isOk && result.value === value) return result
       }
     }
 
@@ -271,7 +271,7 @@ Validator.impl<S.StructType>(S.StructType, (schema) => {
         if (options?.strict === false) {
           try {
             input = JSON.parse(input)
-          } catch(e) {
+          } catch (e) {
             // ignore
           }
         }

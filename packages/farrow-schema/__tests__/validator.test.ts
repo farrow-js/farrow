@@ -693,6 +693,14 @@ describe('Validator', () => {
       e: false,
     }
 
+    const data4 = {
+      a: '1.1',
+      b: '1',
+      c: 'true',
+      d: '2',
+      e: false,
+    }
+
     expect(assertOk(validate0(data0))).toEqual({
       a: 1.23,
       b: 1,
@@ -748,6 +756,9 @@ describe('Validator', () => {
       d: 1,
       e: false,
     })
+
+    expect(() => assertOk(validate0(data4))).toThrow()
+    expect(() => assertOk(validate1(data4))).toThrow()
   })
 
   it('supports read-only and read-only-deep', () => {

@@ -1,5 +1,5 @@
 import { FormatFields, FormatType, FormatTypes, isNamedFormatType } from 'farrow-schema/formatter'
-import { FormatEntries, FormatResult, FormatApi } from './toJSON'
+import { FormatEntries, FormatResult, FormatApi } from 'farrow-api/dist/toJSON'
 
 export const isInlineType = (input: FormatType) => {
   if (isNamedFormatType(input)) {

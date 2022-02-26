@@ -1,8 +1,8 @@
 import fs from 'fs/promises'
-import { Api } from '../src/api'
-import { toJSON } from '../src/toJSON'
+import { Api } from 'farrow-api'
+import { toJSON } from 'farrow-api/dist/toJSON'
 import { codegen } from '../src/codegen'
-import { format } from '../src/prettier'
+import { format } from 'farrow-api/dist/prettier'
 import {
   Any,
   Float,

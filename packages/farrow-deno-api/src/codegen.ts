@@ -1,6 +1,6 @@
 import type { FormatEntries, FormatResult, FormatApi } from 'farrow-api/dist/toJSON'
 import { FormatFields, FormatType, FormatTypes, isNamedFormatType } from 'farrow-schema/formatter'
-import type { CodegenOptions } from 'farrow-api/dist/codegen'
+import type { CodegenOptions } from 'farrow-api-server/dist/codegen'
 
 export const isInlineType = (input: FormatType) => {
   if (isNamedFormatType(input)) {

@@ -3,8 +3,23 @@ import { ReadOnly, TypeOf, ReadOnlyDeep } from '../src/schema'
 import { createSchemaValidator, RegExp, ValidationResult, Validator, ValidatorType } from '../src/validator'
 import { pick, omit, keyof, partial } from '../src/helper'
 
-const { Type, ObjectType, Struct, Int, Float, Literal, List, Union, Intersect, Nullable, Record, Json, Any, Tuple } =
-  Schema
+const {
+  Type,
+  ObjectType,
+  Struct,
+  Int,
+  Float,
+  Literal,
+  List,
+  Union,
+  Intersect,
+  Nullable,
+  Record,
+  Json,
+  Any,
+  Never,
+  Tuple,
+} = Schema
 
 const assertOk = <T>(result: ValidationResult<T>): T => {
   if (result.isOk) return result.value
@@ -501,6 +516,16 @@ describe('Validator', () => {
     expect(assertOk(validateAny([1, 2, 3]))).toEqual([1, 2, 3])
     expect(assertOk(validateAny({ a: 1, b: 2 }))).toEqual({ a: 1, b: 2 })
     expect(assertOk(validateAny(false))).toEqual(false)
+  })
+
+  it('supports never pattern', () => {
+    const validateStructWithNever = createSchemaValidator(Struct({ foo: Number, bar: Never }))
+
+    expect(assertOk(validateStructWithNever({ foo: 0 }))).toEqual({ foo: 0 })
+
+    expect(() => assertOk(validateStructWithNever({ foo: 0, bar: 0 }))).toThrow()
+
+    expect(assertOk(validateStructWithNever({ foo: 0, bar: undefined }))).toEqual({ foo: 0, bar: undefined })
   })
 
   it('supports defining recursive schema via ObjectType', () => {

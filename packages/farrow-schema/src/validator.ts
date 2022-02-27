@@ -405,6 +405,13 @@ Validator.impl(S.Unknown, {
   validate: (input) => Ok(input),
 })
 
+Validator.impl(S.Never, {
+  validate: (input) => {
+    if (input === undefined) return Ok(undefined as never)
+    throw new Error(`${input} is a json, expect 'void' here`)
+  }
+})
+
 Validator.impl<S.StrictType>(S.StrictType, (schema) => {
   return {
     validate: (input, options) => {

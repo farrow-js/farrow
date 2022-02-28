@@ -413,7 +413,7 @@ Validator.impl(S.Unknown, {
 
 Validator.impl(S.Never, {
   validate: (input) => {
-    throw new Error(`${input} is a json, expect 'void' here`)
+    throw new Error(`Should not validate here, got ${input}`)
   }
 })
 

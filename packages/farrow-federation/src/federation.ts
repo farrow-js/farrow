@@ -86,10 +86,10 @@ export const createFederationServices = async (services: ApiServices, customOpti
     return info.entryMap.get(namespace)
   }
 
-  const handleCalling = async (
+  const handleCalling = (
     calling: SingleCalling | IntrospectionCalling,
     init: RequestInit = {},
-  ): Promise<ApiResponseSingle> => {
+  ): Promise<ApiResponseSingle> | ApiResponseSingle => {
     /**
      * capture introspection request
      */

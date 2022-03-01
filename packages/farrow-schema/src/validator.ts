@@ -285,10 +285,9 @@ Validator.impl<S.StructType>(S.StructType, (schema) => {
 
       for (const key in fields) {
         const Field = fields[key]
-        const schema = Field[S.Type]
 
         const value = input[key]
-        const result = Validator.validate(schema, value, options)
+        const result = Validator.validate(Field[S.Type], value, options)
 
         if (result.isErr) {
           return SchemaErr(result.value.message, [key, ...(result.value.path ?? [])])

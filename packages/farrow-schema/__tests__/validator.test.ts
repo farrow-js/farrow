@@ -519,10 +519,15 @@ describe('Validator', () => {
   })
 
   it('supports never pattern', () => {
-    const validateStructWithNever = createSchemaValidator(Struct({ foo: Number, bar: Nullable(Never) }))
-    expect(assertOk(validateStructWithNever({ foo: 0 }))).toEqual({ foo: 0 })
-    expect(assertOk(validateStructWithNever({ foo: 0, bar: undefined }))).toEqual({ foo: 0, bar: undefined })
+    const validateStructWithNever = createSchemaValidator(Struct({ foo: Number, bar: Never }))
+    expect(() => assertOk(validateStructWithNever({ foo: 0 }))).toThrow()
+    expect(() => assertOk(validateStructWithNever({ foo: 0, bar: undefined }))).toThrow()
     expect(() => assertOk(validateStructWithNever({ foo: 0, bar: 0 }))).toThrow()
+
+    const validateStructWithNullableNever = createSchemaValidator(Struct({ foo: Number, bar: Nullable(Never) }))
+    expect(assertOk(validateStructWithNullableNever({ foo: 0 }))).toEqual({ foo: 0 })
+    expect(assertOk(validateStructWithNullableNever({ foo: 0, bar: undefined }))).toEqual({ foo: 0, bar: undefined })
+    expect(() => assertOk(validateStructWithNullableNever({ foo: 0, bar: 0 }))).toThrow()
 
     const validateRecordWithNever = createSchemaValidator(Record(Never))
     expect(assertOk(validateRecordWithNever({}))).toEqual({})

@@ -1142,9 +1142,6 @@ describe('Validator', () => {
     const PartialUser = partial(User)
     const PartialPerson = partial(Person)
 
-    type T0 = TypeOf<typeof PartialUser>
-    type T1 = TypeOf<typeof PartialPerson>
-
     expect(assertOk(Validator.validate(PartialUser, {}))).toEqual({})
     expect(assertOk(Validator.validate(PartialUser, { name: 'only-name' }))).toEqual({ name: 'only-name' })
     expect(() => assertOk(Validator.validate(PartialUser, { friends: [{}, {}] }))).toThrow()

@@ -286,9 +286,6 @@ Validator.impl<S.StructType>(S.StructType, (schema) => {
       for (const key in fields) {
         const Field = fields[key]
         const schema = Field[S.Type]
-        if (schema === S.Never && !(key in input)) {
-          continue
-        }
 
         const value = input[key]
         const result = Validator.validate(schema, value, options)

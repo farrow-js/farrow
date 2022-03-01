@@ -226,7 +226,7 @@ export abstract class Controller extends Module {
   /**
    * enable redux-devtools
    */
-  devtools: boolean | string = true
+  devtools: boolean | string = process.env.NODE_ENV !== 'production'
 
   /**
    * enable redux-logger

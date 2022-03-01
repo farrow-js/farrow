@@ -3,7 +3,7 @@ import type { FormatType, FormatTypes } from 'farrow-schema/formatter'
 import { updateApi, updateType } from './helpers'
 import { getIntrospection } from './introspection'
 
-import { ApiService, ApiServices, FederationOptions, ApiEntry, ApiEntryMap } from './federation'
+import { ApiService, ApiServices, FederationOptions, ApiEntryMap } from './federation'
 
 export type FederationInfo = {
   schema: FormatResult
@@ -59,12 +59,6 @@ export const getFederationInfo = async (
         newEntries.entries[namespace] = updateEntries(item, apiService, [...path, namespace])
       } else {
         newEntries.entries[namespace] = updateApi(item, typeBaseId)
-
-        const apiPath = [...path, namespace]
-        const apiEntry: ApiEntry = {
-          origin: apiService.url,
-          path: apiPath,
-        }
         entryMap.set(apiService.namespace, apiService.url)
       }
     }

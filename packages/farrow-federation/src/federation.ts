@@ -20,11 +20,6 @@ export type ApiService = {
 
 export type ApiServices = ApiService[]
 
-export type ApiEntry = {
-  path: string[]
-  origin: string
-}
-
 export type ApiEntryMap = Map<string, string>
 
 export type Fetch = typeof fetch

@@ -6,7 +6,10 @@ import type { Fetch } from './federation'
 
 export type IntrospectionResult = Result<FormatResult>
 
-export const getIntrospection = async (src: string, fetch: Fetch = nodeFetch as any): Promise<IntrospectionResult> => {
+export const getIntrospection = (
+  src: string,
+  fetch: Fetch = nodeFetch as any,
+): Promise<IntrospectionResult> | IntrospectionResult => {
   const data: IntrospectionCalling = {
     type: 'Introspection',
   }
@@ -21,7 +24,7 @@ export const getIntrospection = async (src: string, fetch: Fetch = nodeFetch as 
 
   try {
     return fetch(src, options)
-      .then(async (response) => {
+      .then((response) => {
         return response.json() as Promise<ApiResponseSingle>
       })
       .then((result) => {

@@ -1,8 +1,8 @@
 import fs from 'fs/promises'
-import { Api } from '../src/api'
-import { toJSON } from '../src/toJSON'
-import { codegen } from '../src/codegen'
-import { format } from '../src/prettier'
+import { Api } from 'farrow-api'
+import { toJSON } from 'farrow-api/dist/toJSON'
+import { generatorClient } from '../src/clientGenerator'
+import { format } from 'farrow-api/dist/prettier'
 import {
   Any,
   Float,
@@ -134,7 +134,7 @@ describe('codegen', () => {
   it('support codegen', async () => {
     const formatResult = toJSON(entries)
 
-    const source = codegen(formatResult, {
+    const source = generatorClient(formatResult, {
       noCheck: 'just for testing',
     })
 
@@ -148,7 +148,7 @@ describe('codegen', () => {
   it('can disable emiting api-client', async () => {
     const formatResult = toJSON(entries)
 
-    const source = codegen(formatResult, {
+    const source = generatorClient(formatResult, {
       emitApiClient: false,
       noCheck: 'just for testing',
     })

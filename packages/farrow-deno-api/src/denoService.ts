@@ -1,7 +1,7 @@
 import { Response, RouterPipeline, useReq } from 'farrow-http'
 import { ApiEntries } from 'farrow-api'
 import { toJSON } from 'farrow-api/dist/toJSON'
-import type { CodegenOptions } from 'farrow-api/dist/createGenerator'
+import type { CodegenOptions } from 'farrow-api/dist/generateApi'
 import { format } from 'farrow-api/dist/prettier'
 import { ApiService } from 'farrow-api-server'
 import { codegen } from './codegen'

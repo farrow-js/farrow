@@ -3,9 +3,9 @@ import { ensureDir } from 'fs-extra'
 import { dirname } from 'path'
 import fetch from 'node-fetch'
 import { FormatResult } from 'farrow-api/dist/toJSON'
-import type { CodegenOptions } from 'farrow-api/dist/createGenerator'
+import type { CodegenOptions } from 'farrow-api/dist/generateApi'
 import { format } from 'farrow-api/dist/prettier'
-import { generatorClient } from 'farrow-api-server/dist/clientGenerator'
+import { generatorApiClient } from 'farrow-api-server/dist/generateApiClient'
 import type { IntrospectionCalling } from 'farrow-api-server'
 import { replaceUrl } from './replaceUrl'
 
@@ -100,7 +100,7 @@ export const createApiClient = (options: ApiClientOptions) => {
       return
     }
 
-    let source = generatorClient(result.output, {
+    let source = generatorApiClient(result.output, {
       ...config.codegen,
       url: config.alias ?? config.src,
     })

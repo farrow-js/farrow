@@ -1,8 +1,8 @@
 import fs from 'fs/promises'
-import { Api } from 'farrow-api'
-import { toJSON } from 'farrow-api/dist/toJSON'
-import { generatorApiClient } from '../src/generateApiClient'
-import { format } from 'farrow-api/dist/prettier'
+import { Api } from '../src/api'
+import { toJSON } from '../src/toJSON'
+import { generateApi } from '../src/generateApi'
+import { format } from '../src/prettier'
 import {
   Any,
   Float,
@@ -131,17 +131,18 @@ const entries = {
 }
 
 describe('codegen', () => {
-  it('support codegen', async () => {
+  it('can disable emiting api-client', async () => {
     const formatResult = toJSON(entries)
 
-    const source = generatorApiClient(formatResult, {
+    const source = generateApi(formatResult, {
+      emitApiClient: false,
       noCheck: 'just for testing',
     })
 
-    const formattedSource = format(source)
+    const formatedSource = format(source)
 
     const expected = await fs.readFile(`${__dirname}/expected/01.ts`)
 
-    expect(formattedSource.replace(/\r|\n/g, '')).toEqual(expected.toString().replace(/\r|\n/g, ''))
+    expect(formatedSource.replace(/\r|\n/g, '')).toBe(expected.toString().replace(/\r|\n/g, ''))
   })
 })

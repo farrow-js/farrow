@@ -123,7 +123,7 @@ export const getFieldsType = (fields: FormatFields, types: FormatTypes): string[
   })
 }
 
-export type Helpers = {
+export type ApiClientHelpers = {
   importStatements: (formatResult: FormatResult, options?: CodegenOptions) => string[]
   typeDeclarations: (formatResult: FormatResult, options?: CodegenOptions) => string[]
   variableDeclarations: (formatResult: FormatResult, options?: CodegenOptions) => string[]
@@ -141,7 +141,7 @@ export type CodegenOptions = {
    * emit createApiClient or not
    * if set to false, only types will be codegen
    */
-  emitApiClient?: boolean
+  apiClientHelpers?: ApiClientHelpers | false
 
   /**
    * a remote address or alias to invoke
@@ -161,36 +161,29 @@ export const PREFIX_COMMENT = `
  */
 `
 
-export const createClientGenerator =
-  (helpers: Helpers) =>
-  (formatResult: FormatResult, options?: CodegenOptions): string => {
-    const config = {
-      emitApiClient: true,
-      ...options,
+export const generateApi = (formatResult: FormatResult, options?: CodegenOptions): string => {
+  const exportSet = new Set<string>()
+
+  const handleType = (formatType: FormatType): string => {
+    if (isInlineType(formatType)) {
+      return ''
     }
 
-    const exportSet = new Set<string>()
+    if (formatType.type === 'Object' || formatType.type === 'Struct') {
+      const typeName = formatType.name!
+      const fields = getFieldsType(formatType.fields, formatResult.types)
 
-    const handleType = (formatType: FormatType): string => {
-      if (isInlineType(formatType)) {
-        return ''
+      if (!typeName) {
+        throw new Error(`Empty name of Object/Struct, fields: {${Object.keys(formatType.fields)}}`)
       }
 
-      if (formatType.type === 'Object' || formatType.type === 'Struct') {
-        const typeName = formatType.name!
-        const fields = getFieldsType(formatType.fields, formatResult.types)
+      if (exportSet.has(typeName)) {
+        throw new Error(`Duplicate Object/Struct type name: ${typeName}`)
+      }
 
-        if (!typeName) {
-          throw new Error(`Empty name of Object/Struct, fields: {${Object.keys(formatType.fields)}}`)
-        }
+      exportSet.add(typeName)
 
-        if (exportSet.has(typeName)) {
-          throw new Error(`Duplicate Object/Struct type name: ${typeName}`)
-        }
-
-        exportSet.add(typeName)
-
-        return `
+      return `
       /**
        * {@label ${typeName}} 
        */
@@ -198,61 +191,77 @@ export const createClientGenerator =
         ${fields.join(',  \n')}
       }
       `
-      }
+    }
 
-      if (formatType.type === 'Union') {
-        const typeName = formatType.name!
-        const expression = formatType.itemTypes
-          .map((itemType) => getFieldType(itemType.typeId, formatResult.types))
-          .join(' | ')
-        return `
+    if (formatType.type === 'Union') {
+      const typeName = formatType.name!
+      const expression = formatType.itemTypes
+        .map((itemType) => getFieldType(itemType.typeId, formatResult.types))
+        .join(' | ')
+      return `
       /**
        * {@label ${typeName}} 
        */
       export type ${typeName} = ${expression}
       `
-      }
+    }
 
-      if (formatType.type === 'Intersect') {
-        const typeName = formatType.name!
-        const expression = formatType.itemTypes
-          .map((itemType) => getFieldType(itemType.typeId, formatResult.types))
-          .join(' & ')
-        return `
+    if (formatType.type === 'Intersect') {
+      const typeName = formatType.name!
+      const expression = formatType.itemTypes
+        .map((itemType) => getFieldType(itemType.typeId, formatResult.types))
+        .join(' & ')
+      return `
       /**
        * {@label ${typeName}} 
        */
       export type ${typeName} = ${expression}
       `
-      }
+    }
 
-      if (formatType.type === 'Tuple') {
-        const typeName = formatType.name!
-        const expression = `[${formatType.itemTypes
-          .map((itemType) => getFieldType(itemType.typeId, formatResult.types))
-          .join(', ')}]`
+    if (formatType.type === 'Tuple') {
+      const typeName = formatType.name!
+      const expression = `[${formatType.itemTypes
+        .map((itemType) => getFieldType(itemType.typeId, formatResult.types))
+        .join(', ')}]`
 
-        return `
+      return `
         /**
          * {@label ${typeName}} 
          */
         export type ${typeName} = ${expression}
         `
-      }
-
-      throw new Error(`Unsupported type of ${JSON.stringify(formatType, null, 2)}`)
     }
 
-    const handleTypes = (formatTypes: FormatTypes) => {
-      return Object.values(formatTypes).map((formatType) => handleType(formatType))
-    }
+    throw new Error(`Unsupported type of ${JSON.stringify(formatType, null, 2)}`)
+  }
+
+  const handleTypes = (formatTypes: FormatTypes) => {
+    return Object.values(formatTypes).map((formatType) => handleType(formatType))
+  }
+
+  const importStatements: string[] = []
+
+  const typeDeclarations = handleTypes(formatResult.types)
+
+  if (typeDeclarations.some((typeDeclaration) => typeDeclaration.includes('JsonType'))) {
+    importStatements.unshift(`import type { JsonType } from 'farrow-api'`)
+  }
+
+  const variableDeclarations: string[] = []
+
+  const helpers = options?.apiClientHelpers || null
+  if (helpers) {
+    importStatements.push(...helpers.importStatements(formatResult, options))
+    typeDeclarations.push(...helpers.typeDeclarations(formatResult, options))
+    variableDeclarations.push(...helpers.variableDeclarations(formatResult, options))
 
     const handleApi = (api: FormatApi, path: string[]) => {
-      return `(${helpers.apiFunctionParams(api, path, formatResult, config)}) => ${helpers.apiFunctionBody(
+      return `(${helpers.apiFunctionParams(api, path, formatResult, options)}) => ${helpers.apiFunctionBody(
         api,
         path,
         formatResult,
-        config,
+        options,
       )}`
     }
 
@@ -273,39 +282,26 @@ export const createClientGenerator =
 
       return `{ ${fields.join(',\n')} }`
     }
+    variableDeclarations.push(`export const api = ${handleEntries(formatResult.entries)}`)
+  }
 
-    const importStatements = helpers.importStatements(formatResult, config)
+  const blocks = [importStatements.join('\n'), typeDeclarations.join('\n\n'), variableDeclarations.join('\n\n')]
 
-    const typeDeclarations = [...helpers.typeDeclarations(formatResult, config), ...handleTypes(formatResult.types)]
+  let source = PREFIX_COMMENT + blocks.join('\n\n')
 
-    if (typeDeclarations.some((typeDeclaration) => typeDeclaration.includes('JsonType'))) {
-      importStatements.unshift(`import type { JsonType } from 'farrow-api'`)
-    }
-
-    const variableDeclarations = helpers.variableDeclarations(formatResult, config)
-
-    if (config.emitApiClient) {
-      const entries = handleEntries(formatResult.entries)
-      variableDeclarations.push(`export const api = ${entries}`)
-    }
-
-    const blocks = [importStatements.join('\n'), typeDeclarations.join('\n\n'), variableDeclarations.join('\n\n')]
-
-    let source = PREFIX_COMMENT + blocks.join('\n\n')
-
-    if (options?.noCheck) {
-      if (typeof options.noCheck === 'string') {
-        source = `
+  if (options?.noCheck) {
+    if (typeof options.noCheck === 'string') {
+      source = `
       // @ts-nocheck ${options.noCheck}
       ${source}
       `
-      } else {
-        source = `
+    } else {
+      source = `
       // @ts-nocheck
       ${source}
       `
-      }
     }
-
-    return source
   }
+
+  return source
+}

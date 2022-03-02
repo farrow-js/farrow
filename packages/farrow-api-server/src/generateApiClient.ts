@@ -1,15 +1,14 @@
-import { createClientGenerator, getFieldType, Helpers } from 'farrow-api/dist/createGenerator'
+import { generateApi, getFieldType, ApiClientHelpers, CodegenOptions } from 'farrow-api/dist/generateApi'
+import type { FormatResult } from 'farrow-api/dist/toJSON'
 
-export const serverApiHelpers: Helpers = {
-  importStatements: (_, options) => {
-    if (!options?.emitApiClient) return []
+export const serverApiHelpers: ApiClientHelpers = {
+  importStatements: () => {
     return [`import { createApiPipelineWithUrl, ApiInvokeOptions } from 'farrow-api-client'`]
   },
   typeDeclarations: () => {
     return [] as string[]
   },
   variableDeclarations: (_, options) => {
-    if (!options?.emitApiClient) return []
     return [`export const url = "${options?.url ?? ''}"`, `export const apiPipeline = createApiPipelineWithUrl(url)`]
   },
   apiFunctionParams: (formApi, _, formatResult) => {
@@ -25,4 +24,5 @@ export const serverApiHelpers: Helpers = {
   },
 }
 
-export const generatorClient = createClientGenerator(serverApiHelpers)
+export const generatorApiClient = (formResult: FormatResult, options?: Omit<CodegenOptions, 'apiClientHelpers'>) =>
+  generateApi(formResult, { ...options, apiClientHelpers: serverApiHelpers })

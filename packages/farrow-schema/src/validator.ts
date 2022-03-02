@@ -285,6 +285,7 @@ Validator.impl<S.StructType>(S.StructType, (schema) => {
 
       for (const key in fields) {
         const Field = fields[key]
+
         const value = input[key]
         const result = Validator.validate(Field[S.Type], value, options)
 
@@ -341,6 +342,7 @@ Validator.impl<S.UnionType>(S.UnionType, (schema) => {
       const messages: string[] = []
 
       for (const Item of schema.Items) {
+        if (Item === S.Never) continue
         const result = Validator.validate(Item, input, options)
         if (result.isOk) return result
         messages.push(result.value.message)
@@ -403,6 +405,12 @@ Validator.impl(S.Any, {
 
 Validator.impl(S.Unknown, {
   validate: (input) => Ok(input),
+})
+
+Validator.impl(S.Never, {
+  validate: (input) => {
+    throw new Error(`Should not validate here, got ${input}`)
+  }
 })
 
 Validator.impl<S.StrictType>(S.StrictType, (schema) => {

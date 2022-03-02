@@ -127,7 +127,7 @@ export type FormatterMethods = {
 
 export type FormatterImpl<T extends Schema = Schema> = FormatterMethods | ((schema: T) => FormatterMethods)
 
-export type NamedFormatType = 
+export type NamedFormatType =
   | FormatTupleType
   | FormatStructType
   | FormatUnionType
@@ -136,8 +136,8 @@ export type NamedFormatType =
 
 export const isNamedFormatType = (input: FormatType): input is NamedFormatType => {
   return (
-    input.type === 'Object' || 
-    input.type === 'Struct' || 
+    input.type === 'Object' ||
+    input.type === 'Struct' ||
     input.type === 'Union' ||
     input.type === 'Intersect' ||
     input.type === 'Tuple'
@@ -196,7 +196,7 @@ export const Formatter = {
     if (!FormatterImpl) {
       throw new Error(`No impl found for Formatter, Ctor: ${Ctor}`)
     }
-    
+
     const typeId = FormatterImpl.format(ctx)
 
     ctx.formatCache.set(Ctor, typeId)
@@ -373,7 +373,7 @@ Formatter.impl(S.StructType, (schema) => {
             deprecated: Field.deprecated,
           }
         }
-        
+
         return formatFields
       }
       const Constructor = schema.constructor as typeof S.Schema
@@ -408,7 +408,7 @@ Formatter.impl(S.ObjectType, (schema) => {
             deprecated: Field.deprecated,
           }
         }
-        
+
         return formatFields
       }
       const Constructor = schema.constructor as typeof S.Schema
@@ -516,6 +516,16 @@ Formatter.impl(S.Any, {
       type: 'Scalar',
       valueType: 'any',
       valueName: 'Any',
+    })
+  },
+})
+
+Formatter.impl(S.Never, {
+  format(ctx) {
+    return ctx.addType({
+      type: 'Scalar',
+      valueType: 'never',
+      valueName: 'Never',
     })
   },
 })

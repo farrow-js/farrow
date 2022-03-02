@@ -220,6 +220,9 @@ export class Any extends Schema {
 export class Unknown extends Schema {
   __type!: unknown
 }
+export class Never extends Schema {
+  __type!: never
+}
 
 export type JsonType =
   | number

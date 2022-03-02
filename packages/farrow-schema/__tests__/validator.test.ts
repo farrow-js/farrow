@@ -3,8 +3,23 @@ import { ReadOnly, TypeOf, ReadOnlyDeep } from '../src/schema'
 import { createSchemaValidator, RegExp, ValidationResult, Validator, ValidatorType } from '../src/validator'
 import { pick, omit, keyof, partial } from '../src/helper'
 
-const { Type, ObjectType, Struct, Int, Float, Literal, List, Union, Intersect, Nullable, Record, Json, Any, Tuple } =
-  Schema
+const {
+  Type,
+  ObjectType,
+  Struct,
+  Int,
+  Float,
+  Literal,
+  List,
+  Union,
+  Intersect,
+  Nullable,
+  Record,
+  Json,
+  Any,
+  Never,
+  Tuple,
+} = Schema
 
 const assertOk = <T>(result: ValidationResult<T>): T => {
   if (result.isOk) return result.value
@@ -501,6 +516,37 @@ describe('Validator', () => {
     expect(assertOk(validateAny([1, 2, 3]))).toEqual([1, 2, 3])
     expect(assertOk(validateAny({ a: 1, b: 2 }))).toEqual({ a: 1, b: 2 })
     expect(assertOk(validateAny(false))).toEqual(false)
+  })
+
+  it('supports never pattern', () => {
+    const validateStructWithNever = createSchemaValidator(Struct({ foo: Number, bar: Never }))
+    expect(() => assertOk(validateStructWithNever({ foo: 0 }))).toThrow()
+    expect(() => assertOk(validateStructWithNever({ foo: 0, bar: undefined }))).toThrow()
+    expect(() => assertOk(validateStructWithNever({ foo: 0, bar: 0 }))).toThrow()
+
+    const validateStructWithNullableNever = createSchemaValidator(Struct({ foo: Number, bar: Nullable(Never) }))
+    expect(assertOk(validateStructWithNullableNever({ foo: 0 }))).toEqual({ foo: 0 })
+    expect(assertOk(validateStructWithNullableNever({ foo: 0, bar: undefined }))).toEqual({ foo: 0, bar: undefined })
+    expect(() => assertOk(validateStructWithNullableNever({ foo: 0, bar: 0 }))).toThrow()
+
+    const validateRecordWithNever = createSchemaValidator(Record(Never))
+    expect(assertOk(validateRecordWithNever({}))).toEqual({})
+    expect(() => assertOk(validateRecordWithNever({ foo: 0 }))).toThrow()
+
+    const validateListWithNever = createSchemaValidator(List(Never))
+    expect(assertOk(validateListWithNever([]))).toEqual([])
+    expect(() => assertOk(validateListWithNever([0]))).toThrow()
+
+    const validateUnionWithNever = createSchemaValidator(Union(Never))
+    expect(() => assertOk(validateUnionWithNever(undefined))).toThrow()
+
+    const validateUnionWithNeverAndNumber = createSchemaValidator(Union(Never, Number))
+    expect(assertOk(validateUnionWithNeverAndNumber(0))).toEqual(0)
+    expect(() => assertOk(validateUnionWithNeverAndNumber(undefined))).toThrow()
+
+    const validateIntersectWithNeverAndNumber = createSchemaValidator(Intersect(Never, Number))
+    expect(() => assertOk(validateIntersectWithNeverAndNumber(0))).toThrow()
+    expect(() => assertOk(validateIntersectWithNeverAndNumber(undefined))).toThrow()
   })
 
   it('supports defining recursive schema via ObjectType', () => {

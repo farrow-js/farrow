@@ -130,7 +130,7 @@ const entries = {
   methodB,
 }
 
-describe('codegen', () => {
+describe('generateApi', () => {
   it('can disable emiting api-client', async () => {
     const formatResult = toJSON(entries)
 

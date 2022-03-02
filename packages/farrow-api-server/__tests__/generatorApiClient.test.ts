@@ -130,7 +130,7 @@ const entries = {
   methodB,
 }
 
-describe('codegen', () => {
+describe('generatorApiClient', () => {
   it('support codegen', async () => {
     const formatResult = toJSON(entries)
 

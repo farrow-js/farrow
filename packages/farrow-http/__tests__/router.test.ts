@@ -1781,7 +1781,7 @@ describe('Router Url Pattern', () => {
     expect(result3.info.body).toMatchObject({ type: 'string', value: 'slash' })
   })
 
-  it('should throw error with route with empty basename', async () => {
+  it('should throw error with route with empty basename', () => {
     const router = Router()
 
     router.route('/foo').use(() => {

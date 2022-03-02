@@ -1067,11 +1067,11 @@ describe('Express', () => {
       const filename = path.join(__dirname, './fixtures/static/foo.js')
       const content = await fs.promises.readFile(filename)
 
-      http.get('/raw').use(async () => {
+      http.get('/raw').use(() => {
         return Response.file(filename)
       })
 
-      http.get('/text').use(async () => {
+      http.get('/text').use(() => {
         return Response.type('text').file(filename)
       })
 

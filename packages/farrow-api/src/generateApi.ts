@@ -128,12 +128,17 @@ export type ApiClientHelpers = {
   typeDeclarations: (formatResult: FormatResult, options?: CodegenOptions) => string[]
   variableDeclarations: (formatResult: FormatResult, options?: CodegenOptions) => string[]
   apiFunctionParams: (
-    formApi: FormatApi,
+    formatApi: FormatApi,
     path: string[],
     formatResult: FormatResult,
     options?: CodegenOptions,
   ) => string
-  apiFunctionBody: (formApi: FormatApi, path: string[], formatResult: FormatResult, options?: CodegenOptions) => string
+  apiFunctionBody: (
+    formatApi: FormatApi,
+    path: string[],
+    formatResult: FormatResult,
+    options?: CodegenOptions,
+  ) => string
 }
 
 export type CodegenOptions = {

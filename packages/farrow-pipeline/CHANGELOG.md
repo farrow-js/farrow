@@ -1,5 +1,11 @@
 # farrow-pipeline
 
+## 1.12.0
+
+### Minor Changes
+
+- a677bf2: refactor(api): client generation
+
 ## 1.11.4
 
 ### Patch Changes

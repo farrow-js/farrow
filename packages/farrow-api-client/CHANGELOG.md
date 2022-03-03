@@ -1,5 +1,18 @@
 # farrow-api-client
 
+## 1.12.0
+
+### Minor Changes
+
+- a677bf2: refactor(api): client generation
+
+### Patch Changes
+
+- Updated dependencies [a677bf2]
+- Updated dependencies [efbfc1b]
+  - farrow-api-server@1.12.0
+  - farrow-pipeline@1.12.0
+
 ## 1.11.2
 
 ### Patch Changes

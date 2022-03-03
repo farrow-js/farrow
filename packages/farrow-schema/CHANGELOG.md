@@ -1,5 +1,16 @@
 # farrow-schema
 
+## 1.12.0
+
+### Minor Changes
+
+- a677bf2: refactor(api): client generation
+
+### Patch Changes
+
+- baa01b6: feat(schema): add never
+- 9fc22b7: fix(schema): validation of literal schema in non-strict mode
+
 ## 1.11.1
 
 ### Patch Changes

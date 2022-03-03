@@ -1,5 +1,16 @@
 # farrow-next
 
+## 1.12.0
+
+### Minor Changes
+
+- a677bf2: refactor(api): client generation
+
+### Patch Changes
+
+- Updated dependencies [a677bf2]
+  - farrow-module@1.12.0
+
 ## 1.11.1
 
 ### Patch Changes

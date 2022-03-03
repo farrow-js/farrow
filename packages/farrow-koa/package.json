@@ -1,6 +1,6 @@
 {
   "name": "farrow-koa",
-  "version": "1.11.3",
+  "version": "1.12.0",
   "description": "A Type-Friendly Web Framework",
   "main": "dist/index.js",
   "files": [
@@ -24,16 +24,16 @@
     "url": "git+https://github.com/Lucifier129/farrow.git"
   },
   "peerDependencies": {
-    "farrow-http": "^1.11.4",
+    "farrow-http": "^1.12.0",
     "koa": "^2.13.1"
   },
   "devDependencies": {
     "@types/jest": "^27.0.2",
     "@types/koa": "^2.13.3",
     "@types/supertest": "^2.0.11",
-    "farrow-http": "^1.11.4",
-    "farrow-pipeline": "^1.11.4",
-    "farrow-schema": "^1.11.1",
+    "farrow-http": "^1.12.0",
+    "farrow-pipeline": "^1.12.0",
+    "farrow-schema": "^1.12.0",
     "jest": "^27.2.2",
     "koa": "^2.13.1",
     "supertest": "^6.1.6",

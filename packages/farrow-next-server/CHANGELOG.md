@@ -1,5 +1,16 @@
 # farrow-next-server
 
+## 1.12.0
+
+### Minor Changes
+
+- a677bf2: refactor(api): client generation
+
+### Patch Changes
+
+- Updated dependencies [a677bf2]
+  - farrow-http@1.12.0
+
 ## 1.11.3
 
 ### Patch Changes

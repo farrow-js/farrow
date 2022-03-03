@@ -4,7 +4,9 @@
  * Don't modify it manually
  */
 
-import type { JsonType } from 'farrow-api-client'
+import type { JsonType } from 'farrow-api'
+import { createApiPipelineWithUrl, ApiInvokeOptions } from 'farrow-api-client'
+
 /**
  * {@label Collection}
  */
@@ -91,4 +93,15 @@ export type PartialStruct = {
   a?: number | null | undefined
   b?: number | null | undefined
   c?: boolean | null | undefined
+}
+
+export const url = ''
+
+export const apiPipeline = createApiPipelineWithUrl(url)
+
+export const api = {
+  methodA: (input: Collection, options?: ApiInvokeOptions) =>
+    apiPipeline.invoke({ type: 'Single', path: ['methodA'], input }, options) as Promise<Collection>,
+  methodB: (input: Collection, options?: ApiInvokeOptions) =>
+    apiPipeline.invoke({ type: 'Single', path: ['methodB'], input }, options) as Promise<Collection>,
 }

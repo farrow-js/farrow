@@ -1,7 +1,7 @@
 import fs from 'fs/promises'
 import { Api } from '../src/api'
 import { toJSON } from '../src/toJSON'
-import { codegen } from '../src/codegen'
+import { generateApi } from '../src/generateApi'
 import { format } from '../src/prettier'
 import {
   Any,
@@ -130,32 +130,18 @@ const entries = {
   methodB,
 }
 
-describe('codegen', () => {
-  it('support codegen', async () => {
-    const formatResult = toJSON(entries)
-
-    const source = codegen(formatResult, {
-      noCheck: 'just for testing',
-    })
-
-    const formattedSource = format(source)
-
-    const expected = await fs.readFile(`${__dirname}/expected/01.ts`)
-
-    expect(formattedSource.replace(/\r|\n/g, '')).toEqual(expected.toString().replace(/\r|\n/g, ''))
-  })
-
+describe('generateApi', () => {
   it('can disable emiting api-client', async () => {
     const formatResult = toJSON(entries)
 
-    const source = codegen(formatResult, {
+    const source = generateApi(formatResult, {
       emitApiClient: false,
       noCheck: 'just for testing',
     })
 
     const formatedSource = format(source)
 
-    const expected = await fs.readFile(`${__dirname}/expected/02.ts`)
+    const expected = await fs.readFile(`${__dirname}/expected/01.ts`)
 
     expect(formatedSource.replace(/\r|\n/g, '')).toBe(expected.toString().replace(/\r|\n/g, ''))
   })

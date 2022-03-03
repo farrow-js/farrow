@@ -1,5 +1,7 @@
-import { Type, Prettier, TypeOf, ToSchemaCtor, SchemaCtorInput } from 'farrow-schema'
+import { Type, Prettier, TypeOf, ToSchemaCtor, SchemaCtorInput, JsonType } from 'farrow-schema'
 import { createAsyncPipeline, AsyncPipeline, MaybeAsync, useContainer, Container } from 'farrow-pipeline'
+
+export type { JsonType }
 
 export type Typeable<T = unknown> =
   | T

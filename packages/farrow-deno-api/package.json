@@ -1,6 +1,6 @@
 {
   "name": "farrow-deno-api",
-  "version": "1.12.0",
+  "version": "1.12.1",
   "description": "A Type-Friendly Web Framework",
   "main": "dist/index.js",
   "files": [
@@ -24,9 +24,9 @@
     "url": "git+https://github.com/Lucifier129/farrow.git"
   },
   "dependencies": {
-    "farrow-api": "^1.12.0",
-    "farrow-api-server": "^1.12.0",
-    "farrow-schema": "^1.12.0"
+    "farrow-api": "^1.12.1",
+    "farrow-api-server": "^1.12.1",
+    "farrow-schema": "^1.12.1"
   },
   "peerDependencies": {
     "farrow-http": "^1.12.0"

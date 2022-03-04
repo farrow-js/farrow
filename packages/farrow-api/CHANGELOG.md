@@ -1,5 +1,13 @@
 # farrow-api
 
+## 1.12.1
+
+### Patch Changes
+
+- b564a8a: Patch for build
+- Updated dependencies [b564a8a]
+  - farrow-schema@1.12.1
+
 ## 1.12.0
 
 ### Minor Changes

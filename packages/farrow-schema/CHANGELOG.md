@@ -1,5 +1,11 @@
 # farrow-schema
 
+## 1.12.1
+
+### Patch Changes
+
+- b564a8a: Patch for build
+
 ## 1.12.0
 
 ### Minor Changes

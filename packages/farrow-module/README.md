@@ -1,166 +1,59 @@
-# farrow-module
+<p align="center">
+  <a href="http://farrowjs.com/" target="blank"><img src="https://github.com/farrow-js/farrow/blob/master/docs/assets/Farrow.blue.bg.png" width="120" alt="Farrow Logo" /></a>
+</p>
 
-A module abstraction providing dependencies management
+<p align="center">
+  <a href="https://www.npmjs.com/package/farrow-http" rel="nofollow">
+    <img alt="npm version" src="https://img.shields.io/npm/v/farrow-http.svg?style=flat" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/test.yml" rel="nofollow">
+    <img alt="Lint & Test Status" src="https://github.com/farrow-js/farrow/workflows/Lint & Test/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/benchmark.yml" rel="nofollow">
+    <img alt="Benchmark Status" src="https://github.com/farrow-js/farrow/workflows/Benchmark/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/Lucifier129/farrow/blob/master/LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg" style="max-width:100%;">
+  </a>
+</p>
 
-## Installation
+## Description
 
-```shell
-# from npm
-npm install --save farrow-module
+**Farrow** is A Type-Friendly Web Framework for Node.js
 
-# from yarn
-yarn add farrow-module
-```
+## Getting Started
 
-## Glossary
+Please follow the documentation at [farrowjs.com](https://www.farrowjs.com/docs/tutorial)!
 
-- `Module`:
+## Benefits
 
-  - Any `Class` which `extends Module`
-  - it's a basic unit for writing logic code
-  - it should not define custom constructor parameters
-  - it should not be instantiated via the `new` keyword manually
-  - everything it needed is via `this.use(DepClass)`
+- Expressive HTTP middleware like [Koa](https://github.com/koajs/koa) but no need to modify `req/res` or `ctx`
+- Strongly typed and type-safe from request to response via powerful schema-based validation
+- Provide React-Hooks-like mechanism which is useful for reusing code and integrating other parts of Server like database connection
+- Easy to learn and use if you were experienced in expressjs/koajs
 
-- `Provider`
+![Farrow Demo](https://github.com/farrow-js/farrow/blob/master/docs/assets/farrow.png)
 
-  - it can be created via `createProvider<Type>(defaultValue)`
-  - it should be attached to `Container` via `this.inject(Provider.provide(value))`
-  - it should be placed only once for a `Container`, duplicated is not allow
+## Environment Requirement
 
-- `Container`
+- TypeScript >= 4.3
+- Node.js >= 14.x
 
-  - Any `Class` which `extends Container`
-  - it's the entry of our code of `modules`
-  - it should be instantiated by the `new` keyword
+## Issues
 
-## Usage
+Contributions, issues and feature requests are welcome! Feel free to check [issues page](https://github.com/Lucifier129/farrow/issues).
 
-```typescript
-import { Module, Container, createProvider } from 'farrow-module'
+## [Contributing Guide](https://github.com/farrow-js/farrow/blob/master/CONTRIBUTING.md)
 
-type PageInfo = {
-  url: string
-  env: string
-}
+## Stay In Touch
 
-/**
- * create a provider carries extra data
- */
-const PageInfo = createProvider<PageInfo>()
+- [Website](https://www.farrowjs.com/)
+- [Twitter](https://twitter.com/guyingjie129)
+- [doc/v1](https://github.com/farrow-js/farrow/tree/master/docs/v1)
+- [Blog](https://www.farrowjs.com/blog)
 
-/**
- * define a module class and inject deps via this.use(Dep)
- */
-class User extends Module {
-  // inject PageInfo
-  page = this.use(PageInfo)
-  path = `${this.page.url}/user`
-  // supporting circular dependencies via getter
-  get product() {
-    return this.use(Product)
-  }
-}
+## License
 
-/**
- * define a module class and inject deps via this.use(Dep)
- */
-class Product extends Module {
-  // inject PageInfo
-  page = this.use(PageInfo)
-  path = `${this.page.url}/product`
-  // supporting circular dependencies via getter
-  get user() {
-    return this.use(User)
-  }
-}
+This project is [MIT](https://github.com/farrow-js/farrow/blob/master/LICENSE) licensed.
 
-/**
- * define a module class and inject deps via this.use(Dep)
- */
-class Root extends Module {
-  // inject PageInfo
-  page = this.use(PageInfo)
-  // inject User
-  user = this.use(User)
-  // inject Product
-  product = this.use(Product)
-
-  // self-injection via getter
-  get self() {
-    return this.use(Root)
-  }
-
-  getInfo() {
-    return {
-      url: this.page.url,
-      env: this.page.env,
-      user: this.user.path,
-      product: this.product.path,
-    }
-  }
-}
-
-/**
- * define a module-container class for entry
- * use [ModuleProviderSymbol] filed for providing Provider
- */
-class App extends Container {
-  page = this.inject(
-    PageInfo.provide({
-      url: '/path/for/app',
-      env: 'app',
-    }),
-  )
-
-  // app.root is equal to app.root1
-  root = this.use(Root)
-
-  root1 = this.use(Root)
-
-  /**
-   * create a new Root and provide new Provider
-   *  app.root2 is not equal to app.root, it's a new one
-   */
-  root2 = this.new(Root, {
-    providers: [
-      PageInfo.provide({
-        url: '/path/for/new',
-        env: 'new',
-      }),
-    ],
-  })
-}
-
-const app = new App()
-
-app.root.getInfo()
-```
-
-## API
-
-### Module#use(DepClass)
-
-`module.use(DepClass)` will read or create a DepClass instance from the `Container`
-
-### Module#inject(providerValue)
-
-`module.inject` will add `provider-value` or `container` to the `Container`
-
-### Module#new(DepClass, options?)
-
-`module.new(DepClass, options)` will create a new DepClass instance in current container/context
-
-- `options.providers`, an list of values created by `Provider` for injecting/reusing.
-- `options.modules`, an list of modules for injecting/resuing.
-
-### Container.from(Class)
-
-`Container.from(Class)` can extends a existed `Class` make it become a `Container` which supports `this.use()` and `this.new()`
-
-### createProvider<Type>(defaultValue?)
-
-`createProvider<Type>(defaultValue?)` create a `Provider` by given `Type` and `defaultValue`
-
-- `Provider.provide(value)`: create a injectable value of `Provider` for `Container`
-- `Provider.defaultValue`: the `defaultValue` of `Provider`, it's optional, maybe `undefined`
+Copyright © 2021-present, [Jade Gu](https://github.com/Lucifier129).

@@ -1,68 +1,59 @@
-# farrow-vite
+<p align="center">
+  <a href="http://farrowjs.com/" target="blank"><img src="https://github.com/farrow-js/farrow/blob/master/docs/assets/Farrow.blue.bg.png" width="120" alt="Farrow Logo" /></a>
+</p>
 
-**farrow-vite**: Vite adapter for farrow-http
+<p align="center">
+  <a href="https://www.npmjs.com/package/farrow-http" rel="nofollow">
+    <img alt="npm version" src="https://img.shields.io/npm/v/farrow-http.svg?style=flat" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/test.yml" rel="nofollow">
+    <img alt="Lint & Test Status" src="https://github.com/farrow-js/farrow/workflows/Lint & Test/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/benchmark.yml" rel="nofollow">
+    <img alt="Benchmark Status" src="https://github.com/farrow-js/farrow/workflows/Benchmark/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/Lucifier129/farrow/blob/master/LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg" style="max-width:100%;">
+  </a>
+</p>
 
-Combining `farrow`, `farrow-http`, `farrow-api` and `farrow-vite`, we can setup a modern full-stack development.
+## Description
 
-## Installation
+**Farrow** is A Type-Friendly Web Framework for Node.js
 
-```shell
-# via npm
-npm install --save farrow-vite
+## Getting Started
 
-# via yarn
-yarn add farrow-vite
-```
+Please follow the documentation at [farrowjs.com](https://www.farrowjs.com/docs/tutorial)!
 
-## Usage
+## Benefits
 
-`npm install --save-dev vite farrow-vite`
+- Expressive HTTP middleware like [Koa](https://github.com/koajs/koa) but no need to modify `req/res` or `ctx`
+- Strongly typed and type-safe from request to response via powerful schema-based validation
+- Provide React-Hooks-like mechanism which is useful for reusing code and integrating other parts of Server like database connection
+- Easy to learn and use if you were experienced in expressjs/koajs
 
-```typescript
-import path from 'path'
-import { Http } from 'farrow-http'
-import { vite } from 'farrow-vite'
+![Farrow Demo](https://github.com/farrow-js/farrow/blob/master/docs/assets/farrow.png)
 
-import { services } from './api'
+## Environment Requirement
 
-let http = Http()
+- TypeScript >= 4.3
+- Node.js >= 14.x
 
-http.use(services)
+## Issues
 
-if (process.env.NODE_ENV === 'development') {
-  // set up vite-dev-server in development
-  http.use(vite())
-} else {
-  // serving the bundler output in production
-  http.serve('/', path.join(__dirname, '../dist/client'))
-}
+Contributions, issues and feature requests are welcome! Feel free to check [issues page](https://github.com/Lucifier129/farrow/issues).
 
-http.listen(3002, () => {
-  console.log('server started at http://localhost:3002')
-})
-```
+## [Contributing Guide](https://github.com/farrow-js/farrow/blob/master/CONTRIBUTING.md)
 
-In `package.json`
+## Stay In Touch
 
-```json
-{
-  "scripts": {
-    "dev": "farrow dev",
-    "build": "tsc && vite build && farrow build"
-  }
-}
-```
+- [Website](https://www.farrowjs.com/)
+- [Twitter](https://twitter.com/guyingjie129)
+- [doc/v1](https://github.com/farrow-js/farrow/tree/master/docs/v1)
+- [Blog](https://www.farrowjs.com/blog)
 
-## API
+## License
 
-```typescript
-import { vite } from 'farrow-vite'
+This project is [MIT](https://github.com/farrow-js/farrow/blob/master/LICENSE) licensed.
 
-/**
- * InlineConfig is the same as vite
- * see https://vitejs.dev/guide/api-javascript.html#inlineconfig
- *
- * RouterPipeline is used for farrow-http
- */
-const vite: (options?: InlineConfig | undefined) => RouterPipeline
-```
+Copyright © 2021-present, [Jade Gu](https://github.com/Lucifier129).

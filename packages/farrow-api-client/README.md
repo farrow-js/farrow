@@ -1,176 +1,59 @@
-# farrow-api-client
+<p align="center">
+  <a href="http://farrowjs.com/" target="blank"><img src="https://github.com/farrow-js/farrow/blob/master/docs/assets/Farrow.blue.bg.png" width="120" alt="Farrow Logo" /></a>
+</p>
 
-**farrow-api-client** is an api-client for `farrow-api-server`
+<p align="center">
+  <a href="https://www.npmjs.com/package/farrow-http" rel="nofollow">
+    <img alt="npm version" src="https://img.shields.io/npm/v/farrow-http.svg?style=flat" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/test.yml" rel="nofollow">
+    <img alt="Lint & Test Status" src="https://github.com/farrow-js/farrow/workflows/Lint & Test/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/benchmark.yml" rel="nofollow">
+    <img alt="Benchmark Status" src="https://github.com/farrow-js/farrow/workflows/Benchmark/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/Lucifier129/farrow/blob/master/LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg" style="max-width:100%;">
+  </a>
+</p>
 
-## Installation
+## Description
 
-```shell
-# via npm
-npm install --save farrow-api-client
+**Farrow** is A Type-Friendly Web Framework for Node.js
 
-# via yarn
-yarn add farrow-api-client
-```
+## Getting Started
 
-## Usage
+Please follow the documentation at [farrowjs.com](https://www.farrowjs.com/docs/tutorial)!
 
-Using [farrow](../farrow/README.md#example) to codegen the `api-client`, and config apiPipeline if needed.
+## Benefits
 
-Simply, we can `import` the file via codegen directly without modification.
+- Expressive HTTP middleware like [Koa](https://github.com/koajs/koa) but no need to modify `req/res` or `ctx`
+- Strongly typed and type-safe from request to response via powerful schema-based validation
+- Provide React-Hooks-like mechanism which is useful for reusing code and integrating other parts of Server like database connection
+- Easy to learn and use if you were experienced in expressjs/koajs
 
-If we need to touch request/response, there are two ways.
+![Farrow Demo](https://github.com/farrow-js/farrow/blob/master/docs/assets/farrow.png)
 
-The first way only affects one url.
+## Environment Requirement
 
-```typescript
-// import the apiPipeline from target module
-import { apiPipeline } from '../api/todo'
+- TypeScript >= 4.3
+- Node.js >= 14.x
 
-/**
- * farrow-api-client is based on farrow-pipeline
- * use pipeline.use(middleware) to do something you want
- */
-apiPipeline.use(async (request, next) => {
-  /**
-   * add extra fileds for post requeset body
-   */
-  let body = {
-    ...request.body,
-    token: 'abc',
-  }
+## Issues
 
-  /**
-   * add extra headers for post request
-   */
-  let options: RequestInit = {
-    headers: {
-      'x-access-token': 'abc',
-    },
-  }
+Contributions, issues and feature requests are welcome! Feel free to check [issues page](https://github.com/Lucifier129/farrow/issues).
 
-  /**
-   * pass new request to next and await for the response
-   */
-  let response = await next({
-    ...request,
-    body,
-    options,
-  })
+## [Contributing Guide](https://github.com/farrow-js/farrow/blob/master/CONTRIBUTING.md)
 
-  // handle the response if needed
-  return response
-})
-```
+## Stay In Touch
 
-The second way only affects all urls.
+- [Website](https://www.farrowjs.com/)
+- [Twitter](https://twitter.com/guyingjie129)
+- [doc/v1](https://github.com/farrow-js/farrow/tree/master/docs/v1)
+- [Blog](https://www.farrowjs.com/blog)
 
-```typescript
-// import the apiPipeline from farrow-api-client
-import { apiPipeline } from 'farrow-api-client'
+## License
 
-// all request performed via farrow-api-client will come here
-// it should be handled carefully
-apiPipeline.use(async (request, next) => {
-  let response = await next(request)
-  return response
-})
+This project is [MIT](https://github.com/farrow-js/farrow/blob/master/LICENSE) licensed.
 
-/**
- * match(string | regexp, middleware)
- * match the request url and handle it via farrow-pipeline
- * if pass a string, it will be matched by url.endsWith(pattern)
- * if pass a regexp, it will be matched by pattern.test(url)
- */
-apiPipeline.match('/todo', async (request, next) => {
-  /**
-   * add extra fileds for post requeset body
-   */
-  let body = {
-    ...request.body,
-    token: 'abc',
-  }
-
-  /**
-   * add extra headers for post request
-   */
-  let options: RequestInit = {
-    headers: {
-      'x-access-token': 'abc',
-    },
-  }
-
-  /**
-   * pass new request to next and await for the response
-   */
-  let response = await next({
-    ...request,
-    body,
-    options,
-  })
-
-  // handle the response if needed
-  return response
-})
-```
-
-### Api
-
-### apiPipeline
-
-```typescript
-export type ApiRequest = {
-  url: string
-  body: {
-    path: string[]
-    input: JsonType
-  }
-  options?: RequestInit
-}
-
-export type ApiErrorResponse = {
-  error: {
-    message: string
-  }
-}
-
-export type ApiSuccessResponse = {
-  output: JsonType
-}
-
-export type ApiResponse = ApiErrorResponse | ApiSuccessResponse
-
-export type ApiPipeline = AsyncPipeline<ApiRequest, ApiResponse> & {
-  match(pattern: string | RegExp, middleware: Middleware<ApiRequest, MaybeAsync<ApiResponse>>): void
-  invoke(url: string, body: ApiRequest['body']): Promise<JsonType>
-}
-
-export type ApiPipelineWithUrl = AsyncPipeline<ApiRequest, ApiResponse> & {
-  invoke(body: ApiRequest['body']): Promise<JsonType>
-}
-```
-
-## createApiPipeline
-
-You can create new `ApiPipeline`, not use the global and default `ApiPipeline`.
-
-```ts
-const myApiPipeline = createApiPipeline({ fetcher })
-```
-
-### Options
-
-```ts
-export type Fetcher = (request: ApiRequest) => Promise<ApiResponse>
-
-export type ApiPipelineOptions = {
-  fetcher?: Fetcher
-}
-```
-
-#### fetcher
-
-Create new `ApiPipeline` by custom `fetcher`:
-
-```ts
-const myApiPipeline = createApiPipeline({ fetcher })
-```
+Copyright © 2021-present, [Jade Gu](https://github.com/Lucifier129).

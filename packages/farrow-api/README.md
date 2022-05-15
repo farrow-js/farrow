@@ -1,154 +1,59 @@
-# farrow-api
+<p align="center">
+  <a href="http://farrowjs.com/" target="blank"><img src="https://github.com/farrow-js/farrow/blob/master/docs/assets/Farrow.blue.bg.png" width="120" alt="Farrow Logo" /></a>
+</p>
 
-**farrow-api**: Schema-based Api builder
+<p align="center">
+  <a href="https://www.npmjs.com/package/farrow-http" rel="nofollow">
+    <img alt="npm version" src="https://img.shields.io/npm/v/farrow-http.svg?style=flat" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/test.yml" rel="nofollow">
+    <img alt="Lint & Test Status" src="https://github.com/farrow-js/farrow/workflows/Lint & Test/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/benchmark.yml" rel="nofollow">
+    <img alt="Benchmark Status" src="https://github.com/farrow-js/farrow/workflows/Benchmark/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/Lucifier129/farrow/blob/master/LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg" style="max-width:100%;">
+  </a>
+</p>
 
-## Setup
+## Description
 
-Install via npm or yarn
+**Farrow** is A Type-Friendly Web Framework for Node.js
 
-```shell
-# via npm
-npm install --save farrow-api
+## Getting Started
 
-# via yarn
-yarn add farrow-api
-```
+Please follow the documentation at [farrowjs.com](https://www.farrowjs.com/docs/tutorial)!
 
-## Usage
+## Benefits
 
-Writing `farrow-api` is just like typing in a higher-order way, we define a api-type via `farrow-schema`. And then use [farrow-api-server](../farrow-api-server/README.md) to attach api to a http server.
+- Expressive HTTP middleware like [Koa](https://github.com/koajs/koa) but no need to modify `req/res` or `ctx`
+- Strongly typed and type-safe from request to response via powerful schema-based validation
+- Provide React-Hooks-like mechanism which is useful for reusing code and integrating other parts of Server like database connection
+- Easy to learn and use if you were experienced in expressjs/koajs
 
-```typescript
-import { Api } from 'farrow-api'
-import { Int, List, ObjectType, Type, TypeOf } from 'farrow-schema'
+![Farrow Demo](https://github.com/farrow-js/farrow/blob/master/docs/assets/farrow.png)
 
-/**
- * define Todo
- */
-export class Todo extends ObjectType {
-  id = {
-    description: `Todo id`,
-    [Type]: Int,
-  }
+## Environment Requirement
 
-  content = {
-    description: 'Todo content',
-    [Type]: String,
-  }
+- TypeScript >= 4.3
+- Node.js >= 14.x
 
-  completed = {
-    description: 'Todo status',
-    [Type]: Boolean,
-  }
-}
+## Issues
 
-// infer the type of Todo
-export type TodoType = TypeOf<Todo>
+Contributions, issues and feature requests are welcome! Feel free to check [issues page](https://github.com/Lucifier129/farrow/issues).
 
-// define Todos
-export const Todos = List(Todo)
+## [Contributing Guide](https://github.com/farrow-js/farrow/blob/master/CONTRIBUTING.md)
 
-// define AddTodoInput
-export class AddTodoInput extends ObjectType {
-  content = {
-    description: 'a content of todo for creating',
-    [Type]: String,
-  }
-}
+## Stay In Touch
 
-// define AddTodoInput
-export class AddTodoOutput extends ObjectType {
-  todos = {
-    description: 'Todo list',
-    [Type]: Todos,
-  }
-}
+- [Website](https://www.farrowjs.com/)
+- [Twitter](https://twitter.com/guyingjie129)
+- [doc/v1](https://github.com/farrow-js/farrow/tree/master/docs/v1)
+- [Blog](https://www.farrowjs.com/blog)
 
-// define an api via input schema and output schema
-export const addTodo = Api(
-  {
-    description: 'add todo',
-    input: AddTodoInput,
-    output: AddTodoOutput,
-  },
-  (input) => {
-    // impl addTodo
-    return {
-      todos: [],
-    }
-  },
-)
+## License
 
-// define RemoveTodoInput
-export class RemoveTodoInput extends ObjectType {
-  id = {
-    description: 'Todo id for removing',
-    [Type]: Int,
-  }
-}
+This project is [MIT](https://github.com/farrow-js/farrow/blob/master/LICENSE) licensed.
 
-// define RemoveTodoOutput
-export class RemoveTodoOutput extends ObjectType {
-  todos = {
-    description: 'Remain todo list',
-    [Type]: Todos,
-  }
-}
-
-// define an api without impl
-export const removeTodo = Api({
-  description: 'remove todo',
-  input: RemoveTodoInput,
-  output: RemoveTodoOutput,
-})
-
-// an api is also a pipeline
-removeTodo.use((input, next) => {
-  return next(input)
-})
-
-// impl remove todo via pipeline.use
-removeTodo.use((input) => {
-  state.todos = state.todos.filter((todo) => todo.id !== input.id)
-  return {
-    todos: state.todos,
-  }
-})
-
-// combine all api to an object/entries
-export const entries = {
-  addTodo,
-  removeTodo,
-}
-```
-
-## API
-
-```typescript
-/**
- * create Api via ApiDefinition
- */
-const Api: (definition: ApiDefinition, impl?: ApiImpl<T> | undefined) => ApiType<T>
-
-/**
- * ApiDefinition
- */
-export type ApiDefinition = {
-  /**
-   * input schema of api
-   */
-  input: SchemaCtorInput
-  /**
-   * output schema of api
-   */
-  output: SchemaCtorInput
-  /**
-   * description of api
-   */
-  description?: string
-  /**
-   * depcreated info of api if needed
-   */
-  deprecated?: string
-}
-```
+Copyright © 2021-present, [Jade Gu](https://github.com/Lucifier129).

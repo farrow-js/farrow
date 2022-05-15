@@ -1,117 +1,59 @@
-# farrow-federation
+<p align="center">
+  <a href="http://farrowjs.com/" target="blank"><img src="https://github.com/farrow-js/farrow/blob/master/docs/assets/Farrow.blue.bg.png" width="120" alt="Farrow Logo" /></a>
+</p>
 
-A aggregation tool for farrow-api.
+<p align="center">
+  <a href="https://www.npmjs.com/package/farrow-http" rel="nofollow">
+    <img alt="npm version" src="https://img.shields.io/npm/v/farrow-http.svg?style=flat" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/test.yml" rel="nofollow">
+    <img alt="Lint & Test Status" src="https://github.com/farrow-js/farrow/workflows/Lint & Test/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/benchmark.yml" rel="nofollow">
+    <img alt="Benchmark Status" src="https://github.com/farrow-js/farrow/workflows/Benchmark/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/Lucifier129/farrow/blob/master/LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg" style="max-width:100%;">
+  </a>
+</p>
 
-It expands from farrow-api-service and get them together to a new and fully-cover services.
+## Description
 
-## Install
+**Farrow** is A Type-Friendly Web Framework for Node.js
 
-```sh
-npm install farrow-federation
+## Getting Started
 
-yarn add farrow-federation
-```
+Please follow the documentation at [farrowjs.com](https://www.farrowjs.com/docs/tutorial)!
 
-## Frist Look
+## Benefits
 
-```ts
-import { Http } from 'farrow-http'
-import { Federation } from 'farrow-federation'
+- Expressive HTTP middleware like [Koa](https://github.com/koajs/koa) but no need to modify `req/res` or `ctx`
+- Strongly typed and type-safe from request to response via powerful schema-based validation
+- Provide React-Hooks-like mechanism which is useful for reusing code and integrating other parts of Server like database connection
+- Easy to learn and use if you were experienced in expressjs/koajs
 
-const http = Http()
+![Farrow Demo](https://github.com/farrow-js/farrow/blob/master/docs/assets/farrow.png)
 
-const service = await Federation([
-  {
-    // anthor farrow-api-server entry
-    url: 'http://localhost:3001/api/todo',
-    namespace: 'todo',
-  },
-])
+## Environment Requirement
 
-http.use(service)
+- TypeScript >= 4.3
+- Node.js >= 14.x
 
-http.listen(3000)
-```
+## Issues
 
-In this demo, the federation service only group one service that is at http://localhost:3001/api/todo. But as you might expect, it can group more service created by farrow-api-service. It also be a service, so it can group themselves.
+Contributions, issues and feature requests are welcome! Feel free to check [issues page](https://github.com/Lucifier129/farrow/issues).
 
-## Services
+## [Contributing Guide](https://github.com/farrow-js/farrow/blob/master/CONTRIBUTING.md)
 
-```ts
-export type ApiService = {
-  url: string
-  namespace: string
-}
+## Stay In Touch
 
-export type ApiServices = ApiService[]
-```
+- [Website](https://www.farrowjs.com/)
+- [Twitter](https://twitter.com/guyingjie129)
+- [doc/v1](https://github.com/farrow-js/farrow/tree/master/docs/v1)
+- [Blog](https://www.farrowjs.com/blog)
 
-this option for you to pass the all service you want to get together.
+## License
 
-The `url` is the service entry and the `namespace` is the namespace of this service entry in current federation.
+This project is [MIT](https://github.com/farrow-js/farrow/blob/master/LICENSE) licensed.
 
-## Options
-
-### fetch
-
-```ts
-fetch?: (input: RequestInfo, init?: RequestInit | undefined) => Promise<globalThis.Response>
-```
-
-For customing fetch.
-
-Default: [node-fetch](https://github.com/node-fetch/node-fetch).
-
-### fetcher
-
-```ts
-fetcher?: ((request: ApiSingleRequest) => Promise<ApiResponseSingle>) &
-((request: ApiIntrospectionRequest) => Promise<ApiResponseSingle>) &
-((request: ApiBatchRequest) => Promise<ApiResponseBatch>)
-```
-
-For customing the function which sends the calling request.
-
-Default: [createFetcher](https://github.com/tqma113/farrow-federation/blob/59c824aa5ecaedfa28d37127e727b2a354cb371d/src/helpers.ts#L6)
-
-### polling
-
-```ts
-polling?: boolean
-```
-
-Polling switch.
-
-Default: `false`.
-
-### pollingInterval
-
-```ts
-pollingInterval?: number
-```
-
-Polling interval time(ms).
-
-Default: `3000`.
-
-### errorStack
-
-```ts
-errorStack?: boolean
-```
-
-Should display error.stack or not.
-
-Default: `process.env.NODE_ENV !== 'production'`.
-
-### strict
-
-```ts
-strict: true
-```
-
-Should throw error when connect to services or not.
-
-Default: `true`
-
-Suggestion: `false` in development, `true` in production.
+Copyright © 2021-present, [Jade Gu](https://github.com/Lucifier129).

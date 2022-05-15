@@ -3,6 +3,7 @@
   "version": "1.12.0",
   "description": "A type-friendly BFF framework",
   "main": "dist/index.js",
+  "homepage": "https://www.farrowjs.com/",
   "scripts": {
     "build": "tsc -b",
     "test": "jest",
@@ -22,7 +23,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Lucifier129/farrow.git"
+    "url": "git+https://github.com/farrow-js/farrow.git"
   },
   "devDependencies": {
     "@types/jest": "^27.0.1",

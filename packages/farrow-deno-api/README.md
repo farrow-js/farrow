@@ -1,93 +1,59 @@
-# farrow-deno-api
+<p align="center">
+  <a href="http://farrowjs.com/" target="blank"><img src="https://github.com/farrow-js/farrow/blob/master/docs/assets/Farrow.blue.bg.png" width="120" alt="Farrow Logo" /></a>
+</p>
 
-A deno server middleware.
+<p align="center">
+  <a href="https://www.npmjs.com/package/farrow-http" rel="nofollow">
+    <img alt="npm version" src="https://img.shields.io/npm/v/farrow-http.svg?style=flat" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/test.yml" rel="nofollow">
+    <img alt="Lint & Test Status" src="https://github.com/farrow-js/farrow/workflows/Lint & Test/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/benchmark.yml" rel="nofollow">
+    <img alt="Benchmark Status" src="https://github.com/farrow-js/farrow/workflows/Benchmark/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/Lucifier129/farrow/blob/master/LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg" style="max-width:100%;">
+  </a>
+</p>
 
-## Install
+## Description
 
-```sh
-npm install farrow-deno-api
+**Farrow** is A Type-Friendly Web Framework for Node.js
 
-yarn add farrow-deno-api
-```
+## Getting Started
 
-## First Look
+Please follow the documentation at [farrowjs.com](https://www.farrowjs.com/docs/tutorial)!
 
-```ts
-// server
-import { Http } from 'farrow-http'
-import { DenoService } from from 'farrow-deno-api'
+## Benefits
 
-// api definition
-...
+- Expressive HTTP middleware like [Koa](https://github.com/koajs/koa) but no need to modify `req/res` or `ctx`
+- Strongly typed and type-safe from request to response via powerful schema-based validation
+- Provide React-Hooks-like mechanism which is useful for reusing code and integrating other parts of Server like database connection
+- Easy to learn and use if you were experienced in expressjs/koajs
 
-const entries = {
-  getCount,
-  setCount,
-  triggerError,
-}
+![Farrow Demo](https://github.com/farrow-js/farrow/blob/master/docs/assets/farrow.png)
 
-const CounterService = DenoService({
-  entries,
-})
-const http = Http()
-const server = http.server()
+## Environment Requirement
 
-http.route('/counter').use(CounterService)
+- TypeScript >= 4.3
+- Node.js >= 14.x
 
-http.listen(3000)
-```
+## Issues
 
-```ts
-// client
-import { api } from 'http://localhost:3000/counter/client.ts'
+Contributions, issues and feature requests are welcome! Feel free to check [issues page](https://github.com/Lucifier129/farrow/issues).
 
-api.getCount({}).then(console.log)
-```
+## [Contributing Guide](https://github.com/farrow-js/farrow/blob/master/CONTRIBUTING.md)
 
-## Options
+## Stay In Touch
 
-### entries
+- [Website](https://www.farrowjs.com/)
+- [Twitter](https://twitter.com/guyingjie129)
+- [doc/v1](https://github.com/farrow-js/farrow/tree/master/docs/v1)
+- [Blog](https://www.farrowjs.com/blog)
 
-```ts
-entries: ApiEntries
-```
+## License
 
-[ApiEntries](https://github.com/Lucifier129/farrow/blob/master/packages/farrow-api/src/api.ts#L111)
+This project is [MIT](https://github.com/farrow-js/farrow/blob/master/LICENSE) licensed.
 
-### namespace
-
-```ts
-namespace: string = 'client'
-```
-
-it affect the path of file:
-
-```ts
-import { api } from 'http://localhost:3000/counter/client.ts'
-```
-
-in client.
-
-### codegen
-
-```ts
-codegen?: CodegenOptions
-```
-
-[CodegenOptions](https://github.com/Lucifier129/farrow/blob/master/packages/farrow-api/src/codegen.ts#L126)
-
-### transform
-
-```ts
-transform?: (source: string) => string
-```
-
-[transform](https://github.com/Lucifier129/farrow/blob/master/packages/farrow/src/api-client/index.ts#L51)
-
-### format
-
-```ts
-format?: (source: string) => string
-```
-
-[format](https://github.com/Lucifier129/farrow/blob/master/packages/farrow/src/api-client/index.ts#L55)
+Copyright © 2021-present, [Jade Gu](https://github.com/Lucifier129).

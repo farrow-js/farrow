@@ -1,148 +1,59 @@
-# farrow
+<p align="center">
+  <a href="http://farrowjs.com/" target="blank"><img src="https://github.com/farrow-js/farrow/blob/master/docs/assets/Farrow.blue.bg.png" width="120" alt="Farrow Logo" /></a>
+</p>
 
-Useful modules for developing farrow app
+<p align="center">
+  <a href="https://www.npmjs.com/package/farrow-http" rel="nofollow">
+    <img alt="npm version" src="https://img.shields.io/npm/v/farrow-http.svg?style=flat" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/test.yml" rel="nofollow">
+    <img alt="Lint & Test Status" src="https://github.com/farrow-js/farrow/workflows/Lint & Test/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/benchmark.yml" rel="nofollow">
+    <img alt="Benchmark Status" src="https://github.com/farrow-js/farrow/workflows/Benchmark/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/Lucifier129/farrow/blob/master/LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg" style="max-width:100%;">
+  </a>
+</p>
 
-## Setup
+## Description
 
-Install via npm or yarn
+**Farrow** is A Type-Friendly Web Framework for Node.js
 
-```shell
-# via npm
-npm install --save farrow
+## Getting Started
 
-# via yarn
-yarn add farrow
-```
+Please follow the documentation at [farrowjs.com](https://www.farrowjs.com/docs/tutorial)!
 
-add `scripts` to your `package.json`
+## Benefits
 
-```json
-{
-  "scripts": {
-    "dev": "farrow dev",
-    "build": "farrow build",
-    "start": "farrow start"
-  }
-}
-```
+- Expressive HTTP middleware like [Koa](https://github.com/koajs/koa) but no need to modify `req/res` or `ctx`
+- Strongly typed and type-safe from request to response via powerful schema-based validation
+- Provide React-Hooks-like mechanism which is useful for reusing code and integrating other parts of Server like database connection
+- Easy to learn and use if you were experienced in expressjs/koajs
 
-and then:
+![Farrow Demo](https://github.com/farrow-js/farrow/blob/master/docs/assets/farrow.png)
 
-- `npm run dev` for developing
-- `npm run build` for bundling the source code
-- `npm run start` for running the output code of bundler
+## Environment Requirement
 
-`farrow` assumes that your source code is in `src` folder, and the output code is in `dist` folder.
+- TypeScript >= 4.3
+- Node.js >= 14.x
 
-## farrow.config.js
+## Issues
 
-`farrow.config.js` is used to configure the behavior of `farrow`
+Contributions, issues and feature requests are welcome! Feel free to check [issues page](https://github.com/Lucifier129/farrow/issues).
 
-### Example
+## [Contributing Guide](https://github.com/farrow-js/farrow/blob/master/CONTRIBUTING.md)
 
-```javascript
-// farrow.config.js
-const { createFarrowConfig } = require('farrow')
+## Stay In Touch
 
-module.exports = createFarrowConfig({
-  server: {
-    entry: 'index.js',
-    src: 'src',
-    dist: 'dist',
-    // uncomment next-line to debug
-    // nodeArgs: ['--inspect-brk']
-  },
-  // for connecting farrow-api-server and codegen farrow-api-client
-  // api: [
-  //   {
-  //     src: 'http://localhost:3002/api/todo',
-  //     dist: `${__dirname}/src/api/todo.ts`,
-  //   },
-  // ],
-})
-```
+- [Website](https://www.farrowjs.com/)
+- [Twitter](https://twitter.com/guyingjie129)
+- [doc/v1](https://github.com/farrow-js/farrow/tree/master/docs/v1)
+- [Blog](https://www.farrowjs.com/blog)
 
-### Type
+## License
 
-```typescript
-export type Config = {
-  server?: ServerBundlerOptions | ServerBundlerOptions[] | false
-  api?: ApiClientOptions | ApiClientOptions[] | false
-}
+This project is [MIT](https://github.com/farrow-js/farrow/blob/master/LICENSE) licensed.
 
-export type ServerBundlerOptions = {
-  /**
-   * filename of entry
-   */
-  entry?: string
-  /**
-   * folder of source code
-   */
-  src?: string
-  /**
-   * folder of output code
-   */
-  dist?: string
-  /**
-   * - args for node.js
-   * - eg. ['--inspect-brk'] for debugging
-   */
-  nodeArgs?: string[]
-  /**
-   * - env for node.js
-   * - eg. { NODE_ENV: 'production' }
-   * - NODE_ENV = production in `farrow start`
-   * - NODE_ENV = development in `farrow dev`
-   */
-  env?: NodeJS.ProcessEnv
-  /**
-   * other options for esbuild
-   */
-  esbuild?: Omit<BuildOptions, 'entryPoints' | 'outdir' | 'outbase'>
-  /**
-   * auto add closest package.json dependenties to esbuild external or not
-   */
-  autoExternal?: boolean
-}
-
-export type ApiClientOptions = {
-  /**
-   * http address of farrow-api
-   */
-  src: string
-  /**
-   * file address of codegen target
-   */
-  dist: string
-  /**
-   * codegen options
-   */
-  codegen?: CodegenOptions
-  /**
-   * the interval of polling
-   * default value is 3000ms
-   */
-  pollingInterval?: number
-  /**
-   * logger options for polling
-   */
-  logger?: false | ((options: ApiClientOptions) => void)
-  /**
-   * transform source code received from server
-   * it's useful when need to attach custom code snippet
-   */
-  transform?: (source: string) => string
-  /**
-   * format source code via codegen
-   */
-  format?: (source: string) => string
-}
-
-export type CodegenOptions = {
-  /**
-   * emit createApiClient or not
-   * if set to false, just types will be codegened
-   */
-  emitApiClient?: boolean
-}
-```
+Copyright © 2021-present, [Jade Gu](https://github.com/Lucifier129).

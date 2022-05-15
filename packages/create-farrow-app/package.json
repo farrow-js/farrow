@@ -3,6 +3,7 @@
   "version": "1.12.0",
   "description": "A cli-tools for scaffolding farrow project",
   "main": "dist/index.js",
+  "homepage": "https://www.farrowjs.com/",
   "bin": {
     "create-farrow-app": "./bin/scripts.js"
   },
@@ -18,7 +19,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Lucifier129/farrow.git"
+    "url": "git+https://github.com/farrow-js/farrow.git"
   },
   "dependencies": {
     "enquirer": "^2.3.6",

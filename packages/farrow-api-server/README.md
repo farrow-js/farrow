@@ -1,113 +1,59 @@
-# farrow-api-server
+<p align="center">
+  <a href="http://farrowjs.com/" target="blank"><img src="https://github.com/farrow-js/farrow/blob/master/docs/assets/Farrow.blue.bg.png" width="120" alt="Farrow Logo" /></a>
+</p>
 
-**farrow-api-server**: farrow-api adapter for farrow-http
+<p align="center">
+  <a href="https://www.npmjs.com/package/farrow-http" rel="nofollow">
+    <img alt="npm version" src="https://img.shields.io/npm/v/farrow-http.svg?style=flat" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/test.yml" rel="nofollow">
+    <img alt="Lint & Test Status" src="https://github.com/farrow-js/farrow/workflows/Lint & Test/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/benchmark.yml" rel="nofollow">
+    <img alt="Benchmark Status" src="https://github.com/farrow-js/farrow/workflows/Benchmark/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/Lucifier129/farrow/blob/master/LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg" style="max-width:100%;">
+  </a>
+</p>
 
-## Setup
+## Description
 
-Install via npm or yarn
+**Farrow** is A Type-Friendly Web Framework for Node.js
 
-```shell
-# via npm
-npm install --save farrow-api-server
+## Getting Started
 
-# via yarn
-yarn add farrow-api-server
-```
+Please follow the documentation at [farrowjs.com](https://www.farrowjs.com/docs/tutorial)!
 
-## Usage
+## Benefits
 
-[farrow-api](../farrow-api/README.md) just defining API, it's not directly bind to a server.
+- Expressive HTTP middleware like [Koa](https://github.com/koajs/koa) but no need to modify `req/res` or `ctx`
+- Strongly typed and type-safe from request to response via powerful schema-based validation
+- Provide React-Hooks-like mechanism which is useful for reusing code and integrating other parts of Server like database connection
+- Easy to learn and use if you were experienced in expressjs/koajs
 
-`farrow-api-server` can convert an `api-entries` to a router of `farrow-http`.
+![Farrow Demo](https://github.com/farrow-js/farrow/blob/master/docs/assets/farrow.png)
 
-In servier-side, we define api/service via `farrow-api`, and attach them to `farrow-http`
+## Environment Requirement
 
-```typescript
-// /src/api/todo.ts
-import { ApiService } from 'farrow-api-server'
+- TypeScript >= 4.3
+- Node.js >= 14.x
 
-// assuming addTodo/removeTodo is defined
+## Issues
 
-// combine all api to an object/entries
-export const entries = {
-  addTodo,
-  removeTodo,
-}
+Contributions, issues and feature requests are welcome! Feel free to check [issues page](https://github.com/Lucifier129/farrow/issues).
 
-// create service router
-export const service = ApiService({
-  entries,
-})
-```
+## [Contributing Guide](https://github.com/farrow-js/farrow/blob/master/CONTRIBUTING.md)
 
-```typescript
-// /src/api/index.ts
-import { Response, Router } from 'farrow-http'
-// import todo-service
-import { service as TodoService } from './todo'
+## Stay In Touch
 
-export const services = Router()
+- [Website](https://www.farrowjs.com/)
+- [Twitter](https://twitter.com/guyingjie129)
+- [doc/v1](https://github.com/farrow-js/farrow/tree/master/docs/v1)
+- [Blog](https://www.farrowjs.com/blog)
 
-// capture all json response and do something if needed
-services.capture('json', (body) => {
-  if (typeof body.value === 'object') {
-    return Response.json({
-      ...body.value,
-      // ...others
-    })
-  }
-  return Response.json(body.value)
-})
+## License
 
-// attach todo api to services
-services.route('/api/todo').use(TodoService)
+This project is [MIT](https://github.com/farrow-js/farrow/blob/master/LICENSE) licensed.
 
-// attach user api to services if existed
-// services.route('/api/user').use(UserService)
-```
-
-```typescript
-import path from 'path'
-import { Http } from 'farrow-http'
-import { vite } from 'farrow-vite'
-
-import { services } from './api'
-
-let http = Http()
-
-// attach services to http
-http.use(services)
-
-http.listen(3000, () => {
-  console.log('server started at http://localhost:3002')
-})
-```
-
-In client-side, for consuming data we need to use [farrow-api-client](../farrow-api-client/README.md).
-
-```typescript
-// import file codegened by farrow
-import { api as TodoApi } from '../api/todo'
-
-const main = async () => {
-  // invoke api
-  let result = await TodoApi.addTodo({
-    content: 'todo content',
-  })
-}
-```
-
-## API
-
-```typescript
-type CreateApiServiceOptions = {
-  // api entries
-  entries: ApiEntries
-  /**
-   * should display error.stack or not
-   * it will be true if process.env.NODE_ENV === 'production' by default
-   */
-  errorStack?: boolean
-}
-const ApiService: (options: CreateApiServiceOptions) => ApiServiceType
-```
+Copyright © 2021-present, [Jade Gu](https://github.com/Lucifier129).

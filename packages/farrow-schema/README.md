@@ -1,196 +1,59 @@
-Farrow-Schema API
+<p align="center">
+  <a href="http://farrowjs.com/" target="blank"><img src="https://github.com/farrow-js/farrow/blob/master/docs/assets/Farrow.blue.bg.png" width="120" alt="Farrow Logo" /></a>
+</p>
 
-`farrow-schema` is a powerful and extensible schema builder library.
+<p align="center">
+  <a href="https://www.npmjs.com/package/farrow-http" rel="nofollow">
+    <img alt="npm version" src="https://img.shields.io/npm/v/farrow-http.svg?style=flat" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/test.yml" rel="nofollow">
+    <img alt="Lint & Test Status" src="https://github.com/farrow-js/farrow/workflows/Lint & Test/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/benchmark.yml" rel="nofollow">
+    <img alt="Benchmark Status" src="https://github.com/farrow-js/farrow/workflows/Benchmark/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/Lucifier129/farrow/blob/master/LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg" style="max-width:100%;">
+  </a>
+</p>
 
-## Installation
+## Description
 
-```shell
-# via npm
-npm install --save farrow-schema
+**Farrow** is A Type-Friendly Web Framework for Node.js
 
-# via yarn
-yarn add farrow-schema
-```
+## Getting Started
 
-## API
+Please follow the documentation at [farrowjs.com](https://www.farrowjs.com/docs/tutorial)!
 
-```typescript
-import {
-  Schema, // abstract class inherited by all schema
-  List, // List type constructor
-  ObjectType, // abstract class of object type schema
-  Int, // Int type
-  Float, // Float type
-  ID, // ID type
-  Struct, // Struct type constructor
-  Nullable, // Nullabel type constructor
-  Union, // Union type constructor
-  Intersect, // Intersection type constructor
-  Literal, // Literal type constructor
-  Record, // Record type constructor
-  Json, // Json type
-  Any, // Any type
-  Strict, // Strict type constructor
-  NonStrict, // NonStrict type constructor
-  Tuple, // Tuple type constrcutor
-  pick, // pick object/struct keys to create a new object/struct type
-  omit, // omit object/struct keys to create a new object/struct type
-  keyof, // get the keys of object/struct
-} from 'farrow-schema'
+## Benefits
 
-// create transformer for transforming schema to another type
-import { createTransformer } from 'farrow-schema/transformer'
+- Expressive HTTP middleware like [Koa](https://github.com/koajs/koa) but no need to modify `req/res` or `ctx`
+- Strongly typed and type-safe from request to response via powerful schema-based validation
+- Provide React-Hooks-like mechanism which is useful for reusing code and integrating other parts of Server like database connection
+- Easy to learn and use if you were experienced in expressjs/koajs
 
-// schema validator
-import { Validator } from 'farrow-schema/validator'
-```
+![Farrow Demo](https://github.com/farrow-js/farrow/blob/master/docs/assets/farrow.png)
 
-## Usage
+## Environment Requirement
 
-```typescript
-import * as Schema from 'farrow-schema'
-import { Validator } from 'farrow-schema/validator'
+- TypeScript >= 4.3
+- Node.js >= 14.x
 
-const { ObjectType, List, ID, Float, Nullable, Struct, Union, Intersect, Literal, Json, Any, Record } = Schema
+## Issues
 
-// define User Object, it supports recursive definition
-class User extends ObjectType {
-  id = ID
-  name = String
-  orders = List(Order) // order list type
-}
+Contributions, issues and feature requests are welcome! Feel free to check [issues page](https://github.com/Lucifier129/farrow/issues).
 
-// define Order Object
-class Order extends ObjectType {
-  id = ID
-  product = Product
-  user = User
-}
+## [Contributing Guide](https://github.com/farrow-js/farrow/blob/master/CONTRIBUTING.md)
 
-// define Product Object
-class Product extends ObjectType {
-  id = ID
-  title = String
-  description = String
-  price = Float
-}
+## Stay In Touch
 
-// define AppState Object
-class AppState extends ObjectType {
-  descriptors = {
-    a: Boolean,
-    // a light way to construct struct type
-    b: Struct({
-      c: {
-        d: List(Nullable(String)),
-      },
-    }),
-  }
+- [Website](https://www.farrowjs.com/)
+- [Twitter](https://twitter.com/guyingjie129)
+- [doc/v1](https://github.com/farrow-js/farrow/tree/master/docs/v1)
+- [Blog](https://www.farrowjs.com/blog)
 
-  struct = Struct({
-    a: Number,
-    b: String,
-    c: {
-      deep: {
-        d: List(Boolean),
-      },
-    },
-  })
+## License
 
-  nullable = Nullable(List(Number))
+This project is [MIT](https://github.com/farrow-js/farrow/blob/master/LICENSE) licensed.
 
-  union = Union(List(Number), List(String), List(Boolean))
-
-  intersect = Intersect(Struct({ a: String }), Struct({ b: Boolean }))
-
-  record = Record(Product)
-
-  literal = Literal(12)
-
-  json = Json
-
-  any = Any
-
-  getUser = User
-  getOrder = Order
-  // supports { [Schema.Type]: SchemaCtor }
-  getProduct = {
-    [Schema.Type]: Product,
-    description: 'get product',
-  }
-}
-
-type T0 = Schema.TypeOf<AppState>
-
-type T1 = Schema.TypeOf<User>
-
-type T2 = Schema.TypeOf<Product>
-
-const result0 = Validator.validate(Product, {
-  id : 'product id'
-  title : 'product title'
-  description : 'product description'
-  price : 1000.1
-})
-
-if (result0.isOk) {
-  console.log(result0.value)
-}
-```
-
-## ValidatorType
-
-it's useful to build your own validator-type with custom validate function.
-
-```typescript
-import { ValidatorType } from 'farrow-schema/validator'
-
-class DateType extends ValidatorType<Date> {
-  validate(input: unknown) {
-    if (input instanceof Date) {
-      return this.Ok(input)
-    }
-
-    if (typeof input === 'number' || typeof input === 'string') {
-      return this.Ok(new Date(input))
-    }
-
-    return this.Err(`${input} is not a valid date`)
-  }
-}
-
-class EmailType extends ValidatorType<string> {
-  validate(input: unknown) {
-    if (typeof input !== 'string') {
-      return this.Err(`${input} should be a string`)
-    }
-
-    if (/^example@farrow\.com$/.test(input)) {
-      return this.Ok(input)
-    }
-
-    return this.Err(`${input} is not a valid email`)
-  }
-}
-```
-
-## RegExp
-
-Given a `regexp` for creating a validator-type
-
-```typescript
-import { RegExp, createSchemaValidator } from 'farrow-schema/validator'
-
-let Reg0 = RegExp(/123/)
-let Reg1 = RegExp(/abc/i)
-
-let validateReg0 = createSchemaValidator(Reg0)
-let validateReg1 = createSchemaValidator(Reg1)
-
-expect(assertOk(validateReg0('123'))).toBe('123')
-expect(() => assertOk(validateReg0('12'))).toThrow()
-
-expect(assertOk(validateReg1('abc'))).toBe('abc')
-expect(assertOk(validateReg1('ABC'))).toBe('ABC')
-expect(() => assertOk(validateReg1('cba'))).toThrow()
-```
+Copyright © 2021-present, [Jade Gu](https://github.com/Lucifier129).

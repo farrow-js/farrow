@@ -1,154 +1,59 @@
-# farrow-pipeline
+<p align="center">
+  <a href="http://farrowjs.com/" target="blank"><img src="https://github.com/farrow-js/farrow/blob/master/docs/assets/Farrow.blue.bg.png" width="120" alt="Farrow Logo" /></a>
+</p>
 
-Type-Friendly middleware library
+<p align="center">
+  <a href="https://www.npmjs.com/package/farrow-http" rel="nofollow">
+    <img alt="npm version" src="https://img.shields.io/npm/v/farrow-http.svg?style=flat" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/test.yml" rel="nofollow">
+    <img alt="CI Status" src="https://github.com/farrow-js/farrow/workflows/CI/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/benchmark.yml" rel="nofollow">
+    <img alt="Benchmark Status" src="https://github.com/farrow-js/farrow/workflows/Benchmark/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/Lucifier129/farrow/blob/master/LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg" style="max-width:100%;">
+  </a>
+</p>
 
-## Installation
+## Description
 
-```shell
-# via npm
-npm install --save farrow-pipeline
+**Farrow** is A Type-Friendly Web Framework for Node.js
 
-# via yarn
-yarn add farrow-pipeline
-```
+## Getting Started
 
-## API
+Please follow the documentation at [farrowjs.com](https://www.farrowjs.com/docs/tutorial)!
 
-```typescript
-import {
-  createContext, // create injectable context
-  createContainer, // create context container
-  createPipeline, // create pipeline
-  usePipeline, // farrow-hooks for using pipeline in another pipeline's middleware
-} from 'farrow-pipeline'
-```
+## Benefits
 
-## createPipeline<I, O>(options?: PipelineOptions) => Pipeline<I, O>
+- Expressive HTTP middleware like [Koa](https://github.com/koajs/koa) but no need to modify `req/res` or `ctx`
+- Strongly typed and type-safe from request to response via powerful schema-based validation
+- Provide React-Hooks-like mechanism which is useful for reusing code and integrating other parts of Server like database connection
+- Easy to learn and use if you were experienced in expressjs/koajs
 
-create a pipeline
+![Farrow Demo](https://github.com/farrow-js/farrow/blob/master/docs/assets/farrow.png)
 
-```typescript
-// contexts for injecting to the pipeline
-type PipelineOptions = {
-  contexts?: ContextStorage
-}
+## Environment Requirement
 
-type Pipeline<I = unknown, O = unknown> = {
-  // add middlewares to pipeline and return pipeline
-  use: (...inputs: MiddlewareInput<I, O>[]) => Pipeline<I, O>
-  // run a pipeline by input and received its output
-  run: (input: I, options?: RunPipelineOptions<I, O>) => O
-  // pipeline.middleware can use in another pipeline.use(...) if their type is matched
-  middleware: Middleware<I, O>
-}
+- TypeScript >= 4.3
+- Node.js >= 14.x
 
-type RunPipelineOptions<I = unknown, O = unknown> = {
-  // container which store some contexts.if container is not given, pipeline will use its internal container
-  container?: Container
-  // if all middleware called next, then onLast would be called
-  onLast?: (input: I) => O
-}
+## Issues
 
-const pipeline = createPipeline<number, number[]>()
+Contributions, issues and feature requests are welcome! Feel free to check [issues page](https://github.com/Lucifier129/farrow/issues).
 
-pipeline.use((input, next) => {
-  return [input, ...next(1), 3]
-})
+## [Contributing Guide](https://github.com/farrow-js/farrow/blob/master/CONTRIBUTING.md)
 
-pipeline.use((input) => {
-  return [input, 2]
-})
+## Stay In Touch
 
-let result = pipeline.run(0) // [0, 1, 2, 3]
-```
+- [Website](https://www.farrowjs.com/)
+- [Twitter](https://twitter.com/guyingjie129)
+- [doc/v1](https://github.com/farrow-js/farrow/tree/master/docs/v1)
+- [Blog](https://www.farrowjs.com/blog)
 
-## createContext<T>(defaultValue: T): Context<T>
+## License
 
-create a injectable context
+This project is [MIT](https://github.com/farrow-js/farrow/blob/master/LICENSE) licensed.
 
-createContext is like `React.createContext`, we can use it injecting anything we want, and access `Context` in any middleware or custom-hooks function.
-
-```typescript
-type Context<T = any> = {
-  id: symbol
-  [ContextSymbol]: T
-  // create a new context equipped a new value
-  create: (value: T) => Context<T>
-  // get context ref { value } for accessing context in current container of pipeline
-  use: () => {
-    value: T
-  }
-  // get context value
-  get: () => T
-  // set context value
-  set: (value: T) => void
-  // assert context value is not null or undefined and return context value
-  assert: () => Exclude<T, undefined | null>
-}
-
-const Context0 = createContext(0)
-
-const pipeline = createPipeline<number, number>({
-  contexts: {
-    // inject Context0 equipped 10 into pipeline
-    context0: Context0.create(10),
-  },
-})
-
-pipeline.use((input, next) => {
-  return next(input) + Context0.get()
-})
-
-pipeline.use((input) => {
-  Context0.set(Context0.get() + 1)
-  return input
-})
-
-let result0 = pipeline.run(10) // return 21
-let result1 = pipeline.run(20) // return 31
-```
-
-## createContainer(contexts?: ContextStorage): Container
-
-create a container to manage contexts
-
-```typescript
-type ContextStorage = {
-  [key: string]: Context
-}
-
-type Container = {
-  // read current value of Context
-  read: <V>(Context: Context<V>) => V
-  // write current value of Context
-  write: <V>(Context: Context<V>, value: V) => void
-}
-
-const Context0 = createContext(0)
-const Context1 = createContext<number[]>([])
-
-const container = createContainer({
-  context0: Context0.create(10),
-  context1: Context1.create([10]),
-})
-
-container.read(Context0) // 10
-container.read(Context1) // [10]
-
-container.write(Context0, 1)
-container.write(Context1, [11])
-
-container.read(Context0) // 1
-container.read(Context1) // [11]
-
-const pipeline = createPipeline<number, number>()
-
-pipeline.run(10, {
-  // use container to replace pipeline's internal container
-  container: container,
-})
-
-// accessing value of Context0/Context1 after pipeline.run(...)
-container.read(Context0) // current value of Context0
-container.read(Context1) // current value of Context1
-```
+Copyright © 2021-present, [Jade Gu](https://github.com/Lucifier129).

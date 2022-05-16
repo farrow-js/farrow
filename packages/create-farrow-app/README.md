@@ -1,27 +1,59 @@
-# create-farrow-app
+<p align="center">
+  <a href="http://farrowjs.com/" target="blank"><img src="https://github.com/farrow-js/farrow/blob/master/docs/assets/Farrow.blue.bg.png" width="120" alt="Farrow Logo" /></a>
+</p>
 
-A cli-tools for scaffolding farrow project
+<p align="center">
+  <a href="https://www.npmjs.com/package/farrow-http" rel="nofollow">
+    <img alt="npm version" src="https://img.shields.io/npm/v/farrow-http.svg?style=flat" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/test.yml" rel="nofollow">
+    <img alt="CI Status" src="https://github.com/farrow-js/farrow/workflows/CI/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/benchmark.yml" rel="nofollow">
+    <img alt="Benchmark Status" src="https://github.com/farrow-js/farrow/workflows/Benchmark/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/Lucifier129/farrow/blob/master/LICENSE">
+    <img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg" style="max-width:100%;">
+  </a>
+</p>
 
-> Compatibility Note: Farrow requires Node.js version >=14.0.0.
+## Description
 
-With npm:
+**Farrow** is A Type-Friendly Web Framework for Node.js
 
-```shell
-$ npm init farrow-app
-```
+## Getting Started
 
-With yarn:
+Please follow the documentation at [farrowjs.com](https://www.farrowjs.com/docs/tutorial)!
 
-```shell
-$ yarn create farrow-app
-```
+## Benefits
 
-Then follow the prompts!
+- Expressive HTTP middleware like [Koa](https://github.com/koajs/koa) but no need to modify `req/res` or `ctx`
+- Strongly typed and type-safe from request to response via powerful schema-based validation
+- Provide React-Hooks-like mechanism which is useful for reusing code and integrating other parts of Server like database connection
+- Easy to learn and use if you were experienced in expressjs/koajs
 
-Currently supported template presets include:
+![Farrow Demo](https://github.com/farrow-js/farrow/blob/master/docs/assets/farrow.png)
 
-- `farrow-only`: only includes farrow for server-side development
+## Environment Requirement
 
-- `farrow-vite-react`: includes `farrow`, `vite` and `react` for full stack development
+- TypeScript >= 4.3
+- Node.js >= 14.x
 
-- `farrow-next-react`: includes `farrow`, `next.js` and `react` for full stack development
+## Issues
+
+Contributions, issues and feature requests are welcome! Feel free to check [issues page](https://github.com/Lucifier129/farrow/issues).
+
+## [Contributing Guide](https://github.com/farrow-js/farrow/blob/master/CONTRIBUTING.md)
+
+## Stay In Touch
+
+- [Website](https://www.farrowjs.com/)
+- [Twitter](https://twitter.com/guyingjie129)
+- [doc/v1](https://github.com/farrow-js/farrow/tree/master/docs/v1)
+- [Blog](https://www.farrowjs.com/blog)
+
+## License
+
+This project is [MIT](https://github.com/farrow-js/farrow/blob/master/LICENSE) licensed.
+
+Copyright © 2021-present, [Jade Gu](https://github.com/Lucifier129).

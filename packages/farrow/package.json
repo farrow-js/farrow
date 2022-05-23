@@ -9,7 +9,9 @@
   "scripts": {
     "build": "tsc -b",
     "test": "jest",
-    "test:coverage": "jest --collectCoverage --coverage"
+    "test:coverage": "jest --collectCoverage --coverage",
+    "prepare": "pnpm run format:bin",
+    "format:bin": "npx crlf --set=LF ./bin/scripts.js"
   },
   "files": [
     "dist",

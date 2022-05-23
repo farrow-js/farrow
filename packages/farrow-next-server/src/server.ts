@@ -15,10 +15,10 @@ export const next = (options?: NextServer['options']): NextRouterPipeline => {
     ...options,
   })
 
-  router.use(() => {
+  router.useLazy(() => {
     const handle = app.getRequestHandler()
 
-    return app.prepare().then(() => {
+    return app.prepare().then(() => () => {
       return Response.custom(({ req, res }) => {
         const parsedUrl = parseUrl(req.url ?? '', true)
         return handle(req, res, parsedUrl)

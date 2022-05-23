@@ -1,5 +1,11 @@
 # farrow
 
+## 1.12.2
+
+### Patch Changes
+
+- 939cd56: fix server
+
 ## 1.12.1
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "farrow",
-  "version": "1.12.1",
+  "version": "1.12.2",
   "description": "Useful modules for developing Farrow App",
   "main": "dist/index.js",
   "homepage": "https://www.farrowjs.com/",

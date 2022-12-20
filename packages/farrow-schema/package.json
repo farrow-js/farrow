@@ -3,6 +3,8 @@
   "version": "1.12.1",
   "description": "A powerful and extensible schema builder",
   "main": "dist/index.js",
+  "module": "esm/index.js",
+  "types": "dist/index.d.ts",
   "homepage": "https://www.farrowjs.com/",
   "files": [
     "src",

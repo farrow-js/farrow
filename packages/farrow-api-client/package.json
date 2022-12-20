@@ -3,6 +3,8 @@
   "version": "1.12.0",
   "description": "A type-friendly BFF framework",
   "main": "dist/index.js",
+  "module": "esm/index.js",
+  "types": "dist/index.d.ts",
   "homepage": "https://www.farrowjs.com/",
   "scripts": {
     "build": "tsc -b",

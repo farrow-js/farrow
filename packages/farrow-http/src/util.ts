@@ -67,5 +67,5 @@ export const getBody = (req: IncomingMessage, options?: BodyOptions) => {
 }
 
 export const isPromise = <Input>(input: MaybeAsync<Input>): input is Promise<Input> => {
-  return input && 'then' in input && typeof input.then === 'function'
+  return !!input && typeof (input as any).then === 'function'
 }

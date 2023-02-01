@@ -25,6 +25,26 @@ export { ApiRequest, ApiResponse, JsonType, ApiErrorResponse, ApiSuccessResponse
 
 export type Fetcher = (request: ApiRequest) => Promise<ApiResponse>
 
+export const defaultFetcher = async (request: ApiRequest): Promise<ApiResponse> => {
+  const { url, calling, options: init } = request
+  const options: RequestInit = {
+    method: 'POST',
+    credentials: 'include',
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      ...init?.headers,
+    },
+    body: JSON.stringify(calling),
+  }
+  const response = await fetch(url, options)
+  const text = await response.text()
+  const json = JSON.parse(text) as ApiResponse
+
+  return json
+}
+
+
 export type ApiPipelineOptions = {
   fetcher?: Fetcher
 }
@@ -115,24 +135,6 @@ export const createApiPipeline = ({ fetcher = defaultFetcher }: ApiPipelineOptio
 
 export const apiPipeline = createApiPipeline()
 
-export const defaultFetcher = async (request: ApiRequest): Promise<ApiResponse> => {
-  const { url, calling, options: init } = request
-  const options: RequestInit = {
-    method: 'POST',
-    credentials: 'include',
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      ...init?.headers,
-    },
-    body: JSON.stringify(calling),
-  }
-  const response = await fetch(url, options)
-  const text = await response.text()
-  const json = JSON.parse(text) as ApiResponse
-
-  return json
-}
 
 export type ApiWithUrlInvokeOptions = ApiInvokeOptions & {
   batch?: boolean

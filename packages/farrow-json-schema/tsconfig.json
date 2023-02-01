@@ -8,6 +8,9 @@
   "references": [
     {
       "path": "../farrow-schema/tsconfig.json"
+    },
+    {
+      "path": "../farrow-api/tsconfig.json"
     }
   ],
   "include": ["src"]

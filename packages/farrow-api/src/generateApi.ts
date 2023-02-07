@@ -143,10 +143,12 @@ export type ApiClientHelpers = {
 
 export type CodegenOptions = {
   /**
-   * emit createApiClient or not
-   * if set to false, only types will be codegen
+   * emit ApiClient
+   * apiClientHelpers can be used to config the different behaviour
    */
-  apiClientHelpers?: ApiClientHelpers | false
+  apiClient?: {
+    helpers: ApiClientHelpers
+  }
 
   /**
    * a remote address or alias to invoke
@@ -190,7 +192,7 @@ export const generateApi = (formatResult: FormatResult, options?: CodegenOptions
 
       return `
       /**
-       * {@label ${typeName}} 
+       * @label ${typeName}
        */
       export type ${typeName} = {
         ${fields.join(',  \n')}
@@ -205,7 +207,7 @@ export const generateApi = (formatResult: FormatResult, options?: CodegenOptions
         .join(' | ')
       return `
       /**
-       * {@label ${typeName}} 
+       * @label ${typeName}
        */
       export type ${typeName} = ${expression}
       `
@@ -218,7 +220,7 @@ export const generateApi = (formatResult: FormatResult, options?: CodegenOptions
         .join(' & ')
       return `
       /**
-       * {@label ${typeName}} 
+       * @label ${typeName}
        */
       export type ${typeName} = ${expression}
       `
@@ -232,7 +234,7 @@ export const generateApi = (formatResult: FormatResult, options?: CodegenOptions
 
       return `
         /**
-         * {@label ${typeName}} 
+         * @label ${typeName}
          */
         export type ${typeName} = ${expression}
         `
@@ -255,8 +257,10 @@ export const generateApi = (formatResult: FormatResult, options?: CodegenOptions
 
   const variableDeclarations: string[] = []
 
-  const helpers = options?.apiClientHelpers || null
-  if (helpers) {
+
+  if (options?.apiClient) {
+    const helpers = options.apiClient.helpers
+
     importStatements.push(...helpers.importStatements(formatResult, options))
     typeDeclarations.push(...helpers.typeDeclarations(formatResult, options))
     variableDeclarations.push(...helpers.variableDeclarations(formatResult, options))

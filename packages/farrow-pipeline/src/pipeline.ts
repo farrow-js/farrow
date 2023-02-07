@@ -116,19 +116,19 @@ export const createPipeline = <I, O>(options?: PipelineOptions) => {
       const hooks = fromContainer(options?.container)
       return options?.onLast
         ? createCurrentCounter(
-            hooks,
-            options.onLast,
-            typeof options.onLastWithContext === 'boolean' ? options.onLastWithContext : true,
-          )
+          hooks,
+          options.onLast,
+          typeof options.onLastWithContext === 'boolean' ? options.onLastWithContext : true,
+        )
         : createCurrentCounter(hooks)
     }
 
     return options?.onLast
       ? createCurrentCounter(
-          currentHooks,
-          options.onLast,
-          typeof options.onLastWithContext === 'boolean' ? options.onLastWithContext : true,
-        )
+        currentHooks,
+        options.onLast,
+        typeof options.onLastWithContext === 'boolean' ? options.onLastWithContext : true,
+      )
       : createCurrentCounter(currentHooks)
   }
 
@@ -168,6 +168,8 @@ export const usePipeline = <I, O>(pipeline: Pipeline<I, O>) => {
 export type MaybeAsync<T> = T | Promise<T>
 
 export type ThunkMiddlewareInput<I, O> = () => MaybeAsync<MiddlewareInput<I, MaybeAsync<O>>>
+
+export type RunAsyncPipelineOptions<I = unknown, O = unknown> = RunPipelineOptions<I, MaybeAsync<O>>
 
 export type AsyncPipeline<I = unknown, O = unknown> = Pipeline<I, MaybeAsync<O>> & {
   useLazy: (thunk: ThunkMiddlewareInput<I, O>) => AsyncPipeline<I, O>

@@ -5,8 +5,8 @@ import fetch from 'node-fetch'
 import { FormatResult } from 'farrow-api/dist/toJSON'
 import type { CodegenOptions } from 'farrow-api/dist/generateApi'
 import { format } from 'farrow-api/dist/prettier'
-import { generatorApiClient } from 'farrow-api-server/dist/generateApiClient'
-import type { IntrospectionCalling } from 'farrow-api-server'
+import { generateApiClient } from 'farrow-api-server/dist/generateApiClient'
+import { getIntrospectionUrl } from 'farrow-api-server'
 import { replaceUrl } from './replaceUrl'
 
 const writeFile = async (filename: string, content: string) => {
@@ -67,17 +67,8 @@ export const createApiClient = (options: ApiClientOptions) => {
   let prevText = ''
 
   const getIntrospection = async () => {
-    const data: IntrospectionCalling = {
-      type: 'Introspection',
-    }
-    const options = {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    }
-    const response = await fetch(config.src, options)
+    const url = getIntrospectionUrl(config.src)
+    const response = await fetch(url)
     const text = await response.text()
 
     if (text === prevText) {
@@ -87,7 +78,7 @@ export const createApiClient = (options: ApiClientOptions) => {
     prevText = text
 
     try {
-      return JSON.parse(text) as { output: FormatResult }
+      return JSON.parse(text) as FormatResult
     } catch (error: any) {
       console.log(`Failed to fetch ${config.src}\nerror: ${error.message}\nresponse:${text}`)
     }
@@ -100,7 +91,7 @@ export const createApiClient = (options: ApiClientOptions) => {
       return
     }
 
-    let source = generatorApiClient(result.output, {
+    let source = generateApiClient(result, {
       ...config.codegen,
       url: config.alias ?? config.src,
     })

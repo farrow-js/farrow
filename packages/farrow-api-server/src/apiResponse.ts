@@ -2,24 +2,18 @@ import type { JsonType } from 'farrow-schema'
 
 export { JsonType }
 
-// __introspection__ = true is no need since we have tag now.
-export type IntrospectionCalling = {
-  type: 'Introspection'
-}
-
 export type SingleCalling = {
   type: 'Single'
   path: string[]
   input: Readonly<JsonType>
 }
 
-// __batch__ = true is no need since we have tag now
 export type BatchCalling = {
   type: 'Batch'
   callings: Readonly<SingleCalling[]>
 }
 
-export type Calling = SingleCalling | BatchCalling | IntrospectionCalling
+export type Calling = SingleCalling | BatchCalling
 
 export type ApiRequest = {
   url: string
@@ -34,45 +28,56 @@ export type ApiErrorResponse = {
   }
 }
 
-export const ApiError = (message: string): ApiErrorResponse => {
+export const ApiErrorResponse = (message: string): ApiErrorResponse => {
   return {
     type: 'ApiErrorResponse',
     error: { message },
   }
 }
 
-export const isApiError = (input: any): input is ApiErrorResponse => {
+export const isApiErrorResponse = (input: any): input is ApiErrorResponse => {
   return input?.type === 'ApiErrorResponse'
 }
 
-export type ApiSuccessResponse = {
-  type: 'ApiSuccessResponse'
+export type ApiSingleSuccessResponse = {
+  type: 'ApiSingleSuccessResponse'
   output: JsonType
 }
 
-export const ApiSuccess = (output: JsonType): ApiSuccessResponse => {
+export const ApiSingleSuccessResponse = (output: ApiSingleSuccessResponse['output']): ApiSingleSuccessResponse => {
   return {
-    type: 'ApiSuccessResponse',
+    type: 'ApiSingleSuccessResponse',
     output,
   }
 }
 
-export const isApiSuccess = (input: any): input is ApiSuccessResponse => {
-  return input?.type === 'ApiSuccessResponse'
+export const isApiSingleSuccessResponse = (input: any): input is ApiSingleSuccessResponse => {
+  return input?.type === 'ApiSingleSuccessResponse'
 }
 
-export const BatchResponse = (result: ApiResponseSingle[]): ApiResponseBatch => {
+
+export type ApiSingleResponse = ApiSingleSuccessResponse | ApiErrorResponse
+
+export type ApiBatchSuccessResponse = {
+  type: 'ApiBatchSuccessResponse'
+  result: ApiSingleResponse[]
+}
+
+export const ApiBatchSuccessResponse = (result: ApiBatchSuccessResponse['result']): ApiBatchSuccessResponse => {
   return {
-    type: 'Batch',
+    type: 'ApiBatchSuccessResponse',
     result,
   }
 }
 
-export type ApiResponseSingle = ApiErrorResponse | ApiSuccessResponse
-
-export type ApiResponseBatch = {
-  type: 'Batch'
-  result: ApiResponseSingle[]
+export const isApiBatchSuccessResponse = (input: any): input is ApiBatchSuccessResponse => {
+  return input?.type === 'ApiBatchSuccessResponse'
 }
 
-export type ApiResponse = ApiResponseSingle | ApiResponseBatch
+export type ApiBatchResponse = ApiBatchSuccessResponse | ApiErrorResponse
+
+export type ApiSuccessResponse = ApiSingleSuccessResponse | ApiBatchSuccessResponse
+
+export type ApiResponse = ApiSuccessResponse | ApiErrorResponse
+
+

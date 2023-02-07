@@ -1,4 +1,4 @@
-import { ApiError, ApiSuccess } from 'farrow-api-server'
+import { ApiErrorResponse, ApiSingleSuccessResponse } from 'farrow-api-server'
 import { apiPipeline } from '../src/index'
 
 apiPipeline.use(async (request, next) => {
@@ -87,27 +87,27 @@ apiPipeline.use((input) => {
   }
 
   if (input.url === '/use/success') {
-    return ApiSuccess({ data, a: 1 })
+    return ApiSingleSuccessResponse({ data, a: 1 })
   }
 
   if (input.url === '/match/success') {
-    return ApiSuccess({ data, a: 1 })
+    return ApiSingleSuccessResponse({ data, a: 1 })
   }
 
   if (input.url === '/match/error') {
-    return ApiError('/match/error')
+    return ApiErrorResponse('/match/error')
   }
 
   if (input.url === '/regexp/success') {
-    return ApiSuccess({
+    return ApiSingleSuccessResponse({
       data,
       b: 1,
     })
   }
 
   if (input.url === '/regexp/error') {
-    return ApiError('/regexp/error')
+    return ApiErrorResponse('/regexp/error')
   }
 
-  return ApiError('handler not found')
+  return ApiErrorResponse('handler not found')
 })

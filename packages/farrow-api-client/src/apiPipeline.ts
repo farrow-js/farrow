@@ -1,5 +1,6 @@
 import 'isomorphic-unfetch'
 import 'setimmediate'
+
 import DataLoader from 'dataloader'
 import {
   AsyncPipeline,
@@ -7,8 +8,9 @@ import {
   getMiddleware,
   MaybeAsync,
   MiddlewareInput,
-  RunPipelineOptions,
+  RunAsyncPipelineOptions,
 } from 'farrow-pipeline'
+
 import type {
   ApiRequest,
   Calling,
@@ -18,7 +20,8 @@ import type {
   JsonType,
   ApiErrorResponse,
   ApiSuccessResponse,
-  ApiResponseSingle,
+  ApiSingleResponse,
+  ApiBatchResponse,
 } from 'farrow-api-server'
 
 export { ApiRequest, ApiResponse, JsonType, ApiErrorResponse, ApiSuccessResponse }
@@ -44,38 +47,54 @@ export const defaultFetcher = async (request: ApiRequest): Promise<ApiResponse> 
   return json
 }
 
+const cacheKeyFn = (input: unknown) => JSON.stringify(input)
 
-export type ApiPipelineOptions = {
-  fetcher?: Fetcher
+const throwErrorIfNeeded = <T>(result: Error | T): T => {
+  if (result instanceof Error) {
+    throw result
+  }
+
+  return result
 }
 
-export type ApiInvokeOptions = {
+
+let fetcher = defaultFetcher
+
+export const setFetcher = (newFetcher: Fetcher) => {
+  fetcher = newFetcher
+}
+
+export const getFetcher = () => {
+  return fetcher
+}
+
+export type ApiPipelineOptions = {
+}
+
+export type ApiInvokeOptions = RunAsyncPipelineOptions<ApiRequest, ApiResponse> & {
   fetcher?: Fetcher
 }
 
 export type ApiPipeline = AsyncPipeline<ApiRequest, ApiResponse> & {
   match(pattern: string | RegExp, middleware: MiddlewareInput<ApiRequest, MaybeAsync<ApiResponse>>): void
-  invoke(url: string, calling: SingleCalling, options?: ApiInvokeOptions): Promise<JsonType | Error>
-  invoke(url: string, calling: BatchCalling, options?: ApiInvokeOptions): Promise<(JsonType | Error)[]>
+  singleInvoke(url: string, calling: SingleCalling, options?: ApiInvokeOptions): Promise<JsonType | Error>
+  batchInvoke(url: string, calling: BatchCalling, options?: ApiInvokeOptions): Promise<Error | (JsonType | Error)[]>
   invoke(url: string, calling: Calling, options?: ApiInvokeOptions): Promise<JsonType | Error | (JsonType | Error)[]>
-  setFetcher(newFetcher: Fetcher): void
 }
 
-export const createApiPipeline = ({ fetcher = defaultFetcher }: ApiPipelineOptions = {}): ApiPipeline => {
+export const createApiPipeline = ({ }: ApiPipelineOptions = {}): ApiPipeline => {
   const pipeline = createAsyncPipeline<ApiRequest, ApiResponse>()
 
-  function run(
-    request: ApiRequest,
-    options?: RunPipelineOptions<ApiRequest, MaybeAsync<ApiResponse>>,
-  ): MaybeAsync<ApiResponse> {
+  const run: ApiPipeline['run'] = (request, options) => {
     return pipeline.run(request, {
-      onLast: fetcher,
+      onLast: input => fetcher(input),
       ...options,
     })
   }
 
   const match: ApiPipeline['match'] = (pattern, middlewareInput) => {
     const middleware = getMiddleware(middlewareInput)
+
     pipeline.use((request, next) => {
       if (pattern instanceof RegExp) {
         if (pattern.test(request.url)) {
@@ -92,91 +111,125 @@ export const createApiPipeline = ({ fetcher = defaultFetcher }: ApiPipelineOptio
     })
   }
 
-  async function invoke(url: string, calling: SingleCalling, options?: ApiInvokeOptions): Promise<JsonType | Error>
-  async function invoke(url: string, calling: BatchCalling, options?: ApiInvokeOptions): Promise<(JsonType | Error)[]>
-  async function invoke(
-    url: string,
-    calling: Calling,
-    options?: ApiInvokeOptions,
-  ): Promise<JsonType | Error | (JsonType | Error)[]> {
-    const runOptions: RunPipelineOptions<ApiRequest, MaybeAsync<ApiResponse>> = {}
+  const singleInvoke = async (url: string, calling: SingleCalling, options?: ApiInvokeOptions) => {
+    const runOptions = {} as RunAsyncPipelineOptions<ApiRequest, ApiResponse>
+
     if (options?.fetcher) {
       runOptions.onLast = options.fetcher
     }
 
-    const result = await run({ url, calling }, runOptions)
+    const apiResponse = await run({ url, calling }, runOptions) as ApiSingleResponse
 
-    const handleResult = (apiResponse: ApiResponseSingle) => {
-      if (apiResponse.type === 'ApiErrorResponse') {
-        return new Error(apiResponse.error.message)
-      }
+    return handleApiSingleResponse(apiResponse)
+  }
 
+  const batchInvoke = async (url: string, calling: BatchCalling, options?: ApiInvokeOptions) => {
+    const runOptions = {} as RunAsyncPipelineOptions<ApiRequest, ApiResponse>
+
+    if (options?.fetcher) {
+      runOptions.onLast = options.fetcher
+    }
+
+    const apiResponse = await run({ url, calling }, runOptions) as ApiBatchResponse
+
+    return handleApiBatchResponse(apiResponse)
+  }
+
+  const invoke = async (
+    url: string,
+    calling: Calling,
+    options?: ApiInvokeOptions,
+  ) => {
+    if (calling.type === 'Single') {
+      return singleInvoke(url, calling, options)
+    }
+
+    if (calling.type === 'Batch') {
+      return batchInvoke(url, calling, options)
+    }
+
+    throw new Error(`Unknown input of calling: ${calling}`)
+  }
+
+  const handleApiSingleResponse = (apiResponse: ApiSingleResponse): JsonType | Error => {
+    if (apiResponse.type === 'ApiErrorResponse') {
+      return new Error(apiResponse.error.message)
+    }
+
+    if (apiResponse.type === 'ApiSingleSuccessResponse') {
       return apiResponse.output
     }
 
-    if (result.type === 'Batch') {
-      return result.result.map(handleResult)
-    }
-    return handleResult(result)
+    throw new Error(`Unknown input: ${apiResponse}`)
   }
 
-  const setFetcher: ApiPipeline['setFetcher'] = (newFetcher) => {
-    fetcher = newFetcher
+  const handleApiBatchResponse = (apiResponse: ApiBatchResponse) => {
+    if (apiResponse.type === 'ApiErrorResponse') {
+      return new Error(apiResponse.error.message)
+    }
+
+    if (apiResponse.type === 'ApiBatchSuccessResponse') {
+      return apiResponse.result.map(handleApiSingleResponse)
+    }
+
+    throw new Error(`Unknown input: ${apiResponse}`)
   }
 
   return {
     ...pipeline,
     run,
     match,
-    invoke,
-    setFetcher,
+    singleInvoke,
+    batchInvoke,
+    invoke
   }
 }
 
 export const apiPipeline = createApiPipeline()
 
-
-export type ApiWithUrlInvokeOptions = ApiInvokeOptions & {
+export type ApiBatchLoadOptions = {
+  /**
+   * enable batching or not
+   */
   batch?: boolean
 }
 
-export type ApiPipelineWithUrl = AsyncPipeline<ApiRequest, ApiResponse> & {
-  invoke(calling: SingleCalling, options?: ApiWithUrlInvokeOptions): Promise<JsonType>
+export type ApiBatchLoader = {
+  load(calling: SingleCalling, options?: ApiBatchLoadOptions): Promise<JsonType>
 }
 
-export const createApiPipelineWithUrl = (url: string, options: ApiPipelineOptions = {}): ApiPipelineWithUrl => {
-  const apiPipeline = createApiPipeline(options)
-  const pipeline = createAsyncPipeline<ApiRequest, ApiResponse>()
 
-  const batchInvoke = (callings: Readonly<SingleCalling[]>) => {
+export const createApiBatchLoader = (url: string): ApiBatchLoader => {
+  const batchLoadFn = async (callings: Readonly<SingleCalling[]>) => {
     const calling: BatchCalling = {
       type: 'Batch',
       callings,
     }
-    return apiPipeline.invoke(url, calling)
-  }
 
-  const dataLoader = new DataLoader(batchInvoke)
-
-  const invoke: ApiPipelineWithUrl['invoke'] = async (calling, options) => {
-    if (options?.batch) {
-      return dataLoader.load(calling)
-    }
-
-    const result = await apiPipeline.invoke(url, calling, options)
-    dataLoader.prime(calling, result)
+    const result = await apiPipeline.batchInvoke(url, calling)
 
     if (result instanceof Error) {
-      throw result
+      return Array(callings.length).fill(result) as Error[]
     }
 
     return result
   }
 
-  apiPipeline.match(url, pipeline)
+  const dataLoader = new DataLoader(batchLoadFn, { cacheKeyFn })
+
+  const load: ApiBatchLoader['load'] = (calling, options) => {
+    if (options?.batch !== false) {
+      return dataLoader.load(calling).then(throwErrorIfNeeded)
+    }
+
+    const resultPromise = apiPipeline.singleInvoke(url, calling).then(throwErrorIfNeeded)
+
+    dataLoader.prime(calling, resultPromise as any)
+
+    return resultPromise
+  }
 
   return {
-    ...apiPipeline,
-    invoke,
+    load,
   }
 }

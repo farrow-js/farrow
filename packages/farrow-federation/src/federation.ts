@@ -1,14 +1,11 @@
 import { Router, Response } from 'farrow-http'
 import nodeFetch from 'node-fetch'
 import {
-  ApiError,
-  ApiSuccess,
   SingleCalling,
-  ApiResponseSingle,
-  BatchResponse,
-  IntrospectionCalling,
-  ApiResponseBatch,
   BatchCalling,
+  ApiSingleResponse,
+  ApiErrorResponse,
+  ApiBatchSuccessResponse,
 } from 'farrow-api-server'
 import { getFederationInfo } from './info'
 import { createFetcher } from './helpers'
@@ -29,19 +26,14 @@ export type ApiSingleRequest = {
   calling: SingleCalling
   options?: RequestInit
 }
-export type ApiIntrospectionRequest = {
-  url: string
-  calling: IntrospectionCalling
-  options?: RequestInit
-}
+
 export type ApiBatchRequest = {
   url: string
   calling: BatchCalling
   options?: RequestInit
 }
-export type Fetcher = ((request: ApiSingleRequest) => Promise<ApiResponseSingle>) &
-  ((request: ApiIntrospectionRequest) => Promise<ApiResponseSingle>) &
-  ((request: ApiBatchRequest) => Promise<ApiResponseBatch>)
+export type Fetcher = ((request: ApiSingleRequest) => Promise<ApiSingleResponse>) &
+  ((request: ApiBatchRequest) => Promise<ApiBatchSuccessResponse>)
 
 export type FederationOptions = {
   fetch?: Fetch
@@ -82,21 +74,14 @@ export const createFederationServices = async (services: ApiServices, customOpti
   }
 
   const handleCalling = (
-    calling: SingleCalling | IntrospectionCalling,
+    calling: SingleCalling,
     init: RequestInit = {},
-  ): Promise<ApiResponseSingle> | ApiResponseSingle => {
-    /**
-     * capture introspection request
-     */
-    if (calling.type === 'Introspection') {
-      return ApiSuccess(info.schema)
-    }
-
+  ): Promise<ApiSingleResponse> | ApiSingleResponse => {
     const apiEntry = getApiEntry(calling.path[0])
 
     if (!apiEntry) {
       const message = `The target API was not found with the path: [${calling.path.join(', ')}]`
-      return ApiError(message)
+      return ApiErrorResponse(message)
     }
 
     const wrapCalling: SingleCalling = {
@@ -109,6 +94,7 @@ export const createFederationServices = async (services: ApiServices, customOpti
       calling: wrapCalling,
       options: init,
     }
+
     return options.fetcher(request)
   }
 
@@ -127,14 +113,25 @@ export const createFederationServices = async (services: ApiServices, customOpti
 
       if (Array.isArray(callings)) {
         const result = await Promise.all(callings.map((calling) => handleCalling(calling, init)))
-        return Response.json(BatchResponse(result))
+        return Response.json(ApiBatchSuccessResponse(result))
       }
 
-      return Response.json(ApiError(UNKNOWN_REQUEST_MESSAGE))
+      return Response.json(ApiErrorResponse(UNKNOWN_REQUEST_MESSAGE))
     }
 
     // single calling
     return Response.json(await handleCalling(request.body, init))
+  })
+
+  /**
+  * capture introspection request
+*/
+  router.use((request, next) => {
+    if (request.pathname !== '/__introspection__' || request.method?.toLowerCase() !== 'get') {
+      return next()
+    }
+
+    return Response.json(info.schema)
   })
 
   if (options.polling) {

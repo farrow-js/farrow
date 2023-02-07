@@ -15,7 +15,7 @@ describe('ApiPipeline', () => {
     })
 
     expect(result).toEqual({
-      type: 'ApiSuccessResponse',
+      type: 'ApiSingleSuccessResponse',
       fromUseForResponse: true,
       output: {
         data: {
@@ -50,7 +50,7 @@ describe('ApiPipeline', () => {
     })
 
     expect(result).toEqual({
-      type: 'ApiSuccessResponse',
+      type: 'ApiSingleSuccessResponse',
       fromUseForResponse: true,
       fromMatchStringForResponse: true,
       output: {
@@ -88,7 +88,7 @@ describe('ApiPipeline', () => {
     })
 
     expect(result).toEqual({
-      type: 'ApiSuccessResponse',
+      type: 'ApiSingleSuccessResponse',
       fromUseForResponse: true,
       fromMatchRegexpForResponse: true,
       output: {
@@ -208,7 +208,7 @@ describe('ApiPipeline', () => {
     })
 
     expect(result).toEqual({
-      type: 'ApiSuccessResponse',
+      type: 'ApiSingleSuccessResponse',
       fromUseForResponse: true,
       output: {
         data: {

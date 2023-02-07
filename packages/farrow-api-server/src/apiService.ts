@@ -1,16 +1,15 @@
 import { Router, Response, RouterPipeline } from 'farrow-http'
 import { List, SchemaCtor, SchemaCtorInput, Struct, toSchemaCtor, Any } from 'farrow-schema'
 import { ApiDefinition, ApiEntries, getContentType, isApi } from 'farrow-api'
-import { FormatResult, toJSON } from 'farrow-api/dist/toJSON'
+import { toJSON } from 'farrow-api/dist/toJSON'
 import { createSchemaValidator, ValidationError, Validator } from 'farrow-schema/validator'
 import get from 'lodash.get'
 import {
-  ApiError,
-  ApiSuccess,
-  SingleCalling,
-  ApiResponseSingle,
-  BatchResponse,
-  IntrospectionCalling,
+  ApiErrorResponse,
+  Calling,
+  ApiResponse,
+  ApiBatchSuccessResponse,
+  ApiSingleSuccessResponse,
 } from './apiResponse'
 
 export type ApiServiceType = RouterPipeline
@@ -30,6 +29,13 @@ const getErrorMessage = (error: ValidationError) => {
   }
 
   return message
+}
+
+export const getIntrospectionUrl = (url: string) => {
+  if (!url.endsWith('/')) {
+    url = url + '/'
+  }
+  return url + '__introspection__'
 }
 
 export type CreateApiServiceOptions = {
@@ -60,29 +66,34 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
     return validator
   }
 
-  let formatResult: FormatResult | undefined
+  let formatResultJSON = ''
 
-  const handleCalling = async (calling: SingleCalling | IntrospectionCalling): Promise<ApiResponseSingle> => {
-    /**
-     * capture introspection request
-     */
-    if (config.introspection && calling.type === 'Introspection') {
-      const output = (formatResult = formatResult ?? toJSON(entries))
-      return ApiSuccess(output)
+  const handleCalling = async (calling: Calling): Promise<ApiResponse> => {
+
+    if (calling.type === 'Batch') {
+      // batch calling
+      const callings = calling.callings
+
+      if (Array.isArray(callings)) {
+        const result = await Promise.all(callings.map(handleCalling)) as unknown as ApiSingleSuccessResponse[]
+        return ApiBatchSuccessResponse(result)
+      }
+
+      return ApiErrorResponse(`Unknown Batch callings: ${callings}`)
     }
 
     const bodyResult = validateBody(calling)
 
     if (bodyResult.isErr) {
       const message = getErrorMessage(bodyResult.value)
-      return ApiError(message)
+      return ApiErrorResponse(message)
     }
 
     const api = get(entries, bodyResult.value.path)
 
     if (!isApi(api)) {
       const message = `The target API was not found with the path: [${bodyResult.value.path.join(', ')}]`
-      return ApiError(message)
+      return ApiErrorResponse(message)
     }
 
     const definition = api.definition as ApiDefinition<SchemaCtorInput>
@@ -97,7 +108,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
 
     if (inputResult.isErr) {
       const message = getErrorMessage(inputResult.value)
-      return ApiError(message)
+      return ApiErrorResponse(message)
     }
 
     try {
@@ -113,38 +124,46 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
 
       if (outputResult.isErr) {
         const message = getErrorMessage(outputResult.value)
-        return ApiError(message)
+        return ApiErrorResponse(message)
       }
 
       /**
        * response output
        */
-      return ApiSuccess(outputResult.value)
+      return ApiSingleSuccessResponse(outputResult.value)
     } catch (error: any) {
       const message = (config.errorStack ? error?.stack || error?.message : error?.message) ?? ''
-      return ApiError(message)
+      return ApiErrorResponse(message)
     }
   }
 
   router.use(async (request, next) => {
-    if (request.method?.toLowerCase() !== 'post') {
+    if (request.pathname !== '/' || request.method?.toLowerCase() !== 'post') {
       return next()
     }
 
-    if (request.body?.type === 'Batch') {
-      // batch calling
-      const callings = request.body!.callings
+    const result = await handleCalling(request.body)
 
-      if (Array.isArray(callings)) {
-        const result = await Promise.all(callings.map(handleCalling))
-        return Response.json(BatchResponse(result))
-      }
-      const message = `Unknown structure of request`
-      return Response.json(ApiError(message))
+    return Response.json(result)
+  })
+
+  /**
+   * capture introspection request
+ */
+  router.use((request, next) => {
+    if (request.pathname !== '/__introspection__' || request.method?.toLowerCase() !== 'get') {
+      return next()
     }
 
-    // single calling
-    return Response.json(await handleCalling(request.body))
+    if (config.introspection) {
+      if (formatResultJSON) {
+        return Response.type('json').string(formatResultJSON)
+      }
+      formatResultJSON = JSON.stringify(toJSON(entries), null, 2)
+      return Response.type('json').string(formatResultJSON)
+    }
+
+    return Response.status(404).text('Not Found.')
   })
 
   return router

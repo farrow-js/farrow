@@ -1,7 +1,7 @@
 import fs from 'fs/promises'
 import { Api } from 'farrow-api'
 import { toJSON } from 'farrow-api/dist/toJSON'
-import { generatorApiClient } from '../src/generateApiClient'
+import { generateApiClient } from '../src/generateApiClient'
 import { format } from 'farrow-api/dist/prettier'
 import {
   Any,
@@ -134,7 +134,7 @@ describe('generatorApiClient', () => {
   it('support codegen', async () => {
     const formatResult = toJSON(entries)
 
-    const source = generatorApiClient(formatResult, {
+    const source = generateApiClient(formatResult, {
       noCheck: 'just for testing',
     })
 

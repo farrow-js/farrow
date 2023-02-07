@@ -135,14 +135,13 @@ describe('generateApi', () => {
     const formatResult = toJSON(entries)
 
     const source = generateApi(formatResult, {
-      emitApiClient: false,
       noCheck: 'just for testing',
     })
 
     const formatedSource = format(source)
 
     const expected = await fs.readFile(`${__dirname}/expected/01.ts`)
-
+    
     expect(formatedSource.replace(/\r|\n/g, '')).toBe(expected.toString().replace(/\r|\n/g, ''))
   })
 })

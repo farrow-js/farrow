@@ -20,7 +20,7 @@ import {
   FormatReadOnlyType,
   FormatReadonlyDeepType,
 } from 'farrow-schema/formatter'
-import type { JSONSchema7, JSONSchema7Definition } from 'json-schema'
+import { JSONSchema7, JSONSchema7Definition } from 'json-schema'
 
 export type FormatResult = {
   typeId: number

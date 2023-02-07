@@ -84,92 +84,86 @@ describe('ApiService', () => {
     http.route('/counter').use(CounterService)
 
     await request(server)
-      .post('/counter')
-      .send({
-        type: 'Introspection',
-      })
+      .get('/counter/__introspection__')
       // .expect((res) => {
       //   console.log('res', JSON.stringify(res.body, null, 2))
       // })
       .expect(200, {
-        type: 'ApiSuccessResponse',
-        output: {
-          protocol: 'Farrow-API',
-          types: {
-            '0': {
-              type: 'Struct',
-              fields: {},
-            },
-            '1': {
-              type: 'Object',
-              name: 'CountState',
-              fields: {
-                count: {
-                  typeId: 2,
-                  $ref: '#/types/2',
-                  description: 'count of counter',
-                },
+        protocol: 'Farrow-API',
+        types: {
+          '0': {
+            type: 'Struct',
+            fields: {},
+          },
+          '1': {
+            type: 'Object',
+            name: 'CountState',
+            fields: {
+              count: {
+                typeId: 2,
+                $ref: '#/types/2',
+                description: 'count of counter',
               },
-            },
-            '2': {
-              type: 'Scalar',
-              valueType: 'number',
-              valueName: 'Int',
-            },
-            '3': {
-              type: 'Struct',
-              fields: {
-                newCount: {
-                  typeId: 2,
-                  $ref: '#/types/2',
-                  description: 'new count value',
-                },
-              },
-            },
-            '4': {
-              type: 'Struct',
-              fields: {},
-            },
-            '5': {
-              type: 'Struct',
-              fields: {},
             },
           },
+          '2': {
+            type: 'Scalar',
+            valueType: 'number',
+            valueName: 'Int',
+          },
+          '3': {
+            type: 'Struct',
+            fields: {
+              newCount: {
+                typeId: 2,
+                $ref: '#/types/2',
+                description: 'new count value',
+              },
+            },
+          },
+          '4': {
+            type: 'Struct',
+            fields: {},
+          },
+          '5': {
+            type: 'Struct',
+            fields: {},
+          },
+        },
+        entries: {
+          type: 'Entries',
           entries: {
-            type: 'Entries',
-            entries: {
-              getCount: {
-                type: 'Api',
-                input: {
-                  typeId: 0,
-                  $ref: '#/types/0',
-                },
-                output: {
-                  typeId: 1,
-                  $ref: '#/types/1',
-                },
+            getCount: {
+              type: 'Api',
+              input: {
+                typeId: 0,
+                $ref: '#/types/0',
               },
-              setCount: {
-                type: 'Api',
-                input: {
-                  typeId: 3,
-                  $ref: '#/types/3',
-                },
-                output: {
-                  typeId: 1,
-                  $ref: '#/types/1',
-                },
+              output: {
+                typeId: 1,
+                $ref: '#/types/1',
               },
-              triggerError: {
-                type: 'Api',
-                input: {
-                  typeId: 4,
-                  $ref: '#/types/4',
-                },
-                output: {
-                  typeId: 5,
-                  $ref: '#/types/5',
-                },
+            },
+            setCount: {
+              type: 'Api',
+              input: {
+                typeId: 3,
+                $ref: '#/types/3',
+              },
+              output: {
+                typeId: 1,
+                $ref: '#/types/1',
+              },
+            },
+            triggerError: {
+              type: 'Api',
+              input: {
+                typeId: 4,
+                $ref: '#/types/4',
+              },
+              output: {
+                typeId: 5,
+                $ref: '#/types/5',
               },
             },
           },
@@ -190,14 +184,8 @@ describe('ApiService', () => {
     )
 
     await request(server)
-      .post('/counter')
-      .send({
-        type: 'Introspection',
-      })
-      .expect(200, {
-        type: 'ApiErrorResponse',
-        error: { message: 'path: ["path"]\nundefined is not a list' },
-      })
+      .get('/counter/__introspection__')
+      .expect(404)
   })
 
   it('supports calling api', async () => {
@@ -213,7 +201,7 @@ describe('ApiService', () => {
         input: {},
       })
       .expect(200, {
-        type: 'ApiSuccessResponse',
+        type: 'ApiSingleSuccessResponse',
         output: {
           count: 0,
         },
@@ -228,7 +216,7 @@ describe('ApiService', () => {
         },
       })
       .expect(200, {
-        type: 'ApiSuccessResponse',
+        type: 'ApiSingleSuccessResponse',
         output: {
           count: 10,
         },
@@ -241,7 +229,7 @@ describe('ApiService', () => {
         input: {},
       })
       .expect(200, {
-        type: 'ApiSuccessResponse',
+        type: 'ApiSingleSuccessResponse',
         output: {
           count: 10,
         },
@@ -338,22 +326,22 @@ describe('ApiService', () => {
         ],
       })
       .expect(200, {
-        type: 'Batch',
+        type: 'ApiBatchSuccessResponse',
         result: [
           {
-            type: 'ApiSuccessResponse',
+            type: 'ApiSingleSuccessResponse',
             output: {
               count: 0,
             },
           },
           {
-            type: 'ApiSuccessResponse',
+            type: 'ApiSingleSuccessResponse',
             output: {
               count: 10,
             },
           },
           {
-            type: 'ApiSuccessResponse',
+            type: 'ApiSingleSuccessResponse',
             output: {
               count: 10,
             },

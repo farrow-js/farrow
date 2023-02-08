@@ -7,10 +7,10 @@
     "start": "farrow start"
   },
   "dependencies": {
-    "farrow": "workspace:^1.11.2",
-    "farrow-api": "workspace:^1.11.0",
-    "farrow-api-server": "workspace:^1.11.0",
-    "farrow-http": "workspace:^1.11.2",
-    "farrow-schema": "workspace:^1.11.0"
+    "farrow": "workspace:^2.0.0",
+    "farrow-api": "workspace:^2.0.0",
+    "farrow-api-server": "workspace:^2.0.0",
+    "farrow-http": "workspace:^2.0.0",
+    "farrow-schema": "workspace:^2.0.0"
   }
 }

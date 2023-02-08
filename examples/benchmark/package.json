@@ -23,17 +23,17 @@
     "doctor:native": "clinic doctor -- node ./index.js"
   },
   "dependencies": {
-    "farrow-api": "^1.11.0",
-    "farrow-api-server": "^1.11.0",
-    "farrow-http": "^1.11.0",
-    "farrow-schema": "^1.11.0"
+    "farrow-api": "^2.0.0",
+    "farrow-api-server": "^2.0.0",
+    "farrow-http": "^2.0.0",
+    "farrow-schema": "^2.0.0"
   },
   "devDependencies": {
     "@types/node": "^16.11.12",
     "autocannon": "^7.5.0",
     "branch-comparer": "^1.1.0",
     "concurrently": "^6.4.0",
-    "farrow": "^1.11.1",
+    "farrow": "^2.0.0",
     "typescript": "^4.5.3"
   }
 }

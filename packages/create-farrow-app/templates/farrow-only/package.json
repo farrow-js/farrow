@@ -1,6 +1,6 @@
 {
   "name": "farrow-only-template",
-  "version": "1.11.0",
+  "version": "2.0.0",
   "private": true,
   "scripts": {
     "dev": "farrow dev",
@@ -8,15 +8,15 @@
     "start": "farrow start"
   },
   "dependencies": {
-    "farrow-api": "^1.11.0",
-    "farrow-api-client": "^1.11.0",
-    "farrow-api-server": "^1.11.0",
-    "farrow-http": "^1.11.0",
-    "farrow-schema": "^1.10.8"
+    "farrow-api": "^2.0.0",
+    "farrow-api-client": "^2.0.0",
+    "farrow-api-server": "^2.0.0",
+    "farrow-http": "^2.0.0",
+    "farrow-schema": "^2.0.0"
   },
   "devDependencies": {
     "@types/node": "^14.14.35",
-    "farrow": "^1.11.0",
+    "farrow": "^2.0.0",
     "typescript": "^4.2.2"
   }
 }

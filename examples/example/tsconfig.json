@@ -3,7 +3,8 @@
   "compilerOptions": {
     "rootDir": "./src",
     "composite": true,
-    "noEmit": true
+    "noEmit": true,
+    "target": "ES2015"
   },
   "include": ["src"]
 }

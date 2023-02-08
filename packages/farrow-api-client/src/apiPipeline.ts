@@ -201,6 +201,13 @@ export type ApiBatchLoader = {
 
 export const createApiBatchLoader = (url: string): ApiBatchLoader => {
   const batchLoadFn = async (callings: Readonly<SingleCalling[]>) => {
+
+    if (callings.length === 1) {
+      const result = await apiPipeline.singleInvoke(url, callings[0])
+      return [result]
+    }
+
+
     const calling: BatchCalling = {
       type: 'Batch',
       callings,

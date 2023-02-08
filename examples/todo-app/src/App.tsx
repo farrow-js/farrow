@@ -19,6 +19,15 @@ function App() {
     })
   }, [count])
 
+  useEffect(() => {
+    TodoApi.addTodo({
+      content: `batch:0`,
+    })
+    TodoApi.addTodo({
+      content: `batch:1`,
+    })
+  }, [])
+
   return (
     <div className="App">
       <pre style={{ textAlign: 'left' }}>{JSON.stringify(todos, null, 2)}</pre>

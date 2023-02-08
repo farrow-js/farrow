@@ -1,6 +1,6 @@
 {
   "name": "farrow-api-server",
-  "version": "1.12.1",
+  "version": "2.0.0",
   "description": "A type-friendly BFF framework",
   "main": "dist/index.js",
   "homepage": "https://www.farrowjs.com/",
@@ -28,16 +28,16 @@
     "@types/jest": "^27.0.1",
     "@types/lodash.get": "^4.4.6",
     "@types/supertest": "^2.0.10",
-    "farrow-api-client": "^1.12.0",
+    "farrow-api-client": "^2.0.0",
     "jest": "^27.2.2",
     "supertest": "^6.1.6",
     "ts-jest": "^27.0.5",
     "typescript": "^4.5.4"
   },
   "dependencies": {
-    "farrow-api": "^1.12.1",
-    "farrow-http": "^1.12.0",
-    "farrow-schema": "^1.12.1",
+    "farrow-api": "^2.0.0",
+    "farrow-http": "^2.0.0",
+    "farrow-schema": "^2.0.0",
     "lodash.get": "^4.4.2",
     "tslib": "^2.1.0"
   }

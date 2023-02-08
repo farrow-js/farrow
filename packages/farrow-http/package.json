@@ -1,6 +1,6 @@
 {
   "name": "farrow-http",
-  "version": "1.12.0",
+  "version": "2.0.0",
   "description": "A Type-Friendly Web Framework",
   "main": "dist/index.js",
   "homepage": "https://www.farrowjs.com/",
@@ -58,8 +58,8 @@
     "destroy": "^1.0.4",
     "encodeurl": "^1.0.2",
     "escape-html": "^1.0.3",
-    "farrow-pipeline": "^1.12.0",
-    "farrow-schema": "^1.12.0",
+    "farrow-pipeline": "^2.0.0",
+    "farrow-schema": "^2.0.0",
     "mime-types": "^2.1.27",
     "on-finished": "^2.3.0",
     "path-to-regexp": "^6.1.0",

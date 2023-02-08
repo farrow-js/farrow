@@ -1,6 +1,6 @@
 {
   "name": "farrow-json-schema",
-  "version": "1.12.0",
+  "version": "2.0.0",
   "description": "A type-friendly BFF framework",
   "main": "dist/index.js",
   "homepage": "https://www.farrowjs.com/",
@@ -29,13 +29,13 @@
   "devDependencies": {
     "@types/jest": "^27.0.2",
     "@types/json-schema": "^7.0.7",
-    "farrow-api": "^1.12.0",
+    "farrow-api": "^2.0.0",
     "jest": "^27.2.2",
     "ts-jest": "^27.0.5",
     "typescript": "^4.5.4"
   },
   "dependencies": {
-    "farrow-schema": "^1.12.0",
+    "farrow-schema": "^2.0.0",
     "tslib": "^2.1.0"
   }
 }

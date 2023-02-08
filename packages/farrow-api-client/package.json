@@ -1,6 +1,6 @@
 {
   "name": "farrow-api-client",
-  "version": "1.12.0",
+  "version": "2.0.0",
   "description": "A type-friendly BFF framework",
   "main": "dist/index.js",
   "homepage": "https://www.farrowjs.com/",
@@ -33,8 +33,8 @@
   },
   "dependencies": {
     "dataloader": "^2.0.0",
-    "farrow-api-server": "^1.12.0",
-    "farrow-pipeline": "^1.12.0",
+    "farrow-api-server": "^2.0.0",
+    "farrow-pipeline": "^2.0.0",
     "isomorphic-unfetch": "^3.1.0",
     "setimmediate": "^1.0.5",
     "tslib": "^2.1.0"

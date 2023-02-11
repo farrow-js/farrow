@@ -257,7 +257,6 @@ export const generateApi = (formatResult: FormatResult, options?: CodegenOptions
 
   const variableDeclarations: string[] = []
 
-
   if (options?.apiClient) {
     const helpers = options.apiClient.helpers
 

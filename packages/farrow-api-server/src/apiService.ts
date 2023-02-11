@@ -69,13 +69,12 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
   let formatResultJSON = ''
 
   const handleCalling = async (calling: Calling): Promise<ApiResponse> => {
-
     if (calling.type === 'Batch') {
       // batch calling
       const callings = calling.callings
 
       if (Array.isArray(callings)) {
-        const result = await Promise.all(callings.map(handleCalling)) as unknown as ApiSingleSuccessResponse[]
+        const result = (await Promise.all(callings.map(handleCalling))) as unknown as ApiSingleSuccessResponse[]
         return ApiBatchSuccessResponse(result)
       }
 
@@ -149,7 +148,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
 
   /**
    * capture introspection request
- */
+   */
   router.use((request, next) => {
     if (request.pathname !== '/__introspection__' || request.method?.toLowerCase() !== 'get') {
       return next()

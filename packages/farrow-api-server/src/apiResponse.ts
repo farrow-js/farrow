@@ -55,7 +55,6 @@ export const isApiSingleSuccessResponse = (input: any): input is ApiSingleSucces
   return input?.type === 'ApiSingleSuccessResponse'
 }
 
-
 export type ApiSingleResponse = ApiSingleSuccessResponse | ApiErrorResponse
 
 export type ApiBatchSuccessResponse = {
@@ -79,5 +78,3 @@ export type ApiBatchResponse = ApiBatchSuccessResponse | ApiErrorResponse
 export type ApiSuccessResponse = ApiSingleSuccessResponse | ApiBatchSuccessResponse
 
 export type ApiResponse = ApiSuccessResponse | ApiErrorResponse
-
-

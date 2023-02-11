@@ -1,4 +1,4 @@
-lockfileVersion: 5.4
+lockfileVersion: 5.3
 
 importers:
 
@@ -31,14 +31,14 @@ importers:
       '@swc/core': 1.3.32
       '@swc/jest': 0.2.24_@swc+core@1.3.32
       '@types/jest': 29.4.0
-      '@typescript-eslint/eslint-plugin': 4.33.0_s2qqtxhzmb7vugvfoyripfgp7i
-      '@typescript-eslint/parser': 4.33.0_jofidmxrjzhj7l6vknpw5ecvfe
+      '@typescript-eslint/eslint-plugin': 4.33.0_96a109dcf9607f5a1aa576228794cffa
+      '@typescript-eslint/parser': 4.33.0_eslint@7.32.0+typescript@4.9.5
       codecov: 3.8.3
       eslint: 7.32.0
       eslint-config-prettier: 7.2.0_eslint@7.32.0
-      eslint-plugin-jest: 24.7.0_bfrijen5mqdzfbbsgrvmb4p2hy
+      eslint-plugin-jest: 24.7.0_09628491bd6407928432346ac0f1fa3e
       eslint-plugin-prefer-let: 1.1.0
-      eslint-plugin-prettier: 3.4.1_22qxzbe4rxbsqykefttlo44try
+      eslint-plugin-prettier: 3.4.1_d6a17c849c8dc32861442ce6b773938e
       eslint-plugin-react: 7.32.2_eslint@7.32.0
       husky: 8.0.3
       lint-staged: 13.1.1
@@ -53,23 +53,23 @@ importers:
       autocannon: ^7.5.0
       branch-comparer: ^1.1.0
       concurrently: ^6.4.0
-      farrow: ^1.11.1
-      farrow-api: ^1.11.0
-      farrow-api-server: ^1.11.0
-      farrow-http: ^1.11.0
-      farrow-schema: ^1.11.0
+      farrow: ^2.0.0
+      farrow-api: ^2.0.0
+      farrow-api-server: ^2.0.0
+      farrow-http: ^2.0.0
+      farrow-schema: ^2.0.0
       typescript: ^4.5.3
     dependencies:
-      farrow-api: 1.12.1
-      farrow-api-server: 1.12.1
-      farrow-http: 1.12.0
-      farrow-schema: 1.12.1
+      farrow-api: link:../../packages/farrow-api
+      farrow-api-server: link:../../packages/farrow-api-server
+      farrow-http: link:../../packages/farrow-http
+      farrow-schema: link:../../packages/farrow-schema
     devDependencies:
       '@types/node': 16.18.12
       autocannon: 7.10.0
       branch-comparer: 1.1.0
       concurrently: 6.5.1
-      farrow: 1.12.2
+      farrow: link:../../packages/farrow
       typescript: 4.9.5
 
   examples/example:
@@ -131,7 +131,7 @@ importers:
       farrow-next: link:../../packages/farrow-next
       farrow-pipeline: link:../../packages/farrow-pipeline
       farrow-schema: link:../../packages/farrow-schema
-      next: 11.1.4_hlszf5b36got6eddf4bbqru3by
+      next: 11.1.4_3ae592f43bf19d3f10632f0218469b0e
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
     devDependencies:
@@ -225,7 +225,7 @@ importers:
       farrow-next: link:../../../farrow-next
       farrow-next-server: link:../../../farrow-next-server
       farrow-schema: link:../../../farrow-schema
-      next: 11.1.4_hlszf5b36got6eddf4bbqru3by
+      next: 11.1.4_3ae592f43bf19d3f10632f0218469b0e
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
     devDependencies:
@@ -351,7 +351,7 @@ importers:
       jest: 27.5.1
       shelljs: 0.8.5
       supertest: 6.3.3
-      ts-jest: 27.1.5_qakvs7sfsbhy7gtcrsjr2pxm7e
+      ts-jest: 27.1.5_8015597e45904f8f9a628c931d3eecf9
       typescript: 4.9.5
 
   packages/farrow-api:
@@ -376,7 +376,7 @@ importers:
       '@types/jest': 27.5.2
       '@types/prettier': 2.7.2
       jest: 27.5.1
-      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
+      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
       typescript: 4.9.5
 
   packages/farrow-api-client:
@@ -401,7 +401,7 @@ importers:
     devDependencies:
       '@types/jest': 27.5.2
       jest: 27.5.1
-      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
+      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
       typescript: 4.9.5
 
   packages/farrow-api-server:
@@ -432,7 +432,7 @@ importers:
       farrow-api-client: link:../farrow-api-client
       jest: 27.5.1
       supertest: 6.3.3
-      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
+      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
       typescript: 4.9.5
 
   packages/farrow-cors:
@@ -459,7 +459,7 @@ importers:
       farrow-http: link:../farrow-http
       jest: 27.5.1
       supertest: 6.3.3
-      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
+      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
       typescript: 4.9.5
 
   packages/farrow-deno-api:
@@ -489,7 +489,7 @@ importers:
       jest: 27.5.1
       node-fetch: 2.6.9
       supertest: 6.3.3
-      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
+      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
       tslib: 2.5.0
       typescript: 4.9.5
 
@@ -519,7 +519,7 @@ importers:
       farrow-schema: link:../farrow-schema
       jest: 27.5.1
       supertest: 6.3.3
-      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
+      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
       typescript: 4.9.5
 
   packages/farrow-federation:
@@ -553,7 +553,7 @@ importers:
       farrow-http: link:../farrow-http
       jest: 27.5.1
       supertest: 6.3.3
-      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
+      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
       tslib: 2.5.0
       typescript: 4.9.5
 
@@ -641,7 +641,7 @@ importers:
       '@types/vary': 1.1.0
       jest: 27.5.1
       supertest: 6.3.3
-      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
+      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
       typescript: 4.9.5
 
   packages/farrow-json-schema:
@@ -662,7 +662,7 @@ importers:
       '@types/json-schema': 7.0.11
       farrow-api: link:../farrow-api
       jest: 27.5.1
-      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
+      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
       typescript: 4.9.5
 
   packages/farrow-koa:
@@ -691,7 +691,7 @@ importers:
       jest: 27.5.1
       koa: 2.14.1
       supertest: 6.3.3
-      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
+      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
       typescript: 4.9.5
 
   packages/farrow-module:
@@ -706,7 +706,7 @@ importers:
     devDependencies:
       '@types/jest': 27.5.2
       jest: 27.5.1
-      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
+      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
       typescript: 4.9.5
 
   packages/farrow-next:
@@ -752,10 +752,10 @@ importers:
       '@types/react-dom': 17.0.18
       '@types/redux-logger': 3.0.9
       jest: 27.5.1
-      next: 11.1.4_hlszf5b36got6eddf4bbqru3by
+      next: 11.1.4_3ae592f43bf19d3f10632f0218469b0e
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
-      ts-jest: 27.1.5_j22lzoizerh26yhx3rtoqxu75q
+      ts-jest: 27.1.5_4eb4bcb919244faf60f7dc66e85e9fec
       typescript: 4.9.5
 
   packages/farrow-next-server:
@@ -776,7 +776,7 @@ importers:
       '@types/react': 17.0.53
       '@types/react-dom': 17.0.18
       farrow-http: link:../farrow-http
-      next: 12.3.4_jiuppbrrdpqsioctsbaxdlfu4e
+      next: 12.3.4_4a28f786311be1243853904171acb4e1
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       typescript: 4.9.5
@@ -793,7 +793,7 @@ importers:
     devDependencies:
       '@types/jest': 27.5.2
       jest: 27.5.1
-      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
+      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
       typescript: 4.9.5
 
   packages/farrow-react:
@@ -826,7 +826,7 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       supertest: 6.3.3
-      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
+      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
       typescript: 4.9.5
 
   packages/farrow-schema:
@@ -841,7 +841,7 @@ importers:
     devDependencies:
       '@types/jest': 27.5.2
       jest: 27.5.1
-      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
+      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
       typescript: 4.9.5
 
   packages/farrow-vite:
@@ -863,7 +863,7 @@ importers:
       farrow-http: link:../farrow-http
       jest: 27.5.1
       supertest: 6.3.3
-      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
+      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
       typescript: 4.9.5
       vite: 2.6.14
 
@@ -1809,7 +1809,7 @@ packages:
   /@next/polyfill-module/11.1.4:
     resolution: {integrity: sha512-CY3bOSQf9Dy3+34dFjFbOdg3DRXIGfujb54D/AVO83ajyQczRZ3xdU0i5VV0eSR6B56ktVy3/aelOffpTUq6LA==}
 
-  /@next/react-dev-overlay/11.1.4_sfoxds7t5ydpegc3knd667wn6m:
+  /@next/react-dev-overlay/11.1.4_react-dom@17.0.2+react@17.0.2:
     resolution: {integrity: sha512-8/9JflJwRXEvVb6cKCWgRTOmALzDJHpWD5diRbtXWsllqxcMBjtscgnO4PaK+9QyZnSYSUbn0zZUZvxOXOTE1Q==}
     peerDependencies:
       react: ^17.0.2
@@ -2444,6 +2444,7 @@ packages:
 
   /@types/parse-json/4.0.0:
     resolution: {integrity: sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==}
+    dev: false
 
   /@types/prettier/2.7.2:
     resolution: {integrity: sha512-KufADq8uQqo1pYKVIYzfKbJfBAc0sOeXqGbFaSpv8MRmC/zXgowNZmFcbngndGk922QDmOASEXUZCaY48gs4cg==}
@@ -2552,7 +2553,7 @@ packages:
       '@types/yargs-parser': 21.0.0
     dev: true
 
-  /@typescript-eslint/eslint-plugin/4.33.0_s2qqtxhzmb7vugvfoyripfgp7i:
+  /@typescript-eslint/eslint-plugin/4.33.0_96a109dcf9607f5a1aa576228794cffa:
     resolution: {integrity: sha512-aINiAxGVdOl1eJyVjaWn/YcVAq4Gi/Yo35qHGCnqbWVz61g39D0h23veY/MA0rFFGfxK7TySg2uwDeNv+JgVpg==}
     engines: {node: ^10.12.0 || >=12.0.0}
     peerDependencies:
@@ -2563,8 +2564,8 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@typescript-eslint/experimental-utils': 4.33.0_jofidmxrjzhj7l6vknpw5ecvfe
-      '@typescript-eslint/parser': 4.33.0_jofidmxrjzhj7l6vknpw5ecvfe
+      '@typescript-eslint/experimental-utils': 4.33.0_eslint@7.32.0+typescript@4.9.5
+      '@typescript-eslint/parser': 4.33.0_eslint@7.32.0+typescript@4.9.5
       '@typescript-eslint/scope-manager': 4.33.0
       debug: 4.3.4
       eslint: 7.32.0
@@ -2578,7 +2579,7 @@ packages:
       - supports-color
     dev: true
 
-  /@typescript-eslint/experimental-utils/4.33.0_jofidmxrjzhj7l6vknpw5ecvfe:
+  /@typescript-eslint/experimental-utils/4.33.0_eslint@7.32.0+typescript@4.9.5:
     resolution: {integrity: sha512-zeQjOoES5JFjTnAhI5QY7ZviczMzDptls15GFsI6jyUOq0kOf9+WonkhtlIhh0RgHRnqj5gdNxW5j1EvAyYg6Q==}
     engines: {node: ^10.12.0 || >=12.0.0}
     peerDependencies:
@@ -2596,7 +2597,7 @@ packages:
       - typescript
     dev: true
 
-  /@typescript-eslint/parser/4.33.0_jofidmxrjzhj7l6vknpw5ecvfe:
+  /@typescript-eslint/parser/4.33.0_eslint@7.32.0+typescript@4.9.5:
     resolution: {integrity: sha512-ZohdsbXadjGBSK0/r+d87X0SBmKzOq4/S5nzK6SBgJspFo9/CUDJ7hjayuze+JK7CZQLDMroqytp7pOcFKTxZA==}
     engines: {node: ^10.12.0 || >=12.0.0}
     peerDependencies:
@@ -2914,6 +2915,7 @@ packages:
   /at-least-node/1.0.0:
     resolution: {integrity: sha512-+q/t7Ekv1EDY2l6Gda6LLiX14rU9TV20Wa3ofeQmwPFZbOMo9DXrLbOjFaaclkXKWidIaopwAObQDqwWtGUjqg==}
     engines: {node: '>= 4.0.0'}
+    dev: false
 
   /autocannon/7.10.0:
     resolution: {integrity: sha512-PY1UrXL4NHE7J0hA6GGN2r8xjiAePS/bii3Hz7NOvp4JO3xDNBgRftDjfAxj1t6FDWXiXEOuKF/pdDiisIS8ZA==}
@@ -3063,8 +3065,6 @@ packages:
       raw-body: 2.5.1
       type-is: 1.6.18
       unpipe: 1.0.0
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /brace-expansion/1.1.11:
@@ -3321,6 +3321,7 @@ packages:
       readdirp: 3.6.0
     optionalDependencies:
       fsevents: 2.3.2
+    dev: false
 
   /ci-info/3.7.1:
     resolution: {integrity: sha512-4jYS4MOAaCIStSRwiuxc4B8MYhIe676yO1sYGzARnjXkWpmzZMMYxY6zu8WYWDhSuth5zhrQ1rhNSibyyvv4/w==}
@@ -3584,6 +3585,7 @@ packages:
       parse-json: 5.2.0
       path-type: 4.0.0
       yaml: 1.10.2
+    dev: false
 
   /create-ecdh/4.0.4:
     resolution: {integrity: sha512-mf+TCx8wWc9VpuxfP2ht0iSISLZnt0JgWlrOKZiNqyUZWnjIaCIVNQArMHnCZKfEYRg6IM7A+NeJoN8gf/Ws0A==}
@@ -3747,11 +3749,6 @@ packages:
 
   /debug/2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
-    peerDependencies:
-      supports-color: '*'
-    peerDependenciesMeta:
-      supports-color:
-        optional: true
     dependencies:
       ms: 2.0.0
 
@@ -4266,6 +4263,7 @@ packages:
       esbuild: 0.14.54
       find-up: 5.0.0
       tslib: 2.5.0
+    dev: false
 
   /esbuild-openbsd-64/0.13.15:
     resolution: {integrity: sha512-wTfvtwYJYAFL1fSs8yHIdf5GEE4NkbtbXtjLWjM3Cw8mmQKqsg8kTiqJ9NJQe5NX/5Qlo7Xd9r1yKMMkHllp5g==}
@@ -4442,7 +4440,7 @@ packages:
       eslint: 7.32.0
     dev: true
 
-  /eslint-plugin-jest/24.7.0_bfrijen5mqdzfbbsgrvmb4p2hy:
+  /eslint-plugin-jest/24.7.0_09628491bd6407928432346ac0f1fa3e:
     resolution: {integrity: sha512-wUxdF2bAZiYSKBclsUMrYHH6WxiBreNjyDxbRv345TIvPeoCEgPNEn3Sa+ZrSqsf1Dl9SqqSREXMHExlMMu1DA==}
     engines: {node: '>=10'}
     peerDependencies:
@@ -4452,8 +4450,8 @@ packages:
       '@typescript-eslint/eslint-plugin':
         optional: true
     dependencies:
-      '@typescript-eslint/eslint-plugin': 4.33.0_s2qqtxhzmb7vugvfoyripfgp7i
-      '@typescript-eslint/experimental-utils': 4.33.0_jofidmxrjzhj7l6vknpw5ecvfe
+      '@typescript-eslint/eslint-plugin': 4.33.0_96a109dcf9607f5a1aa576228794cffa
+      '@typescript-eslint/experimental-utils': 4.33.0_eslint@7.32.0+typescript@4.9.5
       eslint: 7.32.0
     transitivePeerDependencies:
       - supports-color
@@ -4467,7 +4465,7 @@ packages:
       requireindex: 1.2.0
     dev: true
 
-  /eslint-plugin-prettier/3.4.1_22qxzbe4rxbsqykefttlo44try:
+  /eslint-plugin-prettier/3.4.1_d6a17c849c8dc32861442ce6b773938e:
     resolution: {integrity: sha512-htg25EUYUeIhKHXjOinK4BgCcDwtLHjqaxCDsMy5nbnUMkKFvIhMVCp+5GFUXQ4Nr8lBsPqtGAqBenbpFqAA2g==}
     engines: {node: '>=6.0.0'}
     peerDependencies:
@@ -4744,8 +4742,6 @@ packages:
       type-is: 1.6.18
       utils-merge: 1.0.1
       vary: 1.1.2
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /extendable-error/0.1.7:
@@ -4759,84 +4755,6 @@ packages:
       chardet: 0.7.0
       iconv-lite: 0.4.24
       tmp: 0.0.33
-    dev: true
-
-  /farrow-api-server/1.12.1:
-    resolution: {integrity: sha512-hs+48iD12TTIS1bC39Hgl3mTYrA9pFvzQtiWgxhUQPrdcIy7RVe6PNgwCS0dbOvo/2RGZDLpxO0gPxNJg8kgvg==}
-    dependencies:
-      farrow-api: 1.12.1
-      farrow-http: 1.12.0
-      farrow-schema: 1.12.1
-      lodash.get: 4.4.2
-      tslib: 2.5.0
-    dev: false
-
-  /farrow-api/1.12.1:
-    resolution: {integrity: sha512-+uxQMLhOKbJB2L/1+k3gHAsqcrplVUhlEO9sg+EjQ9zVs7tCxtE/+OUC0rxIAl45GfUFno6bAOJB65eIE0q23Q==}
-    dependencies:
-      cosmiconfig: 7.1.0
-      farrow-pipeline: 1.12.0
-      farrow-schema: 1.12.1
-      prettier: 2.8.3
-      tslib: 2.5.0
-
-  /farrow-http/1.12.0:
-    resolution: {integrity: sha512-7yWiaK/NT9bKz4R82Ydw+V5zYFz6kmWDxQLFoTjo3nflitOMJt2I37gWEwnl6a59n36EWi3l9KzbzIf1VrvVsw==}
-    dependencies:
-      accepts: 1.3.8
-      bytes: 3.1.2
-      chalk: 4.1.2
-      co-body: 6.1.0
-      content-disposition: 0.5.4
-      cookie: 0.4.2
-      cookies: 0.8.0
-      destroy: 1.2.0
-      encodeurl: 1.0.2
-      escape-html: 1.0.3
-      farrow-pipeline: 1.12.0
-      farrow-schema: 1.12.1
-      mime-types: 2.1.35
-      on-finished: 2.4.1
-      path-to-regexp: 6.2.1
-      qs: 6.11.0
-      statuses: 2.0.1
-      tslib: 2.5.0
-      type-is: 1.6.18
-      vary: 1.1.2
-    dev: false
-
-  /farrow-pipeline/1.12.0:
-    resolution: {integrity: sha512-wUcfYkWzZysGDsrLmun6fRKw5Q1lUkSwoAs9rDwNIhb3nyIBUTaLhz2+fJq2rY2kOopXKosYCt1Iy3CPnwBpjw==}
-    dependencies:
-      tslib: 2.5.0
-
-  /farrow-schema/1.12.1:
-    resolution: {integrity: sha512-K15et9jhiPakxPxbWRQLT8m1DkIk6BB4KeUkp3YTwqV30cjTIUjdll6q2/lyjS/T/ZX8BLHuZDtacBJdzgJn6A==}
-    dependencies:
-      tslib: 2.5.0
-
-  /farrow/1.12.2:
-    resolution: {integrity: sha512-eY+QtyVuaPeFWLWv94K7JhC/rmbgyaivdCmTViHuk3/qgfiQVEoNmr0os8hFBvdxOGsU4+YPMBYeBBmtYn228A==}
-    hasBin: true
-    dependencies:
-      chalk: 4.1.2
-      chokidar: 3.5.3
-      commander: 8.3.0
-      cosmiconfig: 7.1.0
-      esbuild: 0.14.54
-      esbuild-node-externals: 1.6.0_esbuild@0.14.54
-      execa: 5.1.1
-      farrow-api: 1.12.1
-      farrow-schema: 1.12.1
-      fs-extra: 9.1.0
-      leven: 3.1.0
-      node-fetch: 2.6.9
-      read-pkg-up: 7.0.1
-      replace-in-file: 6.3.5
-      slash: 3.0.0
-      tslib: 2.5.0
-    transitivePeerDependencies:
-      - encoding
     dev: true
 
   /fast-deep-equal/3.1.3:
@@ -4919,8 +4837,6 @@ packages:
       parseurl: 1.3.3
       statuses: 2.0.1
       unpipe: 1.0.0
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /find-cache-dir/3.3.1:
@@ -5032,6 +4948,7 @@ packages:
       graceful-fs: 4.2.10
       jsonfile: 6.1.0
       universalify: 2.0.0
+    dev: false
 
   /fs.realpath/1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
@@ -5083,8 +5000,6 @@ packages:
     resolution: {integrity: sha512-/pViTfifW+gBbh/RnlFYHINvELT9Znt+SYyDKAUL6uV6By019AK/s+i9XP4jSwq7lwP38Fd8HVeTxym3+hkwmQ==}
     dependencies:
       stream-parser: 0.3.1
-    transitivePeerDependencies:
-      - supports-color
 
   /get-package-type/0.1.0:
     resolution: {integrity: sha512-pjzuKtY64GYfWizNAJ0fr9VqttZkNiK2iS430LtIHzjBEr6bX8Am2zm4sW4Ro5wjWW5cAlRL1qAMTcXbjNAO2Q==}
@@ -6370,6 +6285,7 @@ packages:
       universalify: 2.0.0
     optionalDependencies:
       graceful-fs: 4.2.10
+    dev: false
 
   /jsx-ast-utils/3.3.3:
     resolution: {integrity: sha512-fYQHZTZ8jSfmWZ0iyzfwiU4WDX4HpHbMCZ3gPlWYiCl3BoeOTsqKBqnTVfH2rYT7eP5c3sVbeSPHnnJOaTrWiw==}
@@ -6829,7 +6745,7 @@ packages:
     resolution: {integrity: sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==}
     engines: {node: '>= 0.6'}
 
-  /next/11.1.4_hlszf5b36got6eddf4bbqru3by:
+  /next/11.1.4_3ae592f43bf19d3f10632f0218469b0e:
     resolution: {integrity: sha512-GWQJrWYkfAKP8vmrzJcCfRSKv955Khyjqd5jipTcVKDGg+SH+NfjDMWFtCwArcQlHPvzisGu1ERLY0+Eoj7G+g==}
     engines: {node: '>=12.0.0'}
     hasBin: true
@@ -6851,7 +6767,7 @@ packages:
       '@hapi/accept': 5.0.2
       '@next/env': 11.1.4
       '@next/polyfill-module': 11.1.4
-      '@next/react-dev-overlay': 11.1.4_sfoxds7t5ydpegc3knd667wn6m
+      '@next/react-dev-overlay': 11.1.4_react-dom@17.0.2+react@17.0.2
       '@next/react-refresh-utils': 11.1.4_react-refresh@0.8.3
       '@node-rs/helper': 1.2.1
       assert: 2.0.0
@@ -6892,7 +6808,7 @@ packages:
       stream-browserify: 3.0.0
       stream-http: 3.1.1
       string_decoder: 1.3.0
-      styled-jsx: 4.0.1_64k6h7xsf5jw26ymy7ush5uuyi
+      styled-jsx: 4.0.1_@babel+core@7.20.12+react@17.0.2
       timers-browserify: 2.0.12
       tty-browserify: 0.0.1
       use-subscription: 1.5.1_react@17.0.2
@@ -6906,11 +6822,10 @@ packages:
       '@next/swc-win32-x64-msvc': 11.1.4
     transitivePeerDependencies:
       - '@babel/core'
-      - supports-color
       - typescript
       - webpack
 
-  /next/12.3.4_jiuppbrrdpqsioctsbaxdlfu4e:
+  /next/12.3.4_4a28f786311be1243853904171acb4e1:
     resolution: {integrity: sha512-VcyMJUtLZBGzLKo3oMxrEF0stxh8HwuW976pAzlHhI3t8qJ4SROjCrSh1T24bhrbjw55wfZXAbXPGwPt5FLRfQ==}
     engines: {node: '>=12.22.0'}
     hasBin: true
@@ -6934,7 +6849,7 @@ packages:
       postcss: 8.4.14
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
-      styled-jsx: 5.0.7_64k6h7xsf5jw26ymy7ush5uuyi
+      styled-jsx: 5.0.7_@babel+core@7.20.12+react@17.0.2
       use-sync-external-store: 1.2.0_react@17.0.2
     optionalDependencies:
       '@next/swc-android-arm-eabi': 12.3.4
@@ -7726,6 +7641,7 @@ packages:
     engines: {node: '>=8.10.0'}
     dependencies:
       picomatch: 2.3.1
+    dev: false
 
   /rechoir/0.6.2:
     resolution: {integrity: sha512-HFM8rkZ+i3zrV+4LQjwQ0W+ez98pApMGM3HUrN04j3CqzPOzl9nmP15Y8YXNm8QHGv/eacOVEjqhmWpkRV0NAw==}
@@ -7782,6 +7698,7 @@ packages:
       chalk: 4.1.2
       glob: 7.2.3
       yargs: 17.6.2
+    dev: false
 
   /require-directory/2.1.1:
     resolution: {integrity: sha512-fGxEI7+wsG9xrvdjsrlmL22OMTTiHRwAMroiEeMgq8gzoLC/PQr7RsRDSTLUg/bZAZtF+TVIkHc6/4RIKrui+Q==}
@@ -7979,8 +7896,6 @@ packages:
       on-finished: 2.4.1
       range-parser: 1.2.1
       statuses: 2.0.1
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /serve-static/1.15.0:
@@ -7991,8 +7906,6 @@ packages:
       escape-html: 1.0.3
       parseurl: 1.3.3
       send: 0.18.0
-    transitivePeerDependencies:
-      - supports-color
     dev: true
 
   /set-blocking/2.0.0:
@@ -8253,8 +8166,6 @@ packages:
     resolution: {integrity: sha512-bJ/HgKq41nlKvlhccD5kaCr/P+Hu0wPNKPJOH7en+YrJu/9EgqUF+88w5Jb6KNcjOFMhfX4B2asfeAtIGuHObQ==}
     dependencies:
       debug: 2.6.9
-    transitivePeerDependencies:
-      - supports-color
 
   /stream-transform/2.1.3:
     resolution: {integrity: sha512-9GHUiM5hMiCi6Y03jD2ARC1ettBXkQBoQAe7nJsPknnI0ow10aXjTnew8QtYQmLjzn974BnmWEAJgCY6ZP1DeQ==}
@@ -8397,7 +8308,7 @@ packages:
     resolution: {integrity: sha512-PdHt7hHUJKxvTCgbKX9C1V/ftOcjJQgz8BZwNfV5c4B6dcGqlpelTbJ999jBGZ2jYiPAwcX5dP6oBwVlBlUbxw==}
     dev: true
 
-  /styled-jsx/4.0.1_64k6h7xsf5jw26ymy7ush5uuyi:
+  /styled-jsx/4.0.1_@babel+core@7.20.12+react@17.0.2:
     resolution: {integrity: sha512-Gcb49/dRB1k8B4hdK8vhW27Rlb2zujCk1fISrizCcToIs+55B4vmUM0N9Gi4nnVfFZWe55jRdWpAqH1ldAKWvQ==}
     engines: {node: '>= 12.0.0'}
     peerDependencies:
@@ -8418,7 +8329,7 @@ packages:
       stylis: 3.5.4
       stylis-rule-sheet: 0.0.10_stylis@3.5.4
 
-  /styled-jsx/5.0.7_64k6h7xsf5jw26ymy7ush5uuyi:
+  /styled-jsx/5.0.7_@babel+core@7.20.12+react@17.0.2:
     resolution: {integrity: sha512-b3sUzamS086YLRuvnaDigdAewz1/EFYlHpYBP5mZovKEdQQOIIYq8lApylub3HHZ6xFjV051kkGU7cudJmrXEA==}
     engines: {node: '>= 12.0.0'}
     peerDependencies:
@@ -8650,7 +8561,7 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /ts-jest/27.1.5_j22lzoizerh26yhx3rtoqxu75q:
+  /ts-jest/27.1.5_4eb4bcb919244faf60f7dc66e85e9fec:
     resolution: {integrity: sha512-Xv6jBQPoBEvBq/5i2TeSG9tt/nqkbpcurrEG1b+2yfBrcJelOZF9Ml6dmyMh7bcW9JyFbRYpR5rxROSlBLTZHA==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     hasBin: true
@@ -8685,7 +8596,7 @@ packages:
       yargs-parser: 20.2.9
     dev: true
 
-  /ts-jest/27.1.5_n4jzo3ixy42kfaqevs43wjx5ui:
+  /ts-jest/27.1.5_6f13976d17c734a28204acb9bb26fda2:
     resolution: {integrity: sha512-Xv6jBQPoBEvBq/5i2TeSG9tt/nqkbpcurrEG1b+2yfBrcJelOZF9Ml6dmyMh7bcW9JyFbRYpR5rxROSlBLTZHA==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     hasBin: true
@@ -8719,7 +8630,7 @@ packages:
       yargs-parser: 20.2.9
     dev: true
 
-  /ts-jest/27.1.5_qakvs7sfsbhy7gtcrsjr2pxm7e:
+  /ts-jest/27.1.5_8015597e45904f8f9a628c931d3eecf9:
     resolution: {integrity: sha512-Xv6jBQPoBEvBq/5i2TeSG9tt/nqkbpcurrEG1b+2yfBrcJelOZF9Ml6dmyMh7bcW9JyFbRYpR5rxROSlBLTZHA==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     hasBin: true
@@ -8893,6 +8804,7 @@ packages:
     resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
     engines: {node: '>=4.2.0'}
     hasBin: true
+    dev: true
 
   /unbox-primitive/1.0.2:
     resolution: {integrity: sha512-61pPlCD9h51VoreyJ0BReideM3MDKMKnh6+V9L08331ipq6Q8OFXZYiqP6n/tbHx4s5I9uRhcye6BrbkizkBDw==}
@@ -8920,6 +8832,7 @@ packages:
   /universalify/2.0.0:
     resolution: {integrity: sha512-hAZsKq7Yy11Zu1DE0OzWjw7nnLZmJZYTDZZyEFHZdUhV8FkH5MCfoU1XMaxXovpyW5nq5scPqq0ZDP9Zyl04oQ==}
     engines: {node: '>= 10.0.0'}
+    dev: false
 
   /unpipe/1.0.0:
     resolution: {integrity: sha512-pjy2bYhSsufwWlKwPc+l3cN7+wuJlK6uz0YdJEOlQDbl6jo/YlPi4mb8agUkVC8BF7V8NuzeyPNqRksA3hztKQ==}
@@ -9293,6 +9206,7 @@ packages:
   /yaml/1.10.2:
     resolution: {integrity: sha512-r3vXyErRCYJ7wg28yvBY5VSoAF8ZvlcW9/BwUzEtUsjvX/DKs24dIkuwjtuprwJJHsbyUbLApepYTR1BN4uHrg==}
     engines: {node: '>= 6'}
+    dev: false
 
   /yaml/2.2.1:
     resolution: {integrity: sha512-e0WHiYql7+9wr4cWMx3TVQrNwejKaEe7/rHNmQmqRjazfOP5W8PB6Jpebb5o6fIapbz9o9+2ipcaTM2ZwDI6lw==}

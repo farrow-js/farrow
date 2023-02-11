@@ -62,8 +62,5 @@
       "path": "./packages/farrow-federation/tsconfig.json"
     }
   ],
-  "exclude": [
-    "./packages/create-farrow-app/templates",
-    "./packages/*/__tests/**/*"
-  ]
+  "exclude": ["./packages/create-farrow-app/templates", "./packages/*/__tests/**/*"]
 }

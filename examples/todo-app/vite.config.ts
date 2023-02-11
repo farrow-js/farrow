@@ -18,20 +18,20 @@ export default defineConfig({
     alias: [
       {
         find: /^farrow-api-client$/,
-        replacement: resolve(__dirname, '../../packages/farrow-api-client/src')
+        replacement: resolve(__dirname, '../../packages/farrow-api-client/src'),
       },
       {
         find: /^farrow-api-client\/(.*)/,
-        replacement: resolve(__dirname, '../../packages/farrow-api-client/src/$1')
+        replacement: resolve(__dirname, '../../packages/farrow-api-client/src/$1'),
       },
       {
         find: /^farrow-pipeline$/,
-        replacement: resolve(__dirname, '../../packages/farrow-pipeline/src')
+        replacement: resolve(__dirname, '../../packages/farrow-pipeline/src'),
       },
       {
         find: /^farrow-pipeline\/(.*)/,
-        replacement: resolve(__dirname, '../../packages/farrow-pipeline/src/$1')
-      }
-    ]
-  }
+        replacement: resolve(__dirname, '../../packages/farrow-pipeline/src/$1'),
+      },
+    ],
+  },
 })

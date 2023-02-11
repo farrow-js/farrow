@@ -124,8 +124,8 @@ export const createFederationServices = async (services: ApiServices, customOpti
   })
 
   /**
-  * capture introspection request
-*/
+   * capture introspection request
+   */
   router.use((request, next) => {
     if (request.pathname !== '/__introspection__' || request.method?.toLowerCase() !== 'get') {
       return next()

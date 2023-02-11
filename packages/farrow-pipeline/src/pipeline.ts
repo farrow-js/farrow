@@ -116,19 +116,19 @@ export const createPipeline = <I, O>(options?: PipelineOptions) => {
       const hooks = fromContainer(options?.container)
       return options?.onLast
         ? createCurrentCounter(
-          hooks,
-          options.onLast,
-          typeof options.onLastWithContext === 'boolean' ? options.onLastWithContext : true,
-        )
+            hooks,
+            options.onLast,
+            typeof options.onLastWithContext === 'boolean' ? options.onLastWithContext : true,
+          )
         : createCurrentCounter(hooks)
     }
 
     return options?.onLast
       ? createCurrentCounter(
-        currentHooks,
-        options.onLast,
-        typeof options.onLastWithContext === 'boolean' ? options.onLastWithContext : true,
-      )
+          currentHooks,
+          options.onLast,
+          typeof options.onLastWithContext === 'boolean' ? options.onLastWithContext : true,
+        )
       : createCurrentCounter(currentHooks)
   }
 

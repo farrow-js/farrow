@@ -141,7 +141,7 @@ describe('generateApi', () => {
     const formatedSource = format(source)
 
     const expected = await fs.readFile(`${__dirname}/expected/01.ts`)
-    
+
     expect(formatedSource.replace(/\r|\n/g, '')).toBe(expected.toString().replace(/\r|\n/g, ''))
   })
 })

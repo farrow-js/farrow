@@ -6,10 +6,7 @@ import type { Fetch } from './federation'
 
 export type IntrospectionResult = Result<FormatResult>
 
-export const getIntrospection = (
-  src: string,
-  fetch: Fetch = nodeFetch as any,
-): Promise<IntrospectionResult> => {
+export const getIntrospection = (src: string, fetch: Fetch = nodeFetch as any): Promise<IntrospectionResult> => {
   const url = getIntrospectionUrl(src)
   return fetch(url)
     .then((response) => {

@@ -4,7 +4,7 @@ import { toJSON } from 'farrow-api/dist/toJSON'
 import type { CodegenOptions } from 'farrow-api/dist/generateApi'
 import { format } from 'farrow-api/dist/prettier'
 import { ApiService } from 'farrow-api-server'
-import { codegen } from './codegen'
+import { generateApiClient } from './generateApiClient'
 
 export type CreateDenoServiceOptions = {
   entries: ApiEntries
@@ -31,7 +31,7 @@ export const createDenoService = (options: CreateDenoServiceOptions): RouterPipe
     const req = useReq()
     const formatResult = toJSON(entries)
     const url = `http://${req.headers.host}${req.url}`.replace(path, '')
-    let source = codegen(formatResult, {
+    let source = generateApiClient(formatResult, {
       ...options.codegen,
       url,
     })

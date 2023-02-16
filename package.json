@@ -21,7 +21,7 @@
     "format:other": "prettier ./**/*.{md,yml,json,html} --write",
     "format:source": "prettier ./**/*.{ts,tsx,js} --write",
     "init": "pnpm install && pnpm run build",
-    "test": "pnpm --filter './packages/*' test",
+    "test": "pnpm run test --filter './packages'",
     "test:coverage": "pnpm run test:coverage --filter ./packages",
     "publish": "pnpm changeset publish",
     "prepublish": "pnpm run format && git add -A && pnpm run build",

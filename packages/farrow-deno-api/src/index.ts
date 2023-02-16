@@ -1,2 +1,2 @@
 export * from './denoService'
-export * from './codegen'
+export * from './generateApiClient'

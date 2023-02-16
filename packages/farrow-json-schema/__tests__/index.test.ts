@@ -3,7 +3,6 @@ import { Api, ApiEntries } from 'farrow-api'
 import { toJSON } from 'farrow-api/dist/toJSON'
 import { transform, transformResult } from '../src'
 
-
 describe('transform', () => {
   it('schema', () => {
     const definition = {

@@ -6,25 +6,23 @@ import { createFederationServices } from '../src'
 import supertest, { Response } from 'supertest'
 import { IncomingMessage, Server, ServerResponse } from 'http'
 
-
-const fakeFetch = (server: Server<typeof IncomingMessage, typeof ServerResponse>): typeof fetch => (async (input, init) => {
-  const getRes = () => {
-    if (init?.method?.toLowerCase() === 'post') {
-      return supertest(server)
-        .post(input as string)
-        .send(JSON.parse(init?.body as any))
-    } else {
-      return supertest(server)
-        .get(input as string)
+const fakeFetch = (server: Server<typeof IncomingMessage, typeof ServerResponse>): typeof fetch =>
+  (async (input, init) => {
+    const getRes = () => {
+      if (init?.method?.toLowerCase() === 'post') {
+        return supertest(server)
+          .post(input as string)
+          .send(JSON.parse(init?.body as any))
+      }
+      return supertest(server).get(input as string)
     }
-  }
-  const res = await getRes()
-  return {
-    json() {
-      return JSON.parse(res.text)
-    },
-  }
-}) as typeof fetch
+    const res = await getRes()
+    return {
+      json() {
+        return JSON.parse(res.text)
+      },
+    }
+  }) as typeof fetch
 
 describe('farrow-federation', () => {
   const http = Http()
@@ -93,8 +91,8 @@ describe('farrow-federation', () => {
       {
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         // @ts-ignore
-        fetch: fakeFetch(http.server())
-      }
+        fetch: fakeFetch(http.server()),
+      },
     )
 
     const server = Http()

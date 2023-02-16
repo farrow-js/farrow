@@ -57,7 +57,6 @@ const throwErrorIfNeeded = <T>(result: Error | T): T => {
   return result
 }
 
-
 let fetcher = defaultFetcher
 
 export const setFetcher = (newFetcher: Fetcher) => {
@@ -68,8 +67,7 @@ export const getFetcher = () => {
   return fetcher
 }
 
-export type ApiPipelineOptions = {
-}
+export type ApiPipelineOptions = {}
 
 export type ApiInvokeOptions = RunAsyncPipelineOptions<ApiRequest, ApiResponse> & {
   fetcher?: Fetcher
@@ -82,12 +80,13 @@ export type ApiPipeline = AsyncPipeline<ApiRequest, ApiResponse> & {
   invoke(url: string, calling: Calling, options?: ApiInvokeOptions): Promise<JsonType | Error | (JsonType | Error)[]>
 }
 
-export const createApiPipeline = ({ }: ApiPipelineOptions = {}): ApiPipeline => {
+// eslint-disable-next-line no-empty-pattern
+export const createApiPipeline = ({}: ApiPipelineOptions = {}): ApiPipeline => {
   const pipeline = createAsyncPipeline<ApiRequest, ApiResponse>()
 
   const run: ApiPipeline['run'] = (request, options) => {
     return pipeline.run(request, {
-      onLast: input => fetcher(input),
+      onLast: (input) => fetcher(input),
       ...options,
     })
   }
@@ -118,7 +117,7 @@ export const createApiPipeline = ({ }: ApiPipelineOptions = {}): ApiPipeline => 
       runOptions.onLast = options.fetcher
     }
 
-    const apiResponse = await run({ url, calling }, runOptions) as ApiSingleResponse
+    const apiResponse = (await run({ url, calling }, runOptions)) as ApiSingleResponse
 
     return handleApiSingleResponse(apiResponse)
   }
@@ -130,16 +129,12 @@ export const createApiPipeline = ({ }: ApiPipelineOptions = {}): ApiPipeline => 
       runOptions.onLast = options.fetcher
     }
 
-    const apiResponse = await run({ url, calling }, runOptions) as ApiBatchResponse
+    const apiResponse = (await run({ url, calling }, runOptions)) as ApiBatchResponse
 
     return handleApiBatchResponse(apiResponse)
   }
 
-  const invoke = async (
-    url: string,
-    calling: Calling,
-    options?: ApiInvokeOptions,
-  ) => {
+  const invoke = async (url: string, calling: Calling, options?: ApiInvokeOptions) => {
     if (calling.type === 'Single') {
       return singleInvoke(url, calling, options)
     }
@@ -181,7 +176,7 @@ export const createApiPipeline = ({ }: ApiPipelineOptions = {}): ApiPipeline => 
     match,
     singleInvoke,
     batchInvoke,
-    invoke
+    invoke,
   }
 }
 
@@ -197,7 +192,6 @@ export type ApiBatchLoadOptions = {
 export type ApiBatchLoader = {
   load(calling: SingleCalling, options?: ApiBatchLoadOptions): Promise<JsonType>
 }
-
 
 export const createApiBatchLoader = (url: string): ApiBatchLoader => {
   const batchLoadFn = async (callings: Readonly<SingleCalling[]>) => {

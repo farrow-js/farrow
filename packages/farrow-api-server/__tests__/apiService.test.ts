@@ -183,9 +183,7 @@ describe('ApiService', () => {
       }),
     )
 
-    await request(server)
-      .get('/counter/__introspection__')
-      .expect(404)
+    await request(server).get('/counter/__introspection__').expect(404)
   })
 
   it('supports calling api', async () => {

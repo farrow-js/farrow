@@ -17,7 +17,9 @@ export const serverApiHelpers: ApiClientHelpers = {
   },
   apiFunctionBody: (formatApi, path, formatResult) => {
     const outputType = getFieldType(formatApi.output.typeId, formatResult.types)
-    return `apiBatchLoader.load({ type: 'Single', path: ${JSON.stringify(path,)}, input }, options) as Promise<${outputType}>`
+    return `apiBatchLoader.load({ type: 'Single', path: ${JSON.stringify(
+      path,
+    )}, input }, options) as Promise<${outputType}>`
   },
 }
 
@@ -25,7 +27,7 @@ export const generateApiClient = (formResult: FormatResult, options?: Omit<Codeg
   return generateApi(formResult, {
     ...options,
     apiClient: {
-      helpers: serverApiHelpers
-    }
+      helpers: serverApiHelpers,
+    },
   })
 }

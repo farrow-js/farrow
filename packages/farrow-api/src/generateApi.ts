@@ -168,6 +168,18 @@ export const PREFIX_COMMENT = `
  */
 `
 
+export const JSON_TYPE_TEXT = `
+export type JsonType =
+  | number
+  | string
+  | boolean
+  | null
+  | undefined
+  | JsonType[]
+  | { toJSON(): string }
+  | { [key: string]: JsonType }
+`
+
 export const generateApi = (formatResult: FormatResult, options?: CodegenOptions): string => {
   const exportSet = new Set<string>()
 
@@ -251,18 +263,14 @@ export const generateApi = (formatResult: FormatResult, options?: CodegenOptions
 
   const typeDeclarations = handleTypes(formatResult.types)
 
-  if (typeDeclarations.some((typeDeclaration) => typeDeclaration.includes('JsonType'))) {
-    importStatements.unshift(`import type { JsonType } from 'farrow-api'`)
-  }
-
   const variableDeclarations: string[] = []
 
   if (options?.apiClient) {
     const helpers = options.apiClient.helpers
 
-    importStatements.push(...helpers.importStatements(formatResult, options))
-    typeDeclarations.push(...helpers.typeDeclarations(formatResult, options))
-    variableDeclarations.push(...helpers.variableDeclarations(formatResult, options))
+    importStatements.unshift(...helpers.importStatements(formatResult, options))
+    typeDeclarations.unshift(...helpers.typeDeclarations(formatResult, options))
+    variableDeclarations.unshift(...helpers.variableDeclarations(formatResult, options))
 
     const handleApi = (api: FormatApi, path: string[]) => {
       return `(${helpers.apiFunctionParams(api, path, formatResult, options)}) => ${helpers.apiFunctionBody(
@@ -291,6 +299,10 @@ export const generateApi = (formatResult: FormatResult, options?: CodegenOptions
       return `{ ${fields.join(',\n')} }`
     }
     variableDeclarations.push(`export const api = ${handleEntries(formatResult.entries)}`)
+  }
+
+  if (typeDeclarations.some((typeDeclaration) => typeDeclaration.includes('JsonType'))) {
+    typeDeclarations.unshift(JSON_TYPE_TEXT)
   }
 
   const blocks = [importStatements.join('\n'), typeDeclarations.join('\n\n'), variableDeclarations.join('\n\n')]

@@ -33,9 +33,9 @@ const getErrorMessage = (error: ValidationError) => {
 
 export const getIntrospectionUrl = (url: string) => {
   if (!url.endsWith('/')) {
-    url = url + '/'
+    url = `${url}/`
   }
-  return url + '__introspection__'
+  return `${url}__introspection__`
 }
 
 export type CreateApiServiceOptions = {

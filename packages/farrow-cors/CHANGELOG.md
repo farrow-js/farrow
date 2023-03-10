@@ -1,5 +1,14 @@
 # farrow-cors
 
+## 2.0.2
+
+### Patch Changes
+
+- 1f9b7fb: upgrade for version 2.0
+- Updated dependencies [1f9b7fb]
+  - farrow-http@2.0.1
+  - farrow-pipeline@2.0.1
+
 ## 2.0.0
 
 ### Major Changes

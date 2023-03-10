@@ -1,5 +1,13 @@
 # farrow-next
 
+## 2.0.1
+
+### Patch Changes
+
+- 1f9b7fb: upgrade for version 2.0
+- Updated dependencies [1f9b7fb]
+  - farrow-module@2.0.1
+
 ## 2.0.0
 
 ### Major Changes

@@ -1,5 +1,11 @@
 # farrow-schema
 
+## 2.0.1
+
+### Patch Changes
+
+- 1f9b7fb: upgrade for version 2.0
+
 ## 1.12.1
 
 ### Patch Changes

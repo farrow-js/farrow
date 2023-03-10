@@ -1,5 +1,15 @@
 # farrow-api
 
+## 2.0.1
+
+### Patch Changes
+
+- 1f9b7fb: upgrade for version 2.0
+- 4ca3e55: change JsonType from import to inline
+- Updated dependencies [1f9b7fb]
+  - farrow-pipeline@2.0.1
+  - farrow-schema@2.0.1
+
 ## 2.0.0
 
 ### Major Changes

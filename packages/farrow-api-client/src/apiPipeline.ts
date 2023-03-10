@@ -81,7 +81,7 @@ export type ApiPipeline = AsyncPipeline<ApiRequest, ApiResponse> & {
 }
 
 // eslint-disable-next-line no-empty-pattern
-export const createApiPipeline = ({}: ApiPipelineOptions = {}): ApiPipeline => {
+export const createApiPipeline = ({ }: ApiPipelineOptions = {}): ApiPipeline => {
   const pipeline = createAsyncPipeline<ApiRequest, ApiResponse>()
 
   const run: ApiPipeline['run'] = (request, options) => {
@@ -214,7 +214,14 @@ export const createApiBatchLoader = (url: string): ApiBatchLoader => {
     return result
   }
 
-  const dataLoader = new DataLoader(batchLoadFn, { cacheKeyFn })
+  const dataLoader = new DataLoader(async (callings: Readonly<SingleCalling[]>) => {
+    try {
+      return batchLoadFn(callings)
+    } finally {
+      // clear all cache in every batched load for performing new request
+      dataLoader.clearAll()
+    }
+  }, { cacheKeyFn })
 
   const load: ApiBatchLoader['load'] = (calling, options) => {
     if (options?.batch !== false) {

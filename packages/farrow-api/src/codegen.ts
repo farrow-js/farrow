@@ -298,20 +298,25 @@ export type ApiClientOptions = {
     }
 
     const handleEntries = (entries: FormatEntries, path: string[] = [], indent = 2): string => {
-      const fields = Object.entries(entries.entries).map(([key, field]) => {
+      const fields = [] as string[]
+
+      for (const key in entries.entries) {
+        const field = entries.entries[key]
+
         if (field.type === 'Api') {
           const sourceText = handleApi(field, [...path, key])
           const result = `${key}: ${sourceText}`
-          return attachComment(result, {
+
+          fields.push(attachComment(result, {
             remarks: field.description,
             deprecated: field.deprecated,
             [`param input -`]: field.input.description,
             returns: field.output.description,
-          })
+          }))
+        } else {
+          fields.push(`${key}: ${handleEntries(field, [...path, key])}`)
         }
-
-        return `${key}: ${handleEntries(field, [...path, key])}`
-      })
+      }
 
       return `{\n${applyIndentForEachLine(fields.join(',\n'), indent)}\n${' '.repeat(indent - 2)}}`
     }

@@ -116,7 +116,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
     if (isIntrospectionRequest(request)) {
 
       if (config.introspection) {
-        return Response.json(getIntrospection())
+        return Response.type('json').string(getIntrospection())
       }
 
       return Response.status(404).text('Not Found.')

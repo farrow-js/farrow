@@ -65,7 +65,6 @@ export const createApiClient = (options: ApiClientOptions) => {
   const getIntrospection = async () => {
     const url = config.introspectionUrl.startsWith('http') ? config.introspectionUrl : config.src + config.introspectionUrl
 
-
     try {
       const response = await fetch(url)
       const body = await response.json()

@@ -1,7 +1,7 @@
 import path from 'path'
 import shell from 'shelljs'
 import { ChildProcess } from 'child_process'
-import { HttpPipeline } from 'farrow-http'
+import type { HttpPipeline } from 'farrow-http'
 import { Server } from 'http'
 import request from 'supertest'
 

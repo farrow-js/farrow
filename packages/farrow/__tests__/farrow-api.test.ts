@@ -1,6 +1,5 @@
 import shell from 'shelljs'
 import { Server } from 'http'
-import fs from 'fs/promises'
 import { ApiClientOptions, createApiClient } from '../src/api-client'
 import Project0 from '../fixtures/project0/src'
 
@@ -48,25 +47,6 @@ describe('Farrow-Api-Client', () => {
     expect(shell.test('-d', tempDir)).toBe(true)
     expect(shell.test('-f', apiClientOptions.dist)).toBe(true)
 
-    shell.rm('-rf', tempDir)
-  })
-
-  it('should replaceUrl correctly when build', async () => {
-    const synClient = createApiClient(apiClientOptions)
-    // depend on the correctness of `should generate api-client correctly`
-    await synClient.sync()
-
-    const prevSrc = apiClientOptions.src
-    const apiClientOptionsForBuild: ApiClientOptions = {
-      ...apiClientOptions,
-      src: 'http://_#*|*#_myserver.com/api',
-    }
-    const buildClient = createApiClient(apiClientOptionsForBuild)
-    await buildClient.build()
-
-    const content = await fs.readFile(apiClientOptionsForBuild.dist, 'utf-8')
-    expect(content).toContain(apiClientOptionsForBuild.src)
-    expect(content).not.toContain(prevSrc)
     shell.rm('-rf', tempDir)
   })
 })

@@ -1,6 +1,5 @@
-import { createServerBundler, createServerBundlers } from '../bundler/server'
+import { createServerBundlers } from '../bundler/server'
 import { getConfig, GetConfigOptions } from '../config'
-import { createApiClients } from '../api-client'
 
 export default async function build(options: GetConfigOptions) {
   const config = await getConfig(options)
@@ -23,8 +22,4 @@ export default async function build(options: GetConfigOptions) {
       build: true,
     })
   }
-
-  const clientsOptions = config.api ? (Array.isArray(config.api) ? config.api : [config.api]) : []
-  const apiClients = createApiClients({ services: clientsOptions })
-  await apiClients.build()
 }

@@ -83,6 +83,8 @@ describe('deno-api', () => {
 
     const test = await agent(server).get('/counter/client.ts').send()
 
+    fs.writeFileSync(`${__dirname}/client.ts`, test.text)
+
     server.close()
 
     expect(test.text.replace(/\r|\n/g, '')).toBe(source.replace(/\r|\n/g, ''))

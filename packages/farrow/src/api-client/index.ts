@@ -3,11 +3,7 @@ import { ensureDir } from 'fs-extra'
 import { dirname } from 'path'
 import fetch from 'node-fetch'
 import { FormatResult } from 'farrow-api/dist/toJSON'
-import type { CodegenOptions } from 'farrow-api/dist/generateApi'
-import { format } from 'farrow-api/dist/prettier'
-import { generateApiClient } from 'farrow-api-server/dist/generateApiClient'
-import { getIntrospectionUrl } from 'farrow-api-server'
-import { replaceUrl } from './replaceUrl'
+import { CodegenOptions, codegen } from 'farrow-api/dist/codegen'
 
 const writeFile = async (filename: string, content: string) => {
   try {
@@ -28,9 +24,16 @@ export type ApiClientOptions = {
   dist: string
 
   /**
-   * use alias for farrow-api-client instead of src address
+   * introspection url
+   * default value is /__introspection__
+   * if you want to use another url, you can set it here
    */
-  alias?: string
+  introspectionUrl?: string
+
+  /**
+   * get introspection from server
+   */
+  getIntropection?: (body: unknown) => Promise<FormatResult>
 
   /**
    * codegen options
@@ -45,21 +48,14 @@ export type ApiClientOptions = {
    * logger options for polling
    */
   logger?: false | ((options: ApiClientOptions) => void)
-  /**
-   * transform source code received from server
-   * it's useful when need to attach custom code snippet
-   */
-  transform?: (source: string) => string
-  /**
-   * format source code via codegen
-   */
-  format?: (source: string) => string
 }
 
 export const createApiClient = (options: ApiClientOptions) => {
   const config = {
     ...options,
     pollingInterval: 3000,
+    introspectionUrl: '/__introspection__',
+    getIntrospection: (x: unknown) => x as FormatResult,
   }
 
   let tid: ReturnType<typeof setInterval> | null = null
@@ -67,20 +63,27 @@ export const createApiClient = (options: ApiClientOptions) => {
   let prevText = ''
 
   const getIntrospection = async () => {
-    const url = getIntrospectionUrl(config.src)
-    const response = await fetch(url)
-    const text = await response.text()
+    const url = config.introspectionUrl.startsWith('http') ? config.introspectionUrl : config.src + config.introspectionUrl
 
-    if (text === prevText) {
-      return
-    }
-
-    prevText = text
 
     try {
-      return JSON.parse(text) as FormatResult
-    } catch (error: any) {
-      console.log(`Failed to fetch ${config.src}\nerror: ${error.message}\nresponse:${text}`)
+      const response = await fetch(url)
+      const body = await response.json()
+      const introspection = config.getIntrospection(body)
+      const text = JSON.stringify(introspection)
+
+      if (text === prevText) {
+        return
+      }
+
+      prevText = text
+      return introspection
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.log(`Failed to fetch ${config.src}\nerror: ${error.message}`)
+        return
+      }
+      console.log(`Failed to fetch ${config.src}`)
     }
   }
 
@@ -91,25 +94,14 @@ export const createApiClient = (options: ApiClientOptions) => {
       return
     }
 
-    let source = generateApiClient(result, {
+    let source = codegen(result, {
       ...config.codegen,
-      url: config.alias ?? config.src,
     })
-
-    if (config.transform) {
-      source = config.transform(source)
-    }
-
-    if (config.format) {
-      source = config.format(source)
-    } else {
-      source = format(source)
-    }
 
     if (typeof config.logger === 'function') {
       config.logger(options)
     } else if (config.logger !== false) {
-      console.log(`synced`, {
+      console.log(`synced farrow-api`, {
         src: config.src,
         dist: config.dist,
       })
@@ -135,15 +127,10 @@ export const createApiClient = (options: ApiClientOptions) => {
     }
   }
 
-  const build = async () => {
-    await replaceUrl(options)
-  }
-
   return {
     sync,
     start,
     stop,
-    build,
   }
 }
 
@@ -167,15 +154,9 @@ export const createApiClients = (options: CreateApiClientsOptions) => {
     clients.map((syncer) => syncer.stop())
   }
 
-  const build = async () => {
-    const promises = clients.map((client) => client.build())
-    await Promise.all(promises)
-  }
-
   return {
     sync,
     start,
-    stop,
-    build,
+    stop
   }
 }

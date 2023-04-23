@@ -1,8 +1,7 @@
 import fs from 'fs/promises'
 import { Api } from '../src/api'
 import { toJSON } from '../src/toJSON'
-import { generateApi } from '../src/generateApi'
-import { format } from '../src/prettier'
+import { codegen } from '../src/codegen'
 import {
   Any,
   Float,
@@ -26,11 +25,25 @@ import {
 
 const NamedStruct = Struct({
   named: String,
+  nest: {
+    a: Int,
+    nest: {
+      b: Float,
+    }
+  }
 })
 
 NamedStruct.displayName = 'NamedStruct'
 
-const NamedUnion = Union(Int, String, Float)
+const NamedUnion = Union(Int, String, Float, {
+  named: String,
+  nest: {
+    a: Int,
+    nest: {
+      b: Float,
+    }
+  }
+})
 
 NamedUnion.displayName = 'NamedUnion'
 
@@ -44,11 +57,28 @@ const NamedIntersect = Intersect(
   {
     c: Number,
   },
+  {
+    named: String,
+    nest: {
+      a: Int,
+      nest: {
+        b: Float,
+      }
+    }
+  }
 )
 
 NamedIntersect.displayName = 'NamedIntersect'
 
-const NamedTuple = Tuple({ a: Int }, { b: Float }, { c: Number })
+const NamedTuple = Tuple({ a: Int }, { b: Float }, { c: Number }, {
+  named: String,
+  nest: {
+    a: Int,
+    nest: {
+      b: Float,
+    }
+  }
+})
 
 NamedTuple.displayName = 'NamedTuple'
 
@@ -78,7 +108,13 @@ class Collection extends ObjectType {
   nest = Nullable(Collection)
   list = List(Collection)
   struct = Struct({
-    a: Int,
+    named: String,
+    nest: {
+      a: Int,
+      nest: {
+        b: Float,
+      }
+    }
   })
   union = Union(Int, String, Boolean)
   intersect = Intersect(
@@ -107,7 +143,15 @@ class Collection extends ObjectType {
 
 const methodA = Api(
   {
-    input: Collection,
+    input: Struct({
+      named: String,
+      nest: {
+        a: Int,
+        nest: {
+          b: Float,
+        }
+      }
+    }),
     output: Collection,
   },
   () => {
@@ -118,7 +162,15 @@ const methodA = Api(
 const methodB = Api(
   {
     input: Collection,
-    output: Collection,
+    output: Struct({
+      named: String,
+      nest: {
+        a: Int,
+        nest: {
+          b: Float,
+        }
+      }
+    }),
   },
   () => {
     throw new Error('No Implementation')
@@ -128,20 +180,25 @@ const methodB = Api(
 const entries = {
   methodA,
   methodB,
+  nest: {
+    methodA,
+    nest: {
+      methodB,
+    }
+  }
 }
 
 describe('generateApi', () => {
   it('can disable emiting api-client', async () => {
     const formatResult = toJSON(entries)
 
-    const source = generateApi(formatResult, {
-      noCheck: 'just for testing',
-    })
-
-    const formatedSource = format(source)
+    const source = codegen(formatResult, {})
 
     const expected = await fs.readFile(`${__dirname}/expected/01.ts`)
+    
+    // debug
+    // fs.writeFile(`${__dirname}/expected/01.ts`, source)
 
-    expect(formatedSource.replace(/\r|\n/g, '')).toBe(expected.toString().replace(/\r|\n/g, ''))
+    expect(source.replace(/\r|\n/g, '')).toBe(expected.toString().replace(/\r|\n/g, ''))
   })
 })

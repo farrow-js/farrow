@@ -63,8 +63,9 @@ export const createApiClient = (options: ApiClientOptions) => {
   let prevText = ''
 
   const getIntrospection = async () => {
-    const url = config.introspectionUrl.startsWith('http') ? config.introspectionUrl : config.src + config.introspectionUrl
-
+    const url = config.introspectionUrl.startsWith('http')
+      ? config.introspectionUrl
+      : config.src + config.introspectionUrl
 
     try {
       const response = await fetch(url)
@@ -94,7 +95,7 @@ export const createApiClient = (options: ApiClientOptions) => {
       return
     }
 
-    let source = codegen(result, {
+    const source = codegen(result, {
       ...config.codegen,
     })
 
@@ -157,6 +158,6 @@ export const createApiClients = (options: CreateApiClientsOptions) => {
   return {
     sync,
     start,
-    stop
+    stop,
   }
 }

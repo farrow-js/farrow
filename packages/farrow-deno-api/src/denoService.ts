@@ -18,7 +18,7 @@ export const createDenoService = (options: CreateDenoServiceOptions): RouterPipe
 
   service.route(path).use(() => {
     const formatResult = toJSON(entries)
-    let source = codegen(formatResult, {
+    const source = codegen(formatResult, {
       ...options.codegen,
     })
 

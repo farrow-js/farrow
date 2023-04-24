@@ -110,11 +110,10 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
   }
 
   /**
-  * capture introspection request
-  */
+   * capture introspection request
+   */
   router.use((request, next) => {
     if (isIntrospectionRequest(request)) {
-
       if (config.introspection) {
         return Response.json(getIntrospection())
       }
@@ -129,7 +128,9 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
     const api = get(entries, singleCalling.path)
 
     if (!isApi(api)) {
-      const message = `The target API was not found with the path: [${singleCalling.path.map(item => `"${item}"`).join(', ')}]`
+      const message = `The target API was not found with the path: [${singleCalling.path
+        .map((item) => `"${item}"`)
+        .join(', ')}]`
       return ApiErrorResponse(message)
     }
 
@@ -149,9 +150,9 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
       if (inputResult.isErr) {
         const message = getErrorMessage(inputResult.value)
         return ApiErrorResponse(message)
-      } else {
-        input = inputResult.value
       }
+
+      input = inputResult.value
     }
 
     try {
@@ -169,9 +170,8 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
         if (outputResult.isErr) {
           const message = getErrorMessage(outputResult.value)
           return ApiErrorResponse(message)
-        } else {
-          output = outputResult.value
         }
+        output = outputResult.value
       }
 
       /**
@@ -193,7 +193,6 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
     return ApiBatchSuccessResponse(result)
   }
 
-
   const handleStreamCalling = async (streamCalling: StreamCalling) => {
     // stream callings
     const callings = streamCalling.callings
@@ -208,10 +207,12 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
         'Content-Type': 'application/stream+json',
       })
 
-      await Promise.all(callings.map(async (calling, index) => {
-        const result = await handleSingleCalling(calling)
-        send(StreamApiSingleResponse(index, result))
-      }))
+      await Promise.all(
+        callings.map(async (calling, index) => {
+          const result = await handleSingleCalling(calling)
+          send(StreamApiSingleResponse(index, result))
+        }),
+      )
 
       res.end()
     })
@@ -232,10 +233,10 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
       return Response.json(result)
     } else if (calling.type === 'Stream') {
       return handleStreamCalling(calling)
-    } else {
-      const result = await handleSingleCalling(calling)
-      return Response.json(result)
     }
+
+    const result = await handleSingleCalling(calling)
+    return Response.json(result)
   })
 
   return router

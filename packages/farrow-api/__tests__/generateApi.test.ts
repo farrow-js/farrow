@@ -29,8 +29,8 @@ const NamedStruct = Struct({
     a: Int,
     nest: {
       b: Float,
-    }
-  }
+    },
+  },
 })
 
 NamedStruct.displayName = 'NamedStruct'
@@ -41,8 +41,8 @@ const NamedUnion = Union(Int, String, Float, {
     a: Int,
     nest: {
       b: Float,
-    }
-  }
+    },
+  },
 })
 
 NamedUnion.displayName = 'NamedUnion'
@@ -63,22 +63,27 @@ const NamedIntersect = Intersect(
       a: Int,
       nest: {
         b: Float,
-      }
-    }
-  }
+      },
+    },
+  },
 )
 
 NamedIntersect.displayName = 'NamedIntersect'
 
-const NamedTuple = Tuple({ a: Int }, { b: Float }, { c: Number }, {
-  named: String,
-  nest: {
-    a: Int,
+const NamedTuple = Tuple(
+  { a: Int },
+  { b: Float },
+  { c: Number },
+  {
+    named: String,
     nest: {
-      b: Float,
-    }
-  }
-})
+      a: Int,
+      nest: {
+        b: Float,
+      },
+    },
+  },
+)
 
 NamedTuple.displayName = 'NamedTuple'
 
@@ -113,8 +118,8 @@ class Collection extends ObjectType {
       a: Int,
       nest: {
         b: Float,
-      }
-    }
+      },
+    },
   })
   union = Union(Int, String, Boolean)
   intersect = Intersect(
@@ -149,8 +154,8 @@ const methodA = Api(
         a: Int,
         nest: {
           b: Float,
-        }
-      }
+        },
+      },
     }),
     output: Collection,
   },
@@ -168,8 +173,8 @@ const methodB = Api(
         a: Int,
         nest: {
           b: Float,
-        }
-      }
+        },
+      },
     }),
   },
   () => {
@@ -184,8 +189,8 @@ const entries = {
     methodA,
     nest: {
       methodB,
-    }
-  }
+    },
+  },
 }
 
 describe('generateApi', () => {
@@ -195,7 +200,7 @@ describe('generateApi', () => {
     const source = codegen(formatResult, {})
 
     const expected = await fs.readFile(`${__dirname}/expected/01.ts`)
-    
+
     // debug
     // fs.writeFile(`${__dirname}/expected/01.ts`, source)
 

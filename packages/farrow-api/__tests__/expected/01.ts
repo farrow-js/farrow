@@ -154,6 +154,7 @@ export type ApiClientLoaderInput = {
 export interface ApiClientLoaderOptions {
   batch?: boolean
   stream?: boolean
+  cache?: boolean
 }
 
 export type ApiClientOptions = {

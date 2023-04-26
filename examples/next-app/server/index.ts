@@ -20,7 +20,7 @@ http.useLazy(async () => {
   await app.prepare()
   return () => {
     return Response.custom(async ({ req, res }) => {
-      const parsedUrl = parseUrl(req.url, true)
+      const parsedUrl = parseUrl(req.url ?? '', true)
       await handle(req, res, parsedUrl)
     })
   }

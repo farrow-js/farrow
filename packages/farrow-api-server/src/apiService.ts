@@ -11,7 +11,7 @@ import {
   SingleCalling,
   BatchCalling,
   StreamCalling,
-  StreamApiSingleResponse,
+  ApiStreamSingleResponse,
   ApiSingleResponse,
   ApiBatchResponse,
 } from './apiResponse'
@@ -46,13 +46,6 @@ const getErrorMessage = (error: ValidationError) => {
   }
 
   return message
-}
-
-export const getIntrospectionUrl = (url: string) => {
-  if (!url.endsWith('/')) {
-    url = `${url}/`
-  }
-  return `${url}__introspection__`
 }
 
 export type CreateApiServiceOptions = {
@@ -199,9 +192,8 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
     const callings = streamCalling.callings
 
     return Response.custom(async ({ res }) => {
-      const send = (chunk: StreamApiSingleResponse) => {
-        res.write(JSON.stringify(chunk))
-        res.write('\n')
+      const send = (chunk: ApiStreamSingleResponse) => {
+        res.write(JSON.stringify(chunk) + '\n')
       }
 
       res.writeHead(200, {
@@ -210,7 +202,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
 
       await Promise.all(callings.map(async (calling, index) => {
         const result = await handleSingleCalling(calling)
-        send(StreamApiSingleResponse(index, result))
+        send(ApiStreamSingleResponse(index, result))
       }))
 
       res.end()

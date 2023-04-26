@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Index } from './Controller'
-import { api as TodoApi, Todo } from '../../api/todo'
+import { Todo } from '../../api/todo'
 import router from 'next/router'
 import { Module, createProvider, Container, useQueryChangedEffect } from 'farrow-next'
+import { TodoApi } from '../../apis'
 
 export const View = () => {
   const indexCtrl = Index.use()

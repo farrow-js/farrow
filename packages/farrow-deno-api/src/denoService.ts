@@ -1,4 +1,4 @@
-import { Response, RouterPipeline } from 'farrow-http'
+import { Response, route, Router, RouterPipeline } from 'farrow-http'
 import { ApiEntries } from 'farrow-api'
 import { codegen, CodegenOptions } from 'farrow-api/dist/codegen'
 import { toJSON } from 'farrow-api/src/toJSON'
@@ -14,7 +14,7 @@ export const createDenoService = (options: CreateDenoServiceOptions): RouterPipe
   const { entries, namespace = 'client' } = options
   const path = `/${namespace}.ts`
 
-  const service = ApiService({ entries })
+  const service = Router()
 
   service.route(path).use(() => {
     const formatResult = toJSON(entries)
@@ -24,6 +24,8 @@ export const createDenoService = (options: CreateDenoServiceOptions): RouterPipe
 
     return Response.text(source)
   })
+
+  service.use(ApiService({ entries }))
 
   return service
 }

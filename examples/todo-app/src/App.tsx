@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import logo from './logo.svg'
 import './App.css'
-import { api as TodoApi, Todo } from './api/todo'
+import { Todo } from './api/todo'
+import { TodoApi } from './apis'
 
 function App() {
   const [count, setCount] = useState(110)
@@ -9,6 +10,9 @@ function App() {
 
   useEffect(() => {
     const task = async () => {
+      TodoApi.longTask({}, {
+        cache: false,
+      })
       const result = await TodoApi.addTodo({
         content: `count:${count}`,
       })
@@ -20,6 +24,7 @@ function App() {
   }, [count])
 
   useEffect(() => {
+    TodoApi.longTask({})
     TodoApi.addTodo({
       content: `batch:0`,
     })

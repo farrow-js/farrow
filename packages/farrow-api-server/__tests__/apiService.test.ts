@@ -1,8 +1,18 @@
 import request from 'supertest'
-import { Int, ObjectType, Type } from 'farrow-schema'
+import { Int, Literal, ObjectType, Type } from 'farrow-schema'
 import { Http, HttpPipelineOptions } from 'farrow-http'
 import { Api } from 'farrow-api'
+import fetch from 'node-fetch'
 import { ApiService } from '../src/apiService'
+
+let portUid = 3000
+
+
+const delay = (ms: number) => {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms)
+  })
+}
 
 const createHttp = (options?: HttpPipelineOptions) => {
   return Http({
@@ -11,22 +21,25 @@ const createHttp = (options?: HttpPipelineOptions) => {
   })
 }
 
-class CountState extends ObjectType {
-  count = {
-    description: 'count of counter',
-    [Type]: Int,
-  }
-}
-
 let count = 0
 
 const getCount = Api(
   {
     input: {},
-    output: CountState,
+    output: {
+      from: {
+        description: 'from',
+        [Type]: Literal('getCount'),
+      },
+      count: {
+        description: 'count of counter',
+        [Type]: Int,
+      },
+    },
   },
   () => {
     return {
+      from: 'getCount' as const,
       count,
     }
   },
@@ -40,11 +53,24 @@ const setCount = Api(
         [Type]: Int,
       },
     },
-    output: CountState,
+    output: {
+      from: {
+        description: 'from',
+        [Type]: Literal('setCount'),
+      },
+      count: {
+        description: 'count of counter',
+        [Type]: Int,
+      },
+    },
   },
-  (input) => {
+  async (input) => {
+    await delay(10)
     count = input.newCount
-    return getCount({})
+    return {
+      from: 'setCount' as const,
+      count,
+    }
   },
 )
 
@@ -85,89 +111,116 @@ describe('ApiService', () => {
 
     await request(server)
       .get('/counter/__introspection__')
-      // .expect((res) => {
-      //   console.log('res', JSON.stringify(res.body, null, 2))
-      // })
+      .expect((res) => {
+        console.log('res', JSON.stringify(res.body, null, 2))
+      })
       .expect(200, {
-        protocol: 'Farrow-API',
-        types: {
-          '0': {
-            type: 'Struct',
-            fields: {},
+        "protocol": "Farrow-API",
+        "types": {
+          "0": {
+            "type": "Struct",
+            "fields": {}
           },
-          '1': {
-            type: 'Object',
-            name: 'CountState',
-            fields: {
-              count: {
-                typeId: 2,
-                $ref: '#/types/2',
-                description: 'count of counter',
+          "1": {
+            "type": "Struct",
+            "fields": {
+              "from": {
+                "typeId": 2,
+                "$ref": "#/types/2",
+                "description": "from"
               },
-            },
+              "count": {
+                "typeId": 3,
+                "$ref": "#/types/3",
+                "description": "count of counter"
+              }
+            }
           },
-          '2': {
-            type: 'Scalar',
-            valueType: 'number',
-            valueName: 'Int',
+          "2": {
+            "type": "Literal",
+            "value": "getCount"
           },
-          '3': {
-            type: 'Struct',
-            fields: {
-              newCount: {
-                typeId: 2,
-                $ref: '#/types/2',
-                description: 'new count value',
+          "3": {
+            "type": "Scalar",
+            "valueType": "number",
+            "valueName": "Int"
+          },
+          "4": {
+            "type": "Struct",
+            "fields": {
+              "newCount": {
+                "typeId": 3,
+                "$ref": "#/types/3",
+                "description": "new count value"
+              }
+            }
+          },
+          "5": {
+            "type": "Struct",
+            "fields": {
+              "from": {
+                "typeId": 6,
+                "$ref": "#/types/6",
+                "description": "from"
               },
-            },
+              "count": {
+                "typeId": 3,
+                "$ref": "#/types/3",
+                "description": "count of counter"
+              }
+            }
           },
-          '4': {
-            type: 'Struct',
-            fields: {},
+          "6": {
+            "type": "Literal",
+            "value": "setCount"
           },
-          '5': {
-            type: 'Struct',
-            fields: {},
+          "7": {
+            "type": "Struct",
+            "fields": {}
           },
+          "8": {
+            "type": "Struct",
+            "fields": {}
+          }
         },
-        entries: {
-          type: 'Entries',
-          entries: {
-            getCount: {
-              type: 'Api',
-              input: {
-                typeId: 0,
-                $ref: '#/types/0',
+        "entries": {
+          "type": "Entries",
+          "entries": {
+            "getCount": {
+              "type": "Api",
+              "input": {
+                "typeId": 0,
+                "$ref": "#/types/0"
               },
-              output: {
-                typeId: 1,
-                $ref: '#/types/1',
-              },
+              "output": {
+                "typeId": 1,
+                "$ref": "#/types/1"
+              }
             },
-            setCount: {
-              type: 'Api',
-              input: {
-                typeId: 3,
-                $ref: '#/types/3',
+            "setCount": {
+              "type": "Api",
+              "input": {
+                "typeId": 4,
+                "$ref": "#/types/4"
               },
-              output: {
-                typeId: 1,
-                $ref: '#/types/1',
-              },
+              "output": {
+                "typeId": 5,
+                "$ref": "#/types/5"
+              }
             },
-            triggerError: {
-              type: 'Api',
-              input: {
-                typeId: 4,
-                $ref: '#/types/4',
+            "triggerError": {
+              "type": "Api",
+              "input": {
+                "typeId": 7,
+                "$ref": "#/types/7"
               },
-              output: {
-                typeId: 5,
-                $ref: '#/types/5',
-              },
-            },
-          },
-        },
+              "output": {
+                "typeId": 8,
+                "$ref": "#/types/8"
+              }
+            }
+          }
+        }
       })
   })
 
@@ -195,12 +248,14 @@ describe('ApiService', () => {
     await request(server)
       .post('/counter')
       .send({
+        type: 'Single',
         path: ['getCount'],
         input: {},
       })
       .expect(200, {
         type: 'ApiSingleSuccessResponse',
         output: {
+          from: 'getCount',
           count: 0,
         },
       })
@@ -208,6 +263,7 @@ describe('ApiService', () => {
     await request(server)
       .post('/counter')
       .send({
+        type: 'Single',
         path: ['setCount'],
         input: {
           newCount: 10,
@@ -216,6 +272,7 @@ describe('ApiService', () => {
       .expect(200, {
         type: 'ApiSingleSuccessResponse',
         output: {
+          from: 'setCount',
           count: 10,
         },
       })
@@ -223,12 +280,14 @@ describe('ApiService', () => {
     await request(server)
       .post('/counter')
       .send({
+        type: 'Single',
         path: ['getCount'],
         input: {},
       })
       .expect(200, {
         type: 'ApiSingleSuccessResponse',
         output: {
+          from: 'getCount',
           count: 10,
         },
       })
@@ -243,6 +302,7 @@ describe('ApiService', () => {
     await request(server)
       .post('/counter')
       .send({
+        type: 'Single',
         path: ['triggerError'],
         input: {},
       })
@@ -263,13 +323,14 @@ describe('ApiService', () => {
     await request(server)
       .post('/counter')
       .send({
+        type: 'Single',
         path: ['nonExisted'],
         input: {},
       })
       .expect(200, {
         type: 'ApiErrorResponse',
         error: {
-          message: 'The target API was not found with the path: [nonExisted]',
+          message: 'The target API was not found with the path: ["nonExisted"]',
         },
       })
   })
@@ -283,6 +344,7 @@ describe('ApiService', () => {
     await request(server)
       .post('/counter')
       .send({
+        type: 'Single',
         path: ['setCount'],
         input: {
           newCount: false,
@@ -308,16 +370,19 @@ describe('ApiService', () => {
         type: 'Batch',
         callings: [
           {
+            type: 'Single',
             path: ['getCount'],
             input: {},
           },
           {
+            type: 'Single',
             path: ['setCount'],
             input: {
               newCount: 10,
             },
           },
           {
+            type: 'Single',
             path: ['getCount'],
             input: {},
           },
@@ -329,22 +394,109 @@ describe('ApiService', () => {
           {
             type: 'ApiSingleSuccessResponse',
             output: {
+              from: 'getCount',
               count: 0,
             },
           },
           {
             type: 'ApiSingleSuccessResponse',
             output: {
+              from: 'setCount',
               count: 10,
             },
           },
           {
             type: 'ApiSingleSuccessResponse',
             output: {
-              count: 10,
+              from: 'getCount',
+              count: 0,
             },
           },
         ],
       })
+  })
+
+
+  it('supports streaming batch calling api', async () => {
+    const http = createHttp()
+    const server = http.server()
+    const port = portUid++
+    const url = `http://localhost:${port}/counter`
+
+    http.route('/counter').use(CounterService)
+
+    await new Promise<void>(resolve => {
+      server.listen(port, resolve)
+    })
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        type: 'Stream',
+        callings: [
+          {
+            type: 'Single',
+            path: ['getCount'],
+            input: {},
+          },
+          {
+            type: 'Single',
+            path: ['setCount'],
+            input: {
+              newCount: 10,
+            },
+          },
+          {
+            type: 'Single',
+            path: ['getCount'],
+            input: {},
+          },
+        ],
+      })
+    })
+
+    if (!response.body) {
+      throw new Error('response body is not readable')
+    }
+
+    const text = await response.text()
+
+    console.log('text', text)
+
+    expect(text).toBe([
+      {
+        type: 'ApiSingleSuccessResponse',
+        output: {
+          from: 'getCount',
+          count: 0,
+        },
+        index: 0
+      },
+      {
+        type: 'ApiSingleSuccessResponse',
+        output: {
+          from: 'getCount',
+          count: 0,
+        },
+        index: 2
+      },
+      {
+        type: 'ApiSingleSuccessResponse',
+        output: {
+          from: 'setCount',
+          count: 10,
+        },
+        index: 1
+      },
+    ].map(item => JSON.stringify(item) + '\n').join(''))
+
+
+    await new Promise(resolve => {
+      server.close(resolve)
+    })
+
   })
 })

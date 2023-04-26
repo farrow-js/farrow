@@ -202,7 +202,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
       await Promise.all(
         callings.map(async (calling, index) => {
           const result = await handleSingleCalling(calling)
-          send(StreamApiSingleResponse(index, result))
+          send(ApiStreamSingleResponse(index, result))
         }),
       )
 

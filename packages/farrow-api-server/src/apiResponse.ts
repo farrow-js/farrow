@@ -56,6 +56,7 @@ export type ApiSingleResponse = ApiSingleSuccessResponse | ApiErrorResponse
 
 export type ApiStreamSingleResponse = ApiSingleResponse & { index: number }
 
+
 export const ApiStreamSingleResponse = (index: number, response: ApiSingleResponse,): ApiStreamSingleResponse => {
   return {
     ...response,

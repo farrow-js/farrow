@@ -344,6 +344,7 @@ importers:
       '@types/node-fetch': 2.6.2
       '@types/shelljs': 0.8.11
       '@types/supertest': 2.0.12
+      farrow-http: link:../farrow-http
       jest: 27.5.1
       shelljs: 0.8.5
       supertest: 6.3.3

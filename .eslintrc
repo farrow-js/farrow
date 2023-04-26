@@ -11,6 +11,11 @@
       "jsx": true
     }
   },
+  "settings": {
+    "jest": {
+      "version": 27
+    }
+  },
   "plugins": ["jest", "prefer-let", "prettier", "@typescript-eslint"],
   "rules": {
     "react/prop-types": "off",

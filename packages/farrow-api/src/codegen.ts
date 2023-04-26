@@ -92,7 +92,9 @@ export const getFieldType = (typeId: number, types: FormatTypes, indent = 2): st
   }
 
   if (fieldType.type === 'Struct') {
-    return `{\n${applyIndentForEachLine(getFieldsType(fieldType.fields, types).join(',\n'), indent)}\n${' '.repeat(indent - 2)}}`
+    return `{\n${applyIndentForEachLine(getFieldsType(fieldType.fields, types).join(',\n'), indent)}\n${' '.repeat(
+      indent - 2,
+    )}}`
   }
 
   if (
@@ -129,17 +131,16 @@ export const getFieldsType = (fields: FormatFields, types: FormatTypes): string[
   })
 }
 
-
 export type CodegenOptions = {
   /**
    * emit ApiClient or not
    * default: true
-  */
+   */
   apiClient?: boolean
 
   /**
    * add ts-nocheck or not
-  */
+   */
   noCheck?: boolean | string
 }
 
@@ -203,7 +204,7 @@ ${applyIndentForEachLine(fields.join(',\n'), 2)}
  * @label ${typeName}
 */
 export type ${typeName} =
-${applyIndentForEachLine(expression.map(item => `| ${item}`).join('\n'), 2)}
+${applyIndentForEachLine(expression.map((item) => `| ${item}`).join('\n'), 2)}
       `
 
       return source.trim()
@@ -217,7 +218,7 @@ ${applyIndentForEachLine(expression.map(item => `| ${item}`).join('\n'), 2)}
  * @label ${typeName}
 */
 export type ${typeName} =
-${applyIndentForEachLine(expression.map(item => `& ${item}`).join('\n'), 2)}
+${applyIndentForEachLine(expression.map((item) => `& ${item}`).join('\n'), 2)}
 `
 
       return source.trim()
@@ -252,35 +253,37 @@ ${applyIndentForEachLine(expression.join(',\n'), 2)}
     return result
   }
 
-  const typeDeclarations = [
-    JSON_TYPE_DECLARATION,
-    ...handleTypeDeclarations(formatResult.types)
-  ]
+  const typeDeclarations = [JSON_TYPE_DECLARATION, ...handleTypeDeclarations(formatResult.types)]
 
   const variableDeclarations: string[] = []
 
   if (options?.apiClient !== false) {
-
-    typeDeclarations.push(`
+    typeDeclarations.push(
+      `
 export type ApiClientLoaderInput = {
   path: string[]
   input: JsonType
 }
-`.trim())
+`.trim(),
+    )
 
-    typeDeclarations.push(`
+    typeDeclarations.push(
+      `
 export interface ApiClientLoaderOptions {
   batch?: boolean
   stream?: boolean
   cache?: boolean
 }
-`.trim())
+`.trim(),
+    )
 
-    typeDeclarations.push(`
+    typeDeclarations.push(
+      `
 export type ApiClientOptions = {
   loader: (input: ApiClientLoaderInput, options?: ApiClientLoaderOptions) => Promise<JsonType>
 }
-`.trim())
+`.trim(),
+    )
 
     const handleApi = (api: FormatApi, path: string[]) => {
       const inputType = getFieldType(api.input.typeId, formatResult.types)
@@ -289,7 +292,7 @@ export type ApiClientOptions = {
 (input: ${inputType}, loaderOptions?: ApiClientLoaderOptions) => {
   return options.loader(
     {
-      path: [${path.map(item => `'${item}'`).join(', ')}],
+      path: [${path.map((item) => `'${item}'`).join(', ')}],
       input: input as JsonType,
     },
     loaderOptions
@@ -322,11 +325,13 @@ export type ApiClientOptions = {
       return `{\n${applyIndentForEachLine(fields.join(',\n'), indent)}\n${' '.repeat(indent - 2)}}`
     }
 
-    variableDeclarations.push(`
+    variableDeclarations.push(
+      `
 export const createApiClient = (options: ApiClientOptions) => {
   return ${handleEntries(formatResult.entries, [], 4)}
 }
-`.trim())
+`.trim(),
+    )
   }
 
   let source = [PREFIX_COMMENT, ...typeDeclarations, ...variableDeclarations].join('\n\n')

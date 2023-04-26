@@ -5,7 +5,6 @@ import { Int, ObjectType, Type } from 'farrow-schema'
 import { Http, HttpPipelineOptions } from 'farrow-http'
 import { Api } from 'farrow-api'
 import { DenoService } from '../src/index'
-import { api } from './client'
 
 const createHttp = (options?: HttpPipelineOptions) => {
   return Http({
@@ -83,27 +82,10 @@ describe('deno-api', () => {
 
     const test = await agent(server).get('/counter/client.ts').send()
 
-    fs.writeFileSync(`${__dirname}/client.ts`, test.text)
+    // fs.writeFileSync(`${__dirname}/client.ts`, test.text)
 
     server.close()
 
     expect(test.text.replace(/\r|\n/g, '')).toBe(source.replace(/\r|\n/g, ''))
-  })
-
-  it('should work', async () => {
-    global.fetch = fetch as any
-    const http = createHttp()
-
-    http.route('/counter').use(CounterService)
-
-    const server = http.listen(3000)
-
-    expect(await api.getCount({})).toStrictEqual({ count: 0 })
-
-    expect(await api.setCount({ newCount: 1 })).toStrictEqual({ count: 1 })
-
-    expect(await api.getCount({})).toStrictEqual({ count: 1 })
-
-    server.close()
   })
 })

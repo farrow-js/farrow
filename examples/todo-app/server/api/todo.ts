@@ -101,9 +101,33 @@ export const removeTodo = Api(
   },
 )
 
+
+export const longTask = Api(
+  {
+    description: 'long task',
+    input: {},
+    output: {
+      time: {
+        description: 'time cost',
+        [Type]: Number,
+      }
+    },
+  },
+  async () => {
+    const time = 5000 + Math.random() * 1000
+    await new Promise((resolve) => {
+      setTimeout(resolve, time)
+    })
+    return {
+      time: time,
+    }
+  },
+)
+
 export const entries = {
   addTodo,
   removeTodo,
+  longTask,
 }
 
 export const service = ApiService({

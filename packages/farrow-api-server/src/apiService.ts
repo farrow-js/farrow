@@ -11,7 +11,7 @@ import {
   SingleCalling,
   BatchCalling,
   StreamCalling,
-  StreamApiSingleResponse,
+  ApiStreamSingleResponse,
   ApiSingleResponse,
   ApiBatchResponse,
 } from './apiResponse'
@@ -46,13 +46,6 @@ const getErrorMessage = (error: ValidationError) => {
   }
 
   return message
-}
-
-export const getIntrospectionUrl = (url: string) => {
-  if (!url.endsWith('/')) {
-    url = `${url}/`
-  }
-  return `${url}__introspection__`
 }
 
 export type CreateApiServiceOptions = {
@@ -115,7 +108,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
   router.use((request, next) => {
     if (isIntrospectionRequest(request)) {
       if (config.introspection) {
-        return Response.json(getIntrospection())
+        return Response.type('json').string(getIntrospection())
       }
 
       return Response.status(404).text('Not Found.')
@@ -198,9 +191,8 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
     const callings = streamCalling.callings
 
     return Response.custom(async ({ res }) => {
-      const send = (chunk: StreamApiSingleResponse) => {
-        res.write(JSON.stringify(chunk))
-        res.write('\n')
+      const send = (chunk: ApiStreamSingleResponse) => {
+        res.write(JSON.stringify(chunk) + '\n')
       }
 
       res.writeHead(200, {

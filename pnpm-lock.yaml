@@ -1,4 +1,4 @@
-lockfileVersion: 5.3
+lockfileVersion: 5.4
 
 importers:
 
@@ -31,14 +31,14 @@ importers:
       '@swc/core': 1.3.32
       '@swc/jest': 0.2.24_@swc+core@1.3.32
       '@types/jest': 29.4.0
-      '@typescript-eslint/eslint-plugin': 4.33.0_96a109dcf9607f5a1aa576228794cffa
-      '@typescript-eslint/parser': 4.33.0_eslint@7.32.0+typescript@4.9.5
+      '@typescript-eslint/eslint-plugin': 4.33.0_s2qqtxhzmb7vugvfoyripfgp7i
+      '@typescript-eslint/parser': 4.33.0_jofidmxrjzhj7l6vknpw5ecvfe
       codecov: 3.8.3
       eslint: 7.32.0
       eslint-config-prettier: 7.2.0_eslint@7.32.0
-      eslint-plugin-jest: 24.7.0_09628491bd6407928432346ac0f1fa3e
+      eslint-plugin-jest: 24.7.0_bfrijen5mqdzfbbsgrvmb4p2hy
       eslint-plugin-prefer-let: 1.1.0
-      eslint-plugin-prettier: 3.4.1_d6a17c849c8dc32861442ce6b773938e
+      eslint-plugin-prettier: 3.4.1_22qxzbe4rxbsqykefttlo44try
       eslint-plugin-react: 7.32.2_eslint@7.32.0
       husky: 8.0.3
       lint-staged: 13.1.1
@@ -131,7 +131,7 @@ importers:
       farrow-next: link:../../packages/farrow-next
       farrow-pipeline: link:../../packages/farrow-pipeline
       farrow-schema: link:../../packages/farrow-schema
-      next: 11.1.4_3ae592f43bf19d3f10632f0218469b0e
+      next: 11.1.4_hlszf5b36got6eddf4bbqru3by
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
     devDependencies:
@@ -225,7 +225,7 @@ importers:
       farrow-next: link:../../../farrow-next
       farrow-next-server: link:../../../farrow-next-server
       farrow-schema: link:../../../farrow-schema
-      next: 11.1.4_3ae592f43bf19d3f10632f0218469b0e
+      next: 11.1.4_hlszf5b36got6eddf4bbqru3by
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
     devDependencies:
@@ -330,6 +330,7 @@ importers:
       esbuild-node-externals: 1.6.0_esbuild@0.14.54
       execa: 5.1.1
       farrow-api: link:../farrow-api
+      farrow-http: link:../farrow-http
       fs-extra: 9.1.0
       leven: 3.1.0
       node-fetch: 2.6.9
@@ -347,7 +348,7 @@ importers:
       jest: 27.5.1
       shelljs: 0.8.5
       supertest: 6.3.3
-      ts-jest: 27.1.5_8015597e45904f8f9a628c931d3eecf9
+      ts-jest: 27.1.5_qakvs7sfsbhy7gtcrsjr2pxm7e
       typescript: 4.9.5
 
   packages/farrow-api:
@@ -366,38 +367,43 @@ importers:
     devDependencies:
       '@types/jest': 27.5.2
       jest: 27.5.1
-      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
+      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
       typescript: 4.9.5
 
   packages/farrow-api-client:
     specifiers:
       '@types/jest': ^27.0.1
-      dataloader: ^2.0.0
-      farrow-api-server: ^2.0.1
-      farrow-pipeline: ^2.0.1
+      '@types/node-fetch': ^2.5.8
+      farrow-api: workspace:^2.0.1
+      farrow-api-server: workspace:^2.0.1
+      farrow-http: workspace:^2.0.1
+      farrow-schema: workspace:^2.0.1
       isomorphic-unfetch: ^3.1.0
       jest: ^27.2.2
-      setimmediate: ^1.0.5
+      node-fetch: '2'
       ts-jest: ^27.0.5
       tslib: ^2.1.0
       typescript: ^4.5.4
     dependencies:
-      dataloader: 2.2.1
-      farrow-pipeline: link:../farrow-pipeline
       isomorphic-unfetch: 3.1.0
-      setimmediate: 1.0.5
       tslib: 2.5.0
     devDependencies:
       '@types/jest': 27.5.2
+      '@types/node-fetch': 2.6.2
+      farrow-api: link:../farrow-api
       farrow-api-server: link:../farrow-api-server
+      farrow-http: link:../farrow-http
+      farrow-schema: link:../farrow-schema
       jest: 27.5.1
-      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
+      node-fetch: 2.6.9
+      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
       typescript: 4.9.5
 
   packages/farrow-api-server:
     specifiers:
       '@types/jest': ^27.0.1
       '@types/lodash.get': ^4.4.6
+      '@types/node-fetch': ^2.5.8
       '@types/supertest': ^2.0.10
       farrow-api: ^2.0.1
       farrow-api-client: ^2.0.1
@@ -405,6 +411,7 @@ importers:
       farrow-schema: ^2.0.1
       jest: ^27.2.2
       lodash.get: ^4.4.2
+      node-fetch: ^2.6.9
       supertest: ^6.1.6
       ts-jest: ^27.0.5
       tslib: ^2.1.0
@@ -418,11 +425,13 @@ importers:
     devDependencies:
       '@types/jest': 27.5.2
       '@types/lodash.get': 4.4.7
+      '@types/node-fetch': 2.6.2
       '@types/supertest': 2.0.12
       farrow-api-client: link:../farrow-api-client
       jest: 27.5.1
+      node-fetch: 2.6.9
       supertest: 6.3.3
-      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
+      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
       typescript: 4.9.5
 
   packages/farrow-cors:
@@ -449,7 +458,7 @@ importers:
       farrow-http: link:../farrow-http
       jest: 27.5.1
       supertest: 6.3.3
-      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
+      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
       typescript: 4.9.5
 
   packages/farrow-deno-api:
@@ -479,7 +488,7 @@ importers:
       jest: 27.5.1
       node-fetch: 2.6.9
       supertest: 6.3.3
-      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
+      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
       tslib: 2.5.0
       typescript: 4.9.5
 
@@ -509,7 +518,7 @@ importers:
       farrow-schema: link:../farrow-schema
       jest: 27.5.1
       supertest: 6.3.3
-      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
+      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
       typescript: 4.9.5
 
   packages/farrow-federation:
@@ -543,7 +552,7 @@ importers:
       farrow-http: link:../farrow-http
       jest: 27.5.1
       supertest: 6.3.3
-      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
+      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
       tslib: 2.5.0
       typescript: 4.9.5
 
@@ -631,7 +640,7 @@ importers:
       '@types/vary': 1.1.0
       jest: 27.5.1
       supertest: 6.3.3
-      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
+      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
       typescript: 4.9.5
 
   packages/farrow-json-schema:
@@ -652,7 +661,7 @@ importers:
       '@types/json-schema': 7.0.11
       farrow-api: link:../farrow-api
       jest: 27.5.1
-      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
+      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
       typescript: 4.9.5
 
   packages/farrow-koa:
@@ -681,7 +690,7 @@ importers:
       jest: 27.5.1
       koa: 2.14.1
       supertest: 6.3.3
-      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
+      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
       typescript: 4.9.5
 
   packages/farrow-module:
@@ -696,7 +705,7 @@ importers:
     devDependencies:
       '@types/jest': 27.5.2
       jest: 27.5.1
-      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
+      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
       typescript: 4.9.5
 
   packages/farrow-next:
@@ -742,10 +751,10 @@ importers:
       '@types/react-dom': 17.0.18
       '@types/redux-logger': 3.0.9
       jest: 27.5.1
-      next: 11.1.4_3ae592f43bf19d3f10632f0218469b0e
+      next: 11.1.4_hlszf5b36got6eddf4bbqru3by
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
-      ts-jest: 27.1.5_4eb4bcb919244faf60f7dc66e85e9fec
+      ts-jest: 27.1.5_j22lzoizerh26yhx3rtoqxu75q
       typescript: 4.9.5
 
   packages/farrow-next-server:
@@ -766,7 +775,7 @@ importers:
       '@types/react': 17.0.53
       '@types/react-dom': 17.0.18
       farrow-http: link:../farrow-http
-      next: 12.3.4_4a28f786311be1243853904171acb4e1
+      next: 12.3.4_jiuppbrrdpqsioctsbaxdlfu4e
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       typescript: 4.9.5
@@ -783,7 +792,7 @@ importers:
     devDependencies:
       '@types/jest': 27.5.2
       jest: 27.5.1
-      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
+      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
       typescript: 4.9.5
 
   packages/farrow-react:
@@ -816,7 +825,7 @@ importers:
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
       supertest: 6.3.3
-      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
+      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
       typescript: 4.9.5
 
   packages/farrow-schema:
@@ -831,7 +840,7 @@ importers:
     devDependencies:
       '@types/jest': 27.5.2
       jest: 27.5.1
-      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
+      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
       typescript: 4.9.5
 
   packages/farrow-vite:
@@ -853,7 +862,7 @@ importers:
       farrow-http: link:../farrow-http
       jest: 27.5.1
       supertest: 6.3.3
-      ts-jest: 27.1.5_6f13976d17c734a28204acb9bb26fda2
+      ts-jest: 27.1.5_n4jzo3ixy42kfaqevs43wjx5ui
       typescript: 4.9.5
       vite: 2.6.14
 
@@ -1799,7 +1808,7 @@ packages:
   /@next/polyfill-module/11.1.4:
     resolution: {integrity: sha512-CY3bOSQf9Dy3+34dFjFbOdg3DRXIGfujb54D/AVO83ajyQczRZ3xdU0i5VV0eSR6B56ktVy3/aelOffpTUq6LA==}
 
-  /@next/react-dev-overlay/11.1.4_react-dom@17.0.2+react@17.0.2:
+  /@next/react-dev-overlay/11.1.4_sfoxds7t5ydpegc3knd667wn6m:
     resolution: {integrity: sha512-8/9JflJwRXEvVb6cKCWgRTOmALzDJHpWD5diRbtXWsllqxcMBjtscgnO4PaK+9QyZnSYSUbn0zZUZvxOXOTE1Q==}
     peerDependencies:
       react: ^17.0.2
@@ -2543,7 +2552,7 @@ packages:
       '@types/yargs-parser': 21.0.0
     dev: true
 
-  /@typescript-eslint/eslint-plugin/4.33.0_96a109dcf9607f5a1aa576228794cffa:
+  /@typescript-eslint/eslint-plugin/4.33.0_s2qqtxhzmb7vugvfoyripfgp7i:
     resolution: {integrity: sha512-aINiAxGVdOl1eJyVjaWn/YcVAq4Gi/Yo35qHGCnqbWVz61g39D0h23veY/MA0rFFGfxK7TySg2uwDeNv+JgVpg==}
     engines: {node: ^10.12.0 || >=12.0.0}
     peerDependencies:
@@ -2554,8 +2563,8 @@ packages:
       typescript:
         optional: true
     dependencies:
-      '@typescript-eslint/experimental-utils': 4.33.0_eslint@7.32.0+typescript@4.9.5
-      '@typescript-eslint/parser': 4.33.0_eslint@7.32.0+typescript@4.9.5
+      '@typescript-eslint/experimental-utils': 4.33.0_jofidmxrjzhj7l6vknpw5ecvfe
+      '@typescript-eslint/parser': 4.33.0_jofidmxrjzhj7l6vknpw5ecvfe
       '@typescript-eslint/scope-manager': 4.33.0
       debug: 4.3.4
       eslint: 7.32.0
@@ -2569,7 +2578,7 @@ packages:
       - supports-color
     dev: true
 
-  /@typescript-eslint/experimental-utils/4.33.0_eslint@7.32.0+typescript@4.9.5:
+  /@typescript-eslint/experimental-utils/4.33.0_jofidmxrjzhj7l6vknpw5ecvfe:
     resolution: {integrity: sha512-zeQjOoES5JFjTnAhI5QY7ZviczMzDptls15GFsI6jyUOq0kOf9+WonkhtlIhh0RgHRnqj5gdNxW5j1EvAyYg6Q==}
     engines: {node: ^10.12.0 || >=12.0.0}
     peerDependencies:
@@ -2587,7 +2596,7 @@ packages:
       - typescript
     dev: true
 
-  /@typescript-eslint/parser/4.33.0_eslint@7.32.0+typescript@4.9.5:
+  /@typescript-eslint/parser/4.33.0_jofidmxrjzhj7l6vknpw5ecvfe:
     resolution: {integrity: sha512-ZohdsbXadjGBSK0/r+d87X0SBmKzOq4/S5nzK6SBgJspFo9/CUDJ7hjayuze+JK7CZQLDMroqytp7pOcFKTxZA==}
     engines: {node: ^10.12.0 || >=12.0.0}
     peerDependencies:
@@ -3055,6 +3064,8 @@ packages:
       raw-body: 2.5.1
       type-is: 1.6.18
       unpipe: 1.0.0
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /brace-expansion/1.1.11:
@@ -3728,10 +3739,6 @@ packages:
       whatwg-url: 8.7.0
     dev: true
 
-  /dataloader/2.2.1:
-    resolution: {integrity: sha512-Zn+tVZo1RKu120rgoe0JsRk56UiKdefPSH47QROJsMHrX8/S9UJvi5A/A6+Sbuk6rE88z5JoM/wIJ09Z7BTfYA==}
-    dev: false
-
   /date-fns/2.29.3:
     resolution: {integrity: sha512-dDCnyH2WnnKusqvZZ6+jA1O51Ibt8ZMRNkDZdyAyK4YfbDwa/cEmuztzG5pk6hqlp9aSBPYcjOlktquahGwGeA==}
     engines: {node: '>=0.11'}
@@ -3739,6 +3746,11 @@ packages:
 
   /debug/2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
+    peerDependencies:
+      supports-color: '*'
+    peerDependenciesMeta:
+      supports-color:
+        optional: true
     dependencies:
       ms: 2.0.0
 
@@ -4430,7 +4442,7 @@ packages:
       eslint: 7.32.0
     dev: true
 
-  /eslint-plugin-jest/24.7.0_09628491bd6407928432346ac0f1fa3e:
+  /eslint-plugin-jest/24.7.0_bfrijen5mqdzfbbsgrvmb4p2hy:
     resolution: {integrity: sha512-wUxdF2bAZiYSKBclsUMrYHH6WxiBreNjyDxbRv345TIvPeoCEgPNEn3Sa+ZrSqsf1Dl9SqqSREXMHExlMMu1DA==}
     engines: {node: '>=10'}
     peerDependencies:
@@ -4440,8 +4452,8 @@ packages:
       '@typescript-eslint/eslint-plugin':
         optional: true
     dependencies:
-      '@typescript-eslint/eslint-plugin': 4.33.0_96a109dcf9607f5a1aa576228794cffa
-      '@typescript-eslint/experimental-utils': 4.33.0_eslint@7.32.0+typescript@4.9.5
+      '@typescript-eslint/eslint-plugin': 4.33.0_s2qqtxhzmb7vugvfoyripfgp7i
+      '@typescript-eslint/experimental-utils': 4.33.0_jofidmxrjzhj7l6vknpw5ecvfe
       eslint: 7.32.0
     transitivePeerDependencies:
       - supports-color
@@ -4455,7 +4467,7 @@ packages:
       requireindex: 1.2.0
     dev: true
 
-  /eslint-plugin-prettier/3.4.1_d6a17c849c8dc32861442ce6b773938e:
+  /eslint-plugin-prettier/3.4.1_22qxzbe4rxbsqykefttlo44try:
     resolution: {integrity: sha512-htg25EUYUeIhKHXjOinK4BgCcDwtLHjqaxCDsMy5nbnUMkKFvIhMVCp+5GFUXQ4Nr8lBsPqtGAqBenbpFqAA2g==}
     engines: {node: '>=6.0.0'}
     peerDependencies:
@@ -4732,6 +4744,8 @@ packages:
       type-is: 1.6.18
       utils-merge: 1.0.1
       vary: 1.1.2
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /extendable-error/0.1.7:
@@ -4827,6 +4841,8 @@ packages:
       parseurl: 1.3.3
       statuses: 2.0.1
       unpipe: 1.0.0
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /find-cache-dir/3.3.1:
@@ -4990,6 +5006,8 @@ packages:
     resolution: {integrity: sha512-/pViTfifW+gBbh/RnlFYHINvELT9Znt+SYyDKAUL6uV6By019AK/s+i9XP4jSwq7lwP38Fd8HVeTxym3+hkwmQ==}
     dependencies:
       stream-parser: 0.3.1
+    transitivePeerDependencies:
+      - supports-color
 
   /get-package-type/0.1.0:
     resolution: {integrity: sha512-pjzuKtY64GYfWizNAJ0fr9VqttZkNiK2iS430LtIHzjBEr6bX8Am2zm4sW4Ro5wjWW5cAlRL1qAMTcXbjNAO2Q==}
@@ -6735,7 +6753,7 @@ packages:
     resolution: {integrity: sha512-+EUsqGPLsM+j/zdChZjsnX51g4XrHFOIXwfnCVPGlQk/k5giakcKsuxCObBRu6DSm9opw/O6slWbJdghQM4bBg==}
     engines: {node: '>= 0.6'}
 
-  /next/11.1.4_3ae592f43bf19d3f10632f0218469b0e:
+  /next/11.1.4_hlszf5b36got6eddf4bbqru3by:
     resolution: {integrity: sha512-GWQJrWYkfAKP8vmrzJcCfRSKv955Khyjqd5jipTcVKDGg+SH+NfjDMWFtCwArcQlHPvzisGu1ERLY0+Eoj7G+g==}
     engines: {node: '>=12.0.0'}
     hasBin: true
@@ -6757,7 +6775,7 @@ packages:
       '@hapi/accept': 5.0.2
       '@next/env': 11.1.4
       '@next/polyfill-module': 11.1.4
-      '@next/react-dev-overlay': 11.1.4_react-dom@17.0.2+react@17.0.2
+      '@next/react-dev-overlay': 11.1.4_sfoxds7t5ydpegc3knd667wn6m
       '@next/react-refresh-utils': 11.1.4_react-refresh@0.8.3
       '@node-rs/helper': 1.2.1
       assert: 2.0.0
@@ -6798,7 +6816,7 @@ packages:
       stream-browserify: 3.0.0
       stream-http: 3.1.1
       string_decoder: 1.3.0
-      styled-jsx: 4.0.1_@babel+core@7.20.12+react@17.0.2
+      styled-jsx: 4.0.1_64k6h7xsf5jw26ymy7ush5uuyi
       timers-browserify: 2.0.12
       tty-browserify: 0.0.1
       use-subscription: 1.5.1_react@17.0.2
@@ -6812,10 +6830,11 @@ packages:
       '@next/swc-win32-x64-msvc': 11.1.4
     transitivePeerDependencies:
       - '@babel/core'
+      - supports-color
       - typescript
       - webpack
 
-  /next/12.3.4_4a28f786311be1243853904171acb4e1:
+  /next/12.3.4_jiuppbrrdpqsioctsbaxdlfu4e:
     resolution: {integrity: sha512-VcyMJUtLZBGzLKo3oMxrEF0stxh8HwuW976pAzlHhI3t8qJ4SROjCrSh1T24bhrbjw55wfZXAbXPGwPt5FLRfQ==}
     engines: {node: '>=12.22.0'}
     hasBin: true
@@ -6839,7 +6858,7 @@ packages:
       postcss: 8.4.14
       react: 17.0.2
       react-dom: 17.0.2_react@17.0.2
-      styled-jsx: 5.0.7_@babel+core@7.20.12+react@17.0.2
+      styled-jsx: 5.0.7_64k6h7xsf5jw26ymy7ush5uuyi
       use-sync-external-store: 1.2.0_react@17.0.2
     optionalDependencies:
       '@next/swc-android-arm-eabi': 12.3.4
@@ -7887,6 +7906,8 @@ packages:
       on-finished: 2.4.1
       range-parser: 1.2.1
       statuses: 2.0.1
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /serve-static/1.15.0:
@@ -7897,6 +7918,8 @@ packages:
       escape-html: 1.0.3
       parseurl: 1.3.3
       send: 0.18.0
+    transitivePeerDependencies:
+      - supports-color
     dev: true
 
   /set-blocking/2.0.0:
@@ -8157,6 +8180,8 @@ packages:
     resolution: {integrity: sha512-bJ/HgKq41nlKvlhccD5kaCr/P+Hu0wPNKPJOH7en+YrJu/9EgqUF+88w5Jb6KNcjOFMhfX4B2asfeAtIGuHObQ==}
     dependencies:
       debug: 2.6.9
+    transitivePeerDependencies:
+      - supports-color
 
   /stream-transform/2.1.3:
     resolution: {integrity: sha512-9GHUiM5hMiCi6Y03jD2ARC1ettBXkQBoQAe7nJsPknnI0ow10aXjTnew8QtYQmLjzn974BnmWEAJgCY6ZP1DeQ==}
@@ -8299,7 +8324,7 @@ packages:
     resolution: {integrity: sha512-PdHt7hHUJKxvTCgbKX9C1V/ftOcjJQgz8BZwNfV5c4B6dcGqlpelTbJ999jBGZ2jYiPAwcX5dP6oBwVlBlUbxw==}
     dev: true
 
-  /styled-jsx/4.0.1_@babel+core@7.20.12+react@17.0.2:
+  /styled-jsx/4.0.1_64k6h7xsf5jw26ymy7ush5uuyi:
     resolution: {integrity: sha512-Gcb49/dRB1k8B4hdK8vhW27Rlb2zujCk1fISrizCcToIs+55B4vmUM0N9Gi4nnVfFZWe55jRdWpAqH1ldAKWvQ==}
     engines: {node: '>= 12.0.0'}
     peerDependencies:
@@ -8320,7 +8345,7 @@ packages:
       stylis: 3.5.4
       stylis-rule-sheet: 0.0.10_stylis@3.5.4
 
-  /styled-jsx/5.0.7_@babel+core@7.20.12+react@17.0.2:
+  /styled-jsx/5.0.7_64k6h7xsf5jw26ymy7ush5uuyi:
     resolution: {integrity: sha512-b3sUzamS086YLRuvnaDigdAewz1/EFYlHpYBP5mZovKEdQQOIIYq8lApylub3HHZ6xFjV051kkGU7cudJmrXEA==}
     engines: {node: '>= 12.0.0'}
     peerDependencies:
@@ -8552,7 +8577,7 @@ packages:
     engines: {node: '>=8'}
     dev: true
 
-  /ts-jest/27.1.5_4eb4bcb919244faf60f7dc66e85e9fec:
+  /ts-jest/27.1.5_j22lzoizerh26yhx3rtoqxu75q:
     resolution: {integrity: sha512-Xv6jBQPoBEvBq/5i2TeSG9tt/nqkbpcurrEG1b+2yfBrcJelOZF9Ml6dmyMh7bcW9JyFbRYpR5rxROSlBLTZHA==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     hasBin: true
@@ -8587,7 +8612,7 @@ packages:
       yargs-parser: 20.2.9
     dev: true
 
-  /ts-jest/27.1.5_6f13976d17c734a28204acb9bb26fda2:
+  /ts-jest/27.1.5_n4jzo3ixy42kfaqevs43wjx5ui:
     resolution: {integrity: sha512-Xv6jBQPoBEvBq/5i2TeSG9tt/nqkbpcurrEG1b+2yfBrcJelOZF9Ml6dmyMh7bcW9JyFbRYpR5rxROSlBLTZHA==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     hasBin: true
@@ -8621,7 +8646,7 @@ packages:
       yargs-parser: 20.2.9
     dev: true
 
-  /ts-jest/27.1.5_8015597e45904f8f9a628c931d3eecf9:
+  /ts-jest/27.1.5_qakvs7sfsbhy7gtcrsjr2pxm7e:
     resolution: {integrity: sha512-Xv6jBQPoBEvBq/5i2TeSG9tt/nqkbpcurrEG1b+2yfBrcJelOZF9Ml6dmyMh7bcW9JyFbRYpR5rxROSlBLTZHA==}
     engines: {node: ^10.13.0 || ^12.13.0 || ^14.15.0 || >=15.0.0}
     hasBin: true
@@ -8795,7 +8820,6 @@ packages:
     resolution: {integrity: sha512-1FXk9E2Hm+QzZQ7z+McJiHL4NW1F2EzMu9Nq9i3zAaGqibafqYwCVU6WyWAuyQRRzOlxou8xZSyXLEN8oKj24g==}
     engines: {node: '>=4.2.0'}
     hasBin: true
-    dev: true
 
   /unbox-primitive/1.0.2:
     resolution: {integrity: sha512-61pPlCD9h51VoreyJ0BReideM3MDKMKnh6+V9L08331ipq6Q8OFXZYiqP6n/tbHx4s5I9uRhcye6BrbkizkBDw==}

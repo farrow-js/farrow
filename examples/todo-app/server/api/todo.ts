@@ -101,7 +101,6 @@ export const removeTodo = Api(
   },
 )
 
-
 export const longTask = Api(
   {
     description: 'long task',
@@ -110,7 +109,7 @@ export const longTask = Api(
       time: {
         description: 'time cost',
         [Type]: Number,
-      }
+      },
     },
   },
   async () => {

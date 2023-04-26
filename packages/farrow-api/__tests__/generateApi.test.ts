@@ -194,7 +194,7 @@ const entries = {
 }
 
 describe('generateApi', () => {
-  it('can disable emiting api-client', async () => {
+  it('can disable emitting api-client', async () => {
     const formatResult = toJSON(entries)
 
     const source = codegen(formatResult, {})

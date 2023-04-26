@@ -10,9 +10,12 @@ function App() {
 
   useEffect(() => {
     const task = async () => {
-      TodoApi.longTask({}, {
-        cache: false,
-      })
+      TodoApi.longTask(
+        {},
+        {
+          cache: false,
+        },
+      )
       const result = await TodoApi.addTodo({
         content: `count:${count}`,
       })

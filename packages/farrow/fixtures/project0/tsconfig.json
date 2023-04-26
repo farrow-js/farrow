@@ -22,7 +22,5 @@
       "path": "../farrow-schema/tsconfig.json"
     }
   ],
-  "include": [
-    "src"
-  ]
+  "include": ["src"]
 }

@@ -245,9 +245,9 @@ ${applyIndentForEachLine(expression.join(',\n'), 2)}
     const result = [] as string[]
     for (const key in formatTypes) {
       const formatType = formatTypes[key]
-      const formatedType = handleTypeDeclaration(formatType)
-      if (formatedType) {
-        result.push(formatedType)
+      const formattedType = handleTypeDeclaration(formatType)
+      if (formattedType) {
+        result.push(formattedType)
       }
     }
     return result
@@ -311,12 +311,14 @@ export type ApiClientOptions = {
           const sourceText = handleApi(field, [...path, key])
           const result = `${key}: ${sourceText}`
 
-          fields.push(attachComment(result, {
-            remarks: field.description,
-            deprecated: field.deprecated,
-            [`param input -`]: field.input.description,
-            returns: field.output.description,
-          }))
+          fields.push(
+            attachComment(result, {
+              remarks: field.description,
+              deprecated: field.deprecated,
+              [`param input -`]: field.input.description,
+              returns: field.output.description,
+            }),
+          )
         } else {
           fields.push(`${key}: ${handleEntries(field, [...path, key])}`)
         }

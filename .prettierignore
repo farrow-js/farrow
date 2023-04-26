@@ -4,3 +4,4 @@ dist
 esm
 packages/farrow-schema/src/formatter.ts
 packages/farrow-schema/src/validator.ts
+**/expected/**/*

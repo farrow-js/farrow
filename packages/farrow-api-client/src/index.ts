@@ -1,1 +1,1 @@
-export * from './farrow-api-client';
+export * from './farrow-api-client'

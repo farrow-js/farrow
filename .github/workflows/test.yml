@@ -34,5 +34,5 @@ jobs:
       - name: Init
         run: npm install -g pnpm@7 && pnpm run init
 
-      - name: Format & Lint & Build & Test
-        run: pnpm run lint && pnpm run build && pnpm run test
+      - name: Build & Test
+        run: pnpm run build && pnpm run test

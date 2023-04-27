@@ -146,7 +146,7 @@ export const createLoader = (source: string | Fetcher, options?: CreateLoaderOpt
     const response = await fetcher(calling)
 
     const parser = createStreamingJsonParser({
-      onJson: onData
+      onJson: onData,
     })
 
     const reader = typeof response.body?.getReader === 'function' ? response.body.getReader() : null

@@ -117,7 +117,7 @@ export const longTask = Api(
       data: {
         description: 'data',
         [Type]: Any,
-      }
+      },
     },
   },
   async () => {
@@ -127,11 +127,10 @@ export const longTask = Api(
     })
     return {
       time: time,
-      data: largeJson
+      data: largeJson,
     }
-  }
+  },
 )
-
 
 export const entries = {
   addTodo,

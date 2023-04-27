@@ -1,9 +1,9 @@
 export type StreamingJsonParser = {
-    write: (chunk: string) => void;
+  write: (chunk: string) => void
 }
 
 export type CreateStreamingJsonParserOptions = {
-    onJson: (json: any) => void;
+  onJson: (json: any) => void
 }
 
 /**
@@ -12,27 +12,27 @@ export type CreateStreamingJsonParserOptions = {
  * then call the onJson callback
  */
 export const createStreamingJsonParser = (options: CreateStreamingJsonParserOptions): StreamingJsonParser => {
-    let buffer = ''
+  let buffer = ''
 
-    return {
-        write(chunk) {
-            buffer += chunk
+  return {
+    write(chunk) {
+      buffer += chunk
 
-            while (true) {
-                const index = buffer.indexOf('\n')
+      while (true) {
+        const index = buffer.indexOf('\n')
 
-                if (index === -1) {
-                    break
-                }
+        if (index === -1) {
+          break
+        }
 
-                const json = buffer.slice(0, index)
+        const json = buffer.slice(0, index)
 
-                buffer = buffer.slice(index + 1)
+        buffer = buffer.slice(index + 1)
 
-                if (json) {
-                    options.onJson(JSON.parse(json))
-                }
-            }
-        },
-    }
+        if (json) {
+          options.onJson(JSON.parse(json))
+        }
+      }
+    },
+  }
 }

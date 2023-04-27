@@ -35,7 +35,7 @@ jobs:
         run: npm install -g pnpm@6 && pnpm run init
 
       - name: Build
-        run: pnpm run format && pnpm run lint && pnpm run build
+        run: pnpm run build
 
       - name: Benchmark
         run: cd examples/benchmark && pnpm run build && pnpm run benchmark

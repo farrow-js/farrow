@@ -26,7 +26,7 @@
     "farrow-api-server": "^2.1.0",
     "farrow-http": "^2.1.0",
     "farrow-pipeline": "^2.1.0",
-    "farrow-react": "^3.0.0",
+    "farrow-react": "^2.1.0",
     "farrow-schema": "^2.1.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",

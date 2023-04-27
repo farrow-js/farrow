@@ -1,6 +1,6 @@
 {
   "name": "farrow-next-server",
-  "version": "3.0.0",
+  "version": "2.1.0",
   "description": "A next.js adapter for farrow-http",
   "main": "dist/index.js",
   "homepage": "https://www.farrowjs.com/",

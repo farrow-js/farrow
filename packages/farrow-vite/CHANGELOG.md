@@ -1,5 +1,16 @@
 # farrow-vite
 
+## 3.0.0
+
+### Minor Changes
+
+- 8f88d3e: new architecture for farrow-api
+
+### Patch Changes
+
+- Updated dependencies [8f88d3e]
+  - farrow-http@2.1.0
+
 ## 2.0.2
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "farrow-api-client",
-  "version": "2.0.1",
+  "version": "2.1.0",
   "description": "A type-friendly BFF framework",
   "main": "dist/index.js",
   "homepage": "https://www.farrowjs.com/",
@@ -28,10 +28,10 @@
   "devDependencies": {
     "@types/jest": "^27.0.1",
     "@types/node-fetch": "^2.5.8",
-    "farrow-api": "workspace:^2.0.1",
-    "farrow-api-server": "workspace:^2.0.1",
-    "farrow-http": "workspace:^2.0.1",
-    "farrow-schema": "workspace:^2.0.1",
+    "farrow-api": "workspace:^2.1.0",
+    "farrow-api-server": "workspace:^2.1.0",
+    "farrow-http": "workspace:^2.1.0",
+    "farrow-schema": "workspace:^2.1.0",
     "jest": "^27.2.2",
     "node-fetch": "2",
     "ts-jest": "^27.0.5",

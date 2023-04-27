@@ -1,5 +1,15 @@
 # farrow-api-client
 
+## 2.1.0
+
+### Minor Changes
+
+- 8f88d3e: new architecture for farrow-api
+
+### Patch Changes
+
+- 522244d: fix
+
 ## 2.0.1
 
 ### Patch Changes

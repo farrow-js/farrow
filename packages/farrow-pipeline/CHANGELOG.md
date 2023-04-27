@@ -1,5 +1,11 @@
 # farrow-pipeline
 
+## 2.1.0
+
+### Minor Changes
+
+- 8f88d3e: new architecture for farrow-api
+
 ## 2.0.1
 
 ### Patch Changes

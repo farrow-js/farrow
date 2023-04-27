@@ -1,6 +1,6 @@
 {
   "name": "farrow-next-react-template",
-  "version": "2.0.1",
+  "version": "2.0.2",
   "private": true,
   "scripts": {
     "dev": "farrow dev",
@@ -9,13 +9,13 @@
   },
   "dependencies": {
     "@babel/core": "^7.16.5",
-    "farrow-api": "^2.0.1",
-    "farrow-api-client": "^2.0.1",
-    "farrow-api-server": "^2.0.1",
-    "farrow-http": "^2.0.1",
-    "farrow-next": "^2.0.1",
-    "farrow-next-server": "^2.0.2",
-    "farrow-schema": "^2.0.1",
+    "farrow-api": "^2.1.0",
+    "farrow-api-client": "^2.1.0",
+    "farrow-api-server": "^2.1.0",
+    "farrow-http": "^2.1.0",
+    "farrow-next": "^2.1.0",
+    "farrow-next-server": "^3.0.0",
+    "farrow-schema": "^2.1.0",
     "next": "^11.1.1",
     "react": "^17.0.0",
     "react-dom": "^17.0.0"
@@ -24,7 +24,7 @@
     "@types/node": "^14.14.35",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
-    "farrow": "^2.0.1",
+    "farrow": "^2.1.0",
     "typescript": "^4.2.2"
   }
 }

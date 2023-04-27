@@ -8,7 +8,8 @@ import type {
   ApiStreamSingleResponse,
 } from 'farrow-api-server'
 
-import { BatchScheduler, createBatchProcessor, CreateBatchProcessorOptions } from './createBatchProcessor'
+import { BatchScheduler, createBatchProcessor } from './BatchProcessor'
+import { createStreamingJsonParser } from './StreamingJsonParser'
 
 export type JsonType =
   | number
@@ -144,18 +145,9 @@ export const createLoader = (source: string | Fetcher, options?: CreateLoaderOpt
   const handleStreamCalling = async (calling: StreamCalling, onData: (response: ApiStreamSingleResponse) => void) => {
     const response = await fetcher(calling)
 
-    const handleResponse = (text: string) => {
-      const list = text.split('\n')
-
-      for (let index = 0; index < list.length; index++) {
-        const item = list[index]
-
-        if (item) {
-          const json = JSON.parse(item) as ApiStreamSingleResponse
-          onData(json)
-        }
-      }
-    }
+    const parser = createStreamingJsonParser({
+      onJson: onData
+    })
 
     const reader = typeof response.body?.getReader === 'function' ? response.body.getReader() : null
 
@@ -167,7 +159,7 @@ export const createLoader = (source: string | Fetcher, options?: CreateLoaderOpt
       if (response.body && Symbol.asyncIterator in response.body) {
         for await (const chunk of response.body as unknown as AsyncIterable<Uint8Array>) {
           const text = chunk.toString()
-          handleResponse(text)
+          parser.write(text)
         }
       }
 
@@ -175,7 +167,7 @@ export const createLoader = (source: string | Fetcher, options?: CreateLoaderOpt
        * for response without readable body
        */
       const text = await response.text()
-      handleResponse(text)
+      parser.write(text)
       return
     }
 
@@ -195,7 +187,7 @@ export const createLoader = (source: string | Fetcher, options?: CreateLoaderOpt
         stream: true,
       })
 
-      handleResponse(chunk)
+      parser.write(chunk)
     }
   }
 

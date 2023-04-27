@@ -1,6 +1,10 @@
-import { Int, List, ObjectType, Type, TypeOf } from 'farrow-schema'
+import { Any, Int, List, ObjectType, Type, TypeOf } from 'farrow-schema'
 import { Api } from 'farrow-api'
 import { ApiService } from 'farrow-api-server'
+import fs from 'fs'
+import path from 'path'
+
+const largeJson = JSON.parse(fs.readFileSync(path.join(__dirname, '../../large-file.json'), 'utf-8'))
 
 export class Todo extends ObjectType {
   id = {
@@ -110,6 +114,10 @@ export const longTask = Api(
         description: 'time cost',
         [Type]: Number,
       },
+      data: {
+        description: 'data',
+        [Type]: Any,
+      }
     },
   },
   async () => {
@@ -119,9 +127,11 @@ export const longTask = Api(
     })
     return {
       time: time,
+      data: largeJson
     }
-  },
+  }
 )
+
 
 export const entries = {
   addTodo,

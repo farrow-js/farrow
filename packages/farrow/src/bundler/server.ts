@@ -2,7 +2,7 @@ import path from 'path'
 import execa, { ExecaChildProcess } from 'execa'
 import { Plugin, BuildOptions } from 'esbuild'
 import * as esbuild from 'esbuild'
-import slash from 'slash'
+import slash from '../util/slash'
 import fs from 'fs/promises'
 import readPkgUp from 'read-pkg-up'
 import { nodeExternalsPlugin } from 'esbuild-node-externals'
@@ -13,7 +13,7 @@ import { memo } from '../util/memo'
 
 export type BundlerOptions = {
   /**
-   * auto add closest package.json dependenties to esbuild external or not
+   * auto add closest package.json dependencies to esbuild external or not
    */
   autoAddExternal?: boolean
   build: BuildOptions
@@ -41,12 +41,12 @@ export const createBundler = (options: BundlerOptions) => {
     })
     const external = config.autoAddExternal
       ? mergeList(
-          config.build.external,
-          safeGetKeys(pkgResult?.packageJson?.devDependencies),
-          safeGetKeys(pkgResult?.packageJson?.dependencies),
-          safeGetKeys(pkgResult?.packageJson?.peerDependencies),
-          safeGetKeys(pkgResult?.packageJson?.optionalDependencies),
-        )
+        config.build.external,
+        safeGetKeys(pkgResult?.packageJson?.devDependencies),
+        safeGetKeys(pkgResult?.packageJson?.dependencies),
+        safeGetKeys(pkgResult?.packageJson?.peerDependencies),
+        safeGetKeys(pkgResult?.packageJson?.optionalDependencies),
+      )
       : config.build.external
 
     const plugins = config.autoAddExternal

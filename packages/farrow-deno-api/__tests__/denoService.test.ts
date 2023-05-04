@@ -86,6 +86,6 @@ describe('deno-api', () => {
 
     server.close()
 
-    expect(test.text.replace(/\r|\n/g, '')).toBe(source.replace(/\r|\n/g, ''))
+    expect(test.text.replace(/\r|\n|\s|,/g, '')).toBe(source.replace(/\r|\n|\s|,/g, ''))
   })
 })

@@ -224,9 +224,9 @@ export const cookie = (name: string, value: Value | null, options?: CookieOption
   return cookies({ [name]: value }, options)
 }
 
-export const vary = (...fileds: string[]): ResponseInfo => {
+export const vary = (...fields: string[]): ResponseInfo => {
   return {
-    vary: fileds,
+    vary: fields,
   }
 }
 

@@ -110,9 +110,9 @@ describe('ApiService', () => {
 
     await request(server)
       .get('/counter/__introspection__')
-      .expect((res) => {
-        console.log('res', JSON.stringify(res.body, null, 2))
-      })
+      // .expect((res) => {
+      //   console.log('res', JSON.stringify(res.body, null, 2))
+      // })
       .expect(200, {
         protocol: 'Farrow-API',
         types: {
@@ -462,7 +462,94 @@ describe('ApiService', () => {
 
     const text = await response.text()
 
-    console.log('text', text)
+    expect(text).toBe(
+      [
+        {
+          type: 'ApiSingleSuccessResponse',
+          output: {
+            from: 'getCount',
+            count: 0,
+          },
+          index: 0,
+        },
+        {
+          type: 'ApiSingleSuccessResponse',
+          output: {
+            from: 'getCount',
+            count: 0,
+          },
+          index: 2,
+        },
+        {
+          type: 'ApiSingleSuccessResponse',
+          output: {
+            from: 'setCount',
+            count: 10,
+          },
+          index: 1,
+        },
+      ]
+        .map((item) => JSON.stringify(item) + '\n')
+        .join(''),
+    )
+
+    await new Promise((resolve) => {
+      server.close(resolve)
+    })
+  })
+
+  it('supports disable streaming batch calling api', async () => {
+    const http = createHttp()
+    const server = http.server()
+    const port = portUid++
+    const url = `http://localhost:${port}/counter`
+
+    const CounterService = ApiService({
+      entries,
+      errorStack: false,
+      stream: false,
+    })
+
+    http.route('/counter').use(CounterService)
+
+    await new Promise<void>((resolve) => {
+      server.listen(port, resolve)
+    })
+
+    const response = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        type: 'Stream',
+        callings: [
+          {
+            type: 'Single',
+            path: ['getCount'],
+            input: {},
+          },
+          {
+            type: 'Single',
+            path: ['setCount'],
+            input: {
+              newCount: 10,
+            },
+          },
+          {
+            type: 'Single',
+            path: ['getCount'],
+            input: {},
+          },
+        ],
+      }),
+    })
+
+    if (!response.body) {
+      throw new Error('response body is not readable')
+    }
+
+    const text = await response.text()
 
     expect(text).toBe(
       [

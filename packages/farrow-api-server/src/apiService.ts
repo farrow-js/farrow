@@ -14,7 +14,7 @@ import {
   ApiStreamSingleResponse,
   ApiSingleResponse,
   ApiBatchResponse,
-} from './apiResponse'
+} from './apiCalling'
 
 export type ApiServiceType = RouterPipeline
 
@@ -56,6 +56,7 @@ export type CreateApiServiceOptions = {
     input?: boolean
     output?: boolean
   }
+  stream?: boolean
 }
 
 export const createApiService = (options: CreateApiServiceOptions): ApiServiceType => {
@@ -189,6 +190,24 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
   const handleStreamCalling = async (streamCalling: StreamCalling) => {
     // stream callings
     const callings = streamCalling.callings
+
+    // stream callings but not enable stream
+    if (config.stream === false) {
+      const headers = {
+        'Content-Type': 'application/stream+json',
+      }
+
+      let body = ''
+
+      await Promise.all(
+        callings.map(async (calling, index) => {
+          const result = await handleSingleCalling(calling)
+          body += JSON.stringify(ApiStreamSingleResponse(index, result)) + '\n'
+        }),
+      )
+
+      return Response.headers(headers).string(body)
+    }
 
     return Response.custom(async ({ res }) => {
       const send = (chunk: ApiStreamSingleResponse) => {

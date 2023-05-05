@@ -2,7 +2,7 @@ import { createContext, createContainer, createPipeline, usePipeline, useContain
 import { createAsyncPipeline } from '../src/pipeline'
 import * as asyncHooksImpl from '../src/asyncHooksImpl/node'
 
-const delay = (duration = 1) => {
+const delay = (duration: number = 1) => {
   return new Promise<boolean>((resolve) => {
     setTimeout(() => resolve(true), duration)
   })

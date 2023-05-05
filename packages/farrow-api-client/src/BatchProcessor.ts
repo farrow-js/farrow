@@ -57,7 +57,7 @@ export const createBatchProcessor = <Input, Output>(options: CreateBatchProcesso
   }
 
   const addWithCache = (input: Input) => {
-    let key = stringifyJson(input)
+    const key = stringifyJson(input)
 
     if (batchInfo.map.has(key)) {
       const index = batchInfo.map.get(key)!

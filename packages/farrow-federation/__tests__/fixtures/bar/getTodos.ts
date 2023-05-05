@@ -33,7 +33,6 @@ getTodos.use(({ id }) => {
       type: 'GetTodosSuccess',
       todos: mockData[id],
     }
-    // eslint-disable-next-line no-else-return
   } else {
     return {
       type: 'UnknownID',

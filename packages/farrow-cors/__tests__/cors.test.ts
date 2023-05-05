@@ -18,7 +18,7 @@ describe('farrow-cors', () => {
       cors({
         origin: 'http://example.com',
         methods: ['FOO', 'bar'],
-        headers: ['FIZZ', 'buzz'],
+        allowedHeaders: ['FIZZ', 'buzz'],
         credentials: true,
         maxAge: 123,
       }),
@@ -50,7 +50,7 @@ describe('farrow-cors', () => {
         callback(null, {
           origin: request.headers['origin'],
           methods: ['FOO', 'bar'],
-          headers: ['FIZZ', 'buzz'],
+          allowedHeaders: ['FIZZ', 'buzz'],
           credentials: true,
           maxAge: 123,
         })

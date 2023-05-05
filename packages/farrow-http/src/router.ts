@@ -183,11 +183,14 @@ const resolveUrlPattern = <T extends string>(input: T) => {
 
       if (key.endsWith('?')) {
         const name = key.substr(0, key.length - 1)
+        // @ts-ignore
         descriptors[name] = Schema.Nullable(Type)
       } else if (key.endsWith('+') || key.endsWith('*')) {
         const name = key.substr(0, key.length - 1)
+        // @ts-ignore
         descriptors[name] = key.endsWith('*') ? Schema.Nullable(Schema.List(Type)) : Schema.List(Type)
       } else {
+        // @ts-ignore
         descriptors[key] = Type
       }
 
@@ -204,6 +207,7 @@ const resolveUrlPattern = <T extends string>(input: T) => {
   for (const [key, item] of Object.entries(parsedQuery)) {
     const isDynamicKey = key.startsWith('<') && key.endsWith('>')
     if (!isDynamicKey) {
+      // @ts-ignore
       query[key] = Schema.Literal(`${item}`)
     }
   }
@@ -515,6 +519,6 @@ const getMethods = (method: RouterRequestSchema['method']) => {
   return methods
 }
 
-const has = (target: unknown, key: string | number | symbol) => {
+const has = <T>(target: T, key: string | number | symbol): key is keyof T => {
   return Object.prototype.hasOwnProperty.call(target, key)
 }

@@ -14,6 +14,7 @@ export type Typeable<T = unknown> =
 type TypeableContentType<T extends Typeable> = T extends Typeable<infer U> ? U : never
 
 export const getContentType = <T extends Typeable>(typeable: T): TypeableContentType<T> => {
+  // @ts-ignore
   return typeable[Type] ?? typeable
 }
 

@@ -515,7 +515,6 @@ describe('createPipeline', () => {
     })
 
     pipeline.useLazy(async () => {
-      // eslint-disable-next-line @typescript-eslint/await-thenable
       const count = await ++i
       return (input, next) => {
         return next(input + count)

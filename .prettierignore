@@ -2,6 +2,7 @@ examples/.cache
 node_modules
 dist
 esm
+packages/farrow-deno-api/__tests__/client.ts
 packages/farrow-schema/src/formatter.ts
 packages/farrow-schema/src/validator.ts
 **/expected/**/*

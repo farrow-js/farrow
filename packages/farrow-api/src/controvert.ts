@@ -184,6 +184,7 @@ export const controvertTypes = (input: FormatTypes): Map<string, SchemaCtor> => 
         super()
 
         for (const name in fields) {
+          // @ts-ignore
           this[name] = fields[name]
         }
       }

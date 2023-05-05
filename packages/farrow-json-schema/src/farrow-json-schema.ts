@@ -32,7 +32,6 @@ export const transform = (input: FieldDescriptor): JSONSchema7 => {
     const schemaCtor = toSchemaCtor(input)
     const formatResult = formatSchema(schemaCtor)
     return transformResult(formatResult)
-    // eslint-disable-next-line no-else-return
   } else {
     const schemaCtor = toSchemaCtor(input.__type)
     const formatResult = formatSchema(schemaCtor)

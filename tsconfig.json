@@ -13,8 +13,6 @@
     "allowJs": true,
     "strict": true,
     "skipLibCheck": true,
-    "suppressImplicitAnyIndexErrors": true,
-    "suppressExcessPropertyErrors": true,
     "forceConsistentCasingInFileNames": true,
     "target": "ES5",
     "sourceMap": true,

@@ -105,7 +105,7 @@ describe('farrow-api-client', () => {
   let loader: Loader
 
   beforeEach((done) => {
-    let port = portUid++
+    const port = portUid++
     http = createHttp()
     server = http.server()
     http.route('/counter').use(CounterService)
@@ -207,7 +207,7 @@ describe('farrow-api-client', () => {
   })
 
   it('supports batch calling api', async () => {
-    let innerLoaderCallback = jest.fn()
+    const innerLoaderCallback = jest.fn()
     const innerLoader = createLoader((calling) => {
       innerLoaderCallback(calling)
       return loader.fetcher(calling)
@@ -284,7 +284,7 @@ describe('farrow-api-client', () => {
   })
 
   it('supports streaming batch calling api', async () => {
-    let innerLoaderCallback = jest.fn()
+    const innerLoaderCallback = jest.fn()
     const innerLoader = createLoader((calling) => {
       innerLoaderCallback(calling)
       return loader.fetcher(calling)

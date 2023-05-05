@@ -1,5 +1,16 @@
 # farrow-federation
 
+## 2.1.1
+
+### Patch Changes
+
+- 7545e39: bump version with patch
+- Updated dependencies [7545e39]
+  - farrow-api@2.1.1
+  - farrow-api-server@2.1.1
+  - farrow-http@2.1.1
+  - farrow-schema@2.1.1
+
 ## 3.0.0
 
 ### Minor Changes

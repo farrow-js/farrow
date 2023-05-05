@@ -1,5 +1,13 @@
 # farrow-next
 
+## 2.1.1
+
+### Patch Changes
+
+- 7545e39: bump version with patch
+- Updated dependencies [7545e39]
+  - farrow-module@2.1.1
+
 ## 2.1.0
 
 ### Minor Changes

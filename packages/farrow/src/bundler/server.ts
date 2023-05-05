@@ -41,12 +41,12 @@ export const createBundler = (options: BundlerOptions) => {
     })
     const external = config.autoAddExternal
       ? mergeList(
-        config.build.external,
-        safeGetKeys(pkgResult?.packageJson?.devDependencies),
-        safeGetKeys(pkgResult?.packageJson?.dependencies),
-        safeGetKeys(pkgResult?.packageJson?.peerDependencies),
-        safeGetKeys(pkgResult?.packageJson?.optionalDependencies),
-      )
+          config.build.external,
+          safeGetKeys(pkgResult?.packageJson?.devDependencies),
+          safeGetKeys(pkgResult?.packageJson?.dependencies),
+          safeGetKeys(pkgResult?.packageJson?.peerDependencies),
+          safeGetKeys(pkgResult?.packageJson?.optionalDependencies),
+        )
       : config.build.external
 
     const plugins = config.autoAddExternal

@@ -1,9 +1,9 @@
 export default function slash(path: string) {
-    const isExtendedLengthPath = /^\\\\\?\\/.test(path);
+  const isExtendedLengthPath = /^\\\\\?\\/.test(path)
 
-    if (isExtendedLengthPath) {
-        return path;
-    }
+  if (isExtendedLengthPath) {
+    return path
+  }
 
-    return path.replace(/\\/g, '/');
+  return path.replace(/\\/g, '/')
 }

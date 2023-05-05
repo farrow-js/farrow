@@ -24,12 +24,12 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       - name: Setup Node.js ${{ matrix.node-version }}
-        uses: actions/setup-node@v1.4.4
+        uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
 
       - name: Check out
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Init
         run: npm install -g pnpm@6 && pnpm install --no-frozen-lockfile

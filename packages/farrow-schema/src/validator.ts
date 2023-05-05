@@ -286,6 +286,7 @@ Validator.impl<S.StructType>(S.StructType, (schema) => {
       for (const key in fields) {
         const Field = fields[key]
 
+        // @ts-ignore
         const value = input[key]
         const result = Validator.validate(Field[S.Type], value, options)
 
@@ -293,6 +294,7 @@ Validator.impl<S.StructType>(S.StructType, (schema) => {
           return SchemaErr(result.value.message, [key, ...(result.value.path ?? [])])
         }
 
+        // @ts-ignore
         results[key] = result.value
       }
 
@@ -328,6 +330,7 @@ Validator.impl<S.RecordType>(S.RecordType, (schema) => {
           return SchemaErr(result.value.message, [key, ...(result.value.path ?? [])])
         }
 
+        // @ts-ignore
         results[key] = result.value
       }
 

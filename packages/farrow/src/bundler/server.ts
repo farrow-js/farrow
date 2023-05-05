@@ -37,6 +37,7 @@ export const createBundler = (options: BundlerOptions) => {
 
   const getBuilder = memo(async () => {
     const pkgResult = await readPkgUp({
+      // @ts-ignore
       cwd: config.build.entryPoints?.[0],
     })
     const external = config.autoAddExternal
@@ -221,7 +222,6 @@ export const createServerBundler = (options: ServerBundlerOptions = {}) => {
       await stop()
     }
 
-    // eslint-disable-next-line require-atomic-updates
     isStarted = true
 
     const startConfig = {

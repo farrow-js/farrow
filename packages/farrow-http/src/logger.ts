@@ -1,10 +1,10 @@
-import chalk from 'chalk'
+import chalk, { Color } from 'chalk'
 import util from 'util'
 import bytes from 'bytes'
 import { prettyTime } from './util'
 import type { RequestInfo } from './requestInfo'
 
-const colorCodes = {
+const colorCodes: Record<number, typeof Color> = {
   7: 'magenta' as const,
   5: 'red' as const,
   4: 'yellow' as const,

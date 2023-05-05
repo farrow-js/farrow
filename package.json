@@ -16,7 +16,7 @@
     "clean:build": "shx rm -rf ./packages/*/*.tsbuildinfo && shx rm -rf ./packages/*/{dist,esm}",
     "clean:deps": "shx rm -rf ./{packages,examples}/*/node_modules && shx rm -rf node_modules",
     "clean:tests": "shx rm -rf ./packages/*/{dist,esm}/**/__tests__",
-    "lint": "eslint --report-unused-disable-directives ./packages",
+    "lint": "eslint --quiet ./packages",
     "format": "run-p format:source format:other",
     "format:other": "prettier ./**/*.{md,yml,json,html} --write",
     "format:source": "prettier ./**/*.{ts,tsx,js} --write",
@@ -35,12 +35,12 @@
     "@swc/core": "^1.3.55",
     "@swc/jest": "^0.2.26",
     "@types/jest": "^29.5.1",
-    "@typescript-eslint/eslint-plugin": "^4.33.0",
-    "@typescript-eslint/parser": "^4.33.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.2",
+    "@typescript-eslint/parser": "^5.59.2",
     "codecov": "^3.8.3",
-    "eslint": "^7.32.0",
+    "eslint": "^8.39.0",
     "eslint-config-prettier": "^7.2.0",
-    "eslint-plugin-jest": "^24.7.0",
+    "eslint-plugin-jest": "^27.2.1",
     "eslint-plugin-prefer-let": "^1.1.0",
     "eslint-plugin-prettier": "^3.4.1",
     "eslint-plugin-react": "^7.32.2",
@@ -49,7 +49,7 @@
     "npm-run-all": "^4.1.5",
     "prettier": "^2.8.8",
     "shx": "^0.3.4",
-    "typescript": "^4.9.5"
+    "typescript": "^5.0.4"
   },
   "dependencies": {
     "@types/node": "^18.16.1"

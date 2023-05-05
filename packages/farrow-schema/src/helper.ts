@@ -65,6 +65,7 @@ export const pickObject = <T extends ObjectType, Keys extends SchemaField<T, key
   if (instance instanceof ObjectType) {
     for (const key of Object.keys(instance)) {
       if (keys.includes(key as any)) {
+        // @ts-ignore
         const value = instance[key]
         if (isFieldDescriptor(value)) {
           descriptors[key] = value
@@ -92,6 +93,7 @@ export const omitObject = <T extends ObjectType, Keys extends SchemaField<T, key
   if (instance instanceof ObjectType) {
     for (const key of Object.keys(instance)) {
       if (!keys.includes(key as any)) {
+        // @ts-ignore
         const value = instance[key]
         if (isFieldDescriptor(value)) {
           descriptors[key] = value
@@ -142,6 +144,7 @@ export const keyofObject = <T extends ObjectType>(Ctor: new () => T): (keyof Typ
   const keys = [] as (keyof TypeOf<T>)[]
 
   for (const key of Object.keys(instance)) {
+    // @ts-ignore
     const value = instance[key]
     if (isFieldDescriptor(value)) {
       keys.push(key as keyof TypeOf<T>)

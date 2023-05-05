@@ -15,7 +15,7 @@ const TEMPLATES = [
   cyan('farrow-next-react')
 ]
 
-const renameFiles = {
+const renameFiles: Record<string, string> = {
   _gitignore: '.gitignore',
 }
 

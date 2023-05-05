@@ -51,7 +51,6 @@ describe('transform', () => {
       const incre = formatResult.entries.entries['incre']
       if (incre.type === 'Api') {
         const inputJSONSchema = transformResult({ typeId: incre.input.typeId, types: formatResult.types })
-        // eslint-disable-next-line jest/no-conditional-expect
         expect(inputJSONSchema).toMatchObject({
           $id: '/farrow/schema',
           $ref: '#/definitions/0',
@@ -64,7 +63,6 @@ describe('transform', () => {
         })
 
         const outputJSONSchema = transformResult({ typeId: incre.output.typeId, types: formatResult.types })
-        // eslint-disable-next-line jest/no-conditional-expect
         expect(outputJSONSchema).toMatchObject({
           $id: '/farrow/schema',
           $ref: '#/definitions/0',

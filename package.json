@@ -24,10 +24,10 @@
     "test": "pnpm run --filter \"./packages/**\" test",
     "test:coverage": "pnpm run --filter \"./packages/**\" test:coverage",
     "publish": "pnpm changeset publish",
-    "prepublish": "pnpm run format && git add -A && pnpm run build",
+    "prepublish": "pnpm run build",
     "version": "pnpm changeset version",
     "release": "pnpm run version && pnpm run publish",
-    "prerelease": "pnpm run format && git add -A && pnpm run build",
+    "prerelease": "pnpm run build",
     "change": "pnpm changeset"
   },
   "devDependencies": {

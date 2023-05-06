@@ -7,7 +7,10 @@
     <img alt="npm version" src="https://img.shields.io/npm/v/farrow-http.svg?style=flat" style="max-width:100%;">
   </a>
   <a href="https://github.com/farrow-js/farrow/actions/workflows/test.yml" rel="nofollow">
-    <img alt="CI Status" src="https://github.com/farrow-js/farrow/workflows/CI/badge.svg" style="max-width:100%;">
+    <img alt="Test Status" src="https://github.com/farrow-js/farrow/workflows/Test/badge.svg" style="max-width:100%;">
+  </a>
+  <a href="https://github.com/farrow-js/farrow/actions/workflows/lint.yml" rel="nofollow">
+    <img alt="Lint Status" src="https://github.com/farrow-js/farrow/workflows/Lint/badge.svg" style="max-width:100%;">
   </a>
   <a href="https://github.com/farrow-js/farrow/actions/workflows/benchmark.yml" rel="nofollow">
     <img alt="Benchmark Status" src="https://github.com/farrow-js/farrow/workflows/Benchmark/badge.svg" style="max-width:100%;">

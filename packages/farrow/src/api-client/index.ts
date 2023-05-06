@@ -33,7 +33,7 @@ export type ApiClientOptions = {
   /**
    * get introspection from server
    */
-  getIntropection?: (body: unknown) => Promise<FormatResult>
+  getIntrospection?: (body: unknown) => Promise<FormatResult>
 
   /**
    * codegen options
@@ -52,10 +52,10 @@ export type ApiClientOptions = {
 
 export const createApiClient = (options: ApiClientOptions) => {
   const config = {
-    ...options,
     pollingInterval: 3000,
     introspectionUrl: '/__introspection__',
     getIntrospection: (x: unknown) => x as FormatResult,
+    ...options,
   }
 
   let tid: ReturnType<typeof setInterval> | null = null

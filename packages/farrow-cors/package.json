@@ -1,6 +1,6 @@
 {
   "name": "farrow-cors",
-  "version": "3.0.0",
+  "version": "2.2.0",
   "description": "Cross-Origin Resource Sharing(CORS) for farrow-http",
   "main": "dist/index.js",
   "homepage": "https://www.farrowjs.com/",

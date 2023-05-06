@@ -23,7 +23,7 @@
     "@types/react-dom": "^17.0.0",
     "@vitejs/plugin-react-refresh": "^1.1.0",
     "farrow": "^2.2.0",
-    "farrow-vite": "^3.0.0",
+    "farrow-vite": "^2.2.0",
     "typescript": "^5.0.4",
     "vite": "^2.0.1"
   }

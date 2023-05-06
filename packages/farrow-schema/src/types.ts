@@ -17,13 +17,12 @@ export type MarkReadOnlyDeep<T> = T extends Basic | ((...args: any[]) => unknown
 /**
 Same as `ReadonlyDeep`, but accepts only `ReadonlyMap`s as inputs. Internal helper for `ReadonlyDeep`.
 */
-interface ReadOnlyMapDeep<KeyType, ValueType>
-  extends ReadonlyMap<MarkReadOnlyDeep<KeyType>, MarkReadOnlyDeep<ValueType>> {}
+type ReadOnlyMapDeep<KeyType, ValueType> = ReadonlyMap<MarkReadOnlyDeep<KeyType>, MarkReadOnlyDeep<ValueType>>
 
 /**
 Same as `ReadonlyDeep`, but accepts only `ReadonlySet`s as inputs. Internal helper for `ReadonlyDeep`.
 */
-interface ReadOnlySetDeep<ItemType> extends ReadonlySet<MarkReadOnlyDeep<ItemType>> {}
+type ReadOnlySetDeep<ItemType> = ReadonlySet<MarkReadOnlyDeep<ItemType>>
 
 /**
 Same as `ReadonlyDeep`, but accepts only `object`s as inputs. Internal helper for `ReadonlyDeep`.

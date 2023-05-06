@@ -116,7 +116,7 @@ export const replaceState = <State>(store: ReduxStore<State>, state: State) => {
   })
 }
 
-const createReduxDevtoolsEnhancer = (devtools: boolean = true, name?: string, enableLogger = false) => {
+const createReduxDevtoolsEnhancer = (devtools = true, name?: string, enableLogger = false) => {
   const composeEnhancers =
     // tslint:disable-next-line: strict-type-predicates
     devtools && typeof window === 'object' && (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__

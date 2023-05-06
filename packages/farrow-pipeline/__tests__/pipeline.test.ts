@@ -4,7 +4,7 @@ import * as asyncTracerImpl from '../src/asyncTracerImpl/node'
 
 asyncTracerImpl.enable()
 
-const delay = (duration: number = 1) => {
+const delay = (duration = 1) => {
   return new Promise<boolean>((resolve) => {
     setTimeout(() => resolve(true), duration)
   })

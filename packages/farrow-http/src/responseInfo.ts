@@ -186,7 +186,7 @@ export const attachment = (filename?: string, options?: ContentDispositionOption
   })
 }
 
-export const status = (code: number, message: string = ''): ResponseInfo => {
+export const status = (code: number, message = ''): ResponseInfo => {
   return {
     status: {
       code,

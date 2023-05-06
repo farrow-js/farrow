@@ -179,10 +179,10 @@ describe('Container', () => {
     expect(root.b.show()).toBe('container/root/b')
   })
 
-  it('support making another Class to a Contaienr via Container.from', () => {
+  it('support making another Class to a Container via Container.from', () => {
     class Base {
       prefix: string
-      constructor(prefix: string = '') {
+      constructor(prefix = '') {
         this.prefix = prefix
       }
       show() {

@@ -358,7 +358,7 @@ export const createApiClient = (options: ApiClientOptions) => {
     return ''
   }
 
-  let source = [
+  const source = [
     PREFIX_COMMENT,
     getNoCheck(),
     options?.header ?? '',

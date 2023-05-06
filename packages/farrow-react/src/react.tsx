@@ -43,7 +43,7 @@ export type ReactViewOptions = ReactResponseOptions & {
 }
 
 export const useReactView = (options?: ReactViewOptions) => {
-  const basenames = Http.useBasenames().value
+  const basenames = Http.useBasenames()
 
   const config = {
     useStream: true,

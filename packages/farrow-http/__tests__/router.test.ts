@@ -2,6 +2,10 @@ import { Router } from '../src/router'
 import { Response } from '../src/response'
 import { Nullable, Strict, Union, Literal, JsonType, Int, Float } from 'farrow-schema'
 import { Stream } from 'stream'
+import * as asyncHooksNode from 'farrow-pipeline/asyncTracerImpl.node'
+
+// enable async hooks
+asyncHooksNode.enable()
 
 describe('Router', () => {
   it('should validating pathname & method', async () => {

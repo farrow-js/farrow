@@ -7,10 +7,6 @@ export type Context<T = any> = {
   [ContextSymbol]: T
   // create a new context equipped a new value
   create: (value: T) => Context<T>
-  // get context ref { value } for accessing context in current container of pipeline
-  use: () => {
-    value: T
-  }
   // get context value
   get: () => T
   // set context value
@@ -35,17 +31,6 @@ export const createContext = <T>(value: T) => {
   const id = Symbol('ContextID')
 
   const create = (value: T): Context<T> => {
-    const use = () => {
-      const container = useContainer()
-      return Object.seal({
-        get value() {
-          return container.read(Context)
-        },
-        set value(v) {
-          container.write(Context, v)
-        },
-      })
-    }
     const get = () => {
       const container = useContainer()
       return container.read(Context)
@@ -65,7 +50,6 @@ export const createContext = <T>(value: T) => {
       id,
       [ContextSymbol]: value,
       create,
-      use,
       get,
       set,
       assert,

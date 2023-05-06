@@ -673,10 +673,10 @@ describe('Express', () => {
       const server = createApp(http)
 
       http.use(() => {
-        const ctx = TestContext.use()
-        const { value } = ctx
-        ctx.value += 1
-        return Response.text(value.toString())
+        const ctx = TestContext.get()
+
+        TestContext.set(ctx + 1)
+        return Response.text(ctx.toString())
       })
 
       await request(server).get('/').expect(200, '10')
@@ -974,10 +974,9 @@ describe('Express', () => {
       const server = createApp(http)
 
       http.use(async (request, next) => {
-        const basenames = useBasenames()
-        const before = basenames.value
+        const before = useBasenames()
         const response = await next(request)
-        const after = basenames.value
+        const after = useBasenames()
 
         // should reset basenames after next(...)
         expect(before).toEqual(after)

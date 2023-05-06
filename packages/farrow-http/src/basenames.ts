@@ -7,12 +7,12 @@ import { isPromise } from './util'
 export const BasenamesContext = createContext([] as string[])
 
 export const useBasenames = () => {
-  const basenames = BasenamesContext.use()
+  const basenames = BasenamesContext.get()
   return basenames
 }
 
 export const usePrefix = () => {
-  const basenames = BasenamesContext.use().value
+  const basenames = BasenamesContext.get()
   return basenames.join('')
 }
 
@@ -23,7 +23,7 @@ export const route = (name: string): Pipeline<RequestInfo, MaybeAsyncResponse> =
 
   const middleware: Middleware<RequestInfo, MaybeAsyncResponse> = (request, next) => {
     const container = useContainer()
-    const basenames = BasenamesContext.use()
+    const basenames = BasenamesContext.get()
 
     if (!matchBasename(name, request.pathname)) {
       return next()
@@ -31,27 +31,27 @@ export const route = (name: string): Pipeline<RequestInfo, MaybeAsyncResponse> =
 
     const { basename, requestInfo } = handleBasenames([name], request)
 
-    const currentBasenames = basenames.value
+    const currentBasenames = basenames
 
-    basenames.value = [...currentBasenames, basename]
+    BasenamesContext.set([...currentBasenames, basename])
 
     const maybeAsyncResponse = pipeline.run(requestInfo, {
       container,
       onLast: () => {
-        basenames.value = currentBasenames
+        BasenamesContext.set(currentBasenames)
         return next(request)
       },
     })
 
     if (isPromise(maybeAsyncResponse)) {
       return maybeAsyncResponse.then((response) => {
-        basenames.value = currentBasenames
-
+        BasenamesContext.set(currentBasenames)
         return response
       })
     }
 
-    basenames.value = currentBasenames
+    BasenamesContext.set(currentBasenames)
+
     return maybeAsyncResponse
   }
 

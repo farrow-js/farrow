@@ -8,8 +8,8 @@
     "src",
     "dist",
     "esm",
-    "asyncHooks.node.js",
-    "asyncHooks.node.d.ts"
+    "asyncTracerImpl.node.js",
+    "asyncTracerImpl.node.d.ts"
   ],
   "scripts": {
     "build": "pnpm run build:dist && pnpm run build:esm",

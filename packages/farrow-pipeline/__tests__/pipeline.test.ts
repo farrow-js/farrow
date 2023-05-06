@@ -1,6 +1,8 @@
 import { createContext, createContainer, createPipeline, usePipeline, useContainer } from '../src'
 import { createAsyncPipeline } from '../src/pipeline'
-import * as asyncHooksImpl from '../src/asyncHooksImpl/node'
+import * as asyncTracerImpl from '../src/asyncTracerImpl/node'
+
+asyncTracerImpl.enable()
 
 const delay = (duration: number = 1) => {
   return new Promise<boolean>((resolve) => {
@@ -167,29 +169,29 @@ describe('createPipeline', () => {
     const list: number[] = []
 
     pipeline.use((input, next) => {
-      const Context = Context0.use()
+      const value = Context0.get()
 
-      list.push(Context.value)
+      list.push(value)
 
-      Context.value += 1
+      Context0.set(value + 1)
 
       return next()
     })
 
     pipeline.use((input, next) => {
-      const Context = Context0.use()
+      const value = Context0.get()
 
-      list.push(Context.value)
+      list.push(value)
 
-      Context.value += 2
+      Context0.set(value + 2)
 
       return next()
     })
 
     pipeline.use((input) => {
-      const Context = Context0.use()
-      list.push(Context.value)
-      return input + Context.value
+      const value = Context0.get()
+      list.push(value)
+      return input + value
     })
 
     const result = await pipeline.run(10)
@@ -206,40 +208,42 @@ describe('createPipeline', () => {
     const list: number[] = []
 
     pipeline.use(async (input, next) => {
-      const Context = Context0.use()
+      const value = Context0.get()
 
-      list.push(Context.value)
+      list.push(value)
 
-      Context.value += 1
+      Context0.set(value + 1)
 
       const result = await next()
 
-      list.push(Context.value)
+      list.push(Context0.get())
 
       return result
     })
 
     pipeline.use(async (input, next) => {
-      const Context = Context0.use()
+      let value = Context0.get()
 
-      list.push(Context.value)
+      list.push(value)
 
-      Context.value += 2
+      Context0.set(value + 2)
 
       const result = await next()
 
-      list.push(Context.value)
+      value = Context0.get()
 
-      Context.value += 3
+      list.push(value)
+
+      Context0.set(value + 3)
 
       return result
     })
 
     pipeline.use((input) => {
-      const Context = Context0.use()
-      list.push(Context.value)
-      Context.value += 1
-      return Promise.resolve(input + Context.value)
+      const value = Context0.get()
+      list.push(value)
+      Context0.set(value + 1)
+      return Promise.resolve(input + Context0.get())
     })
 
     const result = await pipeline.run(10)
@@ -258,9 +262,9 @@ describe('createPipeline', () => {
     })
 
     pipeline.use((input) => {
-      const Context = TestContext.use()
-      Context.value += input
-      return Context.value
+      const value = TestContext.get()
+      TestContext.set(value + input)
+      return TestContext.get()
     })
 
     const result0 = await pipeline.run(20)
@@ -271,11 +275,11 @@ describe('createPipeline', () => {
       count: TestContext.create(10),
     })
 
-    const rseult1 = await pipeline.run(30, {
+    const result1 = await pipeline.run(30, {
       container,
     })
 
-    expect(rseult1).toEqual(40)
+    expect(result1).toEqual(40)
 
     expect(container.read(TestContext)).toEqual(40)
   })
@@ -393,8 +397,8 @@ describe('createPipeline', () => {
 
     pipeline.use((input) => {
       const container = useContainer()
-      const count0 = Context0.use().value
-      const count1 = Context1.use().value
+      const count0 = Context0.get()
+      const count1 = Context1.get()
 
       list.push(container.read(Context0) === count0)
       list.push(container.read(Context1) === count1)
@@ -478,16 +482,17 @@ describe('createPipeline', () => {
     const steps = [] as number[]
 
     pipeline0.use((input, next) => {
-      const step = StepContext.use()
-      return next(input + step.value++)
+      const step = StepContext.get()
+      StepContext.set(step + 1)
+      return next(input + step)
     })
 
     pipeline0.use(pipeline1)
 
     pipeline1.use((input) => {
-      const step = StepContext.use()
-      steps.push(step.value)
-      return input + step.value
+      const step = StepContext.get()
+      steps.push(step)
+      return input + step
     })
 
     const result0 = pipeline1.run(0)
@@ -538,7 +543,7 @@ describe('createPipeline', () => {
     expect(i).toBe(2)
   })
 
-  it('support async hooks', async () => {
+  it('support async tracer', async () => {
     const pipeline = createAsyncPipeline<number, number>()
 
     const Count = createContext({
@@ -578,13 +583,10 @@ describe('createPipeline', () => {
       count: Count,
     })
 
-    asyncHooksImpl.enable()
 
     const result0 = await pipeline.run(10, {
       container,
     })
-
-    asyncHooksImpl.disable()
 
     expect(result0).toEqual(21)
     expect(list).toEqual([
@@ -615,14 +617,5 @@ describe('createPipeline', () => {
     })
 
     expect(result).toBe(1)
-
-    await expect(
-      pipeline.run(void 0, {
-        onLast: () => {
-          return CountContext.get()
-        },
-        onLastWithContext: false,
-      }),
-    ).rejects.toThrow()
   })
 })

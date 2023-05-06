@@ -1,4 +1,4 @@
-import * as asyncHooksNode from 'farrow-pipeline/asyncHooks.node'
+import * as asyncHooksNode from 'farrow-pipeline/asyncTracerImpl.node'
 
 // enable async hooks
 asyncHooksNode.enable()

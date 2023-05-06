@@ -52,7 +52,6 @@ export type PipelineOptions = {
 export type RunPipelineOptions<I = unknown, O = unknown> = {
   container?: Container
   onLast?: (input: I) => O
-  onLastWithContext?: boolean
 }
 
 export type MiddlewareInput<I = unknown, O = unknown> = Middleware<I, O> | { middleware: Middleware<I, O> }
@@ -89,51 +88,30 @@ export const createPipeline = <I, O>(options?: PipelineOptions) => {
     return pipeline
   }
 
-  const createCurrentCounter = (hooks: Hooks, onLast?: (input: I) => O, onLastWithContext?: boolean) => {
+  const createCurrentCounter = (onLast?: (input: I) => O) => {
     return createCounter<I, O>((index, input, next) => {
       if (index >= middlewares.length) {
         if (onLast) {
-          if (onLastWithContext) {
-            return runHooks(() => onLast(input), hooks)
-          }
           return onLast(input)
         }
         throw new Error(`Expect returning a value, but all middlewares just calling next()`)
       }
 
-      return runHooks(() => middlewares[index](input, next), hooks)
+      return middlewares[index](input, next)
     })
   }
 
   const currentContainer = createContainer(config.contexts)
-  const currentHooks = fromContainer(currentContainer)
-  const currentCounter = createCurrentCounter(currentHooks)
-
-  const getCounter = (options?: RunPipelineOptions<I, O>) => {
-    if (!options) return currentCounter
-
-    if (options?.container) {
-      const hooks = fromContainer(options?.container)
-      return options?.onLast
-        ? createCurrentCounter(
-            hooks,
-            options.onLast,
-            typeof options.onLastWithContext === 'boolean' ? options.onLastWithContext : true,
-          )
-        : createCurrentCounter(hooks)
-    }
-
-    return options?.onLast
-      ? createCurrentCounter(
-          currentHooks,
-          options.onLast,
-          typeof options.onLastWithContext === 'boolean' ? options.onLastWithContext : true,
-        )
-      : createCurrentCounter(currentHooks)
-  }
+  const currentCounter = createCurrentCounter()
 
   const run: Pipeline<I, O>['run'] = (input, options) => {
-    return getCounter(options).start(input)
+    const counter = options?.onLast ? createCurrentCounter(options.onLast) : currentCounter
+    return runWithContainer(
+      () => {
+        return counter.start(input)
+      },
+      options?.container ?? currentContainer
+    )
   }
 
   const middleware: Pipeline<I, O>['middleware'] = (input, next) => {

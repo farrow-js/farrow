@@ -6,14 +6,14 @@ import type { RequestInfo } from './requestInfo'
 export const RequestContext = createContext<IncomingMessage | null>(null)
 
 export const useRequest = () => {
-  const request = RequestContext.use().value
+  const request = RequestContext.get()
   return request
 }
 
 export const ResponseContext = createContext<ServerResponse | null>(null)
 
 export const useResponse = () => {
-  const response = ResponseContext.use().value
+  const response = ResponseContext.get()
 
   return response
 }
@@ -41,7 +41,7 @@ export const useRes = () => {
 export const RequestInfoContext = createContext<RequestInfo | null>(null)
 
 export const useRequestInfo = () => {
-  const requestInfo = RequestInfoContext.use().value
+  const requestInfo = RequestInfoContext.get()
 
   if (!requestInfo) {
     throw new Error(`Expected request info, but got: ${requestInfo}`)

@@ -31,7 +31,7 @@ type ToResponse<T extends ResponseInfoCreator> = (...args: Parameters<T>) => Res
 
 export type Response = {
   info: ResponseInfo
-  merge: (...responsers: Response[]) => Response
+  merge: (...responserList: Response[]) => Response
   is: (...types: string[]) => string | false
   string: ToResponse<typeof string>
   json: ToResponse<typeof json>
@@ -60,8 +60,8 @@ export const toResponse = <T extends ResponseInfoCreator>(f: T, info: ResponseIn
 export const createResponse = (info: ResponseInfo): Response => {
   return {
     info,
-    merge: (...responsers) => {
-      const infos = responsers.map((responser) => responser.info)
+    merge: (...responserList) => {
+      const infos = responserList.map((responser) => responser.info)
       return createResponse(merge(info, ...infos))
     },
     is: (...types) => {

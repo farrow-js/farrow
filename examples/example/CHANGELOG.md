@@ -1,5 +1,18 @@
 # farrow-example
 
+## 2.0.3
+
+### Patch Changes
+
+- Updated dependencies [55d8dcf]
+  - farrow-api@2.2.0
+  - farrow-api-client@2.2.0
+  - farrow-api-server@2.2.0
+  - farrow-http@2.2.0
+  - farrow-pipeline@2.2.0
+  - farrow-react@3.0.0
+  - farrow-schema@2.2.0
+
 ## 2.0.2
 
 ### Patch Changes

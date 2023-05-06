@@ -1,5 +1,16 @@
 # farrow-next-server
 
+## 3.0.0
+
+### Minor Changes
+
+- 55d8dcf: bump minor version to 2.2.0
+
+### Patch Changes
+
+- Updated dependencies [55d8dcf]
+  - farrow-http@2.2.0
+
 ## 2.1.1
 
 ### Patch Changes

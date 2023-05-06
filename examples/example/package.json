@@ -1,6 +1,6 @@
 {
   "name": "farrow-example",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "private": true,
   "description": "Functional style web framework for node.js",
   "scripts": {
@@ -16,18 +16,18 @@
   "author": "Jade Gu",
   "license": "MIT",
   "devDependencies": {
-    "farrow": "^2.1.0",
+    "farrow": "^2.2.0",
     "ts-node": "^9.1.1",
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "farrow-api": "^2.1.0",
-    "farrow-api-client": "^2.1.0",
-    "farrow-api-server": "^2.1.0",
-    "farrow-http": "^2.1.0",
-    "farrow-pipeline": "^2.1.0",
-    "farrow-react": "^2.1.0",
-    "farrow-schema": "^2.1.0",
+    "farrow-api": "^2.2.0",
+    "farrow-api-client": "^2.2.0",
+    "farrow-api-server": "^2.2.0",
+    "farrow-http": "^2.2.0",
+    "farrow-pipeline": "^2.2.0",
+    "farrow-react": "^3.0.0",
+    "farrow-schema": "^2.2.0",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
     "tslib": "^2.5.0"

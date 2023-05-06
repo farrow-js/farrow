@@ -1,5 +1,17 @@
 # farrow-http
 
+## 2.2.0
+
+### Minor Changes
+
+- 55d8dcf: bump minor version to 2.2.0
+
+### Patch Changes
+
+- Updated dependencies [55d8dcf]
+  - farrow-pipeline@2.2.0
+  - farrow-schema@2.2.0
+
 ## 2.1.1
 
 ### Patch Changes

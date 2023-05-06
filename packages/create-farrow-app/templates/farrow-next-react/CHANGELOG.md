@@ -1,5 +1,18 @@
 # farrow-next-react-template
 
+## 2.0.3
+
+### Patch Changes
+
+- Updated dependencies [55d8dcf]
+  - farrow-api@2.2.0
+  - farrow-api-client@2.2.0
+  - farrow-api-server@2.2.0
+  - farrow-http@2.2.0
+  - farrow-next@2.2.0
+  - farrow-next-server@3.0.0
+  - farrow-schema@2.2.0
+
 ## 2.0.2
 
 ### Patch Changes

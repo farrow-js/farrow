@@ -206,4 +206,17 @@ describe('generateApi', () => {
 
     expect(source.replace(/\r|\n/g, '')).toBe(expected.toString().replace(/\r|\n/g, ''))
   })
+
+  it('can attach header and footer when codegen', async () => {
+    const formatResult = toJSON(entries)
+
+    const source = codegen(formatResult, {
+      header: `// header`,
+      footer: `// footer`,
+    })
+
+    expect(source.includes('// header')).toBe(true)
+    expect(source.includes('// footer')).toBe(true)
+  })
+
 })

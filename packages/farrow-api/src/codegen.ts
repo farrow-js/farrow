@@ -142,6 +142,16 @@ export type CodegenOptions = {
    * add ts-nocheck or not
    */
   noCheck?: boolean | string
+
+  /**
+   * code insert at the top of the file
+   */
+  header?: string
+
+  /**
+   * code insert at the bottom of the file
+   * */
+  footer?: string
 }
 
 export const PREFIX_COMMENT = `
@@ -336,21 +346,26 @@ export const createApiClient = (options: ApiClientOptions) => {
     )
   }
 
-  let source = [PREFIX_COMMENT, ...typeDeclarations, ...variableDeclarations].join('\n\n')
-
-  if (options?.noCheck) {
-    if (typeof options.noCheck === 'string') {
-      source = `
-// @ts-nocheck ${options.noCheck}
-${source}
-      `
-    } else {
-      source = `
-// @ts-nocheck
-${source}
-      `
+  const getNoCheck = () => {
+    if (options?.noCheck === true) {
+      return '// @ts-nocheck'
     }
+
+    if (typeof options?.noCheck === 'string') {
+      return `// @ts-nocheck ${options.noCheck}`
+    }
+
+    return ''
   }
+
+  let source = [
+    PREFIX_COMMENT,
+    getNoCheck(),
+    options?.header ?? '',
+    ...typeDeclarations,
+    ...variableDeclarations,
+    options?.footer ?? ''
+  ].join('\n\n')
 
   return source.trim()
 }

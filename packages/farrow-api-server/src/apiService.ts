@@ -58,7 +58,7 @@ export type CreateApiServiceOptions = {
   }
   stream?: boolean
   onSuccess?: (input: SingleCalling, output: JsonType) => void
-  onError?: (input: SingleCalling, error: Error) => void
+  onError?: (input: SingleCalling, message: string) => void
 }
 
 export const createApiService = (options: CreateApiServiceOptions): ApiServiceType => {
@@ -128,7 +128,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
         .map((item) => `"${item}"`)
         .join(', ')}]`
 
-      config.onError?.(singleCalling, new Error(message))
+      config.onError?.(singleCalling, message)
 
       return ApiErrorResponse(message)
     }
@@ -148,7 +148,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
 
       if (inputResult.isErr) {
         const message = getErrorMessage(inputResult.value)
-        config.onError?.(singleCalling, new Error(message))
+        config.onError?.(singleCalling, message)
         return ApiErrorResponse(message)
       }
 
@@ -169,7 +169,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
 
         if (outputResult.isErr) {
           const message = getErrorMessage(outputResult.value)
-          config.onError?.(singleCalling, new Error(message))
+          config.onError?.(singleCalling, message)
           return ApiErrorResponse(message)
         }
         output = outputResult.value
@@ -182,7 +182,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
       return ApiSingleSuccessResponse(output)
     } catch (error: any) {
       const message = (config.errorStack ? error?.stack || error?.message : error?.message) ?? ''
-      config.onError?.(singleCalling, error)
+      config.onError?.(singleCalling, message)
       return ApiErrorResponse(message)
     }
   }

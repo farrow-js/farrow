@@ -586,4 +586,155 @@ describe('ApiService', () => {
       server.close(resolve)
     })
   })
+
+  it('supports subscribe onSuccess/onError event for every single calling', async () => {
+    const http = createHttp()
+    const server = http.server()
+    const port = portUid++
+    const url = `http://localhost:${port}/counter`
+
+    const onSuccess = jest.fn()
+    const onError = jest.fn()
+
+    const CounterService = ApiService({
+      entries,
+      errorStack: false,
+      stream: false,
+      onSuccess,
+      onError
+    })
+
+
+    http.route('/counter').use(CounterService)
+
+    await new Promise<void>((resolve) => {
+      server.listen(port, resolve)
+    })
+
+    // success
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        type: 'Single',
+        path: ['getCount'],
+        input: {},
+      })
+    })
+
+    expect(onSuccess).toBeCalledWith({
+      type: 'Single',
+      path: ['getCount'],
+      input: {},
+    }, {
+      from: 'getCount',
+      count: 0,
+    })
+    expect(onError).toBeCalledTimes(0)
+
+    // trigger error in api
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        type: 'Single',
+        path: ['triggerError'],
+        input: {},
+      })
+    })
+
+    expect(onSuccess).toBeCalledTimes(1)
+    expect(onError).toBeCalledWith({
+      type: 'Single',
+      path: ['triggerError'],
+      input: {},
+    }, 'trigger error')
+
+    // trigger error when args is not valid
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        type: 'Single',
+        path: ['setCount'],
+        input: {
+          newCount: false,
+        },
+      })
+    })
+
+    expect(onSuccess).toBeCalledTimes(1)
+    expect(onError).toBeCalledWith({
+      type: 'Single',
+      path: ['setCount'],
+      input: {
+        newCount: false,
+      },
+    }, 'path: ["newCount"]\nfalse is not an integer')
+
+    // trigger error when api is not existed
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        type: 'Single',
+        path: ['nonExisted'],
+        input: {},
+      })
+    })
+
+    expect(onSuccess).toBeCalledTimes(1)
+    expect(onError).toBeCalledWith({
+      type: 'Single',
+      path: ['nonExisted'],
+      input: {},
+    }, 'The target API was not found with the path: ["nonExisted"]')
+
+
+
+    // success on batch callings
+    await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        type: 'Batch',
+        callings: [
+          {
+            type: 'Single',
+            path: ['getCount'],
+            input: {},
+          },
+          {
+            type: 'Single',
+            path: ['setCount'],
+            input: {
+              newCount: 10,
+            },
+          },
+          {
+            type: 'Single',
+            path: ['getCount'],
+            input: {},
+          },
+        ],
+      })
+
+    })
+
+    expect(onSuccess).toBeCalledTimes(4)
+
+    await new Promise((resolve) => {
+      server.close(resolve)
+    })
+  })
 })

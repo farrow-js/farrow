@@ -61,5 +61,11 @@ describe('Farrow', () => {
     await request(server).get('/env/NODE_ENV').expect(200, {
       NODE_ENV: 'test',
     })
+
+    await new Promise<void>((resolve) => {
+      server.close(() => {
+        resolve()
+      })
+    })
   })
 })

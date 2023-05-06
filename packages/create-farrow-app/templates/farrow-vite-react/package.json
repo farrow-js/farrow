@@ -24,7 +24,7 @@
     "@vitejs/plugin-react-refresh": "^1.1.0",
     "farrow": "^2.1.0",
     "farrow-vite": "^2.1.0",
-    "typescript": "^4.2.2",
+    "typescript": "^5.0.4",
     "vite": "^2.0.1"
   }
 }

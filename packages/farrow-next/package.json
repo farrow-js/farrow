@@ -36,27 +36,28 @@
   "devDependencies": {
     "@babel/core": "^7.16.5",
     "@types/cookie": "^0.4.0",
-    "@types/jest": "^27.0.2",
+    "@types/jest": "^29.5.1",
     "@types/js-cookie": "^2.2.6",
     "@types/qs": "^6.9.5",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",
     "@types/redux-logger": "^3.0.7",
-    "jest": "^27.2.2",
+    "jest": "^29.5.0",
     "next": "^11.1.2",
     "react": "^17.0.0",
     "react-dom": "^17.0.0",
-    "ts-jest": "^27.0.5",
-    "typescript": "^4.5.4"
+    "ts-jest": "^29.1.0",
+    "typescript": "^5.0.4"
   },
   "dependencies": {
     "cookie": "^0.4.1",
     "farrow-module": "^2.1.1",
     "isomorphic-unfetch": "^3.1.0",
+    "jest-environment-jsdom": "^29.5.0",
     "js-cookie": "^2.2.1",
     "qs": "^6.9.6",
     "redux": "^4.0.5",
     "redux-logger": "^3.0.6",
-    "tslib": "^2.1.0"
+    "tslib": "^2.5.0"
   }
 }

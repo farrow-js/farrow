@@ -1,17 +1,17 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`farrow-federation Introspection 1`] = `
-Object {
-  "entries": Object {
-    "entries": Object {
-      "bar": Object {
-        "entries": Object {
-          "getTodos": Object {
-            "input": Object {
+{
+  "entries": {
+    "entries": {
+      "bar": {
+        "entries": {
+          "getTodos": {
+            "input": {
               "$ref": "#/types/9",
               "typeId": 9,
             },
-            "output": Object {
+            "output": {
               "$ref": "#/types/13",
               "typeId": 13,
             },
@@ -20,14 +20,14 @@ Object {
         },
         "type": "Entries",
       },
-      "foo": Object {
-        "entries": Object {
-          "getTodos": Object {
-            "input": Object {
+      "foo": {
+        "entries": {
+          "getTodos": {
+            "input": {
               "$ref": "#/types/0",
               "typeId": 0,
             },
-            "output": Object {
+            "output": {
               "$ref": "#/types/4",
               "typeId": 4,
             },
@@ -36,15 +36,15 @@ Object {
         },
         "type": "Entries",
       },
-      "greet": Object {
-        "entries": Object {
-          "greet": Object {
+      "greet": {
+        "entries": {
+          "greet": {
             "description": "Greeting",
-            "input": Object {
+            "input": {
               "$ref": "#/types/18",
               "typeId": 18,
             },
-            "output": Object {
+            "output": {
               "$ref": "#/types/20",
               "typeId": 20,
             },
@@ -53,66 +53,66 @@ Object {
         },
         "type": "Entries",
       },
-      "todo": Object {
-        "entries": Object {
-          "addTodo": Object {
+      "todo": {
+        "entries": {
+          "addTodo": {
             "description": "add todo",
-            "input": Object {
+            "input": {
               "$ref": "#/types/27",
               "typeId": 27,
             },
-            "output": Object {
+            "output": {
               "$ref": "#/types/30",
               "typeId": 30,
             },
             "type": "Api",
           },
-          "getTodos": Object {
+          "getTodos": {
             "description": "get todos",
-            "input": Object {
+            "input": {
               "$ref": "#/types/20",
               "typeId": 20,
             },
-            "output": Object {
+            "output": {
               "$ref": "#/types/21",
               "typeId": 21,
             },
             "type": "Api",
           },
-          "new": Object {
-            "entries": Object {
-              "clearCompleted": Object {
+          "new": {
+            "entries": {
+              "clearCompleted": {
                 "description": "clear completed",
-                "input": Object {
+                "input": {
                   "$ref": "#/types/45",
                   "typeId": 45,
                 },
-                "output": Object {
+                "output": {
                   "$ref": "#/types/46",
                   "typeId": 46,
                 },
                 "type": "Api",
               },
-              "removeTodo": Object {
+              "removeTodo": {
                 "deprecated": "test",
                 "description": "remove todo",
-                "input": Object {
+                "input": {
                   "$ref": "#/types/33",
                   "typeId": 33,
                 },
-                "output": Object {
+                "output": {
                   "$ref": "#/types/36",
                   "typeId": 36,
                 },
                 "type": "Api",
               },
-              "updateTodo": Object {
+              "updateTodo": {
                 "description": "update todo",
-                "input": Object {
+                "input": {
                   "$ref": "#/types/39",
                   "typeId": 39,
                 },
-                "output": Object {
+                "output": {
                   "$ref": "#/types/43",
                   "typeId": 43,
                 },
@@ -128,94 +128,94 @@ Object {
     "type": "Entries",
   },
   "protocol": "Farrow-API",
-  "types": Object {
-    "0": Object {
-      "fields": Object {
-        "id": Object {
+  "types": {
+    "0": {
+      "fields": {
+        "id": {
           "$ref": "#/types/1",
           "typeId": 1,
         },
       },
       "type": "Struct",
     },
-    "1": Object {
+    "1": {
       "type": "Scalar",
       "valueName": "String",
       "valueType": "string",
     },
-    "10": Object {
+    "10": {
       "type": "Scalar",
       "valueName": "String",
       "valueType": "string",
     },
-    "11": Object {
-      "fields": Object {
-        "todos": Object {
+    "11": {
+      "fields": {
+        "todos": {
           "$ref": "#/types/16",
           "typeId": 16,
         },
-        "type": Object {
+        "type": {
           "$ref": "#/types/14",
           "typeId": 14,
         },
       },
       "type": "Struct",
     },
-    "12": Object {
-      "fields": Object {
-        "message": Object {
+    "12": {
+      "fields": {
+        "message": {
           "$ref": "#/types/10",
           "typeId": 10,
         },
-        "type": Object {
+        "type": {
           "$ref": "#/types/17",
           "typeId": 17,
         },
       },
       "type": "Struct",
     },
-    "13": Object {
-      "itemTypes": Array [
-        Object {
+    "13": {
+      "itemTypes": [
+        {
           "$ref": "#/types/11",
           "typeId": 11,
         },
-        Object {
+        {
           "$ref": "#/types/12",
           "typeId": 12,
         },
       ],
       "type": "Union",
     },
-    "14": Object {
+    "14": {
       "type": "Literal",
       "value": "GetTodosSuccess",
     },
-    "15": Object {
-      "fields": Object {
-        "content": Object {
+    "15": {
+      "fields": {
+        "content": {
           "$ref": "#/types/10",
           "typeId": 10,
         },
-        "createTime": Object {
+        "createTime": {
           "$ref": "#/types/18",
           "typeId": 18,
         },
       },
       "type": "Struct",
     },
-    "16": Object {
+    "16": {
       "$ref": "#/types/15",
       "itemTypeId": 15,
       "type": "List",
     },
-    "17": Object {
+    "17": {
       "type": "Literal",
       "value": "UnknownID",
     },
-    "18": Object {
-      "fields": Object {
-        "name": Object {
+    "18": {
+      "fields": {
+        "name": {
           "$ref": "#/types/19",
           "description": "The name for greeting",
           "typeId": 19,
@@ -224,31 +224,31 @@ Object {
       "name": "GreetInput",
       "type": "Object",
     },
-    "19": Object {
+    "19": {
       "type": "Scalar",
       "valueName": "String",
       "valueType": "string",
     },
-    "2": Object {
-      "fields": Object {
-        "todos": Object {
+    "2": {
+      "fields": {
+        "todos": {
           "$ref": "#/types/7",
           "typeId": 7,
         },
-        "type": Object {
+        "type": {
           "$ref": "#/types/5",
           "typeId": 5,
         },
       },
       "type": "Struct",
     },
-    "20": Object {
-      "fields": Object {},
+    "20": {
+      "fields": {},
       "type": "Struct",
     },
-    "21": Object {
-      "fields": Object {
-        "todos": Object {
+    "21": {
+      "fields": {
+        "todos": {
           "$ref": "#/types/23",
           "description": "all todos",
           "typeId": 23,
@@ -256,19 +256,19 @@ Object {
       },
       "type": "Struct",
     },
-    "22": Object {
-      "fields": Object {
-        "completed": Object {
+    "22": {
+      "fields": {
+        "completed": {
           "$ref": "#/types/26",
           "description": "todo status",
           "typeId": 26,
         },
-        "content": Object {
+        "content": {
           "$ref": "#/types/25",
           "description": "todo content",
           "typeId": 25,
         },
-        "id": Object {
+        "id": {
           "$ref": "#/types/24",
           "description": "todo id",
           "typeId": 24,
@@ -277,29 +277,29 @@ Object {
       "name": "Todo",
       "type": "Object",
     },
-    "23": Object {
+    "23": {
       "$ref": "#/types/22",
       "itemTypeId": 22,
       "type": "List",
     },
-    "24": Object {
+    "24": {
       "type": "Scalar",
       "valueName": "Int",
       "valueType": "number",
     },
-    "25": Object {
+    "25": {
       "type": "Scalar",
       "valueName": "String",
       "valueType": "string",
     },
-    "26": Object {
+    "26": {
       "type": "Scalar",
       "valueName": "Boolean",
       "valueType": "boolean",
     },
-    "27": Object {
-      "fields": Object {
-        "content": Object {
+    "27": {
+      "fields": {
+        "content": {
           "$ref": "#/types/25",
           "description": "todo content to add",
           "typeId": 25,
@@ -308,13 +308,13 @@ Object {
       "name": "AddTodoInput",
       "type": "Object",
     },
-    "28": Object {
-      "fields": Object {
-        "message": Object {
+    "28": {
+      "fields": {
+        "message": {
           "$ref": "#/types/25",
           "typeId": 25,
         },
-        "type": Object {
+        "type": {
           "$ref": "#/types/31",
           "typeId": 31,
         },
@@ -322,14 +322,14 @@ Object {
       "name": "InvalidAddTodoInput",
       "type": "Object",
     },
-    "29": Object {
-      "fields": Object {
-        "todo": Object {
+    "29": {
+      "fields": {
+        "todo": {
           "$ref": "#/types/22",
           "description": "a new todo",
           "typeId": 22,
         },
-        "type": Object {
+        "type": {
           "$ref": "#/types/32",
           "typeId": 32,
         },
@@ -337,26 +337,26 @@ Object {
       "name": "AddTodoSuccess",
       "type": "Object",
     },
-    "3": Object {
-      "fields": Object {
-        "message": Object {
+    "3": {
+      "fields": {
+        "message": {
           "$ref": "#/types/1",
           "typeId": 1,
         },
-        "type": Object {
+        "type": {
           "$ref": "#/types/8",
           "typeId": 8,
         },
       },
       "type": "Struct",
     },
-    "30": Object {
-      "itemTypes": Array [
-        Object {
+    "30": {
+      "itemTypes": [
+        {
           "$ref": "#/types/28",
           "typeId": 28,
         },
-        Object {
+        {
           "$ref": "#/types/29",
           "typeId": 29,
         },
@@ -364,17 +364,17 @@ Object {
       "name": "AddTodoOutput",
       "type": "Union",
     },
-    "31": Object {
+    "31": {
       "type": "Literal",
       "value": "InvalidAddTodoInput",
     },
-    "32": Object {
+    "32": {
       "type": "Literal",
       "value": "AddTodoSuccess",
     },
-    "33": Object {
-      "fields": Object {
-        "todoId": Object {
+    "33": {
+      "fields": {
+        "todoId": {
           "$ref": "#/types/24",
           "description": "todo id wait for removing",
           "typeId": 24,
@@ -383,14 +383,14 @@ Object {
       "name": "RemoveTodoInput",
       "type": "Object",
     },
-    "34": Object {
-      "fields": Object {
-        "todoId": Object {
+    "34": {
+      "fields": {
+        "todoId": {
           "$ref": "#/types/24",
           "description": "invalid todo id",
           "typeId": 24,
         },
-        "type": Object {
+        "type": {
           "$ref": "#/types/37",
           "typeId": 37,
         },
@@ -398,19 +398,19 @@ Object {
       "name": "TodoIdNotFound",
       "type": "Object",
     },
-    "35": Object {
-      "fields": Object {
-        "todoId": Object {
+    "35": {
+      "fields": {
+        "todoId": {
           "$ref": "#/types/24",
           "description": "todo id that removed",
           "typeId": 24,
         },
-        "todos": Object {
+        "todos": {
           "$ref": "#/types/23",
           "description": "current todos",
           "typeId": 23,
         },
-        "type": Object {
+        "type": {
           "$ref": "#/types/38",
           "typeId": 38,
         },
@@ -418,40 +418,40 @@ Object {
       "name": "RemoveTodoSuccess",
       "type": "Object",
     },
-    "36": Object {
-      "itemTypes": Array [
-        Object {
+    "36": {
+      "itemTypes": [
+        {
           "$ref": "#/types/34",
           "typeId": 34,
         },
-        Object {
+        {
           "$ref": "#/types/35",
           "typeId": 35,
         },
       ],
       "type": "Union",
     },
-    "37": Object {
+    "37": {
       "type": "Literal",
       "value": "TodoIdNotFound",
     },
-    "38": Object {
+    "38": {
       "type": "Literal",
       "value": "RemoveTodoSuccess",
     },
-    "39": Object {
-      "fields": Object {
-        "completed": Object {
+    "39": {
+      "fields": {
+        "completed": {
           "$ref": "#/types/41",
           "description": "new todo status",
           "typeId": 41,
         },
-        "content": Object {
+        "content": {
           "$ref": "#/types/40",
           "description": "new todo content",
           "typeId": 40,
         },
-        "todoId": Object {
+        "todoId": {
           "$ref": "#/types/24",
           "description": "todo id wait for update",
           "typeId": 24,
@@ -460,42 +460,42 @@ Object {
       "name": "UpdateTodoInput",
       "type": "Object",
     },
-    "4": Object {
-      "itemTypes": Array [
-        Object {
+    "4": {
+      "itemTypes": [
+        {
           "$ref": "#/types/2",
           "typeId": 2,
         },
-        Object {
+        {
           "$ref": "#/types/3",
           "typeId": 3,
         },
       ],
       "type": "Union",
     },
-    "40": Object {
+    "40": {
       "$ref": "#/types/25",
       "itemTypeId": 25,
       "type": "Nullable",
     },
-    "41": Object {
+    "41": {
       "$ref": "#/types/26",
       "itemTypeId": 26,
       "type": "Nullable",
     },
-    "42": Object {
-      "fields": Object {
-        "todoId": Object {
+    "42": {
+      "fields": {
+        "todoId": {
           "$ref": "#/types/24",
           "description": "todo id that updated",
           "typeId": 24,
         },
-        "todos": Object {
+        "todos": {
           "$ref": "#/types/23",
           "description": "current todos",
           "typeId": 23,
         },
-        "type": Object {
+        "type": {
           "$ref": "#/types/44",
           "typeId": 44,
         },
@@ -503,13 +503,13 @@ Object {
       "name": "UpdateTodoSuccess",
       "type": "Object",
     },
-    "43": Object {
-      "itemTypes": Array [
-        Object {
+    "43": {
+      "itemTypes": [
+        {
           "$ref": "#/types/34",
           "typeId": 34,
         },
-        Object {
+        {
           "$ref": "#/types/42",
           "typeId": 42,
         },
@@ -517,17 +517,17 @@ Object {
       "name": "UpdateTodoOutput",
       "type": "Union",
     },
-    "44": Object {
+    "44": {
       "type": "Literal",
       "value": "UpdateTodoSuccess",
     },
-    "45": Object {
-      "fields": Object {},
+    "45": {
+      "fields": {},
       "type": "Struct",
     },
-    "46": Object {
-      "fields": Object {
-        "todos": Object {
+    "46": {
+      "fields": {
+        "todos": {
           "$ref": "#/types/23",
           "description": "current todos",
           "typeId": 23,
@@ -535,35 +535,35 @@ Object {
       },
       "type": "Struct",
     },
-    "5": Object {
+    "5": {
       "type": "Literal",
       "value": "GetTodosSuccess",
     },
-    "6": Object {
-      "fields": Object {
-        "content": Object {
+    "6": {
+      "fields": {
+        "content": {
           "$ref": "#/types/1",
           "typeId": 1,
         },
-        "createTime": Object {
+        "createTime": {
           "$ref": "#/types/9",
           "typeId": 9,
         },
       },
       "type": "Struct",
     },
-    "7": Object {
+    "7": {
       "$ref": "#/types/6",
       "itemTypeId": 6,
       "type": "List",
     },
-    "8": Object {
+    "8": {
       "type": "Literal",
       "value": "UnknownID",
     },
-    "9": Object {
-      "fields": Object {
-        "id": Object {
+    "9": {
+      "fields": {
+        "id": {
           "$ref": "#/types/10",
           "typeId": 10,
         },

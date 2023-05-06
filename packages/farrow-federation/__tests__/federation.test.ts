@@ -4,9 +4,9 @@ import { service as bar } from './fixtures/bar'
 import { services as baz } from './fixtures/baz'
 import { createFederationServices } from '../src'
 import supertest, { Response } from 'supertest'
-import { IncomingMessage, Server, ServerResponse } from 'http'
+import { Server } from 'http'
 
-const fakeFetch = (server: Server<typeof IncomingMessage, typeof ServerResponse>): typeof fetch =>
+const fakeFetch = (server: Server): typeof fetch =>
   (async (input, init) => {
     const getRes = () => {
       if (init?.method?.toLowerCase() === 'post') {

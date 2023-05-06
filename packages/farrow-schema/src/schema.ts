@@ -7,14 +7,14 @@ export type Prettier<T> = T extends Promise<infer U>
   ? (...args: Prettier<Args>) => Prettier<Return>
   : T extends object | any[]
   ? {
-      [key in keyof T]: Prettier<T[key]>
-    }
+    [key in keyof T]: Prettier<T[key]>
+  }
   : T
 
 export type ShallowPrettier<T> = T extends object | any[]
   ? {
-      [key in keyof T]: T[key]
-    }
+    [key in keyof T]: T[key]
+  }
   : T
 
 export abstract class Schema {
@@ -181,10 +181,10 @@ export type TypeOfFieldDescriptor<T extends FieldDescriptor> = T extends SchemaC
 
 export type TypeOfFieldDescriptors<T extends FieldDescriptors> = {
   [key in keyof T]: T[key] extends FieldDescriptor
-    ? TypeOfFieldDescriptor<T[key]>
-    : T[key] extends FieldDescriptors
-    ? ShallowPrettier<TypeOfFieldDescriptors<T[key]>>
-    : never
+  ? TypeOfFieldDescriptor<T[key]>
+  : T[key] extends FieldDescriptors
+  ? ShallowPrettier<TypeOfFieldDescriptors<T[key]>>
+  : never
 }
 
 export abstract class StructType extends Schema {
@@ -232,11 +232,11 @@ export type JsonType =
   | undefined
   | JsonType[]
   | {
-      toJSON(): string
-    }
+    toJSON(): string
+  }
   | {
-      [key: string]: JsonType
-    }
+    [key: string]: JsonType
+  }
 
 export class Json extends Schema {
   __type!: JsonType
@@ -286,6 +286,7 @@ export const ReadOnlyDeep = <T extends SchemaCtorInput>(Item: T) => {
   }
 }
 
+/* eslint-disable */
 export type SchemaTypeOf<T extends SchemaCtor> = T extends NumberConstructor
   ? Number
   : T extends StringConstructor
@@ -297,6 +298,7 @@ export type SchemaTypeOf<T extends SchemaCtor> = T extends NumberConstructor
   : T extends new () => infer S
   ? S
   : never
+/* eslint-enable */
 
 export const getSchemaCtor = <T extends SchemaCtor>(Ctor: T): SchemaTypeOf<T> => {
   if (isNumberConstructor(Ctor)) {
@@ -356,8 +358,8 @@ export type ToSchemaCtor<T extends SchemaCtorInput> = T extends SchemaCtor
 export type SchemaCtorInputs =
   | SchemaCtorInput[]
   | {
-      [key: string]: SchemaCtorInput
-    }
+    [key: string]: SchemaCtorInput
+  }
 
 export type ToSchemaCtors<T extends SchemaCtorInputs> = {
   [key in keyof T]: T[key] extends SchemaCtorInput ? ToSchemaCtor<T[key]> : never
@@ -390,17 +392,19 @@ export const toSchemaCtors = <T extends SchemaCtorInputs>(Inputs: T): ToSchemaCt
   throw new Error(`Unknown inputs: ${Inputs}`)
 }
 
+/* eslint-enable */
 export type InstanceTypeOf<T extends SchemaCtor> = T extends NumberConstructor
-  ? Number
+  ? number
   : T extends StringConstructor
-  ? String
+  ? string
   : T extends BooleanConstructor
-  ? Boolean
+  ? boolean
   : T extends DateConstructor
   ? Date
   : T extends new () => infer R
   ? R
   : never
+/* eslint-enable */
 
 const instanceWeakMap = new WeakMap<SchemaCtor, Schema>()
 

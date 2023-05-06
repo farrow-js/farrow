@@ -1,5 +1,5 @@
 import { Router, Response, RouterPipeline, RequestInfo } from 'farrow-http'
-import { List, SchemaCtor, SchemaCtorInput, Struct, toSchemaCtor, Any, Literal, Union } from 'farrow-schema'
+import { List, SchemaCtor, SchemaCtorInput, Struct, toSchemaCtor, Any, Literal, Union, JsonType } from 'farrow-schema'
 import { ApiDefinition, ApiEntries, getContentType, isApi } from 'farrow-api'
 import { toJSON } from 'farrow-api/dist/toJSON'
 import { createSchemaValidator, ValidationError, Validator } from 'farrow-schema/validator'
@@ -57,6 +57,8 @@ export type CreateApiServiceOptions = {
     output?: boolean
   }
   stream?: boolean
+  onSuccess?: (input: SingleCalling, output: JsonType) => void
+  onError?: (input: SingleCalling, error: Error) => void
 }
 
 export const createApiService = (options: CreateApiServiceOptions): ApiServiceType => {
@@ -125,6 +127,9 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
       const message = `The target API was not found with the path: [${singleCalling.path
         .map((item) => `"${item}"`)
         .join(', ')}]`
+
+      config.onError?.(singleCalling, new Error(message))
+
       return ApiErrorResponse(message)
     }
 
@@ -143,6 +148,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
 
       if (inputResult.isErr) {
         const message = getErrorMessage(inputResult.value)
+        config.onError?.(singleCalling, new Error(message))
         return ApiErrorResponse(message)
       }
 
@@ -163,17 +169,20 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
 
         if (outputResult.isErr) {
           const message = getErrorMessage(outputResult.value)
+          config.onError?.(singleCalling, new Error(message))
           return ApiErrorResponse(message)
         }
         output = outputResult.value
       }
 
+      config.onSuccess?.(singleCalling, output)
       /**
        * response output
        */
       return ApiSingleSuccessResponse(output)
     } catch (error: any) {
       const message = (config.errorStack ? error?.stack || error?.message : error?.message) ?? ''
+      config.onError?.(singleCalling, error)
       return ApiErrorResponse(message)
     }
   }

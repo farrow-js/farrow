@@ -6,7 +6,7 @@ import { Server } from 'http'
 import request from 'supertest'
 
 jest.setTimeout(50000)
-jest.useFakeTimers();
+jest.useFakeTimers()
 
 const projectPath = path.join(__dirname, '../fixtures/project0')
 
@@ -69,6 +69,6 @@ describe('Farrow', () => {
       })
     })
 
-    jest.runAllTimers();
+    jest.runAllTimers()
   })
 })

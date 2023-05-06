@@ -601,9 +601,8 @@ describe('ApiService', () => {
       errorStack: false,
       stream: false,
       onSuccess,
-      onError
+      onError,
     })
-
 
     http.route('/counter').use(CounterService)
 
@@ -621,17 +620,20 @@ describe('ApiService', () => {
         type: 'Single',
         path: ['getCount'],
         input: {},
-      })
+      }),
     })
 
-    expect(onSuccess).toBeCalledWith({
-      type: 'Single',
-      path: ['getCount'],
-      input: {},
-    }, {
-      from: 'getCount',
-      count: 0,
-    })
+    expect(onSuccess).toBeCalledWith(
+      {
+        type: 'Single',
+        path: ['getCount'],
+        input: {},
+      },
+      {
+        from: 'getCount',
+        count: 0,
+      },
+    )
     expect(onError).toBeCalledTimes(0)
 
     // trigger error in api
@@ -644,15 +646,18 @@ describe('ApiService', () => {
         type: 'Single',
         path: ['triggerError'],
         input: {},
-      })
+      }),
     })
 
     expect(onSuccess).toBeCalledTimes(1)
-    expect(onError).toBeCalledWith({
-      type: 'Single',
-      path: ['triggerError'],
-      input: {},
-    }, 'trigger error')
+    expect(onError).toBeCalledWith(
+      {
+        type: 'Single',
+        path: ['triggerError'],
+        input: {},
+      },
+      'trigger error',
+    )
 
     // trigger error when args is not valid
     await fetch(url, {
@@ -666,17 +671,20 @@ describe('ApiService', () => {
         input: {
           newCount: false,
         },
-      })
+      }),
     })
 
     expect(onSuccess).toBeCalledTimes(1)
-    expect(onError).toBeCalledWith({
-      type: 'Single',
-      path: ['setCount'],
-      input: {
-        newCount: false,
+    expect(onError).toBeCalledWith(
+      {
+        type: 'Single',
+        path: ['setCount'],
+        input: {
+          newCount: false,
+        },
       },
-    }, 'path: ["newCount"]\nfalse is not an integer')
+      'path: ["newCount"]\nfalse is not an integer',
+    )
 
     // trigger error when api is not existed
     await fetch(url, {
@@ -688,17 +696,18 @@ describe('ApiService', () => {
         type: 'Single',
         path: ['nonExisted'],
         input: {},
-      })
+      }),
     })
 
     expect(onSuccess).toBeCalledTimes(1)
-    expect(onError).toBeCalledWith({
-      type: 'Single',
-      path: ['nonExisted'],
-      input: {},
-    }, 'The target API was not found with the path: ["nonExisted"]')
-
-
+    expect(onError).toBeCalledWith(
+      {
+        type: 'Single',
+        path: ['nonExisted'],
+        input: {},
+      },
+      'The target API was not found with the path: ["nonExisted"]',
+    )
 
     // success on batch callings
     await fetch(url, {
@@ -727,8 +736,7 @@ describe('ApiService', () => {
             input: {},
           },
         ],
-      })
-
+      }),
     })
 
     expect(onSuccess).toBeCalledTimes(4)

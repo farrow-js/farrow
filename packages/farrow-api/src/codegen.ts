@@ -364,7 +364,7 @@ export const createApiClient = (options: ApiClientOptions) => {
     options?.header ?? '',
     ...typeDeclarations,
     ...variableDeclarations,
-    options?.footer ?? ''
+    options?.footer ?? '',
   ].join('\n\n')
 
   return source.trim()

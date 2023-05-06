@@ -218,5 +218,4 @@ describe('generateApi', () => {
     expect(source.includes('// header')).toBe(true)
     expect(source.includes('// footer')).toBe(true)
   })
-
 })

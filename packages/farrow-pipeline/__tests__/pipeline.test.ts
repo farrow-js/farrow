@@ -583,7 +583,6 @@ describe('createPipeline', () => {
       count: Count,
     })
 
-
     const result0 = await pipeline.run(10, {
       container,
     })

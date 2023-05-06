@@ -106,12 +106,9 @@ export const createPipeline = <I, O>(options?: PipelineOptions) => {
 
   const run: Pipeline<I, O>['run'] = (input, options) => {
     const counter = options?.onLast ? createCurrentCounter(options.onLast) : currentCounter
-    return runWithContainer(
-      () => {
-        return counter.start(input)
-      },
-      options?.container ?? currentContainer
-    )
+    return runWithContainer(() => {
+      return counter.start(input)
+    }, options?.container ?? currentContainer)
   }
 
   const middleware: Pipeline<I, O>['middleware'] = (input, next) => {

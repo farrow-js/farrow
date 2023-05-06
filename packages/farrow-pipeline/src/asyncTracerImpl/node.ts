@@ -10,7 +10,7 @@ const createAsyncTracer = (): AsyncTracer => {
     },
     get: () => {
       return asyncLocalStorage.getStore()
-    }
+    },
   }
 }
 

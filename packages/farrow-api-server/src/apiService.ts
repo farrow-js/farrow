@@ -239,7 +239,8 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
   }
 
   router.use(async (request) => {
-    const callingResult = validateCalling(request.body ?? request.query)
+    const payload = request.method?.toLowerCase() === 'get' ? request.query : request.body
+    const callingResult = validateCalling(payload)
 
     if (callingResult.isErr) {
       const message = getErrorMessage(callingResult.value)

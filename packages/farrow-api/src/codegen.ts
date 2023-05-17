@@ -279,10 +279,8 @@ export type ApiClientLoaderInput = {
 
     typeDeclarations.push(
       `
-export interface ApiClientLoaderOptions {
-  batch?: boolean
-  stream?: boolean
-  cache?: boolean
+declare global {
+  interface ApiClientLoaderOptions {}
 }
 `.trim(),
     )

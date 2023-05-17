@@ -26,18 +26,26 @@ export type ApiClientLoaderInput = {
   input: JsonType
 }
 
-export interface ApiClientLoaderOptions {
-  batch?: boolean
-  stream?: boolean
-  cache?: boolean
+declare global {
+  interface ApiClientLoaderOptions {
+    batch?: boolean
+    stream?: boolean
+    cache?: boolean
+  }
 }
 
-export type Loader = {
+export type Loader<T extends Fetcher = Fetcher> = {
   (input: ApiClientLoaderInput, options?: ApiClientLoaderOptions): Promise<JsonType>
-  fetcher: Fetcher
+  fetcher: T
 }
 
-export type Fetcher = (input: Calling) => Promise<Response>
+export type ApiClientLoaderFetcherOptions = Omit<ApiClientLoaderOptions, 'batch' | 'stream' | 'cache'>
+
+export type Fetcher = (input: Calling, options: ApiClientLoaderFetcherOptions) => Promise<Response | JsonType>
+
+export const isResponse = (value: any): value is Response => {
+  return typeof value?.json === 'function' && typeof value?.text === 'function'
+}
 
 export type CreateLoaderOptions = {
   /**
@@ -91,16 +99,16 @@ export type CreateLoaderOptions = {
  *    return response
  * })
  */
-export const createLoader = (source: string | Fetcher, options?: CreateLoaderOptions): Loader => {
+export const createLoader = <T extends Fetcher = Fetcher>(source: string | T, options?: CreateLoaderOptions): Loader<T> => {
   const config = {
     batch: true,
     stream: true,
     ...options,
   }
 
-  const fetcher: Fetcher = async (input) => {
+  const fetcher = (async (input, options) => {
     if (typeof source === 'function') {
-      return source(input)
+      return source(input, options)
     }
 
     const response = await fetch(source, {
@@ -108,11 +116,11 @@ export const createLoader = (source: string | Fetcher, options?: CreateLoaderOpt
       headers: {
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify(input),
+      body: JSON.stringify(input)
     })
 
     return response
-  }
+  }) as T
 
   const handleSingleResponse = (response: ApiSingleResponse): Promise<JsonType> => {
     if (response.type === 'ApiErrorResponse') {
@@ -122,18 +130,30 @@ export const createLoader = (source: string | Fetcher, options?: CreateLoaderOpt
     return Promise.resolve(response.output)
   }
 
-  const handleSingleCalling = async (singleCalling: SingleCalling) => {
-    const response = await fetcher(singleCalling)
+  const handleSingleCalling = async (singleCalling: SingleCalling, options: ApiClientLoaderFetcherOptions) => {
+    const response = await fetcher(singleCalling, options)
 
-    const json = (await response.json()) as ApiSingleResponse
+    let json: ApiSingleResponse
+
+    if (!isResponse(response)) {
+      json = response as ApiSingleResponse
+    } else {
+      json = await response.json() as ApiSingleResponse
+    }
 
     return handleSingleResponse(json)
   }
 
-  const handleBatchCalling = async (calling: BatchCalling) => {
-    const response = await fetcher(calling)
+  const handleBatchCalling = async (calling: BatchCalling, options: ApiClientLoaderFetcherOptions) => {
+    const response = await fetcher(calling, options)
 
-    const json = (await response.json()) as ApiBatchResponse
+    let json: ApiBatchResponse
+
+    if (!isResponse(response)) {
+      json = response as ApiBatchResponse
+    } else {
+      json = await response.json() as ApiBatchResponse
+    }
 
     if (json.type === 'ApiErrorResponse') {
       throw new Error(json.error.message)
@@ -142,12 +162,31 @@ export const createLoader = (source: string | Fetcher, options?: CreateLoaderOpt
     return json.result
   }
 
-  const handleStreamCalling = async (calling: StreamCalling, onData: (response: ApiStreamSingleResponse) => void) => {
-    const response = await fetcher(calling)
+  const handleStreamCalling = async (
+    calling: StreamCalling,
+    options: ApiClientLoaderFetcherOptions,
+    onData: (response: ApiStreamSingleResponse) => void
+  ) => {
+    const response = await fetcher(calling, options)
 
     const parser = createStreamingJsonParser({
       onJson: onData,
     })
+
+    if (!isResponse(response)) {
+      if (!Array.isArray(response)) {
+        throw new Error('StreamCalling: response is not a Response or Array')
+      }
+
+      const json = response as ApiStreamSingleResponse[]
+
+      for (const item of json) {
+        onData(item)
+      }
+
+      return
+    }
+
 
     const reader = typeof response.body?.getReader === 'function' ? response.body.getReader() : null
 
@@ -191,12 +230,12 @@ export const createLoader = (source: string | Fetcher, options?: CreateLoaderOpt
     }
   }
 
-  const normalBatchProcessor = createBatchProcessor<SingleCalling, JsonType>({
+  const normalBatchProcessor = createBatchProcessor<SingleCalling, ApiClientLoaderFetcherOptions, JsonType>({
     cache: config.cache,
     scheduler: config.scheduler,
-    onFlush: async (callings, onOutput) => {
+    onFlush: async (callings, options, onOutput) => {
       if (callings.length === 1) {
-        const response = await handleSingleCalling(callings[0])
+        const response = await handleSingleCalling(callings[0], options)
         onOutput(response, 0)
         return
       }
@@ -204,7 +243,7 @@ export const createLoader = (source: string | Fetcher, options?: CreateLoaderOpt
       const responseList = await handleBatchCalling({
         type: 'Batch',
         callings,
-      })
+      }, options)
 
       for (let index = 0; index < responseList.length; index++) {
         const response = responseList[index]
@@ -214,12 +253,12 @@ export const createLoader = (source: string | Fetcher, options?: CreateLoaderOpt
     },
   })
 
-  const streamingBatchProcessor = createBatchProcessor<SingleCalling, JsonType>({
+  const streamingBatchProcessor = createBatchProcessor<SingleCalling, ApiClientLoaderFetcherOptions, JsonType>({
     cache: config.cache,
     scheduler: config.scheduler,
-    onFlush: (callings, onOutput) => {
+    onFlush: (callings, options, onOutput) => {
       if (callings.length === 1) {
-        const promise = handleSingleCalling(callings[0])
+        const promise = handleSingleCalling(callings[0], options)
         onOutput(promise, 0)
         return
       }
@@ -229,6 +268,7 @@ export const createLoader = (source: string | Fetcher, options?: CreateLoaderOpt
           type: 'Stream',
           callings,
         },
+        options,
         (response) => {
           const promise = handleSingleResponse(response)
           onOutput(promise, response.index)
@@ -237,7 +277,7 @@ export const createLoader = (source: string | Fetcher, options?: CreateLoaderOpt
     },
   })
 
-  const loader = (async (input, loaderOptions) => {
+  const loader = (async (input, loaderOptions = {}) => {
     const { path, input: data } = input
 
     const singleCalling: SingleCalling = {
@@ -246,24 +286,21 @@ export const createLoader = (source: string | Fetcher, options?: CreateLoaderOpt
       input: data,
     }
 
-    const shouldBatching = config.batch && loaderOptions?.batch !== false
+    const { cache, batch, stream, ...fetcherOptions } = loaderOptions
+    const shouldBatching = config.batch && batch !== false
 
     if (shouldBatching) {
-      const shouldStreaming = config.stream && loaderOptions?.stream !== false
+      const shouldStreaming = config.stream && stream !== false
 
       if (shouldStreaming) {
-        return streamingBatchProcessor.add(singleCalling, {
-          cache: loaderOptions?.cache,
-        })
+        return streamingBatchProcessor.add(singleCalling, fetcherOptions, { cache })
       } else {
-        return normalBatchProcessor.add(singleCalling, {
-          cache: loaderOptions?.cache,
-        })
+        return normalBatchProcessor.add(singleCalling, fetcherOptions, { cache })
       }
     }
 
-    return handleSingleCalling(singleCalling)
-  }) as Loader
+    return handleSingleCalling(singleCalling, fetcherOptions)
+  }) as Loader<T>
 
   loader.fetcher = fetcher
 

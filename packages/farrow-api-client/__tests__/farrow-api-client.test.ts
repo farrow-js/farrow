@@ -2,10 +2,16 @@ import { Int, Literal, Type } from 'farrow-schema'
 import { Http, HttpPipeline, HttpPipelineOptions } from 'farrow-http'
 import { Api } from 'farrow-api'
 import fetch from 'node-fetch'
-import { ApiService } from 'farrow-api-server'
+import { ApiService, ApiSingleSuccessResponse } from 'farrow-api-server'
 import { Server } from 'http'
 
 import { Loader, createLoader } from '../src'
+
+declare global {
+  interface ApiClientLoaderOptions {
+    key?: string
+  }
+}
 
 globalThis.fetch = fetch as any
 
@@ -208,9 +214,9 @@ describe('farrow-api-client', () => {
 
   it('supports batch calling api', async () => {
     const innerLoaderCallback = jest.fn()
-    const innerLoader = createLoader((calling) => {
+    const innerLoader = createLoader((calling, options) => {
       innerLoaderCallback(calling)
-      return loader.fetcher(calling)
+      return loader.fetcher(calling, options)
     })
 
     const [result0, result1, result2] = await Promise.all([
@@ -285,9 +291,9 @@ describe('farrow-api-client', () => {
 
   it('supports streaming batch calling api', async () => {
     const innerLoaderCallback = jest.fn()
-    const innerLoader = createLoader((calling) => {
+    const innerLoader = createLoader((calling, options) => {
       innerLoaderCallback(calling)
-      return loader.fetcher(calling)
+      return loader.fetcher(calling, options)
     })
 
     const [result0, result1, result2] = await Promise.all([
@@ -343,9 +349,9 @@ describe('farrow-api-client', () => {
 
   it('supports disable cache|batch|stream for each calling', async () => {
     let innerLoaderCallback = jest.fn()
-    const innerLoader = createLoader((calling) => {
+    const innerLoader = createLoader((calling, options) => {
       innerLoaderCallback(calling)
-      return loader.fetcher(calling)
+      return loader.fetcher(calling, options)
     })
 
     const [result0, result1, result2] = await Promise.all([
@@ -619,9 +625,9 @@ describe('farrow-api-client', () => {
     let innerLoaderCallback = jest.fn()
     // disable cache
     let innerLoader = createLoader(
-      (calling) => {
+      (calling, options) => {
         innerLoaderCallback(calling)
-        return loader.fetcher(calling)
+        return loader.fetcher(calling, options)
       },
       {
         cache: false,
@@ -669,9 +675,9 @@ describe('farrow-api-client', () => {
     innerLoaderCallback = jest.fn()
     // disable streaming
     innerLoader = createLoader(
-      (calling) => {
+      (calling, options) => {
         innerLoaderCallback(calling)
-        return loader.fetcher(calling)
+        return loader.fetcher(calling, options)
       },
       {
         cache: false,
@@ -720,9 +726,9 @@ describe('farrow-api-client', () => {
     innerLoaderCallback = jest.fn()
     // disable batch
     innerLoader = createLoader(
-      (calling) => {
+      (calling, options) => {
         innerLoaderCallback(calling)
-        return loader.fetcher(calling)
+        return loader.fetcher(calling, options)
       },
       {
         batch: false,
@@ -768,9 +774,9 @@ describe('farrow-api-client', () => {
     let innerLoaderCallback = jest.fn()
     let schedulerCallback = jest.fn()
     const innerLoader = createLoader(
-      (calling) => {
+      (calling, options) => {
         innerLoaderCallback(calling)
-        return loader.fetcher(calling)
+        return loader.fetcher(calling, options)
       },
       {
         cache: false,
@@ -845,9 +851,9 @@ describe('farrow-api-client', () => {
 
   it('should invoke single calling if only one calling', async () => {
     const innerLoaderCallback = jest.fn()
-    const innerLoader = createLoader((calling) => {
+    const innerLoader = createLoader((calling, options) => {
       innerLoaderCallback(calling)
-      return loader.fetcher(calling)
+      return loader.fetcher(calling, options)
     })
 
     const result = await innerLoader({
@@ -865,5 +871,190 @@ describe('farrow-api-client', () => {
       from: 'getCount',
       count: 0,
     })
+  })
+
+  it('should batch callings grouped by options', async () => {
+    const list = [] as { calling: any; options: any }[]
+    const innerLoader = createLoader((calling, options) => {
+      list.push({ calling, options, })
+      return loader.fetcher(calling, options)
+    })
+
+    const result = await Promise.all([
+      innerLoader(
+        {
+          path: ['getCount'],
+          input: {},
+        },
+        {
+          key: 'foo',
+          cache: false,
+        },
+      ),
+      innerLoader(
+        {
+          path: ['getCount'],
+          input: {},
+        },
+        {
+          key: 'bar',
+          cache: false,
+        },
+      ),
+      innerLoader(
+        {
+          path: ['getCount'],
+          input: {},
+        },
+        {
+          key: 'foo',
+          cache: false,
+        },
+      ),
+      innerLoader(
+        {
+          path: ['getCount'],
+          input: {},
+        },
+        {
+          key: 'bar',
+          cache: false,
+        },
+      ),
+    ])
+
+    expect(list).toEqual([
+      {
+        calling: {
+          type: 'Stream',
+          callings: [
+            {
+              type: 'Single',
+              path: ['getCount'],
+              input: {},
+            },
+            {
+              type: 'Single',
+              path: ['getCount'],
+              input: {},
+            },
+          ],
+        },
+        options: {
+          key: 'foo',
+        },
+      },
+      {
+        calling: {
+          type: 'Stream',
+          callings: [
+            {
+              type: 'Single',
+              path: ['getCount'],
+              input: {},
+            },
+            {
+              type: 'Single',
+              path: ['getCount'],
+              input: {},
+            },
+          ],
+        },
+        options: {
+          key: 'bar',
+        },
+      },
+    ])
+  })
+
+  it('support return json instead of response in fetcher', async () => {
+    const fn = jest.fn()
+    const loader = createLoader(async (calling, options) => {
+      const response = await fetch(baseUrl + '/counter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(calling),
+      })
+
+      const json = await response.json() as ApiSingleSuccessResponse
+
+      fn({ calling, options, json })
+
+      return json
+    })
+
+    const result = await loader({
+      path: ['getCount'],
+      input: {},
+    }, {
+      key: 'foo',
+    })
+
+    expect(result).toEqual({
+      from: 'getCount',
+      count: 0,
+    })
+
+    expect(fn).toBeCalledWith({
+      calling: {
+        type: 'Single',
+        path: ['getCount'],
+        input: {},
+      },
+      options: {
+        key: 'foo',
+      },
+      json: {
+        type: 'ApiSingleSuccessResponse',
+        output: {
+          from: 'getCount',
+          count: 0,
+        },
+      },
+    })
+
+    expect(fn).toBeCalledTimes(1)
+
+    /**
+     * loader.fetcher is available
+     */
+    const result1 = await loader.fetcher({
+      type: 'Single',
+      path: ['getCount'],
+      input: {},
+    }, {
+      key: 'bar',
+    })
+
+    expect(result1).toEqual({
+      type: 'ApiSingleSuccessResponse',
+      output: {
+        from: 'getCount',
+        count: 0,
+      },
+    })
+
+    expect(fn).toBeCalledWith({
+      calling: {
+        type: 'Single',
+        path: ['getCount'],
+        input: {},
+      },
+      options: {
+        key: 'bar',
+      },
+      json: {
+        type: 'ApiSingleSuccessResponse',
+        output: {
+          from: 'getCount',
+          count: 0,
+        },
+      },
+    })
+
+    expect(fn).toBeCalledTimes(2)
+
   })
 })

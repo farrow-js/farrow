@@ -1,5 +1,11 @@
 # farrow-api-client
 
+## 2.2.1
+
+### Patch Changes
+
+- a23d4ee: add FetcherLoaderOptions support, etc
+
 ## 2.2.0
 
 ### Minor Changes

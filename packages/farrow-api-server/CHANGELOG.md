@@ -1,5 +1,13 @@
 # farrow-api-server
 
+## 2.2.1
+
+### Patch Changes
+
+- a23d4ee: add FetcherLoaderOptions support, etc
+- Updated dependencies [a23d4ee]
+  - farrow-api@2.2.1
+
 ## 2.2.0
 
 ### Minor Changes

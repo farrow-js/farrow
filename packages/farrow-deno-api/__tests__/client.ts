@@ -28,10 +28,8 @@ export type ApiClientLoaderInput = {
   input: JsonType
 }
 
-export interface ApiClientLoaderOptions {
-  batch?: boolean
-  stream?: boolean
-  cache?: boolean
+declare global {
+  interface ApiClientLoaderOptions {}
 }
 
 export type ApiClientOptions = {

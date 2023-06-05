@@ -66,7 +66,7 @@ export type ContextStorage = {
 
 export const ContainerSymbol = Symbol('Container')
 
-export type ContextSymbol = typeof ContainerSymbol
+export type ContainerSymbol = typeof ContainerSymbol
 
 export const isContainer = (input: any): input is Container => {
   return !!(input && input[ContainerSymbol])

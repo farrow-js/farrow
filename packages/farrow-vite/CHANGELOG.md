@@ -1,5 +1,11 @@
 # farrow-vite
 
+## 2.2.1
+
+### Patch Changes
+
+- 8c06387: bump version
+
 ## 3.0.0
 
 ### Minor Changes

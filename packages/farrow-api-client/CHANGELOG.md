@@ -1,5 +1,11 @@
 # farrow-api-client
 
+## 2.2.2
+
+### Patch Changes
+
+- 8c06387: bump version
+
 ## 2.2.1
 
 ### Patch Changes

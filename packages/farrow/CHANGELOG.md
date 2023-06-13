@@ -1,5 +1,13 @@
 # farrow
 
+## 2.2.2
+
+### Patch Changes
+
+- 8c06387: bump version
+- Updated dependencies [8c06387]
+  - farrow-api@2.2.2
+
 ## 2.2.1
 
 ### Patch Changes

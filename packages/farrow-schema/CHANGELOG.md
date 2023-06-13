@@ -1,5 +1,11 @@
 # farrow-schema
 
+## 2.2.1
+
+### Patch Changes
+
+- 8c06387: bump version
+
 ## 2.2.0
 
 ### Minor Changes

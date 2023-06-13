@@ -1,5 +1,15 @@
 # farrow-deno-api
 
+## 2.2.1
+
+### Patch Changes
+
+- 8c06387: bump version
+- Updated dependencies [8c06387]
+  - farrow-api@2.2.2
+  - farrow-api-server@2.2.2
+  - farrow-schema@2.2.1
+
 ## 3.0.0
 
 ### Minor Changes

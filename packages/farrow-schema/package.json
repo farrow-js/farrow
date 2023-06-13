@@ -17,6 +17,7 @@
     "build": "pnpm run build:dist && pnpm run build:esm",
     "build:dist": "tsc -b ./tsconfig.json",
     "build:esm": "tsc -b ./tsconfig.esm.json",
+    "test:type": "tsc",
     "test": "jest",
     "test:coverage": "jest --collectCoverage --coverage"
   },

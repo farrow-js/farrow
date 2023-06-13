@@ -1,16 +1,6 @@
 import { isBooleanConstructor, isNumberConstructor, isStringConstructor, isDateConstructor } from './utils'
 import type { DateInstanceType, MarkReadOnlyDeep } from './types'
 
-export type Prettier<T> = T extends Promise<infer U>
-  ? Promise<Prettier<U>>
-  : T extends (...args: infer Args) => infer Return
-  ? (...args: Prettier<Args>) => Prettier<Return>
-  : T extends object | any[]
-  ? {
-    [key in keyof T]: Prettier<T[key]>
-  }
-  : T
-
 export type ShallowPrettier<T> = T extends object | any[]
   ? {
     [key in keyof T]: T[key]
@@ -346,13 +336,13 @@ export type SchemaCtorInput = SchemaCtor | FieldDescriptors
 export type TypeOfSchemaCtorInput<T extends SchemaCtor | FieldDescriptors> = T extends SchemaCtor
   ? TypeOf<T>
   : T extends FieldDescriptors
-  ? TypeOfFieldDescriptors<T>
+  ? ShallowPrettier<TypeOfFieldDescriptors<T>>
   : never
 
 export type ToSchemaCtor<T extends SchemaCtorInput> = T extends SchemaCtor
   ? T
   : T extends FieldDescriptors
-  ? new () => { __type: TypeOfFieldDescriptors<T> }
+  ? new () => { __type: ShallowPrettier<TypeOfFieldDescriptors<T>> }
   : never
 
 export type SchemaCtorInputs =

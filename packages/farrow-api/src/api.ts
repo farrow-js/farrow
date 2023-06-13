@@ -1,4 +1,4 @@
-import { Type, Prettier, TypeOf, ToSchemaCtor, SchemaCtorInput, JsonType } from 'farrow-schema'
+import { Type, TypeOf, ToSchemaCtor, SchemaCtorInput, JsonType, Json, ObjectType, Union, Literal } from 'farrow-schema'
 import { createAsyncPipeline, AsyncPipeline, MaybeAsync, useContainer, Container } from 'farrow-pipeline'
 
 export type { JsonType }
@@ -6,10 +6,10 @@ export type { JsonType }
 export type Typeable<T = unknown> =
   | T
   | {
-      [Type]: T
-      description?: string
-      deprecated?: string
-    }
+    [Type]: T
+    description?: string
+    deprecated?: string
+  }
 
 type TypeableContentType<T extends Typeable> = T extends Typeable<infer U> ? U : never
 
@@ -40,12 +40,12 @@ export type ApiDefinition<Input extends SchemaCtorInput = any, Output extends Sc
    */
   description?: string
   /**
-   * depcreated info of api if needed
+   * deprecated info of api if needed
    */
   deprecated?: string
 }
 
-export type TypeOfTypeable<T extends Typeable<SchemaCtorInput>> = Prettier<TypeOf<ToSchemaCtor<TypeableContentType<T>>>>
+export type TypeOfTypeable<T extends Typeable<SchemaCtorInput>> = TypeOf<ToSchemaCtor<TypeableContentType<T>>>
 
 export type ApiImpl<T extends ApiDefinition> = (
   input: TypeOfTypeable<T['input']>,
@@ -78,7 +78,7 @@ const useContainerSafe = (): Container | undefined => {
   try {
     return useContainer()
     // eslint-disable-next-line no-empty
-  } catch (_) {}
+  } catch (_) { }
 }
 
 export function createApi<T extends ApiDefinition>(definition: T, impl?: ApiImpl<T>): ApiType<T> {

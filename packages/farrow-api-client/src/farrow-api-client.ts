@@ -235,20 +235,27 @@ export const createLoader = <T extends Fetcher = Fetcher>(source: string | T, op
     scheduler: config.scheduler,
     onFlush: async (callings, options, onOutput) => {
       if (callings.length === 1) {
-        const response = await handleSingleCalling(callings[0], options)
-        onOutput(response, 0)
+        const promise = handleSingleCalling(callings[0], options)
+        onOutput(promise, 0)
         return
       }
 
-      const responseList = await handleBatchCalling({
-        type: 'Batch',
-        callings,
-      }, options)
+      try {
+        const responseList = await handleBatchCalling({
+          type: 'Batch',
+          callings,
+        }, options)
 
-      for (let index = 0; index < responseList.length; index++) {
-        const response = responseList[index]
-        const promise = handleSingleResponse(response)
-        onOutput(promise, index)
+        for (let index = 0; index < responseList.length; index++) {
+          const response = responseList[index]
+          const promise = handleSingleResponse(response)
+          onOutput(promise, index)
+        }
+      } catch (error) {
+        for (let index = 0; index < callings.length; index++) {
+          const promise = Promise.reject(error)
+          onOutput(promise, index)
+        }
       }
     },
   })

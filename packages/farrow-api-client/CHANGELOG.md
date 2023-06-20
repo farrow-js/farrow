@@ -1,5 +1,11 @@
 # farrow-api-client
 
+## 2.2.3
+
+### Patch Changes
+
+- 9ab39a4: fix ApiErrorResponse can't be catched
+
 ## 2.2.2
 
 ### Patch Changes

@@ -188,12 +188,14 @@ export const Struct = <T extends FieldDescriptors>(descriptors: T) => {
   }
 }
 
-export type TypeOfRecord<T extends SchemaCtor> = {
-  [key: string]: TypeOf<T>
-}
-
 export abstract class RecordType extends Schema {
-  __type!: TypeOfRecord<this['Item']>
+  __type!: {
+    /**
+     * workaround for:
+     * if the key part missing keyword `this`, `this` in the value part will not be recognized as the current type
+     */
+    [key in keyof this as string]: TypeOf<this['Item']>
+  }
   abstract Item: SchemaCtor
 }
 

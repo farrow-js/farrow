@@ -1,40 +1,80 @@
 import React, { useState, useEffect } from 'react'
 import logo from './logo.svg'
 import './App.css'
-import { Todo } from './api/todo'
-import { TodoApi } from './apis'
+import { Todo } from './__generated__/example'
+import { ExampleApi } from './apis'
+
+const addTodo = async (content: string) => {
+  const result = await ExampleApi.addTodo({
+    content,
+  })
+  return result
+}
+
+
+
+const tryBatch = async () => {
+  const result = await Promise.all([
+    ExampleApi.addTodo({
+      content: 'batch:0',
+    }, {
+      batch: false
+    }),
+    ExampleApi.addTodo({
+      content: 'batch:1',
+    }, {
+      batch: false
+    }),
+    ExampleApi.hello({
+      name: 'Jade',
+    }, {
+      batch: false
+    }),
+    ExampleApi.hello({
+      name: 'Jade',
+    }, {
+      batch: false
+    })
+  ])
+
+  console.log('result', result)
+}
+
+
+
 
 function App() {
   const [count, setCount] = useState(110)
   const [todos, setTodos] = useState<Todo[]>([])
 
   useEffect(() => {
-    const task = async () => {
-      TodoApi.longTask(
-        {},
-        {
-          cache: false,
-        },
-      )
-      const result = await TodoApi.addTodo({
-        content: `count:${count}`,
-      })
-      setTodos(result.todos)
-    }
-    task().catch((error) => {
-      console.log('error', error)
-    })
+    tryBatch()
+    // const task = async () => {
+    //   ExampleApi.longTask(
+    //     {},
+    //     {
+    //       cache: false,
+    //     },
+    //   )
+    //   const result = await ExampleApi.addTodo({
+    //     content: `count:${count}`,
+    //   })
+    //   setTodos(result.todos)
+    // }
+    // task().catch((error) => {
+    //   console.log('error', error)
+    // })
   }, [count])
 
-  useEffect(() => {
-    TodoApi.longTask({})
-    TodoApi.addTodo({
-      content: `batch:0`,
-    })
-    TodoApi.addTodo({
-      content: `batch:1`,
-    })
-  }, [])
+  // useEffect(() => {
+  //   ExampleApi.longTask({})
+  //   ExampleApi.addTodo({
+  //     content: `batch:0`,
+  //   })
+  //   ExampleApi.addTodo({
+  //     content: `batch:1`,
+  //   })
+  // }, [])
 
   return (
     <div className="App">

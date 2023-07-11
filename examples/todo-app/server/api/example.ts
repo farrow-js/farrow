@@ -25,11 +25,11 @@ export class Todo extends ObjectType {
 
 export type TodoType = TypeOf<Todo>
 
-export const Todos = List(Todo)
+export const TodoList = List(Todo)
 
-export type TodosType = TypeOf<typeof Todos>
+export type TodoListType = TypeOf<typeof TodoList>
 
-const state: { uid: number; todos: TodosType } = {
+const state: { uid: number; todos: TodoListType } = {
   uid: 0,
   todos: [
     {
@@ -55,7 +55,7 @@ export class AddTodoInput extends ObjectType {
 export class AddTodoOutput extends ObjectType {
   todos = {
     description: 'Todo list',
-    [Type]: Todos,
+    [Type]: TodoList,
   }
 }
 
@@ -77,6 +77,54 @@ export const addTodo = Api(
   },
 )
 
+export class UpdateTodoInput extends ObjectType {
+  id = {
+    description: 'Todo id for updating',
+    [Type]: Int,
+  }
+
+  content = {
+    description: 'Todo content for updating',
+    [Type]: String,
+  }
+}
+
+export class UpdateTodoOutput extends ObjectType {
+  todos = {
+    description: 'Todo list',
+    [Type]: TodoList,
+  }
+}
+
+export const updateTodo = Api(
+  {
+    description: 'update todo',
+    input: UpdateTodoInput,
+    output: UpdateTodoOutput,
+  },
+  async (input) => {
+    if (input.content === '') {
+      const result = await removeTodo({ id: input.id })
+      return {
+        todos: result.todos,
+      }
+    }
+
+    state.todos = state.todos.map((todo) => {
+      if (todo.id === input.id) {
+        return {
+          ...todo,
+          content: input.content,
+        }
+      }
+      return todo
+    })
+    return {
+      todos: state.todos,
+    }
+  },
+)
+
 export class RemoveTodoInput extends ObjectType {
   id = {
     description: 'Todo id for removing',
@@ -87,7 +135,7 @@ export class RemoveTodoInput extends ObjectType {
 export class RemoveTodoOutput extends ObjectType {
   todos = {
     description: 'Remain todo list',
-    [Type]: Todos,
+    [Type]: TodoList,
   }
 }
 
@@ -132,8 +180,38 @@ export const longTask = Api(
   },
 )
 
+
+class HelloInput extends ObjectType {
+  name = String
+}
+
+class HelloOutput extends ObjectType {
+  message = String
+}
+
+export const hello = Api(
+  {
+    // deprecated: `use \`addTodo\` instead`,
+    input: HelloInput,
+    output: HelloOutput,
+  },
+  async ({ name }) => {
+    if (name === '') {
+      throw new Error('name is empty')
+    }
+
+    return {
+      message: `Hello ${name}!`,
+    }
+  },
+)
+
+
+
 export const entries = {
+  hello,
   addTodo,
+  updateTodo,
   removeTodo,
   longTask,
 }

@@ -1,5 +1,5 @@
 import { Response, Router } from 'farrow-http'
-import { service as TodoService } from './todo'
+import { service as TodoService } from './example'
 
 export const services = Router()
 
@@ -14,4 +14,4 @@ services.capture('json', (body) => {
 })
 
 // attach todo api
-services.route('/api/todo').use(TodoService)
+services.route('/api/example').use(TodoService)

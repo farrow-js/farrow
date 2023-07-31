@@ -143,7 +143,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
     /**
      * validate input
      */
-    if (config.validation?.input !== false) {
+    if (config.validation?.input !== false && definition.validation?.input !== false) {
       const inputResult = validateApiInput(singleCalling.input)
 
       if (inputResult.isErr) {
@@ -158,7 +158,7 @@ export const createApiService = (options: CreateApiServiceOptions): ApiServiceTy
     try {
       let output = await api(input)
 
-      if (config.validation?.output !== false) {
+      if (config.validation?.output !== false && definition.validation?.output !== false) {
         const OutputSchema = toSchemaCtor(getContentType(definition.output))
         const validateApiOutput = getValidator(OutputSchema)
 

@@ -43,6 +43,13 @@ export type ApiDefinition<Input extends SchemaCtorInput = any, Output extends Sc
    * deprecated info of api if needed
    */
   deprecated?: string
+  /**
+   * config validation for input and output
+   */
+  validation?: {
+    input: boolean
+    output: boolean
+  }
 }
 
 export type TypeOfTypeable<T extends Typeable<SchemaCtorInput>> = TypeOf<ToSchemaCtor<TypeableContentType<T>>>

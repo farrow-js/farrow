@@ -5,7 +5,7 @@ import { Api } from 'farrow-api'
 import fetch from 'node-fetch'
 import { ApiService } from '../src/apiService'
 
-let portUid = 3000
+let portUid = 4000
 
 const delay = (ms: number) => {
   return new Promise((resolve) => {
@@ -744,5 +744,57 @@ describe('ApiService', () => {
     await new Promise((resolve) => {
       server.close(resolve)
     })
+  })
+
+  it('should not validate input and output', async () => {
+    const http = createHttp()
+    const server = http.server()
+
+
+    const myApi = Api({
+      input: {
+        a: Int,
+      },
+      output: {
+        a: Int,
+      },
+      validation: {
+        input: false,
+        output: false,
+      }
+    }, input => {
+      return {
+        extraOutput: 123,
+        ...input,
+      }
+    })
+
+    const CounterService = ApiService({
+      entries: {
+        myApi,
+      },
+      errorStack: false,
+    })
+
+    http.route('/test').use(CounterService)
+
+    await request(server)
+      .post('/test')
+      .send({
+        type: 'Single',
+        path: ['myApi'],
+        input: {
+          a: 1.2,
+          extraInput: 123,
+        },
+      })
+      .expect(200, {
+        type: 'ApiSingleSuccessResponse',
+        output: {
+          a: 1.2,
+          extraInput: 123,
+          extraOutput: 123,
+        },
+      })
   })
 })

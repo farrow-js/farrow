@@ -4,13 +4,18 @@ import './App.css'
 import { Todo } from './__generated__/example'
 import { ExampleApi } from './apis'
 
+
+
+
 const addTodo = async (content: string) => {
   const result = await ExampleApi.addTodo({
     content,
   })
-  return result
-}
 
+  return result.todos?.filter(todo => {
+    return todo.content !== ''
+  })
+}
 
 
 const tryBatch = async () => {
@@ -48,7 +53,8 @@ function App() {
   const [todos, setTodos] = useState<Todo[]>([])
 
   useEffect(() => {
-    tryBatch()
+    addTodo(`count:${count}`)
+    // tryBatch()
     // const task = async () => {
     //   ExampleApi.longTask(
     //     {},

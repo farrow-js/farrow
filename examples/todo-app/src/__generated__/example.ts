@@ -44,7 +44,7 @@ export type AddTodoOutput = {
   /**
   * @remarks Todo list
   */
-  todos: (Todo)[]
+  todos?: (Todo)[] | null | undefined
 }
 
 /**

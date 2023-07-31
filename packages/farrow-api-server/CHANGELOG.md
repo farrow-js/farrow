@@ -1,5 +1,13 @@
 # farrow-api-server
 
+## 2.2.3
+
+### Patch Changes
+
+- 1e5b7ae: support configuring input/output validation for single Api
+- Updated dependencies [1e5b7ae]
+  - farrow-api@2.2.3
+
 ## 2.2.2
 
 ### Patch Changes

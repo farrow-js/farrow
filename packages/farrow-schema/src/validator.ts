@@ -232,7 +232,16 @@ Validator.impl<S.LiteralType>(S.LiteralType, (schema) => ({
 
 Validator.impl<S.NullableType>(S.NullableType, schema => ({
   validate: (input, options) => {
-    if (input === null || input === undefined) {
+    if (input === null) {
+      return Ok(input)
+    }
+    return Validator.validate(schema.Item, input, options)
+  }
+}))
+
+Validator.impl<S.OptionalType>(S.OptionalType, schema => ({
+  validate: (input, options) => {
+    if (input === undefined) {
       return Ok(input)
     }
     return Validator.validate(schema.Item, input, options)

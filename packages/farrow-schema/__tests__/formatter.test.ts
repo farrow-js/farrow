@@ -752,7 +752,7 @@ describe('Formatter', () => {
           valueName: 'String',
         },
         '2': {
-          type: 'Nullable',
+          type: 'Optional',
           itemTypeId: 1,
           $ref: '#/types/1',
         },
@@ -776,7 +776,7 @@ describe('Formatter', () => {
           $ref: '#/types/3',
         },
         '5': {
-          type: 'Nullable',
+          type: 'Optional',
           itemTypeId: 4,
           $ref: '#/types/4',
         },
@@ -805,7 +805,7 @@ describe('Formatter', () => {
           valueName: 'String',
         },
         '2': {
-          type: 'Nullable',
+          type: 'Optional',
           itemTypeId: 1,
           $ref: '#/types/1',
         },
@@ -815,7 +815,7 @@ describe('Formatter', () => {
           valueName: 'Int',
         },
         '4': {
-          type: 'Nullable',
+          type: 'Optional',
           itemTypeId: 3,
           $ref: '#/types/3',
         },

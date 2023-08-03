@@ -200,9 +200,6 @@ export abstract class PartialType extends S.Schema {
   abstract Item: S.SchemaCtor
 }
 
-const isNullableType = (input: any): input is new () => S.NullableType => {
-  return input?.prototype instanceof S.NullableType
-}
 
 const getPartialFields = (fields: FieldDescriptors) => {
   const descriptors = {} as S.FieldDescriptors
@@ -210,7 +207,7 @@ const getPartialFields = (fields: FieldDescriptors) => {
   for (const [key, value] of Object.entries(getSchemaCtorFields(fields))) {
     descriptors[key] = {
       ...value,
-      [S.Type]: isNullableType(value[S.Type]) ? value[S.Type] : S.Nullable(value[S.Type]),
+      [S.Type]: S.isOptionalType(value[S.Type]) ? value[S.Type] : S.Optional(value[S.Type]),
     }
   }
 

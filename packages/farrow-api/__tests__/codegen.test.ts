@@ -21,6 +21,7 @@ import {
   Date,
   Tuple,
   partial,
+  Optional,
 } from 'farrow-schema'
 
 const NamedStruct = Struct({
@@ -111,6 +112,7 @@ class Collection extends ObjectType {
   id = ID
   date = Date
   nest = Nullable(Collection)
+  optional = Optional(String)
   list = List(Collection)
   struct = Struct({
     named: String,
@@ -199,12 +201,7 @@ describe('generateApi', () => {
 
     const source = codegen(formatResult, {})
 
-    const expected = await fs.readFile(`${__dirname}/expected/01.ts`)
-
-    // debug
-    // fs.writeFile(`${__dirname}/expected/01.ts`, source)
-
-    expect(source.replace(/\r|\n/g, '')).toBe(expected.toString().replace(/\r|\n/g, ''))
+    expect(source).toMatchSnapshot()
   })
 
   it('can attach header and footer when codegen', async () => {

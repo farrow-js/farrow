@@ -182,13 +182,13 @@ const resolveUrlPattern = <T extends string>(input: T) => {
       const Type = createSchemaByString(value)
 
       if (key.endsWith('?')) {
-        const name = key.substr(0, key.length - 1)
+        const name = key.substring(0, key.length - 1)
         // @ts-ignore
-        descriptors[name] = Schema.Nullable(Type)
+        descriptors[name] = Schema.Optional(Type)
       } else if (key.endsWith('+') || key.endsWith('*')) {
-        const name = key.substr(0, key.length - 1)
+        const name = key.substring(0, key.length - 1)
         // @ts-ignore
-        descriptors[name] = key.endsWith('*') ? Schema.Nullable(Schema.List(Type)) : Schema.List(Type)
+        descriptors[name] = key.endsWith('*') ? Schema.Optional(Schema.List(Type)) : Schema.List(Type)
       } else {
         // @ts-ignore
         descriptors[key] = Type

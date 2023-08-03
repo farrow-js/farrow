@@ -1,6 +1,6 @@
 import * as Schema from '../src/schema'
-import { ReadOnly, TypeOf, ReadOnlyDeep } from '../src/schema'
-import { createSchemaValidator, RegExp, ValidationResult, Validator, ValidatorType } from '../src/validator'
+import { ReadOnly, TypeOf, ReadOnlyDeep, Optional } from '../src/schema'
+import { createSchemaValidator, RegExp, ValidationError, ValidationResult, Validator, ValidatorType } from '../src/validator'
 import { pick, omit, keyof, partial } from '../src/helper'
 
 const {
@@ -24,6 +24,11 @@ const {
 const assertOk = <T>(result: ValidationResult<T>): T => {
   if (result.isOk) return result.value
   throw new Error(result.value.message)
+}
+
+const assertErr = <T>(result: ValidationResult<T>) => {
+  if (result.isErr) return true
+  throw new Error('should be an error')
 }
 
 describe('Validator', () => {
@@ -182,17 +187,17 @@ describe('Validator', () => {
     const validateNullableBoolean = createSchemaValidator(Nullable(Boolean))
 
     expect(assertOk(validateNullableNumber(null))).toBe(null)
-    expect(assertOk(validateNullableNumber(undefined))).toBe(undefined)
     expect(assertOk(validateNullableNumber(1))).toBe(1)
+    expect(assertErr(validateNullableNumber(undefined))).toBe(true)
 
     expect(assertOk(validateNullableString(null))).toBe(null)
-    expect(assertOk(validateNullableString(undefined))).toBe(undefined)
     expect(assertOk(validateNullableString('1'))).toBe('1')
+    expect(assertErr(validateNullableString(undefined))).toBe(true)
 
     expect(assertOk(validateNullableBoolean(null))).toBe(null)
-    expect(assertOk(validateNullableBoolean(undefined))).toBe(undefined)
     expect(assertOk(validateNullableBoolean(true))).toBe(true)
     expect(assertOk(validateNullableBoolean(false))).toBe(false)
+    expect(assertErr(validateNullableBoolean(undefined))).toBe(true)
   })
 
   it('supports list validation', () => {
@@ -230,6 +235,9 @@ describe('Validator', () => {
       e = {
         [Type]: Nullable(String),
       }
+      f? = {
+        [Type]: Optional(String),
+      }
     }
 
     const validate = createSchemaValidator(Obj)
@@ -242,6 +250,8 @@ describe('Validator', () => {
           c: false,
           d: [1, 2, 3],
           e: null,
+          f: 'string',
+          g: 'not existed',
         }),
       ),
     ).toEqual({
@@ -250,8 +260,10 @@ describe('Validator', () => {
       c: false,
       d: [1, 2, 3],
       e: null,
+      f: 'string',
     })
 
+    // field f is optional
     expect(
       assertOk(
         validate({
@@ -259,6 +271,7 @@ describe('Validator', () => {
           b: '1',
           c: false,
           d: [1, 2, 3],
+          e: 'abc'
         }),
       ),
     ).toEqual({
@@ -266,7 +279,20 @@ describe('Validator', () => {
       b: '1',
       c: false,
       d: [1, 2, 3],
+      e: 'abc'
     })
+
+       // field e is not optional
+       expect(
+        assertErr(
+          validate({
+            a: 1,
+            b: '1',
+            c: false,
+            d: [1, 2, 3],
+          }),
+        ),
+      ).toEqual(true)
 
     expect(
       assertOk(
@@ -276,25 +302,6 @@ describe('Validator', () => {
           c: false,
           d: [1, 2, 3],
           e: 'string',
-        }),
-      ),
-    ).toEqual({
-      a: 1,
-      b: '1',
-      c: false,
-      d: [1, 2, 3],
-      e: 'string',
-    })
-
-    expect(
-      assertOk(
-        validate({
-          a: 1,
-          b: '1',
-          c: false,
-          d: [1, 2, 3],
-          e: 'string',
-          f: 'not existed',
         }),
       ),
     ).toEqual({
@@ -524,10 +531,10 @@ describe('Validator', () => {
     expect(() => assertOk(validateStructWithNever({ foo: 0, bar: undefined }))).toThrow()
     expect(() => assertOk(validateStructWithNever({ foo: 0, bar: 0 }))).toThrow()
 
-    const validateStructWithNullableNever = createSchemaValidator(Struct({ foo: Number, bar: Nullable(Never) }))
-    expect(assertOk(validateStructWithNullableNever({ foo: 0 }))).toEqual({ foo: 0 })
-    expect(assertOk(validateStructWithNullableNever({ foo: 0, bar: undefined }))).toEqual({ foo: 0, bar: undefined })
-    expect(() => assertOk(validateStructWithNullableNever({ foo: 0, bar: 0 }))).toThrow()
+    const validateStructWithOptionalNever = createSchemaValidator(Struct({ foo: Number, bar: Optional(Never) }))
+    expect(assertOk(validateStructWithOptionalNever({ foo: 0 }))).toEqual({ foo: 0 })
+    expect(assertOk(validateStructWithOptionalNever({ foo: 0, bar: undefined }))).toEqual({ foo: 0, bar: undefined })
+    expect(() => assertOk(validateStructWithOptionalNever({ foo: 0, bar: 0 }))).toThrow()
 
     const validateRecordWithNever = createSchemaValidator(Record(Never))
     expect(assertOk(validateRecordWithNever({}))).toEqual({})
@@ -552,7 +559,7 @@ describe('Validator', () => {
   it('supports defining recursive schema via ObjectType', () => {
     class Nest extends ObjectType {
       value = Number
-      nest = Nullable(Nest)
+      nest = Optional(Nest)
     }
 
     const validateNest = createSchemaValidator(Nest)
@@ -656,7 +663,7 @@ describe('Validator', () => {
     ])
 
     expect(assertOk(validateNullable(null))).toEqual(null)
-    expect(assertOk(validateNullable(undefined))).toEqual(undefined)
+    expect(assertErr(validateNullable(undefined))).toEqual(true)
 
     expect(assertOk(validateUnion({ a: 1 }))).toEqual({
       a: 1,

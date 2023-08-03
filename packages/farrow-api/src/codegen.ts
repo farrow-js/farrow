@@ -76,7 +76,11 @@ export const getFieldType = (typeId: number, types: FormatTypes, indent = 2): st
   }
 
   if (fieldType.type === 'Nullable') {
-    return `${getFieldType(fieldType.itemTypeId, types)} | null | undefined`
+    return `${getFieldType(fieldType.itemTypeId, types)} | null`
+  }
+
+  if (fieldType.type === 'Optional') {
+    return `${getFieldType(fieldType.itemTypeId, types)} | undefined`
   }
 
   if (fieldType.type === 'List') {
@@ -118,7 +122,7 @@ export const getFieldsType = (fields: FormatFields, types: FormatTypes): string[
     const fieldType = types[field.typeId]
     let result = ''
 
-    if (fieldType.type === 'Nullable') {
+    if (fieldType.type === 'Optional') {
       result = `${key}?: ${getFieldType(field.typeId, types)}`
     } else {
       result = `${key}: ${getFieldType(field.typeId, types)}`

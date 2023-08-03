@@ -5,7 +5,7 @@ import path from 'path'
 import { Stream } from 'stream'
 import express from 'express'
 
-import { Nullable } from 'farrow-schema'
+import { Optional } from 'farrow-schema'
 import { createContext } from 'farrow-pipeline'
 
 import {
@@ -917,7 +917,7 @@ describe('Express', () => {
           pathname: '/test',
           query: {
             a: String,
-            new: Nullable(Boolean),
+            new: Optional(Boolean),
           },
         })
         .use((request) => {

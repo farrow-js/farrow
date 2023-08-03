@@ -54,6 +54,12 @@ export type FormatNullableType = {
   $ref: string
 }
 
+export type FormatOptionalType = {
+  type: 'Optional'
+  itemTypeId: number
+  $ref: string
+}
+
 export type FormatUnionType = {
   type: 'Union'
   name?: string
@@ -105,6 +111,7 @@ export type FormatType =
   | FormatListType
   | FormatLiteralType
   | FormatNullableType
+  | FormatOptionalType
   | FormatIntersectType
   | FormatTupleType
   | FormatStrictType
@@ -334,6 +341,19 @@ Formatter.impl(S.NullableType, (schema) => {
       const typeId = Formatter.formatSchema(schema.Item, ctx)
       return ctx.addType({
         type: 'Nullable',
+        itemTypeId: typeId,
+        $ref: `#/types/${typeId}`,
+      })
+    },
+  }
+})
+
+Formatter.impl(S.OptionalType, (schema) => {
+  return {
+    format(ctx) {
+      const typeId = Formatter.formatSchema(schema.Item, ctx)
+      return ctx.addType({
+        type: 'Optional',
         itemTypeId: typeId,
         $ref: `#/types/${typeId}`,
       })

@@ -5,7 +5,7 @@ import path from 'path'
 import { Stream } from 'stream'
 import Koa from 'koa'
 
-import { Nullable } from 'farrow-schema'
+import { Optional } from 'farrow-schema'
 import { createContext } from 'farrow-pipeline'
 
 import {
@@ -920,7 +920,7 @@ describe('Http', () => {
           pathname: '/test',
           query: {
             a: String,
-            new: Nullable(Boolean),
+            new: Optional(Boolean),
           },
         })
         .use((request) => {

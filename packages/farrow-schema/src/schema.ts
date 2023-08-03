@@ -135,7 +135,7 @@ export const Null = Literal(null)
 export const Undefined = Literal(undefined)
 
 export abstract class NullableType extends Schema {
-  __type!: TypeOf<this['Item']> | null | undefined
+  __type!: TypeOf<this['Item']> | null
   abstract Item: SchemaCtor
 }
 
@@ -145,6 +145,21 @@ export const isNullableType = (input: any): input is new () => NullableType => {
 
 export const Nullable = <T extends SchemaCtorInput>(Item: T) => {
   return class Nullable extends NullableType {
+    Item = toSchemaCtor(Item)
+  }
+}
+
+export abstract class OptionalType extends Schema {
+  __type!: TypeOf<this['Item']> | undefined
+  abstract Item: SchemaCtor
+}
+
+export const isOptionalType = (input: any): input is new () => OptionalType => {
+  return input?.prototype instanceof OptionalType
+}
+
+export const Optional = <T extends SchemaCtorInput>(Item: T) => {
+  return class Optional extends OptionalType {
     Item = toSchemaCtor(Item)
   }
 }

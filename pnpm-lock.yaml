@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 importers:
 
   .:
@@ -247,8 +251,8 @@ importers:
         specifier: ^5.0.4
         version: 5.0.4
       vite:
-        specifier: ^2.0.1
-        version: 2.9.15
+        specifier: ^2.9.16
+        version: 2.9.16
 
   packages/create-farrow-app:
     dependencies:
@@ -404,8 +408,8 @@ importers:
         specifier: ^5.0.4
         version: 5.0.4
       vite:
-        specifier: ^2.0.1
-        version: 2.9.15
+        specifier: ^2.9.16
+        version: 2.9.16
 
   packages/farrow:
     dependencies:
@@ -431,7 +435,7 @@ importers:
         specifier: ^5.0.0
         version: 5.1.1
       farrow-api:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-api
       fs-extra:
         specifier: ^9.1.0
@@ -468,7 +472,7 @@ importers:
         specifier: ^2.0.10
         version: 2.0.12
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       jest:
         specifier: ^29.5.0
@@ -489,10 +493,10 @@ importers:
   packages/farrow-api:
     dependencies:
       farrow-pipeline:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-pipeline
       farrow-schema:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-schema
       tslib:
         specifier: ^2.5.0
@@ -527,16 +531,16 @@ importers:
         specifier: ^2.5.8
         version: 2.6.2
       farrow-api:
-        specifier: workspace:^2.2.0
+        specifier: workspace:^2.3.0
         version: link:../farrow-api
       farrow-api-server:
-        specifier: workspace:^2.2.0
+        specifier: workspace:^2.3.0
         version: link:../farrow-api-server
       farrow-http:
-        specifier: workspace:^2.2.0
+        specifier: workspace:^2.3.0
         version: link:../farrow-http
       farrow-schema:
-        specifier: workspace:^2.2.0
+        specifier: workspace:^2.3.0
         version: link:../farrow-schema
       jest:
         specifier: ^29.5.0
@@ -554,13 +558,13 @@ importers:
   packages/farrow-api-server:
     dependencies:
       farrow-api:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-api
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       farrow-schema:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-schema
       lodash.get:
         specifier: ^4.4.2
@@ -582,7 +586,7 @@ importers:
         specifier: ^2.0.10
         version: 2.0.12
       farrow-api-client:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-api-client
       jest:
         specifier: ^29.5.0
@@ -606,7 +610,7 @@ importers:
         specifier: ^2.8.5
         version: 2.8.5
       farrow-pipeline:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-pipeline
       tslib:
         specifier: ^2.5.0
@@ -622,7 +626,7 @@ importers:
         specifier: ^2.0.10
         version: 2.0.12
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       jest:
         specifier: ^29.5.0
@@ -640,13 +644,13 @@ importers:
   packages/farrow-deno-api:
     dependencies:
       farrow-api:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-api
       farrow-api-server:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-api-server
       farrow-schema:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-schema
       tslib:
         specifier: ^2.5.0
@@ -662,7 +666,7 @@ importers:
         specifier: ^2.0.12
         version: 2.0.12
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       jest:
         specifier: ^29.5.0
@@ -699,13 +703,13 @@ importers:
         specifier: ^4.17.1
         version: 4.18.2
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       farrow-pipeline:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-pipeline
       farrow-schema:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-schema
       jest:
         specifier: ^29.5.0
@@ -723,13 +727,13 @@ importers:
   packages/farrow-federation:
     dependencies:
       farrow-api:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-api
       farrow-api-server:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-api-server
       farrow-schema:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-schema
       node-fetch:
         specifier: ^2.6.2
@@ -751,10 +755,10 @@ importers:
         specifier: ^2.0.11
         version: 2.0.12
       farrow-cors:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-cors
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       jest:
         specifier: ^29.5.0
@@ -802,10 +806,10 @@ importers:
         specifier: ^1.0.3
         version: 1.0.3
       farrow-pipeline:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-pipeline
       farrow-schema:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-schema
       mime-types:
         specifier: ^2.1.27
@@ -899,7 +903,7 @@ importers:
   packages/farrow-json-schema:
     dependencies:
       farrow-schema:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-schema
       tslib:
         specifier: ^2.5.0
@@ -912,7 +916,7 @@ importers:
         specifier: ^7.0.7
         version: 7.0.11
       farrow-api:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-api
       jest:
         specifier: ^29.5.0
@@ -940,13 +944,13 @@ importers:
         specifier: ^2.0.11
         version: 2.0.12
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       farrow-pipeline:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-pipeline
       farrow-schema:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-schema
       jest:
         specifier: ^29.5.0
@@ -989,7 +993,7 @@ importers:
         specifier: ^0.4.1
         version: 0.4.2
       farrow-module:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-module
       isomorphic-unfetch:
         specifier: ^3.1.0
@@ -1072,7 +1076,7 @@ importers:
         specifier: ^17.0.0
         version: 17.0.18
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       next:
         specifier: ^12.0.4
@@ -1131,7 +1135,7 @@ importers:
         specifier: ^2.0.11
         version: 2.0.12
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       jest:
         specifier: ^29.5.0
@@ -1184,7 +1188,7 @@ importers:
         specifier: ^2.0.11
         version: 2.0.12
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       jest:
         specifier: ^29.5.0
@@ -1199,8 +1203,8 @@ importers:
         specifier: ^5.0.4
         version: 5.0.4
       vite:
-        specifier: 2.6.14
-        version: 2.6.14
+        specifier: 2.9.16
+        version: 2.9.16
 
   packages/farrow/fixtures/project0:
     dependencies:
@@ -4453,28 +4457,12 @@ packages:
     requiresBuild: true
     optional: true
 
-  /esbuild-android-arm64@0.13.15:
-    resolution: {integrity: sha512-m602nft/XXeO8YQPUDVoHfjyRVPdPgjyyXOxZ44MK/agewFFkPa8tUo6lAzSWh5Ui5PB4KR9UIFTSBKh/RrCmg==}
-    cpu: [arm64]
-    os: [android]
-    requiresBuild: true
-    dev: true
-    optional: true
-
   /esbuild-android-arm64@0.14.54:
     resolution: {integrity: sha512-F9E+/QDi9sSkLaClO8SOV6etqPd+5DgJje1F9lOWoNncDdOBL2YF59IhsWATSt0TLZbYCf3pNlTHvVV5VfHdvg==}
     engines: {node: '>=12'}
     cpu: [arm64]
     os: [android]
     requiresBuild: true
-    optional: true
-
-  /esbuild-darwin-64@0.13.15:
-    resolution: {integrity: sha512-ihOQRGs2yyp7t5bArCwnvn2Atr6X4axqPpEdCFPVp7iUj4cVSdisgvEKdNR7yH3JDjW6aQDw40iQFoTqejqxvQ==}
-    cpu: [x64]
-    os: [darwin]
-    requiresBuild: true
-    dev: true
     optional: true
 
   /esbuild-darwin-64@0.14.54:
@@ -4485,28 +4473,12 @@ packages:
     requiresBuild: true
     optional: true
 
-  /esbuild-darwin-arm64@0.13.15:
-    resolution: {integrity: sha512-i1FZssTVxUqNlJ6cBTj5YQj4imWy3m49RZRnHhLpefFIh0To05ow9DTrXROTE1urGTQCloFUXTX8QfGJy1P8dQ==}
-    cpu: [arm64]
-    os: [darwin]
-    requiresBuild: true
-    dev: true
-    optional: true
-
   /esbuild-darwin-arm64@0.14.54:
     resolution: {integrity: sha512-OPafJHD2oUPyvJMrsCvDGkRrVCar5aVyHfWGQzY1dWnzErjrDuSETxwA2HSsyg2jORLY8yBfzc1MIpUkXlctmw==}
     engines: {node: '>=12'}
     cpu: [arm64]
     os: [darwin]
     requiresBuild: true
-    optional: true
-
-  /esbuild-freebsd-64@0.13.15:
-    resolution: {integrity: sha512-G3dLBXUI6lC6Z09/x+WtXBXbOYQZ0E8TDBqvn7aMaOCzryJs8LyVXKY4CPnHFXZAbSwkCbqiPuSQ1+HhrNk7EA==}
-    cpu: [x64]
-    os: [freebsd]
-    requiresBuild: true
-    dev: true
     optional: true
 
   /esbuild-freebsd-64@0.14.54:
@@ -4517,28 +4489,12 @@ packages:
     requiresBuild: true
     optional: true
 
-  /esbuild-freebsd-arm64@0.13.15:
-    resolution: {integrity: sha512-KJx0fzEDf1uhNOZQStV4ujg30WlnwqUASaGSFPhznLM/bbheu9HhqZ6mJJZM32lkyfGJikw0jg7v3S0oAvtvQQ==}
-    cpu: [arm64]
-    os: [freebsd]
-    requiresBuild: true
-    dev: true
-    optional: true
-
   /esbuild-freebsd-arm64@0.14.54:
     resolution: {integrity: sha512-sFwueGr7OvIFiQT6WeG0jRLjkjdqWWSrfbVwZp8iMP+8UHEHRBvlaxL6IuKNDwAozNUmbb8nIMXa7oAOARGs1Q==}
     engines: {node: '>=12'}
     cpu: [arm64]
     os: [freebsd]
     requiresBuild: true
-    optional: true
-
-  /esbuild-linux-32@0.13.15:
-    resolution: {integrity: sha512-ZvTBPk0YWCLMCXiFmD5EUtB30zIPvC5Itxz0mdTu/xZBbbHJftQgLWY49wEPSn2T/TxahYCRDWun5smRa0Tu+g==}
-    cpu: [ia32]
-    os: [linux]
-    requiresBuild: true
-    dev: true
     optional: true
 
   /esbuild-linux-32@0.14.54:
@@ -4549,28 +4505,12 @@ packages:
     requiresBuild: true
     optional: true
 
-  /esbuild-linux-64@0.13.15:
-    resolution: {integrity: sha512-eCKzkNSLywNeQTRBxJRQ0jxRCl2YWdMB3+PkWFo2BBQYC5mISLIVIjThNtn6HUNqua1pnvgP5xX0nHbZbPj5oA==}
-    cpu: [x64]
-    os: [linux]
-    requiresBuild: true
-    dev: true
-    optional: true
-
   /esbuild-linux-64@0.14.54:
     resolution: {integrity: sha512-EgjAgH5HwTbtNsTqQOXWApBaPVdDn7XcK+/PtJwZLT1UmpLoznPd8c5CxqsH2dQK3j05YsB3L17T8vE7cp4cCg==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [linux]
     requiresBuild: true
-    optional: true
-
-  /esbuild-linux-arm64@0.13.15:
-    resolution: {integrity: sha512-bYpuUlN6qYU9slzr/ltyLTR9YTBS7qUDymO8SV7kjeNext61OdmqFAzuVZom+OLW1HPHseBfJ/JfdSlx8oTUoA==}
-    cpu: [arm64]
-    os: [linux]
-    requiresBuild: true
-    dev: true
     optional: true
 
   /esbuild-linux-arm64@0.14.54:
@@ -4581,14 +4521,6 @@ packages:
     requiresBuild: true
     optional: true
 
-  /esbuild-linux-arm@0.13.15:
-    resolution: {integrity: sha512-wUHttDi/ol0tD8ZgUMDH8Ef7IbDX+/UsWJOXaAyTdkT7Yy9ZBqPg8bgB/Dn3CZ9SBpNieozrPRHm0BGww7W/jA==}
-    cpu: [arm]
-    os: [linux]
-    requiresBuild: true
-    dev: true
-    optional: true
-
   /esbuild-linux-arm@0.14.54:
     resolution: {integrity: sha512-qqz/SjemQhVMTnvcLGoLOdFpCYbz4v4fUo+TfsWG+1aOu70/80RV6bgNpR2JCrppV2moUQkww+6bWxXRL9YMGw==}
     engines: {node: '>=12'}
@@ -4597,28 +4529,12 @@ packages:
     requiresBuild: true
     optional: true
 
-  /esbuild-linux-mips64le@0.13.15:
-    resolution: {integrity: sha512-KlVjIG828uFPyJkO/8gKwy9RbXhCEUeFsCGOJBepUlpa7G8/SeZgncUEz/tOOUJTcWMTmFMtdd3GElGyAtbSWg==}
-    cpu: [mips64el]
-    os: [linux]
-    requiresBuild: true
-    dev: true
-    optional: true
-
   /esbuild-linux-mips64le@0.14.54:
     resolution: {integrity: sha512-qTHGQB8D1etd0u1+sB6p0ikLKRVuCWhYQhAHRPkO+OF3I/iSlTKNNS0Lh2Oc0g0UFGguaFZZiPJdJey3AGpAlw==}
     engines: {node: '>=12'}
     cpu: [mips64el]
     os: [linux]
     requiresBuild: true
-    optional: true
-
-  /esbuild-linux-ppc64le@0.13.15:
-    resolution: {integrity: sha512-h6gYF+OsaqEuBjeesTBtUPw0bmiDu7eAeuc2OEH9S6mV9/jPhPdhOWzdeshb0BskRZxPhxPOjqZ+/OqLcxQwEQ==}
-    cpu: [ppc64]
-    os: [linux]
-    requiresBuild: true
-    dev: true
     optional: true
 
   /esbuild-linux-ppc64le@0.14.54:
@@ -4645,14 +4561,6 @@ packages:
     requiresBuild: true
     optional: true
 
-  /esbuild-netbsd-64@0.13.15:
-    resolution: {integrity: sha512-3+yE9emwoevLMyvu+iR3rsa+Xwhie7ZEHMGDQ6dkqP/ndFzRHkobHUKTe+NCApSqG5ce2z4rFu+NX/UHnxlh3w==}
-    cpu: [x64]
-    os: [netbsd]
-    requiresBuild: true
-    dev: true
-    optional: true
-
   /esbuild-netbsd-64@0.14.54:
     resolution: {integrity: sha512-PR01lmIMnfJTgeU9VJTDY9ZerDWVFIUzAtJuDHwwceppW7cQWjBBqP48NdeRtoP04/AtO9a7w3viI+PIDr6d+w==}
     engines: {node: '>=12'}
@@ -4672,28 +4580,12 @@ packages:
       tslib: 2.5.0
     dev: false
 
-  /esbuild-openbsd-64@0.13.15:
-    resolution: {integrity: sha512-wTfvtwYJYAFL1fSs8yHIdf5GEE4NkbtbXtjLWjM3Cw8mmQKqsg8kTiqJ9NJQe5NX/5Qlo7Xd9r1yKMMkHllp5g==}
-    cpu: [x64]
-    os: [openbsd]
-    requiresBuild: true
-    dev: true
-    optional: true
-
   /esbuild-openbsd-64@0.14.54:
     resolution: {integrity: sha512-Qyk7ikT2o7Wu76UsvvDS5q0amJvmRzDyVlL0qf5VLsLchjCa1+IAvd8kTBgUxD7VBUUVgItLkk609ZHUc1oCaw==}
     engines: {node: '>=12'}
     cpu: [x64]
     os: [openbsd]
     requiresBuild: true
-    optional: true
-
-  /esbuild-sunos-64@0.13.15:
-    resolution: {integrity: sha512-lbivT9Bx3t1iWWrSnGyBP9ODriEvWDRiweAs69vI+miJoeKwHWOComSRukttbuzjZ8r1q0mQJ8Z7yUsDJ3hKdw==}
-    cpu: [x64]
-    os: [sunos]
-    requiresBuild: true
-    dev: true
     optional: true
 
   /esbuild-sunos-64@0.14.54:
@@ -4704,28 +4596,12 @@ packages:
     requiresBuild: true
     optional: true
 
-  /esbuild-windows-32@0.13.15:
-    resolution: {integrity: sha512-fDMEf2g3SsJ599MBr50cY5ve5lP1wyVwTe6aLJsM01KtxyKkB4UT+fc5MXQFn3RLrAIAZOG+tHC+yXObpSn7Nw==}
-    cpu: [ia32]
-    os: [win32]
-    requiresBuild: true
-    dev: true
-    optional: true
-
   /esbuild-windows-32@0.14.54:
     resolution: {integrity: sha512-T+rdZW19ql9MjS7pixmZYVObd9G7kcaZo+sETqNH4RCkuuYSuv9AGHUVnPoP9hhuE1WM1ZimHz1CIBHBboLU7w==}
     engines: {node: '>=12'}
     cpu: [ia32]
     os: [win32]
     requiresBuild: true
-    optional: true
-
-  /esbuild-windows-64@0.13.15:
-    resolution: {integrity: sha512-9aMsPRGDWCd3bGjUIKG/ZOJPKsiztlxl/Q3C1XDswO6eNX/Jtwu4M+jb6YDH9hRSUflQWX0XKAfWzgy5Wk54JQ==}
-    cpu: [x64]
-    os: [win32]
-    requiresBuild: true
-    dev: true
     optional: true
 
   /esbuild-windows-64@0.14.54:
@@ -4736,14 +4612,6 @@ packages:
     requiresBuild: true
     optional: true
 
-  /esbuild-windows-arm64@0.13.15:
-    resolution: {integrity: sha512-zzvyCVVpbwQQATaf3IG8mu1IwGEiDxKkYUdA4FpoCHi1KtPa13jeScYDjlW0Qh+ebWzpKfR2ZwvqAQkSWNcKjA==}
-    cpu: [arm64]
-    os: [win32]
-    requiresBuild: true
-    dev: true
-    optional: true
-
   /esbuild-windows-arm64@0.14.54:
     resolution: {integrity: sha512-M0kuUvXhot1zOISQGXwWn6YtS+Y/1RT9WrVIOywZnJHo3jCDyewAc79aKNQWFCQm+xNHVTq9h8dZKvygoXQQRg==}
     engines: {node: '>=12'}
@@ -4751,30 +4619,6 @@ packages:
     os: [win32]
     requiresBuild: true
     optional: true
-
-  /esbuild@0.13.15:
-    resolution: {integrity: sha512-raCxt02HBKv8RJxE8vkTSCXGIyKHdEdGfUmiYb8wnabnaEmHzyW7DCHb5tEN0xU8ryqg5xw54mcwnYkC4x3AIw==}
-    hasBin: true
-    requiresBuild: true
-    optionalDependencies:
-      esbuild-android-arm64: 0.13.15
-      esbuild-darwin-64: 0.13.15
-      esbuild-darwin-arm64: 0.13.15
-      esbuild-freebsd-64: 0.13.15
-      esbuild-freebsd-arm64: 0.13.15
-      esbuild-linux-32: 0.13.15
-      esbuild-linux-64: 0.13.15
-      esbuild-linux-arm: 0.13.15
-      esbuild-linux-arm64: 0.13.15
-      esbuild-linux-mips64le: 0.13.15
-      esbuild-linux-ppc64le: 0.13.15
-      esbuild-netbsd-64: 0.13.15
-      esbuild-openbsd-64: 0.13.15
-      esbuild-sunos-64: 0.13.15
-      esbuild-windows-32: 0.13.15
-      esbuild-windows-64: 0.13.15
-      esbuild-windows-arm64: 0.13.15
-    dev: true
 
   /esbuild@0.14.54:
     resolution: {integrity: sha512-Cy9llcy8DvET5uznocPyqL3BFRrFXSVqbgpMJ9Wz8oVjZlh/zUSNbPRbov0VX7VxN2JH1Oa0uNxZ7eLRb62pJA==}
@@ -8233,14 +8077,6 @@ packages:
       fsevents: 2.3.2
     dev: true
 
-  /rollup@2.79.1:
-    resolution: {integrity: sha512-uKxbd0IhMZOhjAiD5oAFp7BqvkA4Dv47qpOCtaNvng4HBwdbWtdOh8f5nZNuk2rp51PMGk3bzfWu5oayNEuYnw==}
-    engines: {node: '>=10.0.0'}
-    hasBin: true
-    optionalDependencies:
-      fsevents: 2.3.2
-    dev: true
-
   /run-async@2.4.1:
     resolution: {integrity: sha512-tvVnVv01b8c1RrA6Ep7JkStj85Guv/YrMcwqYQnwjsAS2cTmmPGBBjAjpCW7RrSodNSoE2/qg9O4bceNvUuDgQ==}
     engines: {node: '>=0.12.0'}
@@ -9276,32 +9112,8 @@ packages:
     resolution: {integrity: sha512-BNGbWLfd0eUPabhkXUVm0j8uuvREyTh5ovRa/dyow/BqAbZJyC+5fU+IzQOzmAKzYqYRAISoRhdQr3eIZ/PXqg==}
     engines: {node: '>= 0.8'}
 
-  /vite@2.6.14:
-    resolution: {integrity: sha512-2HA9xGyi+EhY2MXo0+A2dRsqsAG3eFNEVIo12olkWhOmc8LfiM+eMdrXf+Ruje9gdXgvSqjLI9freec1RUM5EA==}
-    engines: {node: '>=12.2.0'}
-    hasBin: true
-    peerDependencies:
-      less: '*'
-      sass: '*'
-      stylus: '*'
-    peerDependenciesMeta:
-      less:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-    dependencies:
-      esbuild: 0.13.15
-      postcss: 8.4.21
-      resolve: 1.22.1
-      rollup: 2.79.1
-    optionalDependencies:
-      fsevents: 2.3.2
-    dev: true
-
-  /vite@2.9.15:
-    resolution: {integrity: sha512-fzMt2jK4vQ3yK56te3Kqpkaeq9DkcZfBbzHwYpobasvgYmP2SoAr6Aic05CsB4CzCZbsDv4sujX3pkEGhLabVQ==}
+  /vite@2.9.16:
+    resolution: {integrity: sha512-X+6q8KPyeuBvTQV8AVSnKDvXoBMnTx8zxh54sOwmmuOdxkjMmEJXH2UEchA+vTMps1xw9vL64uwJOWryULg7nA==}
     engines: {node: '>=12.2.0'}
     hasBin: true
     peerDependencies:

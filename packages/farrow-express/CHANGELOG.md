@@ -1,5 +1,11 @@
 # farrow-express
 
+## 2.3.0
+
+### Minor Changes
+
+- bf1d54d: refactor: split Nullable feature to Nullable and Optional
+
 ## 2.2.1
 
 ### Patch Changes

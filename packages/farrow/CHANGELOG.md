@@ -1,5 +1,16 @@
 # farrow
 
+## 2.3.0
+
+### Minor Changes
+
+- bf1d54d: refactor: split Nullable feature to Nullable and Optional
+
+### Patch Changes
+
+- Updated dependencies [bf1d54d]
+  - farrow-api@2.3.0
+
 ## 2.2.2
 
 ### Patch Changes

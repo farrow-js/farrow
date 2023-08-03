@@ -1,5 +1,16 @@
 # farrow-cors
 
+## 2.3.0
+
+### Minor Changes
+
+- bf1d54d: refactor: split Nullable feature to Nullable and Optional
+
+### Patch Changes
+
+- Updated dependencies [bf1d54d]
+  - farrow-pipeline@2.3.0
+
 ## 2.2.1
 
 ### Patch Changes

@@ -1,6 +1,6 @@
 {
   "name": "farrow-api",
-  "version": "2.2.3",
+  "version": "2.3.0",
   "description": "A type-friendly BFF framework",
   "main": "dist/index.js",
   "homepage": "https://www.farrowjs.com/",
@@ -31,8 +31,8 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "farrow-pipeline": "^2.2.1",
-    "farrow-schema": "^2.2.1",
+    "farrow-pipeline": "^2.3.0",
+    "farrow-schema": "^2.3.0",
     "tslib": "^2.5.0"
   }
 }

@@ -1,4 +1,3 @@
-import fs from 'fs/promises'
 import { Api } from '../src/api'
 import { toJSON } from '../src/toJSON'
 import { codegen } from '../src/codegen'
@@ -20,7 +19,6 @@ import {
   Unknown,
   Date,
   Tuple,
-  partial,
   Optional,
 } from 'farrow-schema'
 
@@ -88,22 +86,12 @@ const NamedTuple = Tuple(
 
 NamedTuple.displayName = 'NamedTuple'
 
-const PartialStruct = partial(
-  Struct({
-    a: Int,
-    b: Float,
-    c: Boolean,
-  }),
-)
-
-PartialStruct.displayName = 'PartialStruct'
 
 class Collection extends ObjectType {
   namedStruct = NamedStruct
   namedUnion = NamedUnion
   namedIntersect = NamedIntersect
   namedTuple = NamedTuple
-  partialStruct = PartialStruct
   number = Number
   int = Int
   float = Float
@@ -112,7 +100,7 @@ class Collection extends ObjectType {
   id = ID
   date = Date
   nest = Nullable(Collection)
-  optional = Optional(String)
+  optional?= Optional(String)
   list = List(Collection)
   struct = Struct({
     named: String,
@@ -148,10 +136,32 @@ class Collection extends ObjectType {
   }
 }
 
+
+class A extends ObjectType {
+  a = String
+}
+
+A.namespace = 'TestNamespace'
+
+class B extends ObjectType {
+  b = String
+}
+
+B.namespace = 'TestNamespace'
+
+const NamedRecord = Record(Collection)
+
+NamedRecord.displayName = 'NamedRecord'
+
 const methodA = Api(
   {
     input: Struct({
       named: String,
+      testNamespace: {
+        a: A,
+        b: B,
+        namedRecord: NamedRecord,
+      },
       nest: {
         a: Int,
         nest: {

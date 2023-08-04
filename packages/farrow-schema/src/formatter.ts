@@ -17,12 +17,14 @@ export type FormatObjectType = {
   type: 'Object'
   name: string
   fields: FormatFields
+  namespace?: string
 }
 
 export type FormatStructType = {
   type: 'Struct'
   name?: string
   fields: FormatFields
+  namespace?: string
 }
 
 export type FormatScalarType = {
@@ -64,18 +66,21 @@ export type FormatUnionType = {
   type: 'Union'
   name?: string
   itemTypes: { typeId: number; $ref: string }[]
+  namespace?: string
 }
 
 export type FormatIntersectType = {
   type: 'Intersect'
   name?: string
   itemTypes: { typeId: number; $ref: string }[]
+  namespace?: string
 }
 
 export type FormatTupleType = {
   type: 'Tuple'
   name?: string
   itemTypes: { typeId: number; $ref: string }[]
+  namespace?: string
 }
 
 export type FormatStrictType = {
@@ -401,6 +406,7 @@ Formatter.impl(S.StructType, (schema) => {
       return ctx.addType({
         type: 'Struct',
         name: Constructor.displayName,
+        namespace: Constructor.namespace,
         get fields() {
           return getFields()
         }
@@ -436,6 +442,7 @@ Formatter.impl(S.ObjectType, (schema) => {
       return ctx.addType({
         type: 'Object',
         name: Constructor.displayName ?? Constructor.name,
+        namespace: Constructor.namespace,
         get fields() {
           return getFields()
         }
@@ -447,6 +454,8 @@ Formatter.impl(S.ObjectType, (schema) => {
 Formatter.impl(S.UnionType, (schema) => {
   const Constructor = schema.constructor as typeof S.Schema
   const displayName = Constructor.displayName
+  const namespace = Constructor.namespace
+
   return {
     format(ctx) {
       const itemTypes = schema.Items.map((Item) => {
@@ -459,6 +468,7 @@ Formatter.impl(S.UnionType, (schema) => {
       return ctx.addType({
         type: 'Union',
         name: displayName,
+        namespace,
         itemTypes,
       })
     },
@@ -468,6 +478,8 @@ Formatter.impl(S.UnionType, (schema) => {
 Formatter.impl(S.IntersectType, (schema) => {
   const Constructor = schema.constructor as typeof S.Schema
   const displayName = Constructor.displayName
+  const namespace = Constructor.namespace
+
   return {
     format(ctx) {
       const itemTypes = schema.Items.map((Item) => {
@@ -480,6 +492,7 @@ Formatter.impl(S.IntersectType, (schema) => {
       return ctx.addType({
         type: 'Intersect',
         name: displayName,
+        namespace,
         itemTypes,
       })
     },
@@ -489,6 +502,8 @@ Formatter.impl(S.IntersectType, (schema) => {
 Formatter.impl(S.TupleType, (schema) => {
   const Constructor = schema.constructor as typeof S.Schema
   const displayName = Constructor.displayName
+  const namespace = Constructor.namespace
+
   return {
     format(ctx) {
       const itemTypes = schema.Items.map((Item) => {
@@ -501,6 +516,7 @@ Formatter.impl(S.TupleType, (schema) => {
       return ctx.addType({
         type: 'Tuple',
         name: displayName,
+        namespace,
         itemTypes,
       })
     },
@@ -609,18 +625,5 @@ Formatter.impl(S.ReadOnlyDeepType, (schema) => {
         $ref: `#/types/${typeId}`,
       })
     },
-  }
-})
-
-Formatter.impl(PartialType, schema => {
-  const Constructor = schema.constructor as typeof S.Schema
-  const ItemConstructor = schema.Item as unknown as typeof S.Schema
-
-  ItemConstructor.displayName = Constructor.displayName
-
-  return {
-    format(ctx) {
-      return Formatter.formatSchema(schema.Item, ctx)
-    }
   }
 })

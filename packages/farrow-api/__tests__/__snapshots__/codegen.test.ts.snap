@@ -24,7 +24,6 @@ export type Collection = {
   namedUnion: NamedUnion,
   namedIntersect: NamedIntersect,
   namedTuple: NamedTuple,
-  partialStruct: PartialStruct,
   number: number,
   int: number,
   float: number,
@@ -141,13 +140,20 @@ export type NamedTuple = [
   }
 ]
 
-/**
- * @label PartialStruct
-*/
-export type PartialStruct = {
-  a: number | null,
-  b: number | null,
-  c: boolean | null
+export namespace TestNamespace {
+  /**
+   * @label A
+  */
+  export type A = {
+    a: string
+  }
+  
+  /**
+   * @label B
+  */
+  export type B = {
+    b: string
+  }
 }
 
 export type ApiClientLoaderInput = {
@@ -167,6 +173,11 @@ export const createApiClient = (options: ApiClientOptions) => {
   return {
     methodA: (input: {
       named: string,
+      testNamespace: {
+        a: TestNamespace.A,
+        b: TestNamespace.B,
+        namedRecord: Record<string, Collection>
+      },
       nest: {
         a: number,
         nest: {
@@ -202,6 +213,11 @@ export const createApiClient = (options: ApiClientOptions) => {
     nest: {
       methodA: (input: {
         named: string,
+        testNamespace: {
+          a: TestNamespace.A,
+          b: TestNamespace.B,
+          namedRecord: Record<string, Collection>
+        },
         nest: {
           a: number,
           nest: {

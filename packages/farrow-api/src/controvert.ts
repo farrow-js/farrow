@@ -180,6 +180,8 @@ export const controvertTypes = (input: FormatTypes): Map<string, SchemaCtor> => 
     const fields = controvertFieldsType(input.fields)
 
     return class Obj extends ObjectType {
+      static displayName = input.name
+      static namespace = input.namespace
       constructor() {
         super()
 
@@ -211,17 +213,32 @@ export const controvertTypes = (input: FormatTypes): Map<string, SchemaCtor> => 
 
   const controvertUnionType = (input: FormatUnionType): SchemaCtor => {
     const items: SchemaCtorInput[] = input.itemTypes.map(({ typeId }) => findType(typeId))
-    return Union(...items)
+    const UnionType = Union(...items)
+
+    UnionType.displayName = input.name
+    UnionType.namespace = input.namespace
+
+    return UnionType
   }
 
   const controvertIntersectType = (input: FormatIntersectType): SchemaCtor => {
     const items: SchemaCtorInput[] = input.itemTypes.map(({ typeId }) => findType(typeId))
-    return Intersect(...items)
+    const IntersectType = Intersect(...items)
+
+    IntersectType.displayName = input.name
+    IntersectType.namespace = input.namespace
+
+    return IntersectType
   }
 
   const controvertStructType = (input: FormatStructType): SchemaCtor => {
     const fields = controvertFieldsType(input.fields)
-    return Struct(fields)
+    const StructType = Struct(fields)
+
+    StructType.displayName = input.name
+    StructType.namespace = input.namespace
+
+    return StructType
   }
 
   const controvertRecordType = (input: FormatRecordType): SchemaCtor => {
@@ -236,7 +253,12 @@ export const controvertTypes = (input: FormatTypes): Map<string, SchemaCtor> => 
 
   const controvertTupleType = (input: FormatTupleType): SchemaCtor => {
     const items: SchemaCtorInput[] = input.itemTypes.map(({ typeId }) => findType(typeId))
-    return Tuple(...items)
+    const TupleType = Tuple(...items)
+
+    TupleType.displayName = input.name
+    TupleType.namespace = input.namespace
+
+    return TupleType
   }
 
   const controvertLiteralType = (input: FormatLiteralType): SchemaCtor => {

@@ -12,6 +12,7 @@ export abstract class Schema {
     return value
   }
   static displayName?: string
+  static namespace?: string
   abstract __type: unknown
 }
 

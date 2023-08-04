@@ -10,6 +10,9 @@ export const isInlineType = (input: FormatType) => {
 
 const getTypeName = (input: FormatType): string | null => {
   if (isNamedFormatType(input) && input.name) {
+    if (input.namespace) {
+      return `${input.namespace}.${input.name}`
+    }
     return input.name
   }
   return null
@@ -188,8 +191,10 @@ export const codegen = (formatResult: FormatResult, options?: CodegenOptions): s
         throw new Error(`Empty name of Object/Struct, fields: {${Object.keys(formatType.fields)}}`)
       }
 
-      if (exportSet.has(typeName)) {
-        throw new Error(`Duplicate Object/Struct type name: ${typeName}`)
+      const exportKey = formatType.namespace ? `${formatType.namespace}.${typeName}` : typeName
+
+      if (exportSet.has(exportKey)) {
+        throw new Error(`Duplicate Object/Struct type name: ${typeName} with namespace: ${formatType.namespace}`)
       }
 
       exportSet.add(typeName)
@@ -208,6 +213,15 @@ ${applyIndentForEachLine(fields.join(',\n'), 2)}
     if (formatType.type === 'Union') {
       const typeName = formatType.name!
       const expression = formatType.itemTypes.map((itemType) => getFieldType(itemType.typeId, formatResult.types))
+
+      const exportKey = formatType.namespace ? `${formatType.namespace}.${typeName}` : typeName
+
+      if (exportSet.has(exportKey)) {
+        throw new Error(`Duplicate Union type name: ${typeName} with namespace: ${formatType.namespace}`)
+      }
+
+      exportSet.add(typeName)
+
       const source = `
 /**
  * @label ${typeName}
@@ -222,6 +236,15 @@ ${applyIndentForEachLine(expression.map((item) => `| ${item}`).join('\n'), 2)}
     if (formatType.type === 'Intersect') {
       const typeName = formatType.name!
       const expression = formatType.itemTypes.map((itemType) => getFieldType(itemType.typeId, formatResult.types))
+
+      const exportKey = formatType.namespace ? `${formatType.namespace}.${typeName}` : typeName
+
+      if (exportSet.has(exportKey)) {
+        throw new Error(`Duplicate Intersect type name: ${typeName} with namespace: ${formatType.namespace}`)
+      }
+
+      exportSet.add(typeName)
+
       const source = `
 /**
  * @label ${typeName}
@@ -236,6 +259,14 @@ ${applyIndentForEachLine(expression.map((item) => `& ${item}`).join('\n'), 2)}
     if (formatType.type === 'Tuple') {
       const typeName = formatType.name!
       const expression = formatType.itemTypes.map((itemType) => getFieldType(itemType.typeId, formatResult.types))
+
+      const exportKey = formatType.namespace ? `${formatType.namespace}.${typeName}` : typeName
+
+      if (exportSet.has(exportKey)) {
+        throw new Error(`Duplicate Tuple type name: ${typeName} with namespace: ${formatType.namespace}`)
+      }
+
+      exportSet.add(typeName)
 
       return `
 /**
@@ -262,7 +293,60 @@ ${applyIndentForEachLine(expression.join(',\n'), 2)}
     return result
   }
 
-  const typeDeclarations = [JSON_TYPE_DECLARATION, ...handleTypeDeclarations(formatResult.types)]
+  type NamespaceMap = Map<string, FormatTypes>
+
+
+  const collectNamespace = (formatTypes: FormatTypes) => {
+    const namespaceMap: NamespaceMap = new Map()
+
+    for (const key in formatTypes) {
+      const formatType = formatTypes[key]
+      if (isNamedFormatType(formatType)) {
+        const namespace = formatType.namespace ?? ''
+        let types = namespaceMap.get(namespace)
+
+        if (!types) {
+          types = {}
+          namespaceMap.set(namespace, types)
+        }
+
+        types[key] = formatType
+      }
+    }
+
+    return namespaceMap
+  }
+
+  const handleNamespaceDeclaration = (namespace: string, formatTypes: FormatTypes) => {
+    const formattedTypes = handleTypeDeclarations(formatTypes)
+
+    if (!namespace) {
+      return formattedTypes.join('\n\n')
+    }
+
+    return `
+export namespace ${namespace} {
+${applyIndentForEachLine(formattedTypes.join('\n\n'), 2)}
+}
+`.trim()
+  }
+
+  const handleNamespaceDeclarations = (namespaceMap: NamespaceMap) => {
+    const result = [] as string[]
+
+    for (const [namespace, types] of namespaceMap) {
+      const formattedNamespace = handleNamespaceDeclaration(namespace, types)
+      if (formattedNamespace) {
+        result.push(formattedNamespace)
+      }
+    }
+
+    return result
+  }
+
+  const namespaceMap = collectNamespace(formatResult.types)
+
+  const typeDeclarations = [JSON_TYPE_DECLARATION, ...handleNamespaceDeclarations(namespaceMap)]
 
   const variableDeclarations: string[] = []
 

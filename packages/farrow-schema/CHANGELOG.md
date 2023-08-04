@@ -1,5 +1,11 @@
 # farrow-schema
 
+## 2.3.1
+
+### Patch Changes
+
+- c8e2a2d: add namespace supporting
+
 ## 2.3.0
 
 ### Minor Changes

@@ -1,5 +1,13 @@
 # farrow-api
 
+## 2.3.1
+
+### Patch Changes
+
+- c8e2a2d: add namespace supporting
+- Updated dependencies [c8e2a2d]
+  - farrow-schema@2.3.1
+
 ## 2.3.0
 
 ### Minor Changes

@@ -34,7 +34,7 @@
     "supertest": "^6.1.6",
     "ts-jest": "^29.1.0",
     "typescript": "^5.0.4",
-    "vite": "2.6.14"
+    "vite": "2.9.17"
   },
   "dependencies": {
     "tslib": "^2.5.0"

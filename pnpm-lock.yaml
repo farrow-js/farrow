@@ -1,5 +1,9 @@
 lockfileVersion: '6.0'
 
+settings:
+  autoInstallPeers: true
+  excludeLinksFromLockfile: false
+
 importers:
 
   .:
@@ -431,7 +435,7 @@ importers:
         specifier: ^5.0.0
         version: 5.1.1
       farrow-api:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-api
       fs-extra:
         specifier: ^9.1.0
@@ -468,7 +472,7 @@ importers:
         specifier: ^2.0.10
         version: 2.0.12
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       jest:
         specifier: ^29.5.0
@@ -489,10 +493,10 @@ importers:
   packages/farrow-api:
     dependencies:
       farrow-pipeline:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-pipeline
       farrow-schema:
-        specifier: ^2.2.0
+        specifier: ^2.3.1
         version: link:../farrow-schema
       tslib:
         specifier: ^2.5.0
@@ -527,16 +531,16 @@ importers:
         specifier: ^2.5.8
         version: 2.6.2
       farrow-api:
-        specifier: workspace:^2.2.0
+        specifier: workspace:^2.3.0
         version: link:../farrow-api
       farrow-api-server:
-        specifier: workspace:^2.2.0
+        specifier: workspace:^2.3.0
         version: link:../farrow-api-server
       farrow-http:
-        specifier: workspace:^2.2.0
+        specifier: workspace:^2.3.0
         version: link:../farrow-http
       farrow-schema:
-        specifier: workspace:^2.2.0
+        specifier: workspace:^2.3.0
         version: link:../farrow-schema
       jest:
         specifier: ^29.5.0
@@ -554,13 +558,13 @@ importers:
   packages/farrow-api-server:
     dependencies:
       farrow-api:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-api
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       farrow-schema:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-schema
       lodash.get:
         specifier: ^4.4.2
@@ -582,7 +586,7 @@ importers:
         specifier: ^2.0.10
         version: 2.0.12
       farrow-api-client:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-api-client
       jest:
         specifier: ^29.5.0
@@ -606,7 +610,7 @@ importers:
         specifier: ^2.8.5
         version: 2.8.5
       farrow-pipeline:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-pipeline
       tslib:
         specifier: ^2.5.0
@@ -622,7 +626,7 @@ importers:
         specifier: ^2.0.10
         version: 2.0.12
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       jest:
         specifier: ^29.5.0
@@ -640,13 +644,13 @@ importers:
   packages/farrow-deno-api:
     dependencies:
       farrow-api:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-api
       farrow-api-server:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-api-server
       farrow-schema:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-schema
       tslib:
         specifier: ^2.5.0
@@ -662,7 +666,7 @@ importers:
         specifier: ^2.0.12
         version: 2.0.12
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       jest:
         specifier: ^29.5.0
@@ -696,16 +700,16 @@ importers:
         specifier: ^2.0.12
         version: 2.0.12
       express:
-        specifier: ^4.17.1
-        version: 4.18.2
+        specifier: ^4.19.2
+        version: 4.19.2
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       farrow-pipeline:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-pipeline
       farrow-schema:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-schema
       jest:
         specifier: ^29.5.0
@@ -723,13 +727,13 @@ importers:
   packages/farrow-federation:
     dependencies:
       farrow-api:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-api
       farrow-api-server:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-api-server
       farrow-schema:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-schema
       node-fetch:
         specifier: ^2.6.2
@@ -751,10 +755,10 @@ importers:
         specifier: ^2.0.11
         version: 2.0.12
       farrow-cors:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-cors
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       jest:
         specifier: ^29.5.0
@@ -802,10 +806,10 @@ importers:
         specifier: ^1.0.3
         version: 1.0.3
       farrow-pipeline:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-pipeline
       farrow-schema:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-schema
       mime-types:
         specifier: ^2.1.27
@@ -899,7 +903,7 @@ importers:
   packages/farrow-json-schema:
     dependencies:
       farrow-schema:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-schema
       tslib:
         specifier: ^2.5.0
@@ -912,7 +916,7 @@ importers:
         specifier: ^7.0.7
         version: 7.0.11
       farrow-api:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-api
       jest:
         specifier: ^29.5.0
@@ -940,13 +944,13 @@ importers:
         specifier: ^2.0.11
         version: 2.0.12
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       farrow-pipeline:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-pipeline
       farrow-schema:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-schema
       jest:
         specifier: ^29.5.0
@@ -989,7 +993,7 @@ importers:
         specifier: ^0.4.1
         version: 0.4.2
       farrow-module:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-module
       isomorphic-unfetch:
         specifier: ^3.1.0
@@ -1072,7 +1076,7 @@ importers:
         specifier: ^17.0.0
         version: 17.0.18
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       next:
         specifier: ^12.0.4
@@ -1131,7 +1135,7 @@ importers:
         specifier: ^2.0.11
         version: 2.0.12
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       jest:
         specifier: ^29.5.0
@@ -1184,7 +1188,7 @@ importers:
         specifier: ^2.0.11
         version: 2.0.12
       farrow-http:
-        specifier: ^2.2.0
+        specifier: ^2.3.0
         version: link:../farrow-http
       jest:
         specifier: ^29.5.0
@@ -3452,8 +3456,8 @@ packages:
   /bn.js@5.2.1:
     resolution: {integrity: sha512-eXRvHzWyYPBuB4NBy0cmYQjGitUrtqwbvlzP3G6VFnNRbsZQIxQ10PbKKHt8gZ/HW/D/747aDl+QkDqg3KQLMQ==}
 
-  /body-parser@1.20.1:
-    resolution: {integrity: sha512-jWi7abTbYwajOytWCQc37VulmWiRae5RyTpaCyDcS5/lMdtwSz5lOpDE67srw/HYe35f1z3fDQw+3txg7gNtWw==}
+  /body-parser@1.20.2:
+    resolution: {integrity: sha512-ml9pReCu3M61kGlqoTm2umSXTlRTuGTx0bfYj+uIUKKYycG5NtSbeetV3faSU6R7ajOPw0g/J1PvK4qNy7s5bA==}
     engines: {node: '>= 0.8', npm: 1.2.8000 || >= 1.4.16}
     dependencies:
       bytes: 3.1.2
@@ -3465,7 +3469,7 @@ packages:
       iconv-lite: 0.4.24
       on-finished: 2.4.1
       qs: 6.11.0
-      raw-body: 2.5.1
+      raw-body: 2.5.2
       type-is: 1.6.18
       unpipe: 1.0.0
     transitivePeerDependencies:
@@ -3957,8 +3961,8 @@ packages:
     engines: {node: '>= 0.6'}
     dev: false
 
-  /cookie@0.5.0:
-    resolution: {integrity: sha512-YZ3GUyn/o8gfKJlnlX7g7xq4gyO6OSuhGPKaaGssGB2qgDUS0gPgtTvoyZLTt9Ab6dC4hfc9dV5arkvc/OCmrw==}
+  /cookie@0.6.0:
+    resolution: {integrity: sha512-U71cyTamuh1CRNCfpGY6to28lxvNwPG4Guz/EVjgf3Jmzv0vlDp1atT9eS5dDjMYHucpHbWns6Lwf3BKz6svdw==}
     engines: {node: '>= 0.6'}
     dev: true
 
@@ -4322,7 +4326,7 @@ packages:
     dev: true
 
   /ee-first@1.1.1:
-    resolution: {integrity: sha1-WQxhFWsK4vTwJVcyoViyZrxWsh0=}
+    resolution: {integrity: sha512-WMwm9LhRUo+WUaRN+vRuETqG89IgZphVSNkdFgeb6sS/E4OrDIN7t48CAewSHXc6C8lefD8KKfr5vY61brQlow==}
 
   /electron-to-chromium@1.4.288:
     resolution: {integrity: sha512-8s9aJf3YiokIrR+HOQzNOGmEHFXVUQzXM/JaViVvKdCkNUjS+lEa/uT7xw3nDVG/IgfxiIwUGkwJ6AR1pTpYsQ==}
@@ -5100,16 +5104,16 @@ packages:
       jest-util: 29.5.0
     dev: true
 
-  /express@4.18.2:
-    resolution: {integrity: sha512-5/PsL6iGPdfQ/lKM1UuielYgv3BUoJfz1aUwU9vHZ+J7gyvwdQXFEBIEIaxeGf0GIcreATNyBExtalisDbuMqQ==}
+  /express@4.19.2:
+    resolution: {integrity: sha512-5T6nhjsT+EOMzuck8JjBHARTHfMht0POzlA60WV2pMD3gyXw2LZnZ+ueGdNxG+0calOJcWKbpFcuzLZ91YWq9Q==}
     engines: {node: '>= 0.10.0'}
     dependencies:
       accepts: 1.3.8
       array-flatten: 1.1.1
-      body-parser: 1.20.1
+      body-parser: 1.20.2
       content-disposition: 0.5.4
       content-type: 1.0.5
-      cookie: 0.5.0
+      cookie: 0.6.0
       cookie-signature: 1.0.6
       debug: 2.6.9
       depd: 2.0.0
@@ -7018,7 +7022,7 @@ packages:
       safe-buffer: 5.2.1
 
   /media-typer@0.3.0:
-    resolution: {integrity: sha1-hxDXrwqmJvj/+hzgAWhUUmMlV0g=}
+    resolution: {integrity: sha512-dq+qelQ9akHpcOl/gUVRTxVIOkAJ1wR3QAvb4RsVjS8oVoFjDGTc679wJYmUmknUF5HwMLOgb5O+a3KxfWapPQ==}
     engines: {node: '>= 0.6'}
 
   /memorystream@0.3.1:
@@ -7980,6 +7984,17 @@ packages:
       http-errors: 2.0.0
       iconv-lite: 0.4.24
       unpipe: 1.0.0
+    dev: false
+
+  /raw-body@2.5.2:
+    resolution: {integrity: sha512-8zGqypfENjCIqGhgXToC8aB2r7YrBX+AQAfIPs/Mlk+BtPTztOvTS01NRW/3Eh60J+a48lt8qsCzirQ6loCVfA==}
+    engines: {node: '>= 0.8'}
+    dependencies:
+      bytes: 3.1.2
+      http-errors: 2.0.0
+      iconv-lite: 0.4.24
+      unpipe: 1.0.0
+    dev: true
 
   /react-dom@17.0.2(react@17.0.2):
     resolution: {integrity: sha512-s4h96KtLDUQlsENhMn1ar8t2bEa+q/YAtj8pPPdIjPDGBDIVNsrD9aXNWqspUe6AzKCIG0C1HZZLqLV7qpOBGA==}

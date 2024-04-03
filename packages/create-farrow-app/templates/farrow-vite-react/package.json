@@ -25,6 +25,6 @@
     "farrow": "^2.2.0",
     "farrow-vite": "^2.2.0",
     "typescript": "^5.0.4",
-    "vite": "^2.0.1"
+    "vite": "^2.9.18"
   }
 }

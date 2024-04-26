@@ -1,6 +1,6 @@
 {
   "name": "farrow-next",
-  "version": "2.3.0",
+  "version": "2.3.1",
   "description": "A framework runs on Next.js",
   "main": "dist/index.js",
   "homepage": "https://www.farrowjs.com/",

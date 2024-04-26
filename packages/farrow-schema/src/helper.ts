@@ -133,7 +133,7 @@ export const omit = ((Ctor: any, keys: any) => {
   }
 
   throw new Error(`Unknown Schema Constructor: ${Ctor}`)
-}) as PickSchema
+}) as OmitSchema
 
 export const keyofStruct = <T extends StructType>(Ctor: new () => T): (keyof T['descriptors'])[] => {
   return Object.keys(getInstance(Ctor).descriptors)

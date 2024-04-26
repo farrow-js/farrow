@@ -121,10 +121,11 @@ const createReduxDevtoolsEnhancer = (devtools = true, name?: string, enableLogge
     // tslint:disable-next-line: strict-type-predicates
     devtools && typeof window === 'object' && (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__
       ? (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__({
-          name,
-        })
+        name,
+      })
       : compose
 
+  // @ts-ignore createLogger is not exported
   const enhancer = enableLogger ? composeEnhancers(applyMiddleware(createLogger())) : composeEnhancers()
 
   return enhancer

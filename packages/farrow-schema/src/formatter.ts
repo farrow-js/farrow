@@ -627,3 +627,16 @@ Formatter.impl(S.ReadOnlyDeepType, (schema) => {
     },
   }
 })
+
+Formatter.impl(PartialType, schema => {
+  const Constructor = schema.constructor as typeof S.Schema
+  const ItemConstructor = schema.Item as unknown as typeof S.Schema
+
+  ItemConstructor.displayName = Constructor.displayName
+
+  return {
+    format(ctx) {
+      return Formatter.formatSchema(schema.Item, ctx)
+    }
+  }
+})

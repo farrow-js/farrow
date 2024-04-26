@@ -1,5 +1,11 @@
 # farrow-next
 
+## 2.3.1
+
+### Patch Changes
+
+- fix: typo in farrow-schema
+
 ## 2.3.0
 
 ### Minor Changes

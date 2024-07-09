@@ -421,7 +421,7 @@ export type ProviderProps = {
 /**
  * Provider for injecting controllers
  */
-export const Provider: React.FC<ProviderProps> = ({ controllers, children }) => {
+export const Provider: React.FC<React.PropsWithChildren<ProviderProps>> = ({ controllers, children }) => {
   const valueRef = useRef<ControllerReactContextValue | null>(null)
 
   if (!valueRef.current) {

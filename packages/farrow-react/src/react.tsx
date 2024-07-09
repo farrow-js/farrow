@@ -1,7 +1,6 @@
 import React from 'react'
 import ReactDOMServer from 'react-dom/server'
-import { Stream } from 'stream'
-import MultiStream from 'multistream'
+import { Stream, PassThrough } from 'stream'
 
 import * as Http from 'farrow-http'
 
@@ -23,19 +22,28 @@ export const renderToString = <T extends JSX.Element>(element: T, options?: Reac
 }
 
 export const renderToNodeStream = <T extends JSX.Element>(element: T, options?: ReactResponseOptions) => {
-  const contentStream = ReactDOMServer.renderToNodeStream(element)
-  const docType = options?.docType ?? defaultDocType
+  const passThrough = new PassThrough()
 
+  const docType = options?.docType ?? defaultDocType
   const docTypeStream = new Stream.Readable({
     read() {
       this.push(`${docType}\n`)
       this.push(null)
     },
   })
+  docTypeStream.pipe(passThrough, { end: false })
 
-  const stream = new (MultiStream as any)([docTypeStream, contentStream])
+  const { pipe } = ReactDOMServer.renderToPipeableStream(element, {
+    onShellReady() {
+      // When initial HTML is ready, pipe it to the PassThrough stream
+      pipe(passThrough)
+    },
+    onError(error) {
+      passThrough.emit('error', error)
+    },
+  })
 
-  return Response.type('html').stream(stream)
+  return Response.type('html').stream(passThrough)
 }
 
 export type ReactViewOptions = ReactResponseOptions & {

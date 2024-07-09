@@ -1,5 +1,5 @@
 import React from 'react'
-import ReactDOM from 'react-dom'
+import ReactDOM from 'react-dom/client'
 import { act } from 'react-dom/test-utils'
 import { Controller, page, createProvider } from '../src/index'
 
@@ -114,16 +114,18 @@ const TestPage = page({
 
 describe('farrow-next', () => {
   let container: HTMLDivElement | undefined
+  let root: ReactDOM.Root
   beforeEach(() => {
     // setup a DOM element as a render target
     container = document.createElement('div')
+    root = ReactDOM.createRoot(container)
     document.body.appendChild(container)
   })
 
   afterEach(() => {
     // cleanup on exiting
     if (container) {
-      ReactDOM.unmountComponentAtNode(container)
+      root.unmount()
       container.remove()
       container = undefined
     }
@@ -182,7 +184,7 @@ describe('farrow-next', () => {
 
     // render
     act(() => {
-      ReactDOM.render(<TestPage {...initialProps!} />, container!)
+      root.render(<TestPage {...initialProps!} />)
     })
 
     const envElem = document.getElementById('env')

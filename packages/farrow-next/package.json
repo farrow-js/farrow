@@ -50,7 +50,7 @@
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "cookie": "^0.4.1",
+    "cookie": "^0.7.0",
     "farrow-module": "^2.3.0",
     "isomorphic-unfetch": "^3.1.0",
     "jest-environment-jsdom": "^29.5.0",

@@ -51,60 +51,68 @@ export const omitStruct = <T extends StructType, Keys extends (keyof T['descript
   return Struct(descriptors as Omit<T['descriptors'], Keys[number]>)
 }
 
-export type PickObject<T extends ObjectType, Keys extends SchemaField<T, keyof T>> = {
-  [key in keyof T as key extends Keys ? key : never]: T[key] extends FieldDescriptor ? T[key] : never
-}
-
+export type PickObject<T extends ObjectType, Keys extends SchemaField<T, keyof T>[]> = new () => {
+  [K in Keys[number]]: T[K] extends FieldDescriptor ? T[K] : T[K] extends S.SchemaCtorInput ? T[K] : never
+} & ObjectType
 export const pickObject = <T extends ObjectType, Keys extends SchemaField<T, keyof T>[]>(
   Ctor: new () => T,
   keys: Keys,
 ) => {
   const instance = getInstance(Ctor)
-  const descriptors = {} as FieldDescriptors
 
-  if (instance instanceof ObjectType) {
-    for (const key of Object.keys(instance)) {
-      if (keys.includes(key as any)) {
-        // @ts-ignore
-        const value = instance[key]
-        if (isFieldDescriptor(value)) {
-          descriptors[key] = value
-        } else if (isFieldDescriptors(value)) {
-          descriptors[key] = value
+  return class PickedObject extends ObjectType {
+    constructor() {
+      super()
+      if (instance instanceof ObjectType) {
+        for (const key of Object.keys(instance)) {
+          if (keys.includes(key as any)) {
+            // @ts-ignore
+            const value = instance[key]
+            if (isFieldDescriptor(value) || isFieldDescriptors(value)) {
+              Object.defineProperty(this, key, {
+                enumerable: true,
+                value: value,
+              })
+            }
+          }
         }
       }
     }
-  }
-
-  return Struct(descriptors as PickObject<T, Keys[number]>)
+  } as PickObject<T, Keys>
 }
 
-export type OmitObject<T extends ObjectType, Keys extends SchemaField<T, keyof T>> = {
-  [key in keyof T as key extends Keys | '__type' ? never : key]: T[key] extends FieldDescriptor ? T[key] : never
-}
+export type OmitObject<T extends ObjectType, Keys extends SchemaField<T, keyof T>[]> = new () => {
+  [K in keyof T as K extends Keys[number] | '__type' ? never : K]: T[K] extends FieldDescriptor
+    ? T[K]
+    : T[K] extends S.SchemaCtorInput
+    ? T[K]
+    : never
+} & ObjectType
 
 export const omitObject = <T extends ObjectType, Keys extends SchemaField<T, keyof T>[]>(
   Ctor: new () => T,
   keys: Keys,
 ) => {
   const instance = getInstance(Ctor)
-  const descriptors = {} as FieldDescriptors
-
-  if (instance instanceof ObjectType) {
-    for (const key of Object.keys(instance)) {
-      if (!keys.includes(key as any)) {
-        // @ts-ignore
-        const value = instance[key]
-        if (isFieldDescriptor(value)) {
-          descriptors[key] = value
-        } else if (isFieldDescriptors(value)) {
-          descriptors[key] = value
+  return class OmittedObject extends ObjectType {
+    constructor() {
+      super()
+      if (instance instanceof ObjectType) {
+        for (const key of Object.keys(instance)) {
+          if (!keys.includes(key as any)) {
+            // @ts-ignore
+            const value = instance[key]
+            if (isFieldDescriptor(value) || isFieldDescriptors(value)) {
+              Object.defineProperty(this, key, {
+                enumerable: true,
+                value: value,
+              })
+            }
+          }
         }
       }
     }
-  }
-
-  return Struct(descriptors as OmitObject<T, Keys[number]>)
+  } as OmitObject<T, Keys>
 }
 
 export type PickSchema = typeof pickObject & typeof pickStruct
@@ -222,12 +230,34 @@ export const partialStruct = <T extends StructType>(Ctor: new () => T) => {
   }
 }
 
+export type PartialObjectType<T extends ObjectType> = new () => {
+  [K in keyof T as K extends '__type' ? never : K]?: T[K] extends FieldDescriptor
+    ? T[K]
+    : T[K] extends S.SchemaCtorInput
+    ? T[K]
+    : never
+} & ObjectType
 export const partialObject = <T extends ObjectType>(Ctor: new () => T) => {
   const instance = getInstance(Ctor)
 
-  return class partial extends PartialType {
-    Item = S.Struct(getPartialFields(instance as unknown as S.FieldDescriptors)) as unknown as typeof Ctor
-  }
+  return class PartialObject extends ObjectType {
+    constructor() {
+      super()
+      if (instance instanceof ObjectType) {
+        for (const key of Object.keys(instance)) {
+          // @ts-ignore
+          const value = instance[key]
+          if (isFieldDescriptor(value) || isFieldDescriptors(value)) {
+            Object.defineProperty(this, key, {
+              enumerable: true,
+              // @ts-ignore
+              value: isNullableType(value) ? value : S.Nullable(value),
+            })
+          }
+        }
+      }
+    }
+  } as unknown as PartialObjectType<T>
 }
 
 export const partial: typeof partialStruct & typeof partialObject = (
@@ -239,6 +269,81 @@ export const partial: typeof partialStruct & typeof partialObject = (
 
   if (Ctor?.prototype instanceof StructType) {
     return partialStruct(Ctor as any)
+  }
+
+  throw new Error(`Unknown Schema Constructor: ${Ctor}`)
+}
+
+const getRequiredFields = (fields: FieldDescriptors): FieldDescriptors => {
+  const descriptors = {} as FieldDescriptors
+
+  for (const [key, value] of Object.entries(fields)) {
+    if (isFieldDescriptor(value)) {
+      descriptors[key] = isNullableType(value) ? (value as any).Item : value
+    } else if (isFieldDescriptors(value)) {
+      descriptors[key] = getRequiredFields(value)
+    }
+  }
+
+  return descriptors
+}
+
+export const requiredStruct = <T extends StructType>(Ctor: new () => T) => {
+  const instance = getInstance(Ctor)
+  const descriptors = {} as FieldDescriptors
+
+  // 遍历所有字段
+  for (const [key, value] of Object.entries(instance.descriptors)) {
+    if (isFieldDescriptor(value)) {
+      // 如果是可空类型，获取其原始类型
+      descriptors[key] = isNullableType(value) ? (value as any).Item : value
+    } else if (isFieldDescriptors(value)) {
+      // 如果是嵌套对象，递归处理
+      descriptors[key] = getRequiredFields(value)
+    }
+  }
+
+  return Struct(descriptors)
+}
+
+export type RequiredObjectType<T extends ObjectType> = new () => {
+  [K in keyof T as K extends '__type' ? never : K]: T[K] extends FieldDescriptor
+    ? T[K]
+    : T[K] extends S.SchemaCtorInput
+    ? T[K]
+    : never
+} & ObjectType
+
+export const requiredObject = <T extends ObjectType>(Ctor: new () => T) => {
+  const instance = getInstance(Ctor)
+
+  return class RequiredObject extends ObjectType {
+    constructor() {
+      super()
+      if (instance instanceof ObjectType) {
+        for (const key of Object.keys(instance)) {
+          const value = instance[key]
+          if (isFieldDescriptor(value) || isFieldDescriptors(value)) {
+            Object.defineProperty(this, key, {
+              enumerable: true,
+              value: isNullableType(value) ? value.Item : value,
+            })
+          }
+        }
+      }
+    }
+  } as RequiredObjectType<T>
+}
+
+export const required: typeof requiredStruct & typeof requiredObject = (
+  Ctor: new () => S.ObjectType | S.StructType,
+): any => {
+  if (Ctor?.prototype instanceof ObjectType) {
+    return requiredObject(Ctor as any)
+  }
+
+  if (Ctor?.prototype instanceof StructType) {
+    return requiredStruct(Ctor as any)
   }
 
   throw new Error(`Unknown Schema Constructor: ${Ctor}`)

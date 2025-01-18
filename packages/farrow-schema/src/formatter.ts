@@ -441,7 +441,9 @@ Formatter.impl(S.ObjectType, (schema) => {
 
       return ctx.addType({
         type: 'Object',
-        name: Constructor.displayName ?? Constructor.name,
+        // if keep 'Constructor.displayName ?? Constructor.name', it will be 'PartialObject' or 'RequiredObject' with partial function, although we can name it with displayName like 'PartialUser' using Ctor.name in the function, However, in scenarios where tool functions are nested, the default naming might be confusing or troublesome.
+        // @ts-ignore
+        name: Constructor.displayName ?? (Constructor.name === 'PartialObject' || Constructor.name === 'RequiredObject' ? undefined : Constructor.name),
         namespace: Constructor.namespace,
         get fields() {
           return getFields()

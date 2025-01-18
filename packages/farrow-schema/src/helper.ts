@@ -208,7 +208,6 @@ export abstract class PartialType extends S.Schema {
   abstract Item: S.SchemaCtor
 }
 
-
 const getPartialFields = (fields: FieldDescriptors) => {
   const descriptors = {} as S.FieldDescriptors
 
@@ -243,17 +242,15 @@ export const partialObject = <T extends ObjectType>(Ctor: new () => T) => {
   return class PartialObject extends ObjectType {
     constructor() {
       super()
-      if (instance instanceof ObjectType) {
-        for (const key of Object.keys(instance)) {
-          // @ts-ignore
-          const value = instance[key]
-          if (isFieldDescriptor(value) || isFieldDescriptors(value)) {
-            Object.defineProperty(this, key, {
-              enumerable: true,
-              // @ts-ignore
-              value: isNullableType(value) ? value : S.Nullable(value),
-            })
-          }
+      for (const key of Object.keys(instance)) {
+        // @ts-ignore
+        const value = instance[key]
+        if (isFieldDescriptor(value) || isFieldDescriptors(value)) {
+          Object.defineProperty(this, key, {
+            enumerable: true,
+            // @ts-ignore
+            value: S.isOptionalType(value) ? value : S.Optional(value),
+          })
         }
       }
     }
@@ -279,7 +276,7 @@ const getRequiredFields = (fields: FieldDescriptors): FieldDescriptors => {
 
   for (const [key, value] of Object.entries(fields)) {
     if (isFieldDescriptor(value)) {
-      descriptors[key] = isNullableType(value) ? (value as any).Item : value
+      descriptors[key] = S.isOptionalType(value) ? getInstance(value).Item : value
     } else if (isFieldDescriptors(value)) {
       descriptors[key] = getRequiredFields(value)
     }
@@ -291,19 +288,16 @@ const getRequiredFields = (fields: FieldDescriptors): FieldDescriptors => {
 export const requiredStruct = <T extends StructType>(Ctor: new () => T) => {
   const instance = getInstance(Ctor)
   const descriptors = {} as FieldDescriptors
-
-  // 遍历所有字段
   for (const [key, value] of Object.entries(instance.descriptors)) {
     if (isFieldDescriptor(value)) {
-      // 如果是可空类型，获取其原始类型
-      descriptors[key] = isNullableType(value) ? (value as any).Item : value
+      descriptors[key] = S.isOptionalType(value) ? getInstance(value).Item : value
     } else if (isFieldDescriptors(value)) {
-      // 如果是嵌套对象，递归处理
       descriptors[key] = getRequiredFields(value)
     }
   }
 
-  return Struct(descriptors)
+  const requiredStruct = Struct(descriptors)
+  return requiredStruct
 }
 
 export type RequiredObjectType<T extends ObjectType> = new () => {
@@ -320,15 +314,14 @@ export const requiredObject = <T extends ObjectType>(Ctor: new () => T) => {
   return class RequiredObject extends ObjectType {
     constructor() {
       super()
-      if (instance instanceof ObjectType) {
-        for (const key of Object.keys(instance)) {
-          const value = instance[key]
-          if (isFieldDescriptor(value) || isFieldDescriptors(value)) {
-            Object.defineProperty(this, key, {
-              enumerable: true,
-              value: isNullableType(value) ? value.Item : value,
-            })
-          }
+      for (const key of Object.keys(instance)) {
+        // @ts-ignore
+        const value = instance[key]
+        if (isFieldDescriptor(value) || isFieldDescriptors(value)) {
+          Object.defineProperty(this, key, {
+            enumerable: true,
+            value: S.isOptionalType(value) ? getInstance(value).Item : value,
+          })
         }
       }
     }

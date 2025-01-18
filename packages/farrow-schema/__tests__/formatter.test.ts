@@ -19,10 +19,11 @@ import {
   ReadOnly,
   ReadOnlyDeep,
   Tuple,
+  Optional,
 } from '../src/schema'
 
 import { formatSchema } from '../src/formatter'
-import { partial } from '../src/helper'
+import { partial, required } from '../src/helper'
 
 describe('Formatter', () => {
   it('supports format Number', () => {
@@ -729,12 +730,11 @@ describe('Formatter', () => {
 
     const result0 = formatSchema(PartialUser)
     const result1 = formatSchema(PartialPerson)
-
     expect(result0).toEqual({
       typeId: 0,
       types: {
         '0': {
-          type: 'Struct',
+          type: 'Object',
           fields: {
             name: {
               typeId: 2,
@@ -782,7 +782,6 @@ describe('Formatter', () => {
         },
       },
     })
-
     expect(result1).toEqual({
       typeId: 0,
       types: {
@@ -818,6 +817,94 @@ describe('Formatter', () => {
           type: 'Optional',
           itemTypeId: 3,
           $ref: '#/types/3',
+        },
+      },
+    })
+  })
+  it('support format required struct/object', () => {
+    class User extends ObjectType {
+      name = String
+      friends = Optional(List(User))
+    }
+    const Person = Struct({
+      name: Optional(String),
+      age: Int,
+    })
+
+    const result0 = formatSchema(required(User))
+    const result1 = formatSchema(required(Person))
+    expect(result0).toEqual({
+      typeId: 0,
+      types: {
+        '0': {
+          type: 'Object',
+          fields: {
+            name: {
+              typeId: 1,
+              $ref: '#/types/1',
+            },
+            friends: {
+              typeId: 3,
+              $ref: '#/types/3',
+            },
+          },
+        },
+        '1': {
+          type: 'Scalar',
+          valueType: 'string',
+          valueName: 'String',
+        },
+        '2': {
+          type: 'Object',
+          name: 'User',
+          fields: {
+            name: {
+              typeId: 1,
+              $ref: '#/types/1',
+            },
+            friends: {
+              typeId: 4,
+              $ref: '#/types/4',
+            },
+          },
+        },
+        '3': {
+          type: 'List',
+          itemTypeId: 2,
+          $ref: '#/types/2',
+        },
+        '4': {
+          type: 'Optional',
+          itemTypeId: 3,
+          $ref: '#/types/3',
+        },
+      },
+    })
+    expect(result1).toEqual({
+      typeId: 0,
+      types: {
+        '0': {
+          type: 'Struct',
+          fields: {
+            name: {
+              typeId: 1,
+              $ref: '#/types/1',
+            },
+            age: {
+              typeId: 2,
+              $ref: '#/types/2',
+            },
+          },
+        },
+        '1': {
+          type: 'Scalar',
+          valueType: 'string',
+          valueName: 'String',
+        },
+        '2': {
+          type: 'Scalar',
+          valueType: 'number',
+          valueName: 'Int',
         },
       },
     })

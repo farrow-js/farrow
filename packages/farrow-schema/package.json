@@ -1,9 +1,13 @@
 {
   "name": "farrow-schema",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "A powerful and extensible schema builder",
   "main": "dist/index.js",
   "homepage": "https://www.farrowjs.com/",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "files": [
     "src",
     "dist",

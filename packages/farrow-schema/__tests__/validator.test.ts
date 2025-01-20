@@ -1,7 +1,15 @@
 import * as Schema from '../src/schema'
 import { ReadOnly, TypeOf, ReadOnlyDeep, Optional } from '../src/schema'
-import { createSchemaValidator, RegExp, ValidationError, ValidationResult, Validator, ValidatorType } from '../src/validator'
-import { pick, omit, keyof, partial } from '../src/helper'
+import {
+  createSchemaValidator,
+  RegExp,
+  ValidationError,
+  ValidationResult,
+  Validator,
+  ValidatorType,
+} from '../src/validator'
+import { pick, omit, keyof, partial, required } from '../src/helper'
+import { formatSchema } from '../src/formatter'
 
 const {
   Type,
@@ -271,7 +279,7 @@ describe('Validator', () => {
           b: '1',
           c: false,
           d: [1, 2, 3],
-          e: 'abc'
+          e: 'abc',
         }),
       ),
     ).toEqual({
@@ -279,20 +287,20 @@ describe('Validator', () => {
       b: '1',
       c: false,
       d: [1, 2, 3],
-      e: 'abc'
+      e: 'abc',
     })
 
-       // field e is not optional
-       expect(
-        assertErr(
-          validate({
-            a: 1,
-            b: '1',
-            c: false,
-            d: [1, 2, 3],
-          }),
-        ),
-      ).toEqual(true)
+    // field e is not optional
+    expect(
+      assertErr(
+        validate({
+          a: 1,
+          b: '1',
+          c: false,
+          d: [1, 2, 3],
+        }),
+      ),
+    ).toEqual(true)
 
     expect(
       assertOk(
@@ -1222,5 +1230,39 @@ describe('Validator', () => {
     expect(assertOk(Validator.validate(PartialPerson, {}))).toEqual({})
     expect(assertOk(Validator.validate(PartialPerson, { name: 'only-name' }))).toEqual({ name: 'only-name' })
     expect(assertOk(Validator.validate(PartialPerson, { name: 'name', age: 1 }))).toEqual({ name: 'name', age: 1 })
+  })
+  it('support required operator', () => {
+    class User extends ObjectType {
+      name = String
+      friends = Optional(List(User))
+    }
+    const Person = Struct({
+      name: String,
+      age: Optional(Int),
+    })
+    const PersonRequired = required(Person)
+    const UserRequired = required(User)
+    expect(assertOk(Validator.validate(User, { name: 'optional' }))).toEqual({
+      name: 'optional',
+    })
+    expect(
+      assertOk(
+        Validator.validate(Person, {
+          name: 'optional',
+        }),
+      ),
+    ).toEqual({
+      name: 'optional',
+    })
+    expect(assertErr(Validator.validate(PersonRequired, { name: 'optional' }))).toBe(true)
+    expect(assertErr(Validator.validate(UserRequired, { name: 'optional' }))).toBe(true)
+    expect(assertOk(Validator.validate(PersonRequired, { name: 'required', age: 1 }))).toEqual({
+      name: 'required',
+      age: 1,
+    })
+    expect(assertOk(Validator.validate(UserRequired, { name: 'required', friends: [{ name: 'required' }] }))).toEqual({
+      name: 'required',
+      friends: [{ name: 'required' }],
+    })
   })
 })

@@ -10,6 +10,7 @@ import {
   Pipeline,
   AsyncPipeline,
   Middleware,
+  Next,
 } from 'farrow-pipeline'
 import * as Schema from 'farrow-schema'
 import type { ValidationError } from 'farrow-schema/validator'
@@ -254,7 +255,11 @@ export type HttpMiddlewareInput = MiddlewareInput<RequestInfo, MaybeAsyncRespons
 
 export type MatchOptions = {
   block?: boolean
-  onSchemaError?(error: ValidationError): Response | void
+  onSchemaError?(
+    error: ValidationError,
+    input: RequestInfo,
+    next: Next<RequestInfo, MaybeAsyncResponse>,
+  ): MaybeAsyncResponse | void
 }
 
 export type RouterSchema = RouterRequestSchema | RouterUrlSchema
@@ -339,27 +344,27 @@ export const createRouterPipeline = (): RouterPipeline => {
     route(name).use((request, next) => {
       // prevent directory traversal attack
       const filename = path.normalize(request.pathname)
-      const fullpath = path.join(dirname, filename)
-      if (fullpath.indexOf(dirname) !== 0) {
+      const fullPath = path.join(dirname, filename)
+      if (fullPath.indexOf(dirname) !== 0) {
         return next(request)
       }
 
-      return getStats(fullpath).then((stats) => {
+      return getStats(fullPath).then((stats) => {
         /**
          * handle file
          */
         if (stats?.isFile()) {
-          return Response.file(fullpath)
+          return Response.file(fullPath)
         }
 
         /**
          * handle {dirname}/index.html
          */
         if (stats?.isDirectory()) {
-          const indexHtmlPath = getIndexHtmlPath(fullpath)
+          const indexHtmlPath = getIndexHtmlPath(fullPath)
           return getStats(indexHtmlPath).then((indexHtmlStats) => {
             if (indexHtmlStats?.isFile()) {
-              return Response.file(getIndexHtmlPath(fullpath))
+              return Response.file(getIndexHtmlPath(fullPath))
             }
             return next(request)
           })
@@ -412,7 +417,7 @@ export const createRouterPipeline = (): RouterPipeline => {
 
       if (result.isErr) {
         if (config.onSchemaError) {
-          const response = config.onSchemaError(result.value)
+          const response = config.onSchemaError(result.value, input, next)
           if (response) return response
         }
 

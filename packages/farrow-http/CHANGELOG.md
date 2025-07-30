@@ -1,5 +1,11 @@
 # farrow-http
 
+## 2.3.1
+
+### Patch Changes
+
+- feat: onSchemaError(err, req, next) receives another two params
+
 ## 2.3.0
 
 ### Minor Changes

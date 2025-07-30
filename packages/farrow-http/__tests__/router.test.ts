@@ -2175,6 +2175,60 @@ describe('Router onSchemaError', () => {
       },
     })
   })
+
+  it('supports calling next in onSchemaError to continue matching', async () => {
+    const router = Router()
+
+    router
+      .get(
+        '/posts/<id:int>',
+        {},
+        {
+          onSchemaError: (error, input, next) => {
+            return next()
+          },
+        },
+      )
+      .use((request) => {
+        return Response.json(request)
+      })
+
+    router.get('/posts/<slug:string>', {}).use((request) => {
+      return Response.json(request)
+    })
+
+    const result = await router.run({
+      method: 'GET',
+      pathname: '/posts/123',
+    })
+
+    expect(result.info.body).toEqual({
+      type: 'json',
+      value: {
+        method: 'GET',
+        params: {
+          id: 123,
+        },
+        pathname: '/posts/123',
+      },
+    })
+
+    const result2 = await router.run({
+      method: 'GET',
+      pathname: '/posts/abc',
+    })
+
+    expect(result2.info.body).toEqual({
+      type: 'json',
+      value: {
+        method: 'GET',
+        params: {
+          slug: 'abc',
+        },
+        pathname: '/posts/abc',
+      },
+    })
+  })
 })
 
 describe('Router useLazy', () => {

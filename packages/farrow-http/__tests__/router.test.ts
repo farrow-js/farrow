@@ -1797,3 +1797,560 @@ describe('Router Url Pattern', () => {
     )
   })
 })
+
+describe('Router onSchemaError', () => {
+  it('should handle schema validation error with custom response', async () => {
+    const router = Router()
+
+    router
+      .match(
+        {
+          pathname: '/test',
+          query: {
+            id: Number,
+          },
+        },
+        {
+          onSchemaError: (error, input, next) => {
+            return Response.status(422).json({
+              error: 'Custom validation error',
+              details: error.message,
+              path: error.path,
+              requestPath: input.pathname,
+            })
+          },
+        },
+      )
+      .use((request) => {
+        return Response.json(request)
+      })
+
+    const result = await router.run({
+      pathname: '/test',
+      query: {
+        id: 'invalid-number',
+      },
+    })
+
+    expect(result.info.body).toEqual({
+      type: 'json',
+      value: {
+        error: 'Custom validation error',
+        details: expect.any(String),
+        path: expect.any(Array),
+        requestPath: '/test',
+      },
+    })
+    expect(result.info.status).toEqual({
+      code: 422,
+      message: '',
+    })
+  })
+
+  it('should handle schema validation error and continue with next()', async () => {
+    const router = Router()
+    let fallbackCalled = false
+
+    router
+      .match(
+        {
+          pathname: '/test',
+          query: {
+            id: Number,
+          },
+        },
+        {
+          onSchemaError: (error, input, next) => {
+            // Don't return response, continue processing
+            return next(input)
+          },
+        },
+      )
+      .use((request) => {
+        return Response.json(request)
+      })
+
+    // Add fallback handler
+    router.use((request, next) => {
+      fallbackCalled = true
+      return Response.status(400).json({
+        error: 'Fallback error handler',
+        pathname: request.pathname,
+      })
+    })
+
+    const result = await router.run({
+      pathname: '/test',
+      query: {
+        id: 'invalid-number',
+      },
+    })
+
+    expect(fallbackCalled).toBe(true)
+    expect(result.info.body).toEqual({
+      type: 'json',
+      value: {
+        error: 'Fallback error handler',
+        pathname: '/test',
+      },
+    })
+    expect(result.info.status).toEqual({
+      code: 400,
+      message: '',
+    })
+  })
+
+  it('should handle schema validation error with async response', async () => {
+    const router = Router()
+
+    router
+      .match(
+        {
+          pathname: '/test',
+          method: 'POST',
+          body: {
+            name: String,
+            age: Number,
+          },
+        },
+        {
+          onSchemaError: async (error, input, next) => {
+            // Simulate async processing
+            await new Promise((resolve) => setTimeout(resolve, 10))
+
+            return Response.status(400).json({
+              error: 'Async validation error',
+              details: error.message,
+              timestamp: Date.now(),
+            })
+          },
+        },
+      )
+      .use((request) => {
+        return Response.json(request)
+      })
+
+    const result = await router.run({
+      pathname: '/test',
+      method: 'POST',
+      body: {
+        name: 'test',
+        age: 'invalid-age',
+      },
+    })
+
+    expect(result.info.body).toEqual({
+      type: 'json',
+      value: {
+        error: 'Async validation error',
+        details: expect.any(String),
+        timestamp: expect.any(Number),
+      },
+    })
+    expect(result.info.status).toEqual({
+      code: 400,
+      message: '',
+    })
+  })
+
+  it('should handle schema validation error with conditional logic', async () => {
+    const router = Router()
+
+    router
+      .match(
+        {
+          pathname: '/test',
+          query: {
+            id: Number,
+            type: String,
+          },
+        },
+        {
+          onSchemaError: (error, input, next) => {
+            // Return different responses based on error type
+            if (error.path?.includes('id')) {
+              return Response.status(400).json({
+                error: 'Invalid ID format',
+                suggestion: 'Please provide a valid number',
+              })
+            }
+
+            if (error.path?.includes('type')) {
+              return Response.status(400).json({
+                error: 'Invalid type parameter',
+                allowedTypes: ['user', 'admin', 'guest'],
+              })
+            }
+
+            // Continue with default handling for other errors
+            return next(input)
+          },
+        },
+      )
+      .use((request) => {
+        return Response.json(request)
+      })
+
+    // Test ID error
+    const result1 = await router.run({
+      pathname: '/test',
+      query: {
+        id: 'invalid-id',
+        type: 'user',
+      },
+    })
+
+    expect(result1.info.body).toEqual({
+      type: 'json',
+      value: {
+        error: 'Invalid ID format',
+        suggestion: 'Please provide a valid number',
+      },
+    })
+
+    // Test type error
+    const result2 = await router.run({
+      pathname: '/test',
+      query: {
+        id: '123',
+        type: 123,
+      },
+    })
+
+    expect(result2.info.body).toEqual({
+      type: 'json',
+      value: {
+        error: 'Invalid type parameter',
+        allowedTypes: ['user', 'admin', 'guest'],
+      },
+    })
+  })
+
+  it('should handle schema validation error with request context', async () => {
+    const router = Router()
+
+    router
+      .match(
+        {
+          pathname: '/api/:version/users/:id',
+          params: {
+            version: String,
+            id: Number,
+          },
+          headers: {
+            'x-api-key': String,
+          },
+        },
+        {
+          onSchemaError: (error, input, next) => {
+            // Provide more detailed error information based on request context
+            const context = {
+              pathname: input.pathname,
+              method: input.method,
+              headers: input.headers,
+              userAgent: input.headers?.['user-agent'],
+            }
+
+            return Response.status(422).json({
+              error: 'Validation failed',
+              context,
+              validationError: {
+                message: error.message,
+                path: error.path,
+              },
+            })
+          },
+        },
+      )
+      .use((request) => {
+        return Response.json(request)
+      })
+
+    const result = await router.run({
+      pathname: '/api/v1/users/invalid-id',
+      method: 'GET',
+      headers: {
+        'x-api-key': 'test-key',
+        'user-agent': 'test-agent',
+      },
+    })
+
+    expect(result.info.body).toEqual({
+      type: 'json',
+      value: {
+        error: 'Validation failed',
+        context: {
+          pathname: '/api/v1/users/invalid-id',
+          method: 'GET',
+          headers: {
+            'x-api-key': 'test-key',
+            'user-agent': 'test-agent',
+          },
+          userAgent: 'test-agent',
+        },
+        validationError: {
+          message: expect.any(String),
+          path: expect.any(Array),
+        },
+      },
+    })
+    expect(result.info.status).toEqual({
+      code: 422,
+      message: '',
+    })
+  })
+
+  it('should handle schema validation error with URL pattern', async () => {
+    const router = Router()
+
+    router
+      .match(
+        {
+          url: '/api/<version:string>/users/<id:int>?<page:int>',
+        },
+        {
+          onSchemaError: (error, input, next) => {
+            // Parse URL parameter errors
+            const urlInfo = {
+              pathname: input.pathname,
+              query: input.query,
+              errorType: error.path?.join('.'),
+            }
+
+            return Response.status(400).json({
+              error: 'URL parameter validation failed',
+              urlInfo,
+              suggestion: 'Check your URL parameters',
+            })
+          },
+        },
+      )
+      .use((request) => {
+        return Response.json(request)
+      })
+
+    // Test path parameter error
+    const result1 = await router.run({
+      pathname: '/api/v1/users/invalid-id',
+      query: {
+        page: '1',
+      },
+    })
+
+    expect(result1.info.body).toEqual({
+      type: 'json',
+      value: {
+        error: 'URL parameter validation failed',
+        urlInfo: {
+          pathname: '/api/v1/users/invalid-id',
+          query: {
+            page: '1',
+          },
+          errorType: expect.any(String),
+        },
+        suggestion: 'Check your URL parameters',
+      },
+    })
+
+    // Test query parameter error
+    const result2 = await router.run({
+      pathname: '/api/v1/users/123',
+      query: {
+        page: 'invalid-page',
+      },
+    })
+
+    expect(result2.info.body).toEqual({
+      type: 'json',
+      value: {
+        error: 'URL parameter validation failed',
+        urlInfo: {
+          pathname: '/api/v1/users/123',
+          query: {
+            page: 'invalid-page',
+          },
+          errorType: expect.any(String),
+        },
+        suggestion: 'Check your URL parameters',
+      },
+    })
+  })
+})
+
+describe('Router useLazy', () => {
+  it('should support lazy loading middleware with sync function', async () => {
+    const router = Router()
+    let middlewareLoaded = false
+
+    const matchedPipeline = router.match({
+      pathname: '/test',
+      query: {
+        id: Number,
+      },
+    })
+
+    matchedPipeline.useLazy(() => {
+      middlewareLoaded = true
+      return (request, next) => {
+        return Response.json({
+          message: 'Lazy loaded middleware',
+          id: request.query.id,
+          pathname: request.pathname,
+        })
+      }
+    })
+
+    // Middleware should not be loaded yet
+    expect(middlewareLoaded).toBe(false)
+
+    const result = await router.run({
+      pathname: '/test',
+      query: {
+        id: '123',
+      },
+    })
+
+    // Middleware should be loaded after first request
+    expect(middlewareLoaded).toBe(true)
+    expect(result.info.body).toEqual({
+      type: 'json',
+      value: {
+        message: 'Lazy loaded middleware',
+        id: 123,
+        pathname: '/test',
+      },
+    })
+  })
+
+  it('should support lazy loading middleware with async function', async () => {
+    const router = Router()
+    let middlewareLoaded = false
+    let loadCount = 0
+
+    const matchedPipeline = router.match({
+      pathname: '/test',
+      method: 'POST',
+      body: {
+        data: String,
+      },
+    })
+
+    matchedPipeline.useLazy(async () => {
+      // Simulate async loading
+      await new Promise((resolve) => setTimeout(resolve, 10))
+      middlewareLoaded = true
+      loadCount++
+
+      return (request, next) => {
+        return Response.json({
+          message: 'Async lazy loaded middleware',
+          data: request.body.data,
+          loadCount,
+        })
+      }
+    })
+
+    // Middleware should not be loaded yet
+    expect(middlewareLoaded).toBe(false)
+    expect(loadCount).toBe(0)
+
+    const result = await router.run({
+      pathname: '/test',
+      method: 'POST',
+      body: {
+        data: 'test-data',
+      },
+    })
+
+    // Middleware should be loaded after first request
+    expect(middlewareLoaded).toBe(true)
+    expect(loadCount).toBe(1)
+    expect(result.info.body).toEqual({
+      type: 'json',
+      value: {
+        message: 'Async lazy loaded middleware',
+        data: 'test-data',
+        loadCount: 1,
+      },
+    })
+
+    // Second request should reuse the loaded middleware
+    const result2 = await router.run({
+      pathname: '/test',
+      method: 'POST',
+      body: {
+        data: 'test-data-2',
+      },
+    })
+
+    expect(loadCount).toBe(1) // Should not load again
+    expect(result2.info.body).toEqual({
+      type: 'json',
+      value: {
+        message: 'Async lazy loaded middleware',
+        data: 'test-data-2',
+        loadCount: 1,
+      },
+    })
+  })
+
+  it('should support multiple lazy middleware in sequence', async () => {
+    const router = Router()
+    const executionOrder: string[] = []
+
+    const matchedPipeline = router.match({
+      pathname: '/test/:id',
+      params: {
+        id: Number,
+      },
+    })
+
+    matchedPipeline.useLazy(() => {
+      executionOrder.push('lazy1-loaded')
+      return (request, next) => {
+        executionOrder.push('lazy1-executed')
+        return next(request)
+      }
+    })
+
+    matchedPipeline.useLazy(async () => {
+      await new Promise((resolve) => setTimeout(resolve, 5))
+      executionOrder.push('lazy2-loaded')
+      return (request, next) => {
+        executionOrder.push('lazy2-executed')
+        return next(request)
+      }
+    })
+
+    matchedPipeline.use((request) => {
+      executionOrder.push('final-handler')
+      return Response.json({
+        message: 'Final handler',
+        id: request.params.id,
+        executionOrder,
+      })
+    })
+
+    const result = await router.run({
+      method: 'GET',
+      pathname: '/test/123',
+    })
+
+    expect(executionOrder).toEqual([
+      'lazy1-loaded',
+      'lazy1-executed',
+      'lazy2-loaded',
+      'lazy2-executed',
+      'final-handler',
+    ])
+
+    expect(result.info.body).toEqual({
+      type: 'json',
+      value: {
+        message: 'Final handler',
+        id: 123,
+        executionOrder: ['lazy1-loaded', 'lazy1-executed', 'lazy2-loaded', 'lazy2-executed', 'final-handler'],
+      },
+    })
+  })
+})

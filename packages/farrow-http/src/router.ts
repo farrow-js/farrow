@@ -283,11 +283,11 @@ export type RouterPipeline = AsyncPipeline<RequestInfo, Response> & {
   match<T extends RouterRequestSchema>(
     schema: T,
     options?: MatchOptions,
-  ): Pipeline<TypeOfRequestSchema<T>, MaybeAsyncResponse>
+  ): AsyncPipeline<TypeOfRequestSchema<T>, Response>
   match<U extends string, T extends RouterUrlSchema<U>>(
     schema: T,
     options?: MatchOptions,
-  ): Pipeline<TypeOfUrlSchema<T>, MaybeAsyncResponse>
+  ): AsyncPipeline<TypeOfUrlSchema<T>, Response>
 } & RoutingMethods
 
 export type RoutingMethod = <U extends string, T extends RouterSharedSchema>(
@@ -382,7 +382,7 @@ export const createRouterPipeline = (): RouterPipeline => {
     validator,
     matcher,
   }: {
-    matchedPipeline: Pipeline<T, MaybeAsyncResponse>
+    matchedPipeline: AsyncPipeline<T, Response>
     method: RouterSharedSchema['method']
     options?: MatchOptions
     validator: Validator<T>
@@ -447,7 +447,7 @@ export const createRouterPipeline = (): RouterPipeline => {
 
   const match: RouterPipeline['match'] = (schema: any, options: MatchOptions) => {
     if (isRouterRequestSchema(schema)) {
-      const matchedPipeline = createPipeline<any, MaybeAsyncResponse>()
+      const matchedPipeline = createAsyncPipeline<any, Response>()
       const { validator, matcher } = createRequestSchemaValidatorAndMatcher(schema)
       return createMatchedPipeline({
         matchedPipeline,
@@ -459,7 +459,7 @@ export const createRouterPipeline = (): RouterPipeline => {
     }
 
     if (isRouterUrlSchema(schema)) {
-      const matchedPipeline = createPipeline<any, MaybeAsyncResponse>()
+      const matchedPipeline = createAsyncPipeline<any, Response>()
       const { validator, matcher } = createUrlSchemaValidatorAndMatcher(schema)
       return createMatchedPipeline({
         matchedPipeline,

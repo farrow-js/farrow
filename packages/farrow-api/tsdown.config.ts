@@ -1,7 +1,7 @@
 import { defineConfig } from 'tsdown'
 
 export default defineConfig({
-  tsconfig: 'tsconfig.esm.json',
+  tsconfig: 'tsconfig.json',
   entry: {
     index: 'src/index.ts',
     api: 'src/api.ts',

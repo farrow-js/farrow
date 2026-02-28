@@ -29,7 +29,11 @@
     "version": "pnpm changeset version",
     "release": "pnpm run version && pnpm run publish",
     "prerelease": "pnpm run build:full",
-    "change": "pnpm changeset"
+    "change": "pnpm changeset",
+    "rush:update": "npx -y @microsoft/rush update",
+    "rush:install": "npx -y @microsoft/rush install",
+    "rush:build": "npx -y @microsoft/rush build",
+    "rush:test": "npx -y @microsoft/rush test"
   },
   "devDependencies": {
     "@changesets/cli": "2.26.1",

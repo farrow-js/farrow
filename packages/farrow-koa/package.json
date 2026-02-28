@@ -9,9 +9,11 @@
     "src"
   ],
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsdown --config tsdown.config.ts --target esnext --format cjs --outDir dist --dts false && tsdown --config tsdown.config.ts --target esnext --format esm --outDir dist/esm --dts false",
     "test": "jest",
-    "test:coverage": "jest --collectCoverage --coverage"
+    "test:coverage": "jest --collectCoverage --coverage",
+    "build:dist": "pnpm run build",
+    "build:esm": "pnpm run build"
   },
   "keywords": [
     "Web Framework",
@@ -25,16 +27,16 @@
     "url": "git+https://github.com/farrow-js/farrow.git"
   },
   "peerDependencies": {
-    "farrow-http": "^2.2.0",
+    "farrow-http": "workspace:^2.3.1",
     "koa": "^2.13.1"
   },
   "devDependencies": {
     "@types/jest": "^29.5.1",
     "@types/koa": "^2.13.3",
     "@types/supertest": "^2.0.11",
-    "farrow-http": "^2.3.0",
-    "farrow-pipeline": "^2.3.0",
-    "farrow-schema": "^2.3.0",
+    "farrow-http": "workspace:^2.3.1",
+    "farrow-pipeline": "workspace:^2.3.0",
+    "farrow-schema": "workspace:^2.3.3",
     "jest": "^29.5.0",
     "koa": "^2.13.1",
     "supertest": "^6.1.6",
@@ -43,5 +45,7 @@
   },
   "dependencies": {
     "tslib": "^2.5.0"
-  }
+  },
+  "module": "dist/esm/index.js",
+  "types": "dist/index.d.ts"
 }

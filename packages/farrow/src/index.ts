@@ -1,6 +1,6 @@
-import { Config } from './config'
+import type { Config } from './config'
 
-export { Config }
+export type { Config }
 
 export const defineConfig = (config: Config) => {
   return config

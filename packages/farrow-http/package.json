@@ -9,9 +9,11 @@
     "src"
   ],
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsdown --config tsdown.config.ts --target esnext --format cjs --outDir dist --dts false && tsdown --config tsdown.config.ts --target esnext --format esm --outDir dist/esm --dts false",
     "test": "jest",
-    "test:coverage": "jest --collectCoverage --coverage"
+    "test:coverage": "jest --collectCoverage --coverage",
+    "build:dist": "pnpm run build",
+    "build:esm": "pnpm run build"
   },
   "keywords": [
     "Web Framework",
@@ -58,8 +60,8 @@
     "destroy": "^1.0.4",
     "encodeurl": "^1.0.2",
     "escape-html": "^1.0.3",
-    "farrow-pipeline": "^2.3.0",
-    "farrow-schema": "^2.3.0",
+    "farrow-pipeline": "workspace:^2.3.0",
+    "farrow-schema": "workspace:^2.3.3",
     "mime-types": "^2.1.27",
     "on-finished": "^2.3.0",
     "path-to-regexp": "^6.1.0",
@@ -68,5 +70,7 @@
     "tslib": "^2.5.0",
     "type-is": "^1.6.18",
     "vary": "^1.1.2"
-  }
+  },
+  "module": "dist/esm/index.js",
+  "types": "dist/index.d.ts"
 }

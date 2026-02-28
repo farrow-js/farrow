@@ -5,9 +5,9 @@
   "main": "dist/index.js",
   "homepage": "https://www.farrowjs.com/",
   "scripts": {
-    "build": "pnpm run build:dist && pnpm run build:esm",
-    "build:dist": "tsc -b ./tsconfig.json",
-    "build:esm": "tsc -b ./tsconfig.esm.json",
+    "build": "tsdown --config tsdown.config.ts --target esnext --format cjs --outDir dist --dts false && tsdown --config tsdown.config.ts --target esnext --format esm --outDir dist/esm --dts false",
+    "build:dist": "pnpm run build",
+    "build:esm": "pnpm run build",
     "test": "jest",
     "test:coverage": "jest --collectCoverage --coverage"
   },
@@ -29,13 +29,15 @@
   "devDependencies": {
     "@types/jest": "^29.5.1",
     "@types/json-schema": "^7.0.7",
-    "farrow-api": "^2.3.0",
+    "farrow-api": "workspace:^2.3.1",
     "jest": "^29.5.0",
     "ts-jest": "^29.1.0",
     "typescript": "^5.0.4"
   },
   "dependencies": {
-    "farrow-schema": "^2.3.0",
+    "farrow-schema": "workspace:^2.3.3",
     "tslib": "^2.5.0"
-  }
+  },
+  "module": "dist/esm/index.js",
+  "types": "dist/index.d.ts"
 }

@@ -8,7 +8,9 @@
     "create-farrow-app": "./bin/scripts.js"
   },
   "scripts": {
-    "build": "tsc -b"
+    "build": "tsdown --config tsdown.config.ts --target esnext --format cjs --outDir dist --dts false && tsdown --config tsdown.config.ts --target esnext --format esm --outDir dist/esm --dts false",
+    "build:dist": "pnpm run build",
+    "build:esm": "pnpm run build"
   },
   "keywords": [
     "Web Framework",
@@ -31,5 +33,7 @@
   "devDependencies": {
     "@types/minimist": "^1.2.2",
     "typescript": "^5.0.4"
-  }
+  },
+  "module": "dist/esm/index.js",
+  "types": "dist/index.d.ts"
 }

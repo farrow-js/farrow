@@ -3,7 +3,16 @@ const path = require('path')
 module.exports = {
   cacheDirectory: path.join(__dirname, 'node_modules/.jest-cache'),
   transform: {
-    '^.+\\.tsx?$': 'ts-jest',
+    '^.+\\.tsx?$': [
+      'ts-jest',
+      {
+        diagnostics: false,
+        tsconfig: {
+          target: 'ES2018',
+          module: 'CommonJS',
+        },
+      },
+    ],
   },
   testRegex: '(/__tests__/*.|\\.(test|spec))\\.(ts|tsx|js|jsx)$',
   moduleFileExtensions: ['ts', 'tsx', 'js', 'jsx'],

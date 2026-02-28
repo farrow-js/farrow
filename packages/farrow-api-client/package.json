@@ -5,14 +5,15 @@
   "main": "dist/index.js",
   "homepage": "https://www.farrowjs.com/",
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsdown --config tsdown.config.ts --target esnext --format cjs --outDir dist --dts false && tsdown --config tsdown.config.ts --target esnext --format esm --outDir dist/esm --dts false",
     "test": "jest",
-    "test:coverage": "jest --collectCoverage --coverage"
+    "test:coverage": "jest --collectCoverage --coverage",
+    "build:dist": "pnpm run build",
+    "build:esm": "pnpm run build"
   },
   "files": [
     "src",
-    "dist",
-    "esm"
+    "dist"
   ],
   "keywords": [
     "Web Framework",
@@ -40,5 +41,7 @@
   "dependencies": {
     "isomorphic-unfetch": "^3.1.0",
     "tslib": "^2.5.0"
-  }
+  },
+  "module": "dist/esm/index.js",
+  "types": "dist/index.d.ts"
 }

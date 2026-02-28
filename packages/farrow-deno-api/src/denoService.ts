@@ -1,7 +1,7 @@
 import { Response, route, Router, RouterPipeline } from 'farrow-http'
 import { ApiEntries } from 'farrow-api'
 import { codegen, CodegenOptions } from 'farrow-api/dist/codegen'
-import { toJSON } from 'farrow-api/src/toJSON'
+import { toJSON } from 'farrow-api/dist/toJSON'
 import { ApiService } from 'farrow-api-server'
 
 export type CreateDenoServiceOptions = {

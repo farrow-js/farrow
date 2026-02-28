@@ -8,11 +8,13 @@
     "farrow": "./bin/scripts.js"
   },
   "scripts": {
-    "build": "tsc -b",
+    "build": "tsdown --config tsdown.config.ts --target esnext --format cjs --outDir dist --dts false && tsdown --config tsdown.config.ts --target esnext --format esm --outDir dist/esm --dts false",
     "test": "jest",
     "test:coverage": "jest --collectCoverage --coverage",
     "prepare": "pnpm run format:bin",
-    "format:bin": "npx crlf --set=LF ./bin/scripts.js"
+    "format:bin": "npx crlf --set=LF ./bin/scripts.js",
+    "build:dist": "pnpm run build",
+    "build:esm": "pnpm run build"
   },
   "files": [
     "dist",
@@ -36,7 +38,7 @@
     "@types/node-fetch": "^2.5.8",
     "@types/shelljs": "^0.8.9",
     "@types/supertest": "^2.0.10",
-    "farrow-http": "^2.3.0",
+    "farrow-http": "workspace:^2.3.1",
     "jest": "^29.5.0",
     "shelljs": "^0.8.4",
     "supertest": "^6.0.1",
@@ -51,12 +53,14 @@
     "esbuild": "^0.14.5",
     "esbuild-node-externals": "^1.4.1",
     "execa": "^5.0.0",
-    "farrow-api": "^2.3.0",
+    "farrow-api": "workspace:^2.3.1",
     "fs-extra": "^9.1.0",
     "leven": "3",
     "node-fetch": "^2.6.1",
     "read-pkg-up": "^7.0.1",
     "replace-in-file": "^6.2.0",
     "tslib": "^2.5.0"
-  }
+  },
+  "module": "dist/esm/index.js",
+  "types": "dist/index.d.ts"
 }

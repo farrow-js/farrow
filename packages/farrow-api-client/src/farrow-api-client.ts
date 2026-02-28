@@ -6,7 +6,7 @@ import type {
   ApiSingleResponse,
   ApiBatchResponse,
   ApiStreamSingleResponse,
-} from 'farrow-api-server/src/apiCalling'
+} from 'farrow-api-server'
 
 import { BatchScheduler, createBatchProcessor } from './BatchProcessor'
 import { createStreamingJsonParser } from './StreamingJsonParser'

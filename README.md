@@ -42,6 +42,17 @@ Please follow the documentation at [farrowjs.com](https://www.farrowjs.com/docs/
 - TypeScript >= 4.3
 - Node.js >= 14.x
 
+## Monorepo workflow (Rush)
+
+This repository now includes a minimal [Rush](https://rushjs.io/) setup for monorepo orchestration while keeping existing package scripts (`build`, `test`, etc.) unchanged.
+
+Common commands:
+
+- `pnpm run rush:update` — generate/update Rush lockfiles and install dependencies
+- `pnpm run rush:install` — install from existing Rush lockfile only
+- `pnpm run rush:build` — run each package `build` script in dependency order
+- `pnpm run rush:test` — run each package `test` script in dependency order
+
 ## Issues
 
 Contributions, issues and feature requests are welcome! Feel free to check [issues page](https://github.com/Lucifier129/farrow/issues).

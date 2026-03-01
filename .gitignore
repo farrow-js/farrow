@@ -157,3 +157,6 @@ lib
 .idea
 
 .clinic
+
+# Rush
+common/temp/

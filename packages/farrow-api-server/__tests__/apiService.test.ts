@@ -5,8 +5,6 @@ import { Api } from 'farrow-api'
 import fetch from 'node-fetch'
 import { ApiService } from '../src/apiService'
 
-let portUid = 4000
-
 const delay = (ms: number) => {
   return new Promise((resolve) => {
     setTimeout(resolve, ms)
@@ -418,14 +416,19 @@ describe('ApiService', () => {
   it('supports streaming batch calling api', async () => {
     const http = createHttp()
     const server = http.server()
-    const port = portUid++
-    const url = `http://localhost:${port}/counter`
-
     http.route('/counter').use(CounterService)
 
     await new Promise<void>((resolve) => {
-      server.listen(port, resolve)
+      server.listen(0, '127.0.0.1', resolve)
     })
+
+    const address = server.address()
+
+    if (!address || typeof address === 'string') {
+      throw new Error('server address is invalid')
+    }
+
+    const url = `http://127.0.0.1:${address.port}/counter`
 
     const response = await fetch(url, {
       method: 'POST',
@@ -501,8 +504,6 @@ describe('ApiService', () => {
   it('supports disable streaming batch calling api', async () => {
     const http = createHttp()
     const server = http.server()
-    const port = portUid++
-    const url = `http://localhost:${port}/counter`
 
     const CounterService = ApiService({
       entries,
@@ -513,8 +514,16 @@ describe('ApiService', () => {
     http.route('/counter').use(CounterService)
 
     await new Promise<void>((resolve) => {
-      server.listen(port, resolve)
+      server.listen(0, '127.0.0.1', resolve)
     })
+
+    const address = server.address()
+
+    if (!address || typeof address === 'string') {
+      throw new Error('server address is invalid')
+    }
+
+    const url = `http://127.0.0.1:${address.port}/counter`
 
     const response = await fetch(url, {
       method: 'POST',
@@ -590,8 +599,6 @@ describe('ApiService', () => {
   it('supports subscribe onSuccess/onError event for every single calling', async () => {
     const http = createHttp()
     const server = http.server()
-    const port = portUid++
-    const url = `http://localhost:${port}/counter`
 
     const onSuccess = jest.fn()
     const onError = jest.fn()
@@ -607,8 +614,16 @@ describe('ApiService', () => {
     http.route('/counter').use(CounterService)
 
     await new Promise<void>((resolve) => {
-      server.listen(port, resolve)
+      server.listen(0, '127.0.0.1', resolve)
     })
+
+    const address = server.address()
+
+    if (!address || typeof address === 'string') {
+      throw new Error('server address is invalid')
+    }
+
+    const url = `http://127.0.0.1:${address.port}/counter`
 
     // success
     await fetch(url, {

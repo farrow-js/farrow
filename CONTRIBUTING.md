@@ -45,10 +45,16 @@ cd ./packages/*
 pnpm run build
 ```
 
-build all packages, with:
+build all packages (incremental, faster for local dev), with:
 
 ```zsh
 pnpm run build
+```
+
+run a full clean build (recommended for release verification), with:
+
+```zsh
+pnpm run build:full
 ```
 
 If you need to clean all `node_modules/*` the project for any reason, with
@@ -110,10 +116,10 @@ Repository maintainers can publish a new version of all packages to npm.
    pnpm install
    ```
 
-3. Build
+3. Build (clean build for release safety)
 
    ```zsh
-   pnpm run build
+   pnpm run build:full
    ```
 
 4. Add changeset

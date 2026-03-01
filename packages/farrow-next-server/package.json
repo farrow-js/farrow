@@ -9,7 +9,9 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsc -b"
+    "build": "tsdown --config tsdown.config.ts --target esnext --format cjs --outDir dist --dts false && tsdown --config tsdown.config.ts --target esnext --format esm --outDir dist/esm --dts false",
+    "build:dist": "pnpm run build",
+    "build:esm": "pnpm run build"
   },
   "keywords": [
     "Next.js",
@@ -24,7 +26,7 @@
     "url": "git+https://github.com/farrow-js/farrow.git"
   },
   "peerDependencies": {
-    "farrow-http": "^2.2.0",
+    "farrow-http": "workspace:^2.3.1",
     "next": ">=10.0.5",
     "react": "^18.3.0",
     "react-dom": "^18.3.0"
@@ -33,7 +35,7 @@
     "@babel/core": "^7.16.5",
     "@types/react": "^18.3.0",
     "@types/react-dom": "^18.3.0",
-    "farrow-http": "^2.3.0",
+    "farrow-http": "workspace:^2.3.1",
     "next": "^12.0.4",
     "react": "^18.3.0",
     "react-dom": "^18.3.0",
@@ -41,5 +43,7 @@
   },
   "dependencies": {
     "tslib": "^2.5.0"
-  }
+  },
+  "module": "dist/esm/index.js",
+  "types": "dist/index.d.ts"
 }

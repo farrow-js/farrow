@@ -55,7 +55,7 @@ export const createLogger = (options?: LoggerOptions) => {
     event: LoggerEvent,
   ) => {
     const colorCode = (status / 100) | 0
-    const length = [204, 205, 304].includes(status) ? '' : contentLength ? bytes(contentLength) : '-'
+    const length = [204, 205, 304].includes(status) ? '' : contentLength ? bytes(contentLength) ?? '-' : '-'
     const upstream = event === 'error' ? chalk.red('xxx') : event === 'close' ? chalk.yellow('-x-') : chalk.gray('-->')
 
     print(

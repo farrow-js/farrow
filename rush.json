@@ -1,0 +1,84 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/rush/v5/rush.schema.json",
+  "rushVersion": "5.169.3",
+  "pnpmVersion": "9.0.0",
+  "nodeSupportedVersionRange": ">=18.0.0",
+  "projects": [
+    {
+      "packageName": "create-farrow-app",
+      "projectFolder": "packages/create-farrow-app"
+    },
+    {
+      "packageName": "farrow",
+      "projectFolder": "packages/farrow"
+    },
+    {
+      "packageName": "farrow-api",
+      "projectFolder": "packages/farrow-api"
+    },
+    {
+      "packageName": "farrow-api-client",
+      "projectFolder": "packages/farrow-api-client"
+    },
+    {
+      "packageName": "farrow-api-server",
+      "projectFolder": "packages/farrow-api-server"
+    },
+    {
+      "packageName": "farrow-cors",
+      "projectFolder": "packages/farrow-cors"
+    },
+    {
+      "packageName": "farrow-deno-api",
+      "projectFolder": "packages/farrow-deno-api"
+    },
+    {
+      "packageName": "farrow-express",
+      "projectFolder": "packages/farrow-express"
+    },
+    {
+      "packageName": "farrow-federation",
+      "projectFolder": "packages/farrow-federation"
+    },
+    {
+      "packageName": "farrow-http",
+      "projectFolder": "packages/farrow-http"
+    },
+    {
+      "packageName": "farrow-json-schema",
+      "projectFolder": "packages/farrow-json-schema"
+    },
+    {
+      "packageName": "farrow-koa",
+      "projectFolder": "packages/farrow-koa"
+    },
+    {
+      "packageName": "farrow-module",
+      "projectFolder": "packages/farrow-module"
+    },
+    {
+      "packageName": "farrow-next",
+      "projectFolder": "packages/farrow-next"
+    },
+    {
+      "packageName": "farrow-next-server",
+      "projectFolder": "packages/farrow-next-server"
+    },
+    {
+      "packageName": "farrow-pipeline",
+      "projectFolder": "packages/farrow-pipeline"
+    },
+    {
+      "packageName": "farrow-react",
+      "projectFolder": "packages/farrow-react"
+    },
+    {
+      "packageName": "farrow-schema",
+      "projectFolder": "packages/farrow-schema"
+    },
+    {
+      "packageName": "farrow-vite",
+      "projectFolder": "packages/farrow-vite"
+    }
+  ]
+}

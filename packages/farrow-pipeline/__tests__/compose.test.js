@@ -1,6 +1,6 @@
 // based on https://github.com/koajs/compose/blob/master/test/test.js
-const { compose } = require('../src/compose')
-const assert = require('assert')
+import { compose } from '../src/compose'
+import assert from 'assert'
 
 function wait(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms || 1))

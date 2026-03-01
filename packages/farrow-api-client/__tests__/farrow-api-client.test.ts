@@ -110,7 +110,7 @@ describe('farrow-api-client', () => {
   let baseUrl: string
   let loader: Loader
 
-  beforeEach((done) => {
+  beforeEach(async () => {
     const port = portUid++
     http = createHttp()
     server = http.server()
@@ -124,11 +124,21 @@ describe('farrow-api-client', () => {
      */
     count = 0
 
-    server.listen(port, done)
+    await new Promise<void>((resolve, reject) => {
+      server.listen(port, (error?: Error) => {
+        if (error) reject(error)
+        else resolve()
+      })
+    })
   })
 
-  afterEach((done) => {
-    server.close(done)
+  afterEach(async () => {
+    await new Promise<void>((resolve, reject) => {
+      server.close((error?: Error) => {
+        if (error) reject(error)
+        else resolve()
+      })
+    })
   })
 
   it('supports calling api', async () => {

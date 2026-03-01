@@ -566,8 +566,8 @@ describe('Http', () => {
         .expect(200, await read('README.md'))
 
       await request(server)
-        .get('/static/dist/index.js')
-        .expect(200, await read('dist/index.js'))
+        .get('/static/__tests__/fixtures/static/foo.js')
+        .expect(200, await read('__tests__/fixtures/static/foo.js'))
 
       await request(server).get('/static/abc').expect(404)
     })

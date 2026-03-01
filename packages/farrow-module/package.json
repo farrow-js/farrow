@@ -12,8 +12,8 @@
     "build": "tsdown --config tsdown.config.ts --target esnext --format cjs --outDir dist --dts false && tsdown --config tsdown.config.ts --target esnext --format esm --outDir dist/esm --dts false",
     "build:dist": "pnpm run build",
     "build:esm": "pnpm run build",
-    "test": "jest",
-    "test:coverage": "jest --collectCoverage --coverage"
+    "test": "vitest run --config vitest.config.js",
+    "test:coverage": "vitest run --config vitest.config.js --coverage"
   },
   "keywords": [
     "Web Framework",
@@ -30,9 +30,6 @@
     "tslib": "^2.5.0"
   },
   "devDependencies": {
-    "@types/jest": "^29.5.1",
-    "jest": "^29.5.0",
-    "ts-jest": "^29.1.0",
     "typescript": "^5.0.4"
   },
   "module": "dist/esm/index.js",

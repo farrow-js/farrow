@@ -8,6 +8,8 @@ import request from 'supertest'
 jest.setTimeout(50000)
 jest.useFakeTimers()
 
+const packagePath = path.join(__dirname, '..')
+const repoRootPath = path.join(packagePath, '../..')
 const projectPath = path.join(__dirname, '../fixtures/project0')
 
 const srcPath = path.join(projectPath, 'src')
@@ -39,6 +41,26 @@ describe('Farrow', () => {
   })
 
   it('should build and run a server', async () => {
+    shell.cd(repoRootPath)
+
+    const requiredBuildTargets = [
+      { entry: 'packages/farrow/dist/bin/index.js', filter: 'farrow' },
+      { entry: 'packages/farrow-http/dist/index.js', filter: 'farrow-http' },
+      { entry: 'packages/farrow-api/dist/index.js', filter: 'farrow-api' },
+      { entry: 'packages/farrow-api-server/dist/index.js', filter: 'farrow-api-server' },
+      { entry: 'packages/farrow-schema/dist/index.js', filter: 'farrow-schema' },
+      { entry: 'packages/farrow-pipeline/dist/index.js', filter: 'farrow-pipeline' },
+      { entry: 'packages/farrow-module/dist/index.js', filter: 'farrow-module' },
+    ]
+
+    for (const target of requiredBuildTargets) {
+      if (!shell.test('-f', path.join(repoRootPath, target.entry))) {
+        const buildResult = await exec(`pnpm --filter ${target.filter} run build`)
+        expect(buildResult.code).toBe(0)
+      }
+    }
+
+    shell.cd(projectPath)
     shell.rm('-rf', distPath)
 
     expect(shell.test('-d', distPath)).toBe(false)

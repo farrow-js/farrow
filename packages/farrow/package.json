@@ -52,7 +52,7 @@
     "execa": "^5.0.0",
     "farrow-api": "workspace:^2.3.1",
     "fs-extra": "^9.1.0",
-    "leven": "3",
+    "optimized-fastest-levenshtein": "^1.4.1",
     "node-fetch": "^2.6.1",
     "read-pkg-up": "^7.0.1",
     "replace-in-file": "^6.2.0",

@@ -47,7 +47,7 @@
     "chokidar": "^3.4.1",
     "commander": "^8.3.0",
     "cosmiconfig": "^7.0.0",
-    "esbuild": "^0.14.5",
+    "esbuild": "^0.28.1",
     "esbuild-node-externals": "^1.4.1",
     "execa": "^5.0.0",
     "farrow-api": "workspace:^2.3.1",
